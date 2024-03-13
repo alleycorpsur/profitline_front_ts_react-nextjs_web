@@ -4,6 +4,8 @@ import { DotsThree, Eye, Plus } from "phosphor-react";
 import { FilterClients } from "@/components/atoms/FilterClients/FilterClients";
 
 import "./clientsprojecttable.scss";
+import { useClients } from "@/hooks/useClients";
+import { useAppStore } from "@/lib/store/store";
 
 const { Text, Link } = Typography;
 
@@ -37,8 +39,8 @@ export const ClientsProjectTable = ({ setIsCreateClient, setIsViewDetailsClients
     },
     {
       title: "NIT",
-      dataIndex: "NIT",
-      key: "NIT",
+      dataIndex: "nit",
+      key: "nit",
       render: (text) => <Text>{text}</Text>
     },
     {
@@ -122,6 +124,12 @@ export const ClientsProjectTable = ({ setIsCreateClient, setIsViewDetailsClients
       )
     }
   ];
+  const { ID } = useAppStore((state) => state.selectProject);
+  const { data } = useClients({
+    idProject: ID
+  });
+  console.log(data);
+
   return (
     <>
       <main className="mainClientsProjectTable">
@@ -146,57 +154,3 @@ export const ClientsProjectTable = ({ setIsCreateClient, setIsViewDetailsClients
     </>
   );
 };
-const data = [
-  {
-    key: "1",
-    active: "",
-    client_name: "Coopidrogas",
-    NIT: "347623472-5643",
-    TypeClient: "Persona natural",
-    users: "36",
-    bills: "36",
-    budget: "180.000.00",
-    risk: "Alto",
-    holding: "Grupo SURA",
-    status: true
-  },
-  {
-    key: "2",
-    active: "",
-    client_name: "Coopidrogas2",
-    NIT: "347623472-5643",
-    TypeClient: "Persona natural",
-    users: "36",
-    bills: "36",
-    budget: "180.000.00",
-    risk: "Alto",
-    holding: "Grupo SURA",
-    status: false
-  },
-  {
-    key: "3",
-    active: "",
-    client_name: "Coopidrogas",
-    NIT: "347623472-5643",
-    TypeClient: "Persona natural",
-    users: "36",
-    bills: "36",
-    budget: "180.000.00",
-    risk: "Alto",
-    holding: "Grupo SURA",
-    status: true
-  },
-  {
-    key: "4",
-    active: "",
-    client_name: "Coopidrogas2",
-    NIT: "347623472-5643",
-    TypeClient: "Persona natural",
-    users: "36",
-    bills: "36",
-    budget: "180.000.00",
-    risk: "Alto",
-    holding: "Grupo SURA",
-    status: false
-  }
-];
