@@ -6,9 +6,16 @@ import "./modalstatusclient.scss";
 const { Text } = Typography;
 interface Props {
   isOpen: boolean;
+  typeToRemove?: string;
+  isLegalCollection?: boolean;
   setIsStatusClient: Dispatch<SetStateAction<{ status: boolean; remove: boolean }>>;
 }
-export const ModalStatusClient = ({ isOpen, setIsStatusClient }: Props) => {
+export const ModalStatusClient = ({
+  isOpen,
+  isLegalCollection = true,
+  typeToRemove = "Usuario",
+  setIsStatusClient
+}: Props) => {
   return (
     <Modal
       open={isOpen}
@@ -37,16 +44,18 @@ export const ModalStatusClient = ({ isOpen, setIsStatusClient }: Props) => {
             <Flex className="radioStatus">
               <Radio value={2}>Inactivo</Radio>
             </Flex>
-            <Flex className="radioStatus">
-              <Radio value={3}>Cobro Juridico</Radio>
-            </Flex>
+            {isLegalCollection && (
+              <Flex className="radioStatus">
+                <Radio value={3}>Cobro Juridico</Radio>
+              </Flex>
+            )}
           </Space>
         </Radio.Group>
         <Text
           className="deleteText"
           onClick={() => setIsStatusClient({ status: true, remove: true })}
         >
-          Eliminar Usuario
+          Eliminar {typeToRemove}
         </Text>
       </Flex>
     </Modal>

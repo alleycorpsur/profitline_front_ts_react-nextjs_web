@@ -1,0 +1,66 @@
+@import '../../../../styles/variables.scss';
+
+.mainUsersProjectTable {
+    width: 100%;
+    overflow-y: scroll;
+    height: 100%;
+
+    .mainUsersProjectTable_header {
+        margin: 2rem 0;
+        margin-top: 1rem;
+        padding-right: 1rem;
+    }
+
+    .statusContainer {
+        padding: .25rem .5rem;
+        border-radius: 1rem;
+        width: auto;
+        border: 1px solid $active;
+    }
+
+    .statusContainerPending {
+        padding: .25rem .5rem;
+        border-radius: 1rem;
+        width: auto;
+        border: 1px solid $pending;
+        cursor: pointer;
+    }
+
+    .statusPending {
+        width: .75rem;
+        height: .75rem;
+        border-radius: 1rem;
+        margin-right: .5rem;
+        background-color: $pending ;
+    }
+
+    .statusActive {
+        width: .75rem;
+        height: .75rem;
+        border-radius: 1rem;
+        margin-right: .5rem;
+        background-color: $active ;
+    }
+
+    .inputSearch {
+        &::placeholder {
+            color: black !important;
+        }
+
+    }
+
+    .buttonNewProject {
+        background-color: $secondary;
+        color: black;
+        font-weight: 600;
+        box-shadow: none;
+        display: flex;
+        align-items: center;
+
+        &:hover {
+            background-color: $secondary !important;
+            opacity: 0.8;
+            color: black;
+        }
+    }
+}
