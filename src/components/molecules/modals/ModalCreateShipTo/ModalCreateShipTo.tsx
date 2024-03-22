@@ -27,12 +27,10 @@ export const ModalCreateShipTo = ({ isOpen, setIsCreateShipTo }: Props) => {
   const [isOpenAddress, setIsOpenAddress] = useState(false);
   const {
     control,
-    // handleSubmit,
     formState: { errors }
   } = useForm<ShipToType>({
     defaultValues: {},
     disabled: isEditAvailable
-    // values: isViewDetailsUser?.active ? dataToDataForm(dataUser.data) : ({} as ShipToType)
   });
   return (
     <>
