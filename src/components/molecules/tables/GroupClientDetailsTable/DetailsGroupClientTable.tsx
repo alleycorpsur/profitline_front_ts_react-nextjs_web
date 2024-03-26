@@ -8,6 +8,8 @@ import { ModalStatusClient } from "../../modals/ModalStatusClient/ModalStatusCli
 import { ModalRemove } from "../../modals/ModalRemove/ModalRemove";
 
 import "./detailsgroupclienttable.scss";
+import useSWR from "swr";
+import { fetcher } from "@/utils/api/api";
 
 const { Text } = Typography;
 const { Search } = Input;
@@ -16,9 +18,10 @@ const initValuesDetails = { active: false, id: 0 };
 
 interface Props {
   onCloseDetails: () => void;
+  idGroup: string;
 }
 
-export const DetailsGroupClientTable = ({ onCloseDetails }: Props) => {
+export const DetailsGroupClientTable = ({ onCloseDetails, idGroup }: Props) => {
   const [isDetailsClients, setIsDetailsClients] = useState(initValuesDetails);
   const [isModalStatus, setIsModalStatus] = useState({ status: false, remove: false });
 
@@ -65,18 +68,20 @@ export const DetailsGroupClientTable = ({ onCloseDetails }: Props) => {
       dataIndex: "holding",
       render: (text) => <Text>{text}</Text>
     },
-
     {
       title: "Estado",
       key: "status",
       width: "150px",
       dataIndex: "status",
-      render: (_, { ACTIVE }) => (
+      render: (_, { is_deleted }) => (
         <>
-          {ACTIVE ? (
-            <Flex align="center" className={ACTIVE ? "statusContainer" : "statusContainerPending"}>
-              <div className={ACTIVE ? "statusActive" : "statusPending"} />
-              <Text>{ACTIVE ? "Activo" : "Inactivo"}</Text>
+          {!is_deleted ? (
+            <Flex
+              align="center"
+              className={!is_deleted ? "statusContainer" : "statusContainerPending"}
+            >
+              <div className={!is_deleted ? "statusActive" : "statusPending"} />
+              <Text>{!is_deleted ? "Activo" : "Inactivo"}</Text>
             </Flex>
           ) : (
             <Popconfirm
@@ -88,10 +93,10 @@ export const DetailsGroupClientTable = ({ onCloseDetails }: Props) => {
             >
               <Flex
                 align="center"
-                className={ACTIVE ? "statusContainer" : "statusContainerPending"}
+                className={!is_deleted ? "statusContainer" : "statusContainerPending"}
               >
-                <div className={ACTIVE ? "statusActive" : "statusPending"} />
-                <Text>{ACTIVE ? "Activo" : "Inactivo"}</Text>
+                <div className={!is_deleted ? "statusActive" : "statusPending"} />
+                <Text>{!is_deleted ? "Activo" : "Inactivo"}</Text>
               </Flex>
             </Popconfirm>
           )}
@@ -99,6 +104,9 @@ export const DetailsGroupClientTable = ({ onCloseDetails }: Props) => {
       )
     }
   ];
+
+  const pathKey = `/group-client/${idGroup}`;
+  const { data } = useSWR<any>(pathKey, fetcher, {});
 
   return (
     <>
@@ -142,11 +150,7 @@ export const DetailsGroupClientTable = ({ onCloseDetails }: Props) => {
         </Flex>
         <Table pagination={false} columns={columns} dataSource={data} />
       </main>
-      <ModalSelectClients
-        isOpen={isDetailsClients.active}
-        nameGroupClient="Pareto"
-        onClose={() => setIsDetailsClients(initValuesDetails)}
-      />
+      <ModalSelectClients isOpen={isDetailsClients.active} nameGroupClient="Pareto" />
       <ModalStatusClient
         isLegalCollection={false}
         typeToRemove="Grupo"
@@ -162,27 +166,3 @@ export const DetailsGroupClientTable = ({ onCloseDetails }: Props) => {
     </>
   );
 };
-const data = [
-  {
-    ID: 12,
-    ACTIVE: true,
-    NIT: "123123-2",
-    wallet: 1233,
-    client_name: "Clientes Pareto",
-    users: 55,
-    ship_to: 66,
-    groups: 88,
-    holding: 36
-  },
-  {
-    ID: 2,
-    ACTIVE: true,
-    NIT: "123123-2",
-    wallet: 1233,
-    client_name: "Clientes Pareto",
-    users: 55,
-    ship_to: 66,
-    groups: 88,
-    holding: 36
-  }
-];

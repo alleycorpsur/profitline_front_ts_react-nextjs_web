@@ -1,13 +1,14 @@
 import { useState } from "react";
-import { Button, Checkbox, Flex, Popconfirm, Table, Typography } from "antd";
+import { Button, Checkbox, Flex, Table, Typography } from "antd";
 import type { TableProps } from "antd";
 import { DotsThree, Eye, Plus } from "phosphor-react";
 
 import { ModalNewGroupClient } from "../../modals/ModalNewGroupClient/ModalNewGroupClient";
-
-import "./groupclientsprojecttable.scss";
 import { FilterClients } from "@/components/atoms/FilterClients/FilterClients";
 import { DetailsGroupClientTable } from "../GroupClientDetailsTable/DetailsGroupClientTable";
+import { useGroupClients } from "@/hooks/useGroupClients";
+
+import "./groupclientsprojecttable.scss";
 
 const { Text } = Typography;
 
@@ -27,60 +28,61 @@ export const GroupProjectClientsTable = () => {
     },
     {
       title: "Nombre grupo",
-      dataIndex: "client_name",
-      key: "client_name",
+      dataIndex: "group_name",
+      key: "group_name",
       render: (text) => <Text>{text}</Text>
     },
     {
       title: "Clientes",
       dataIndex: "clients",
       key: "clients",
-      render: (text) => <Text>{text}</Text>
+      render: (text, { clients }) => <Text>{clients.length}</Text>
     },
-    {
-      title: "Suscritos",
-      key: "clients_subscribed",
-      dataIndex: "clients_subscribed",
-      render: (text) => <Text>{text}</Text>
-    },
-    {
-      title: "Ship To",
-      key: "shipto",
-      dataIndex: "shipto",
-      render: (text) => <Text>{text}</Text>
-    },
-    {
-      title: "Estado",
-      key: "status",
-      width: "150px",
-      dataIndex: "status",
-      render: (_, { ACTIVE }) => (
-        <>
-          {ACTIVE ? (
-            <Flex align="center" className={ACTIVE ? "statusContainer" : "statusContainerPending"}>
-              <div className={ACTIVE ? "statusActive" : "statusPending"} />
-              <Text>{ACTIVE ? "Activo" : "Inactivo"}</Text>
-            </Flex>
-          ) : (
-            <Popconfirm
-              placement="topRight"
-              title={"Invitación pendiente de aprobación"}
-              description={"Volver a Enviar invitacion?"}
-              okText="Si"
-              cancelText="No"
-            >
-              <Flex
-                align="center"
-                className={ACTIVE ? "statusContainer" : "statusContainerPending"}
-              >
-                <div className={ACTIVE ? "statusActive" : "statusPending"} />
-                <Text>{ACTIVE ? "Activo" : "Inactivo"}</Text>
-              </Flex>
-            </Popconfirm>
-          )}
-        </>
-      )
-    },
+    // These information is not available right now
+    // {
+    //   title: "Suscritos",
+    //   key: "clients_subscribed",
+    //   dataIndex: "clients_subscribed",
+    //   render: (text) => <Text>{text}</Text>
+    // },
+    // {
+    //   title: "Ship To",
+    //   key: "shipto",
+    //   dataIndex: "shipto",
+    //   render: (text) => <Text>{text}</Text>
+    // },
+    // {
+    //   title: "Estado",
+    //   key: "status",
+    //   width: "150px",
+    //   dataIndex: "status",
+    //   render: (_, { ACTIVE }) => (
+    //     <>
+    //       {ACTIVE ? (
+    //         <Flex align="center" className={ACTIVE ? "statusContainer" : "statusContainerPending"}>
+    //           <div className={ACTIVE ? "statusActive" : "statusPending"} />
+    //           <Text>{ACTIVE ? "Activo" : "Inactivo"}</Text>
+    //         </Flex>
+    //       ) : (
+    //         <Popconfirm
+    //           placement="topRight"
+    //           title={"Invitación pendiente de aprobación"}
+    //           description={"Volver a Enviar invitacion?"}
+    //           okText="Si"
+    //           cancelText="No"
+    //         >
+    //           <Flex
+    //             align="center"
+    //             className={ACTIVE ? "statusContainer" : "statusContainerPending"}
+    //           >
+    //             <div className={ACTIVE ? "statusActive" : "statusPending"} />
+    //             <Text>{ACTIVE ? "Activo" : "Inactivo"}</Text>
+    //           </Flex>
+    //         </Popconfirm>
+    //       )}
+    //     </>
+    //   )
+    // },
     {
       title: "",
       key: "seeProject",
@@ -94,6 +96,8 @@ export const GroupProjectClientsTable = () => {
       )
     }
   ];
+
+  const { data } = useGroupClients();
 
   return (
     <>
@@ -119,86 +123,17 @@ export const GroupProjectClientsTable = () => {
           <Table columns={columns} dataSource={data} />
         </main>
       ) : (
-        <DetailsGroupClientTable onCloseDetails={() => setIsDetailsClients(initValuesDetails)} />
+        <DetailsGroupClientTable
+          idGroup={`${isDetailsClients.id}`}
+          onCloseDetails={() => setIsDetailsClients(initValuesDetails)}
+        />
       )}
       <ModalNewGroupClient
+        isDetailsClients={isDetailsClients}
+        setIsDetailsClients={setIsDetailsClients}
         isOpen={isCreateGroupClient}
         onClose={() => setIsCreateGroupClient(false)}
       />
     </>
   );
 };
-const data = [
-  {
-    ID: 1,
-    ACTIVE: false,
-    client_name: "Clientes Pareto",
-    clients: 55,
-    clients_subscribed: 66,
-    shipto: 88
-  },
-  {
-    ID: 2,
-    ACTIVE: true,
-    client_name: "Clientes Pareto",
-    clients: 55,
-    clients_subscribed: 66,
-    shipto: 88
-  },
-  {
-    ID: 3,
-    ACTIVE: false,
-    client_name: "Clientes Pareto",
-    clients: 55,
-    clients_subscribed: 66,
-    shipto: 88
-  },
-  {
-    ID: 4,
-    ACTIVE: true,
-    client_name: "Clientes Pareto",
-    clients: 55,
-    clients_subscribed: 66,
-    shipto: 88
-  },
-  {
-    ID: 5,
-    ACTIVE: false,
-    client_name: "Clientes Pareto",
-    clients: 55,
-    clients_subscribed: 66,
-    shipto: 88
-  },
-  {
-    ID: 8,
-    ACTIVE: true,
-    client_name: "Clientes Pareto",
-    clients: 55,
-    clients_subscribed: 66,
-    shipto: 88
-  },
-  {
-    ID: 9,
-    ACTIVE: true,
-    client_name: "Clientes Pareto",
-    clients: 55,
-    clients_subscribed: 66,
-    shipto: 88
-  },
-  {
-    ID: 10,
-    ACTIVE: false,
-    client_name: "Clientes Pareto",
-    clients: 55,
-    clients_subscribed: 66,
-    shipto: 88
-  },
-  {
-    ID: 11,
-    ACTIVE: true,
-    client_name: "Clientes Pareto",
-    clients: 55,
-    clients_subscribed: 66,
-    shipto: 88
-  }
-];

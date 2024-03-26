@@ -49,7 +49,9 @@ a {
 .ant-select-item-option-selected {
   background-color: rgba(255, 255, 255, 0.37) !important;
 }
-
+.ant-table-row-selected >.ant-table-cell{
+  background-color: $background !important;
+}
 .ant-cascader-menus,
 .ant-cascader-menu-item {
   background-color: white !important;

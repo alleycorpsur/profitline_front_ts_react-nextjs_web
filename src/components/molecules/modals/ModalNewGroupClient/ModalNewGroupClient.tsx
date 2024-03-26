@@ -1,17 +1,28 @@
+import { Dispatch, SetStateAction, useState } from "react";
 import { Modal, Typography } from "antd";
-
 import { useForm } from "react-hook-form";
+
 import { InputForm } from "@/components/atoms/InputForm/InputForm";
+import { ModalSelectClients } from "../ModalSelectClients/ModalSelectClients";
 
 import "./modalnewgroupclient.scss";
-import { useState } from "react";
-import { ModalSelectClients } from "../ModalSelectClients/ModalSelectClients";
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
+  isDetailsClients: {
+    active: boolean;
+    id: number;
+  };
+  setIsDetailsClients: Dispatch<
+    SetStateAction<{
+      active: boolean;
+      id: number;
+    }>
+  >;
 }
 const { Title, Text } = Typography;
+
 export type GroupClientType = {
   group: {
     name: string;
@@ -19,14 +30,24 @@ export type GroupClientType = {
 };
 const initValuesDetails = { active: false, id: 0 };
 
-export const ModalNewGroupClient = ({ isOpen, onClose }: Props) => {
+export const ModalNewGroupClient = ({
+  isOpen,
+  onClose,
+  isDetailsClients,
+  setIsDetailsClients
+}: Props) => {
   const {
     control,
-    formState: { errors }
+    formState: { errors },
+    watch
   } = useForm<GroupClientType>({
-    defaultValues: {}
+    defaultValues: {
+      group: { name: "" }
+    }
   });
-  const [isDetailsClient, setIsDetailsClient] = useState(initValuesDetails);
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+
+  const nameGroup = watch("group.name");
 
   return (
     <>
@@ -36,7 +57,8 @@ export const ModalNewGroupClient = ({ isOpen, onClose }: Props) => {
         title={<Title level={4}>Nuevo grupo de clientes</Title>}
         className="modalcreategroup"
         okButtonProps={{
-          className: "buttonOk"
+          className: "buttonOk",
+          disabled: nameGroup.length < 2
         }}
         cancelButtonProps={{
           className: "buttonCancel"
@@ -44,7 +66,7 @@ export const ModalNewGroupClient = ({ isOpen, onClose }: Props) => {
         okText="Siguiente"
         cancelText="Cancelar"
         onCancel={onClose}
-        onOk={() => setIsDetailsClient({ active: true, id: 1 })}
+        onOk={() => setIsDetailsClients({ active: true, id: 1 })}
       >
         <Text className="text">Ingresa el nombre del grupo de clientes </Text>
         <InputForm
@@ -57,10 +79,12 @@ export const ModalNewGroupClient = ({ isOpen, onClose }: Props) => {
         />
       </Modal>
       <ModalSelectClients
-        nameGroupClient="Pareto"
+        selectedRowKeys={selectedRowKeys}
+        setSelectedRowKeys={setSelectedRowKeys}
+        nameGroupClient={nameGroup}
         isCreate={true}
-        onClose={() => setIsDetailsClient(initValuesDetails)}
-        isOpen={isDetailsClient.active}
+        onClose={() => setIsDetailsClients(initValuesDetails)}
+        isOpen={isDetailsClients.active}
       />
     </>
   );
