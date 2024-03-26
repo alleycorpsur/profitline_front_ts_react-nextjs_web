@@ -1,0 +1,40 @@
+@import "../../../../styles/variables.scss";
+
+.selectzonebr {
+    width: 100%;
+
+    .bres {
+        background-color: $background;
+        padding: .75rem;
+        border-radius: 0.5rem;
+        margin-top: .5rem;
+        justify-content: flex-start;
+
+    }
+
+    .title {
+        font-size: 1.2rem;
+    }
+    .holdingsItems{
+        max-height: 550px;
+        overflow-y: auto;
+        gap: 1rem;
+    }
+
+
+    .removebutton {
+        width: 20px !important;
+        background-color: $dark-gray;
+        height: 20px;
+        border-radius: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .addButtonChannel {
+        display: flex;
+        align-items: center;
+        margin-top: .5rem;
+    }
+}

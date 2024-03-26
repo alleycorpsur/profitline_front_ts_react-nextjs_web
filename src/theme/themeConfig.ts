@@ -25,6 +25,12 @@ const theme: ThemeConfig = {
       colorPrimary: "#CBE71E",
       colorBorder: "black",
       colorPrimaryBorder: "black"
+    },
+    Popover: {
+      colorBgElevated: "#F7F7F7"
+    },
+    Checkbox: {
+      colorPrimary: "#CBE71E"
     }
   }
 };

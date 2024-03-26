@@ -2,15 +2,14 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Empty, Flex, Spin, Typography } from "antd";
 import useSWR from "swr";
 
-import { SelectChanel } from "@/components/atoms/SelectChanel/SelectChanel";
+import { SelectChanel } from "@/components/molecules/selects/SelectChanel/SelectChanel";
 
 import { useAppStore } from "@/lib/store/store";
 import { fetcher } from "@/utils/api/api";
-
 import { IBRE } from "@/types/bre/IBRE";
+import { filterBRbyIdSubline, transformFormat } from "@/utils/utils";
 
 import "./selectstructure.scss";
-import { filterBRbyIdSubline, transformFormat } from "@/utils/utils";
 interface Props {
   sublinesUser?: number[];
   selectedSublines: {

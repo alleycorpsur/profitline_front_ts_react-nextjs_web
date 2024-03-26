@@ -1,10 +1,10 @@
 import { AddressContainer } from "@/components/atoms/AddressContainer/AddressContainer";
-import { InputForm } from "@/components/atoms/InputForm/InputForm";
+import { InputForm } from "@/components/atoms/inputs/InputForm/InputForm";
 import { Flex, Modal, Typography } from "antd";
 import { Dispatch, SetStateAction, useState } from "react";
 import { useForm } from "react-hook-form";
 import "./modaladdress.scss";
-import { InputAddress } from "@/components/atoms/InputAddress/InputAddress";
+import { InputAddress } from "@/components/atoms/inputs/InputAddress/InputAddress";
 import { ModalBusinessRules } from "../ModalBusinessRules/ModalBusinessRules";
 
 const { Title } = Typography;

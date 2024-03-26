@@ -1,0 +1,38 @@
+@import "../../../../styles/variables.scss";
+
+.selectzonebr {
+    width: 100%;
+
+    .zones {
+        background-color: $background;
+        padding: .75rem;
+        border-radius: 0.5rem;
+        margin-top: .5rem;
+        justify-content: flex-start;
+    }
+
+    .title {
+        font-size: 1.2rem;
+    }
+
+    .zone {
+        background-color: $white;
+        width: 100%;
+        border-radius: .25rem;
+        padding: .3rem .5rem;
+        margin: .5rem 0;
+    }
+
+    .removebutton {
+        width: 25px !important;
+        background-color: $dark-gray;
+        height: 25px;
+        border-radius: 2rem;
+    }
+
+    .addButtonChannel {
+        display: flex;
+        align-items: center;
+        margin-top: .5rem;
+    }
+}

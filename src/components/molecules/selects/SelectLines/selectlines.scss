@@ -1,0 +1,10 @@
+@import "../../../../styles/variables.scss";
+
+.lineSelect {
+    background-color: $white;
+    width: 60%;
+    height: 100%;
+    border-radius: .25rem;
+    padding: 0.5rem 1rem;
+    overflow-y: auto;
+}

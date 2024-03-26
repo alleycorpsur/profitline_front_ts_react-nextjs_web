@@ -10,7 +10,7 @@ import {
   Plus
 } from "phosphor-react";
 
-import { InputForm } from "@/components/atoms/InputForm/InputForm";
+import { InputForm } from "@/components/atoms/inputs/InputForm/InputForm";
 
 import { DocumentButton } from "@/components/atoms/DocumentButton/DocumentButton";
 import { DividerCustom } from "@/components/atoms/DividerCustom/DividerCustom";

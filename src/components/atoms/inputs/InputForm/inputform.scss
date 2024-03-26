@@ -1,0 +1,57 @@
+@import '../../../../styles/variables.scss';
+
+.containerInput {
+    width: 23%;
+    margin: 0.25rem 0.5rem;
+
+    .ant-color-picker-trigger {
+        background-color: $background;
+        justify-content: flex-start;
+        padding: 1.5rem;
+        border: none;
+    }
+
+    .ant-popover-inner {
+        background-color: $background;
+
+    }
+
+    .ant-select-selection-item-content {
+        color: black;
+
+    }
+
+    .ant-input-disabled {
+        color: black;
+    }
+
+    .input {
+        background-color: $background;
+        margin-bottom: 0.2rem;
+        border-radius: 0;
+        padding: 0.7rem;
+        border-radius: 0.25rem;
+
+        &::placeholder {
+            color: $secondary-gray;
+        }
+    }
+
+    .textError {
+        padding-left: 0.5rem;
+        color: red;
+    }
+
+    .inputError {
+        border: 1px dashed red;
+        background-color: $background;
+        margin-bottom: 0.2rem;
+        border-radius: 0;
+        padding: 0.7rem;
+        border-radius: 0.25rem;
+
+        &::placeholder {
+            color: $secondary-gray;
+        }
+    }
+}

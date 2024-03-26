@@ -1,0 +1,15 @@
+@import '../../../../styles/variables.scss';
+
+.inputcreateline {
+    background-color: $background;
+    width: 100%;
+
+    .createButtonZone {
+        width: 98%;
+        display: flex;
+        align-items: center;
+        height: 3rem;
+        margin-top: .3rem;
+        border: none;
+    }
+}

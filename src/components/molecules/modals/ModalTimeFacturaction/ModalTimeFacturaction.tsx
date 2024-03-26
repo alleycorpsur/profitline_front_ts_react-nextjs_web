@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction } from "react";
 import { Flex, Input, Modal, Radio, Space, Typography } from "antd";
 
 import "./modaltimefacturaction.scss";
-import { SelectCustom } from "@/components/atoms/SelectCustom/SelectCustom";
+import { SelectCustom } from "@/components/molecules/selects/SelectCustom/SelectCustom";
 
 const { Text } = Typography;
 interface Props {

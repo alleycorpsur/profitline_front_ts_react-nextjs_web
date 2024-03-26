@@ -1,48 +1,21 @@
 import config from "@/config";
-import { IZones } from "@/types/zones/IZones";
 import { getIdToken } from "@/utils/api/api";
-import { SUCCESS } from "@/utils/constants/globalConstants";
+import { CREATED, SUCCESS } from "@/utils/constants/globalConstants";
 import { MessageInstance } from "antd/es/message/interface";
 import axios, { AxiosResponse } from "axios";
 
-export const getAllZones = async ({
-  idProject
-}: {
-  idProject: string;
-}): Promise<AxiosResponse<IZones>> => {
-  const token = await getIdToken();
-  try {
-    const response: AxiosResponse<IZones> = await axios.get(
-      `${config.API_HOST}/zone/project/${idProject}`,
-      {
-        headers: {
-          Accept: "application/json, text/plain, */*",
-          "Content-Type": "application/json; charset=utf-8",
-          Authorization: `Bearer ${token}`
-        }
-      }
-    );
-
-    return response;
-  } catch (error) {
-    return error as any;
-  }
-};
-
-export const addZone = async ({
+export const addHolding = async ({
   name,
-  project_id,
   messageApi
 }: {
   name: string;
-  project_id: string;
   messageApi: MessageInstance;
 }): Promise<AxiosResponse<any>> => {
   const token = await getIdToken();
   try {
     const response: AxiosResponse<any> = await axios.post(
-      `${config.API_HOST}/zone/`,
-      { zone_description: name, project_id },
+      `${config.API_HOST}/holding`,
+      { name },
       {
         headers: {
           Accept: "application/json, text/plain, */*",
@@ -51,10 +24,10 @@ export const addZone = async ({
         }
       }
     );
-    if (response.status === SUCCESS) {
+    if (response.status === CREATED) {
       messageApi.open({
         type: "success",
-        content: `La zona fue creada exitosamente.`
+        content: `El holding fue creado exitosamente.`
       });
     } else {
       messageApi.open({
@@ -70,26 +43,29 @@ export const addZone = async ({
   }
 };
 
-export const removeZoneById = async ({
-  idZone,
+export const removeHoldingById = async ({
+  idHolding,
   messageApi
 }: {
-  idZone: string;
+  idHolding: string;
   messageApi: MessageInstance;
 }): Promise<AxiosResponse<any>> => {
   const token = await getIdToken();
   try {
-    const response: AxiosResponse<any> = await axios.delete(`${config.API_HOST}/zone/${idZone}`, {
-      headers: {
-        Accept: "application/json, text/plain, */*",
-        "Content-Type": "application/json; charset=utf-8",
-        Authorization: `Bearer ${token}`
+    const response: AxiosResponse<any> = await axios.delete(
+      `${config.API_HOST}/holding/${idHolding}`,
+      {
+        headers: {
+          Accept: "application/json, text/plain, */*",
+          "Content-Type": "application/json; charset=utf-8",
+          Authorization: `Bearer ${token}`
+        }
       }
-    });
+    );
     if (response.status === SUCCESS) {
       messageApi.open({
         type: "success",
-        content: `La zona fue eliminada exitosamente.`
+        content: `El holding fue eliminado exitosamente.`
       });
     } else {
       messageApi.open({

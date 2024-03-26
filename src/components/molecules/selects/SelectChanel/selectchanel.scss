@@ -1,0 +1,12 @@
+@import '../../../../styles/variables.scss';
+
+.chanelSelect {
+    width: 100%;
+    height: 100%;
+    flex-wrap: wrap;
+    gap: .5rem;
+    display: flex;
+    border-radius: .25rem;
+    padding: 0.5rem 1rem;
+    overflow-y: auto;
+}
