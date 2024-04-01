@@ -1,0 +1,32 @@
+@import "../../../../styles/variables.scss";
+
+.selectdocumenttype {
+    width: 100%;
+    height: 2.8rem !important;
+    background-color: $background ;
+    border-radius: 0.25rem;
+    border-bottom: none;
+    padding: 0.8rem;
+    margin-left: .3rem !important;
+
+    margin-bottom: .9rem !important;
+
+    .ant-select-selector {
+        background-color: $background !important;
+        border: none !important;
+    }
+
+    .ant-select-selection-placeholder {
+        color: $dark-gray !important;
+
+    }
+}
+
+.selectdocumenttypeError {
+    border: 1px dashed red;
+    width: 100%;
+    margin-bottom: 0.2rem;
+    background-color: $background;
+    padding: 0.7rem;
+    border-radius: 0.25rem;
+}

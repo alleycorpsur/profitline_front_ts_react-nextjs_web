@@ -12,7 +12,6 @@ import {
 
 import { InputForm } from "@/components/atoms/inputs/InputForm/InputForm";
 
-import { DocumentButton } from "@/components/atoms/DocumentButton/DocumentButton";
 import { DividerCustom } from "@/components/atoms/DividerCustom/DividerCustom";
 import { ShipToProjectTable } from "@/components/molecules/tables/ShipToProjectTable/ShipToProjectTable";
 
@@ -21,6 +20,14 @@ import { ModalTimeFacturaction } from "@/components/molecules/modals/ModalTimeFa
 import { ModalCreateShipTo } from "@/components/molecules/modals/ModalCreateShipTo/ModalCreateShipTo";
 import { ModalStatusClient } from "@/components/molecules/modals/ModalStatusClient/ModalStatusClient";
 import { ModalRemove } from "@/components/molecules/modals/ModalRemove/ModalRemove";
+
+import { SelectDocumentType } from "@/components/molecules/selects/SelectDocumentType/SelectDocumentType";
+import { SelectClientType } from "@/components/molecules/selects/SelectClientType/SelectClientType";
+import { SelectHolding } from "@/components/molecules/selects/SelectHolding/SelectHolding";
+import { SelectCities } from "@/components/molecules/selects/SelectCities/SelectCities";
+import { SelectRisk } from "@/components/molecules/selects/SelectRisk/SelectRisk";
+import { SelectRadicationType } from "@/components/molecules/selects/SelectRadicationType/SelectRadicationType";
+import { SelectConditionPayment } from "@/components/molecules/selects/SelectConditionPayment/SelectConditionPayment";
 
 import "./clientprojectform.scss";
 
@@ -125,11 +132,16 @@ export const ClientProjectForm = ({ onGoBackTable, isViewDetailsClient }: Props)
             <Title level={4}>Información del usuario</Title>
             {/* -----------------------------------Informacion del Usuario--------------------------------------- */}
             <Flex component={"section"} className="generalProject">
-              <InputForm
+              {/* <InputForm
                 titleInput="Tipo de Documento"
                 control={control}
                 nameInput="infoClient.typeOfDocument"
                 error={errors.infoClient?.typeOfDocument}
+              /> */}
+              <SelectDocumentType
+                control={control}
+                nameInput="infoClient.typeOfDocument"
+                errors={errors.infoClient?.typeOfDocument}
               />
               <InputForm
                 titleInput="No. de documento"
@@ -149,17 +161,21 @@ export const ClientProjectForm = ({ onGoBackTable, isViewDetailsClient }: Props)
                 nameInput="infoClient.socialReason"
                 error={errors.infoClient?.socialReason}
               />
-              <InputForm
+              {/* <InputForm
                 titleInput="Tipo de Cliente"
                 control={control}
                 nameInput="infoClient.typeOfClient"
                 error={errors.infoClient?.typeOfClient}
+              /> */}
+              <SelectClientType
+                control={control}
+                nameInput="infoClient.typeOfClient"
+                errors={errors.infoClient?.typeOfDocument}
               />
-              <InputForm
-                titleInput="Holding"
+              <SelectHolding
                 control={control}
                 nameInput="infoClient.holding"
-                error={errors.infoClient?.holding}
+                errors={errors.infoClient?.holding}
               />
               <InputForm
                 titleInput="Teléfono"
@@ -173,17 +189,15 @@ export const ClientProjectForm = ({ onGoBackTable, isViewDetailsClient }: Props)
                 nameInput="infoClient.email"
                 error={errors.infoClient?.email}
               />
-              <InputForm
-                titleInput="Ciudad"
+              <SelectCities
                 control={control}
                 nameInput="infoClient.city"
-                error={errors.infoClient?.city}
+                errors={errors.infoClient?.city}
               />
-              <InputForm
-                titleInput="Riesgo"
+              <SelectRisk
                 control={control}
                 nameInput="infoClient.risk"
-                error={errors.infoClient?.risk}
+                errors={errors.infoClient?.risk}
               />
               <Flex vertical style={{ width: "24.5%" }} justify="center">
                 <Title level={5}>Período de facturación</Title>
@@ -194,17 +208,15 @@ export const ClientProjectForm = ({ onGoBackTable, isViewDetailsClient }: Props)
                   onClick={() => setIsTimeFacturaction(true)}
                 />
               </Flex>
-              <InputForm
-                titleInput="Tipo de radicación"
+              <SelectRadicationType
                 control={control}
                 nameInput="infoClient.periodBilling"
-                error={errors.infoClient?.periodBilling}
+                errors={errors.infoClient?.periodBilling}
               />
-              <InputForm
-                titleInput="Condición de pago"
+              <SelectConditionPayment
                 control={control}
                 nameInput="infoClient.conditionPay"
-                error={errors.infoClient?.conditionPay}
+                errors={errors.infoClient?.conditionPay}
               />
               <InputForm
                 titleInput="Ingresar dirección"
@@ -216,11 +228,11 @@ export const ClientProjectForm = ({ onGoBackTable, isViewDetailsClient }: Props)
             {/* -----------------------------------Experiencia----------------------------------- */}
             <Title level={4}>Documentos</Title>
             <Flex vertical align="flex-start">
-              <Flex wrap="wrap" gap={"1rem"} style={{ width: "100%" }}>
-                {[1, 23, 45, 6, 7, 8, 9].map((document) => (
+              {/* <Flex wrap="wrap" gap={"1rem"} style={{ width: "100%" }}> */}
+              {/* {[1, 23, 45, 6, 7, 8, 9].map((document) => (
                   <DocumentButton key={document} fileName="Archivo1.pdf" fileSize="200KB" />
-                ))}
-              </Flex>
+                ))} */}
+              {/* </Flex> */}
               <Button
                 size="large"
                 type="text"

@@ -1,8 +1,27 @@
 import config from "@/config";
+import { ISelectHolding } from "@/types/holding/ISelectHolding";
 import { getIdToken } from "@/utils/api/api";
 import { CREATED, SUCCESS } from "@/utils/constants/globalConstants";
 import { MessageInstance } from "antd/es/message/interface";
 import axios, { AxiosResponse } from "axios";
+
+export const getAllHoldings = async (): Promise<ISelectHolding> => {
+  const token = await getIdToken();
+  try {
+    const response: ISelectHolding = await axios.get(`${config.API_HOST}/holding`, {
+      headers: {
+        Accept: "application/json, text/plain, */*",
+        "Content-Type": "application/json; charset=utf-8",
+        Authorization: `Bearer ${token}`
+      }
+    });
+    console.log(response);
+
+    return response;
+  } catch (error) {
+    return error as ISelectHolding;
+  }
+};
 
 export const addHolding = async ({
   name,

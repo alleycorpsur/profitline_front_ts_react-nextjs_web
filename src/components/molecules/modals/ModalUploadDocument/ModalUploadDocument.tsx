@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction } from "react";
 import { Flex, Modal, Typography } from "antd";
 
 import "./modaluploaddocument.scss";
-import { UploadDocumentButton } from "@/components/atoms/UploadDocumentButton/UploadDocumentButton";
+import { UploadFileButton } from "@/components/atoms/UploadFileButton/UploadFileButton";
 
 interface Props {
   isOpen: boolean;
@@ -29,12 +29,12 @@ export const ModalUploadDocument = ({ isOpen, setIsOpenUpload }: Props) => {
         Haz clic en cada casilla para adjuntar los documentos requeridos
       </Text>
       <Flex vertical className="mainUploadDocuments">
-        <UploadDocumentButton />
-        <UploadDocumentButton />
-        <UploadDocumentButton />
-        <UploadDocumentButton />
-        <UploadDocumentButton />
-        <UploadDocumentButton />
+        <UploadFileButton nameInput="RUT" />
+        <UploadFileButton nameInput="Cámara de Comercio" />
+        <UploadFileButton nameInput="Estados financieros" />
+        <UploadFileButton nameInput="Formato de creación" />
+        <UploadFileButton nameInput="Certificación Bancaria" />
+        <UploadFileButton nameInput="Archivos adicionales" />
       </Flex>
     </Modal>
   );

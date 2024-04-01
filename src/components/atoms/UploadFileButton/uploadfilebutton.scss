@@ -1,0 +1,44 @@
+@import '../../../styles/variables.scss';
+
+.uploaddocumentbutton {
+    justify-content: space-between;
+
+    .titleDocument {
+        font-size: 0.9rem;
+    }
+
+    .descriptionDocument {
+        font-size: 0.8rem;
+
+    }
+
+    .ant-upload-wrapper {
+        width: 70% !important;
+    }
+
+    .ant-upload,
+    .ant-upload-select {
+        width: 100% !important;
+    }
+
+    .documentButton {
+        background-color: $background;
+        width: 100%;
+        height: 4.75rem;
+        border-radius: .5rem;
+        padding: 1.5rem 1.4rem;
+        cursor: pointer;
+
+        .nameFile {
+            font-size: 1rem;
+            margin-left: 0.5rem;
+        }
+
+        .sizeFile {
+            font-size: .8rem;
+            font-weight: 300;
+            margin-top: .15rem;
+            margin-left: 1.5rem;
+        }
+    }
+}
