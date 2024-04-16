@@ -2,7 +2,7 @@
 import { Flex, Typography } from "antd";
 
 import { SideBar } from "@/components/molecules/SideBar/SideBar";
-import { NavRightSection } from "@/components/atoms/NavRightSection/NavRightSection";
+// import { NavRightSection } from "@/components/atoms/NavRightSection/NavRightSection";
 import { ProjectTable } from "@/components/molecules/tables/ProjectsTable/ProjectsTable";
 
 import "./projects.scss";
@@ -20,7 +20,7 @@ export const ProjectsView = () => {
               Proyectos
             </Title>
           </Flex>
-          <NavRightSection />
+          {/* <NavRightSection /> */}
         </Flex>
         <ProjectTable />
       </Flex>

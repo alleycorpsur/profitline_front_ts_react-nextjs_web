@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Button, Flex } from "antd";
 
-import { ArrowLineRight, Gear, SquaresFour, User } from "phosphor-react";
+import { ArrowLineRight, User } from "phosphor-react";
 import Image from "next/image";
 
 import "./sidebar.scss";
@@ -20,20 +20,20 @@ export const SideBar = () => {
             src="/images/cruz-verde.png"
           />
         </Flex>
-        <Button
+        {/* <Button
           type="primary"
           size="large"
           icon={<SquaresFour size="26" />}
           className="buttonIconActive"
         >
           {isSideBarLarge && "Dashboard"}
-        </Button>
+        </Button> */}
         <Button type="primary" size="large" icon={<User size="26" />} className="buttonIcon">
           {isSideBarLarge && "Clientes"}
         </Button>
-        <Button type="primary" size="large" icon={<Gear size="26" />} className="buttonIconActive">
+        {/* <Button type="primary" size="large" icon={<Gear size="26" />} className="buttonIconActive">
           {isSideBarLarge && "Administracion"}
-        </Button>
+        </Button> */}
       </Flex>
       <Flex>
         <Button

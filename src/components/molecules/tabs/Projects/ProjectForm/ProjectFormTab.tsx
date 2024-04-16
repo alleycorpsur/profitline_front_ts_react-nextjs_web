@@ -16,6 +16,7 @@ import { IProject } from "@/types/projects/IProject";
 import { InputForm } from "@/components/atoms/inputs/InputForm/InputForm";
 
 import "./projectformtab.scss";
+import { ModalTimeFacturaction } from "@/components/molecules/modals/ModalTimeFacturaction/ModalTimeFacturaction";
 
 const { Title, Text } = Typography;
 
@@ -56,6 +57,7 @@ export const ProjectFormTab = ({
   onActiveProject = () => {},
   onDesactivateProject = () => {}
 }: Props) => {
+  const [isTimeFacturaction, setIsTimeFacturaction] = useState(false);
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [imageFile, setImageFile] = useState(data.LOGO);
   const [imageError, setImageError] = useState(false);
@@ -185,6 +187,21 @@ export const ProjectFormTab = ({
               control={control}
               error={errors.general?.address}
             />
+            <InputForm
+              titleInput="Período de facturación"
+              nameInput="general.billing_period"
+              control={control}
+              error={errors.general?.billing_period}
+            />
+            {/* <Flex vertical style={{ width: "24.5%" }} justify="center">
+                <Title level={5}>Período de facturación</Title>
+                <Input
+                  variant="borderless"
+                  className="input"
+                  placeholder="Segundo miércoles del mes"
+                  onClick={() => setIsTimeFacturaction(true)}
+                />
+              </Flex> */}
           </Flex>
           {/* -----------------------------------Contact----------------------------------- */}
           <Title className="title" level={4}>
@@ -251,7 +268,7 @@ export const ProjectFormTab = ({
               </Text>
             </Flex>
             {/* <Flex vertical className="containerInput">
-            <Title level={5}>Descripcion</Title>
+            <Title className="title" level={5}>Descripcion</Title>
             <Controller
               name="personalization.description"
               control={control}
@@ -275,6 +292,10 @@ export const ProjectFormTab = ({
           </Flex>
         </Flex>
       </form>
+      <ModalTimeFacturaction
+        isOpen={isTimeFacturaction}
+        setIsTimeFacturaction={setIsTimeFacturaction}
+      />
       <ModalChangeStatus
         isActiveStatus={data?.IS_ACTIVE!}
         isOpen={isOpenModal}
@@ -296,7 +317,8 @@ const dataToProjectFormData = (data: IProject) => {
       nit: data.NIT,
       currencies: currenciesFormated,
       country: `${data.COUNTRY_ID}-${data.COUNTRY_NAME}`,
-      address: data.ADDRESS
+      address: data.ADDRESS,
+      billing_period: data.BILLING_PERIOD
     },
     contact: {
       name: data.CONTACT,

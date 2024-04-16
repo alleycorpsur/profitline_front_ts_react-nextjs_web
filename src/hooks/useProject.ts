@@ -11,6 +11,7 @@ interface Props {
 
 export const useProject = ({ id }: Props) => {
   const { data, isLoading } = useSWR<IProjectById>(`/project/${id}`, fetcher);
+
   const setSelectProject = useAppStore((state) => state.setSelectedProject);
 
   useEffect(() => {

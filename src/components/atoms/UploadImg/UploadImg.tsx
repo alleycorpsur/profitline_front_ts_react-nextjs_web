@@ -56,7 +56,7 @@ export const UploadImg = ({ disabled = false, imgDefault = "", setImgFile }: Pro
       >
         {loading && <Spin />}
         {imageUrl ? (
-          <img src={imageUrl} alt="avatar" style={{ width: "100%" }} />
+          <Image src={imageUrl} alt="avatar" width={0} height={0} sizes="100vw" className="img" />
         ) : (
           <Image src={"/images/watermark.svg"} alt="marca de agua" width={48} height={48} />
         )}

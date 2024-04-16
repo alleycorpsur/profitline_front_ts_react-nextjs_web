@@ -33,6 +33,7 @@ export interface IProject {
   CONTACT: string;
   PHONE: string;
   ADDRESS: string;
+  BILLING_PERIOD: Date;
   COUNTRY_ID: number;
   CURRENCY: Currency[];
   EMAIL: string;

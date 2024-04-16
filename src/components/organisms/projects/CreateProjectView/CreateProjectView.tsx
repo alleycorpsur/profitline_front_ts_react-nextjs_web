@@ -2,7 +2,7 @@ import { Flex, Tabs, TabsProps, Typography, message } from "antd";
 
 // components
 import { SideBar } from "@/components/molecules/SideBar/SideBar";
-import { NavRightSection } from "@/components/atoms/NavRightSection/NavRightSection";
+// import { NavRightSection } from "@/components/atoms/NavRightSection/NavRightSection";
 import { ProjectFormTab } from "@/components/molecules/tabs/Projects/ProjectForm/ProjectFormTab";
 import { addProject } from "@/services/projects/projects";
 
@@ -45,39 +45,39 @@ export const CreateProjectView = () => {
       children: <ProjectFormTab statusForm="create" onSubmitForm={onCreateProject} />
     },
     {
-      key: "1",
+      key: "2",
       label: "Reglas de negocio",
-      children: <ProjectFormTab statusForm="review" onSubmitForm={() => {}} />
+      children: <ProjectFormTab statusForm="create" onSubmitForm={onCreateProject} />
     },
     {
-      key: "",
+      key: "3",
       label: "Clientes",
-      children: <ProjectFormTab statusForm="review" onSubmitForm={() => {}} />
+      children: <ProjectFormTab statusForm="create" onSubmitForm={onCreateProject} />
     },
     {
-      key: "",
+      key: "4",
       label: "Usuarios",
-      children: <ProjectFormTab statusForm="review" onSubmitForm={() => {}} />
+      children: <ProjectFormTab statusForm="create" onSubmitForm={onCreateProject} />
     },
     {
-      key: "",
+      key: "5",
       label: "Cuentas",
-      children: <ProjectFormTab statusForm="review" onSubmitForm={() => {}} />
+      children: <ProjectFormTab statusForm="create" onSubmitForm={onCreateProject} />
     },
     {
-      key: "",
+      key: "6",
       label: "Grupos de clientes",
-      children: <ProjectFormTab statusForm="review" onSubmitForm={() => {}} />
+      children: <ProjectFormTab statusForm="create" onSubmitForm={onCreateProject} />
     },
     {
-      key: "",
+      key: "7",
       label: "Aprobaciones",
-      children: <ProjectFormTab statusForm="review" onSubmitForm={() => {}} />
+      children: <ProjectFormTab statusForm="create" onSubmitForm={onCreateProject} />
     },
     {
-      key: "",
+      key: "8",
       label: "Comunicaciones",
-      children: <ProjectFormTab statusForm="review" onSubmitForm={() => {}} />
+      children: <ProjectFormTab statusForm="create" onSubmitForm={onCreateProject} />
     }
   ];
 
@@ -93,9 +93,9 @@ export const CreateProjectView = () => {
                 Crear Proyecto
               </Title>
             </Flex>
-            <Flex component={"navbar"} align="center" justify="space-between">
+            {/* <Flex component={"navbar"} align="center" justify="space-between">
               <NavRightSection />
-            </Flex>
+            </Flex> */}
           </Flex>
           {/* ------------Main Info Project-------------- */}
           <Flex className="tabsContainer">

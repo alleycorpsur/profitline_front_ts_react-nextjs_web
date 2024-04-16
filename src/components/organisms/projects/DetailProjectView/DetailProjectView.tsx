@@ -4,7 +4,7 @@ import { Button, Flex, Result, Skeleton, Spin, Tabs, TabsProps, Typography, mess
 //components
 import { SideBar } from "@/components/molecules/SideBar/SideBar";
 import { ProjectFormTab } from "@/components/molecules/tabs/Projects/ProjectForm/ProjectFormTab";
-import { NavRightSection } from "@/components/atoms/NavRightSection/NavRightSection";
+// import { NavRightSection } from "@/components/atoms/NavRightSection/NavRightSection";
 import { UsersProjectTable } from "@/components/molecules/tables/UsersProjectTable/UsersProjectTable";
 import { UserProjectForm } from "@/components/molecules/tabs/Projects/UserProjectForm/UserProjectForm";
 import { ClientsProjectView } from "../ClientsProjectView/ClientsProjectView";
@@ -177,9 +177,9 @@ export const DetailsProjectView = ({ isEdit = false, idProjectParam = "" }: Prop
                 )}
               </Flex>
             </Flex>
-            <Flex align="center">
+            {/* <Flex align="center">
               <NavRightSection />
-            </Flex>
+            </Flex> */}
           </Flex>
           {/* ------------Main Info Project-------------- */}
           {!loading && data.length === 0 ? (
