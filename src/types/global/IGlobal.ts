@@ -6,3 +6,17 @@ export type Pagination = {
   totalPages: number;
   totalRows: number;
 };
+
+export interface GenericResponsePage<T = any> {
+  status: number;
+  message: string;
+  success?: boolean;
+  data: T;
+  pagination: Pagination;
+}
+export interface GenericResponse<T = any> {
+  status: number;
+  message: string;
+  success?: boolean;
+  data: T;
+}

@@ -64,9 +64,15 @@ API.interceptors.request.use(async (request) => {
 
 API.interceptors.response.use(
   function (response) {
+    response.data.success = true;
     return response.data;
   },
   function (error) {
+    error.success = false;
+    const response = error.response;
+    if (response?.data?.message) {
+      error.message = response.data.message;
+    }
     return Promise.resolve(error);
   }
 );

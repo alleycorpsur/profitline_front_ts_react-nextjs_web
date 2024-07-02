@@ -4,7 +4,7 @@ const { Text } = Typography;
 import "./uploaddocumentbutton.scss";
 import { Dispatch, SetStateAction, useState } from "react";
 
-interface FileObject {
+export interface FileObject {
   docReference: string;
   file: File | undefined;
 }

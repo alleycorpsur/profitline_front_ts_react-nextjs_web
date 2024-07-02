@@ -6,7 +6,7 @@
     border-radius: 0.25rem;
     border-bottom: none;
     height: 100% !important;
-    width: 250px;
+    width: 100%;
 
     span {
         font-size: 1rem;
@@ -22,7 +22,6 @@
         font-size: 1.1rem;
         color: $secondary-gray;
     }
-
 }
 
 .input {
@@ -32,13 +31,16 @@
 .columnHeader {
     font-weight: bold;
     color: $gray;
-    font-size: .8rem;
+    font-size: 0.8rem;
 }
 
 .container {
     padding: 1rem;
     border-radius: 4px;
     border: 1px solid $dark-gray;
+    span {
+        font-weight: 500 !important;
+    }
 }
 
 .button {

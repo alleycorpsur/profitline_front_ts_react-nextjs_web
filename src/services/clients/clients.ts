@@ -1,8 +1,9 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
 import config from "@/config";
-import { getIdToken } from "@/utils/api/api";
+import { API, getIdToken } from "@/utils/api/api";
 import {
   ClientFormType,
+  IClient,
   IClientAxios,
   ICreateClient,
   IUpdateClient
@@ -12,6 +13,7 @@ import { IBillingPeriodForm } from "@/types/billingPeriod/IBillingPeriod";
 import { SUCCESS } from "@/utils/constants/globalConstants";
 import { MessageInstance } from "antd/es/message/interface";
 import { IAddAddressData } from "@/types/locations/ILocations";
+import { GenericResponse } from "@/types/global/IGlobal";
 
 // create
 
@@ -199,4 +201,28 @@ export const deleteClientById = async (
     console.warn("error deleting client by Id: ", error);
     return error as any;
   }
+};
+
+type PropsGetAllByProject = {
+  idProject: string;
+  city?: number[];
+  holding?: number[];
+  risk?: number[];
+  payment_condition?: number[];
+  radication_type?: number[];
+  status?: number[];
+};
+export const getAllByProject = async (props: PropsGetAllByProject): Promise<IClient[]> => {
+  const { city, holding, risk, payment_condition, radication_type, status, idProject } = props;
+  const response: GenericResponse<IClient[]> = await API.get(`/client/project/${idProject}`, {
+    params: {
+      city,
+      holding,
+      risk,
+      payment_condition,
+      radication_type,
+      status
+    }
+  });
+  return response?.data;
 };

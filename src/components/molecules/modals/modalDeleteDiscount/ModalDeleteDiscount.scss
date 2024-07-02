@@ -1,0 +1,39 @@
+@import "@styles/variables.scss";
+
+.modalDeleteDiscount {
+    width: 100%;
+
+    .buttonOk {
+        width: 49%;
+        height: 3rem;
+        box-shadow: none;
+        background-color: $secondary;
+        color: black;
+        font-weight: 600;
+
+        &:hover {
+            background-color: $secondary !important;
+            opacity: 0.8;
+        }
+    }
+
+    .deleteText {
+        text-decoration: underline;
+        cursor: pointer;
+    }
+
+    .buttonCancel {
+        width: 49%;
+        height: 3rem;
+        box-shadow: none;
+        background-color: $white;
+        color: black;
+        font-weight: 600;
+        border: 1px solid black;
+
+        &:hover {
+            background-color: $white !important;
+            opacity: 0.8;
+        }
+    }
+}

@@ -110,3 +110,18 @@ a {
         color: $dark-gray !important;
     }
 }
+
+.PrincipalButton {
+    span {
+        color: $black;
+        display: inline-flex;
+        align-items: center;
+        font-weight: 600;
+    }
+    &:hover {
+        span {
+            color: white;
+            transition-duration: 250ms;
+        }
+    }
+}

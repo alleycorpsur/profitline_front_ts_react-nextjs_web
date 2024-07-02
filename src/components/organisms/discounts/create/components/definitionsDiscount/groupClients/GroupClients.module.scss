@@ -4,6 +4,8 @@
     background-color: $background;
     padding: 1rem;
     border-radius: 10px;
+    max-height: 350px;
+    overflow-y: scroll;
 }
 
 .groupClients {

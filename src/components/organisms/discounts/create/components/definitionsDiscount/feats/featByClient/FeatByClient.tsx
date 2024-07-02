@@ -1,59 +1,89 @@
 import styles from "./FeatByClient.module.scss";
-import { Flex, Radio, RadioChangeEvent, Typography } from "antd";
-import { lineDummy } from "../featByOrder/dataDummy";
-import { useState } from "react";
+import { Flex, Radio, Typography } from "antd";
 import { InputForm } from "@/components/atoms/inputs/InputForm/InputForm";
-import { useForm } from "react-hook-form";
+import { UseFormReturn, useForm } from "react-hook-form";
 import ProductList from "../../productList/ProductList";
 import GroupClients from "../../groupClients/GroupClients";
+import useDiscountFeats from "../hooks/useDiscountFeats";
+import { DiscountSchema } from "../../../../resolvers/generalResolver";
+import { useClientsGroups } from "@/hooks/useClientsGroups";
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 const clientDummy = [
-    {
-      id: 1,
-      name: "Grupo 1",
-    },
-    {
-      id: 2,
-      name: "Grupo 2",
-    },
-    {
-      id: 3,
-      name: "Grupo 3",
-    },
-    {
-      id: 4,
-      name: "Grupo 4",
-    },
-  ];
+  {
+    id: 1,
+    name: "Grupo 1"
+  },
+  {
+    id: 2,
+    name: "Grupo 2"
+  },
+  {
+    id: 3,
+    name: "Grupo 3"
+  },
+  {
+    id: 4,
+    name: "Grupo 4"
+  }
+];
 
-export default function FeatByCient() {
-  const { control } = useForm();
-  const [value, setValue] = useState(1);
+type FeatByOrderProps = {
+  discountType: number;
+  form: UseFormReturn<DiscountSchema, any, undefined>;
+  statusForm: "create" | "edit" | "review";
+};
 
-  const onChange = (e: RadioChangeEvent) => {
-    console.log("radio checked", e.target.value);
-    setValue(e.target.value);
-  };
+export default function FeatByCient({ form, statusForm }: FeatByOrderProps) {
+  const {
+    setValue,
+    watch,
+    control,
+    formState: { errors }
+  } = form;
+  const { lines, onChange, isLoading, projectId } = useDiscountFeats({ setValue });
+  const { data, error, loading } = useClientsGroups({
+    idProject: projectId.toString(),
+    noLimit: true
+  });
 
   return (
     <Flex className={styles.principalContainer} vertical gap={20}>
       <Title level={5}>Descuento aplicable</Title>
-      <Radio.Group onChange={onChange} value={value} className={styles.radioGroup}>
-        <Radio value={3}>Descuento aplicable en porcentaje</Radio>
-        <Radio value={4}>Descuento aplicable en valor fijo</Radio>
+      <Radio.Group
+        onChange={onChange}
+        value={watch("computation_type")}
+        className={styles.radioGroup}
+        disabled={statusForm === "review"}
+      >
+        <Radio value={1}>Descuento aplicable en porcentaje</Radio>
+        <Radio value={2}>Descuento aplicable en valor fijo</Radio>
       </Radio.Group>
+      <Text type="danger" hidden={!errors?.computation_type}>
+        {errors?.computation_type?.message}
+      </Text>
       <InputForm
         control={control}
-        nameInput="minOrder"
-        error={undefined}
-        placeholder="0"
+        nameInput="discount"
+        error={errors?.discount}
+        placeholder="0%"
         className={styles.input}
       />
       <Title level={5}>Selecciona un grupo de clientes</Title>
-      <GroupClients clients={clientDummy}></GroupClients>
-      <ProductList lines={lineDummy}></ProductList>
+      <GroupClients
+        clients={data?.data}
+        error={error}
+        loading={loading}
+        form={form}
+        statusForm={statusForm}
+      ></GroupClients>
+      <ProductList
+        lines={lines}
+        loading={isLoading}
+        form={form}
+        statusForm={statusForm}
+      ></ProductList>
     </Flex>
   );
 }

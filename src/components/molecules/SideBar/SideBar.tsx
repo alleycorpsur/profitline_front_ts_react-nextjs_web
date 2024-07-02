@@ -31,7 +31,7 @@ export const SideBar = () => {
           </Flex>
         )}
 
-        <Link href="/clientes/all" passHref legacyBehavior>
+        <Link href="/clientes/all">
           <Button
             type="primary"
             size="large"
@@ -45,7 +45,7 @@ export const SideBar = () => {
           <Button
             type="primary"
             size="large"
-            icon={<Megaphone size={32} />}
+            icon={<Megaphone size={26} />}
             className={path.startsWith("/descuentos") ? "buttonIcon" : "buttonIconActive"}
           >
             {isSideBarLarge && "Descuentos"}

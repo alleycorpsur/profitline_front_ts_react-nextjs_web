@@ -20,6 +20,12 @@
             border: 1px solid $dark-gray;
             padding: 3rem 5rem;
             flex-direction: column;
+            @media (max-width: 768px) {
+                width: 230px;
+            }
+            @media (min-width: 768px) {
+                width: 300px;
+            }
             > span {
                 font-size: 1rem;
                 font-weight: 500;

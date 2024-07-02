@@ -1,12 +1,11 @@
 import { Button, ConfigProvider, theme } from "antd";
-import { BaseButtonProps } from "antd/es/button/button";
+import { BaseButtonProps, ButtonProps } from "antd/es/button/button";
 
 const { useToken } = theme;
 
-export default function PrincipalButton({ children, ...rest }: BaseButtonProps) {
+export default function PrincipalButton({ children, ...rest }: ButtonProps & BaseButtonProps) {
   const { token } = useToken();
   const color = token.green;
-  console.log(color);
 
   return (
     <ConfigProvider
@@ -18,7 +17,7 @@ export default function PrincipalButton({ children, ...rest }: BaseButtonProps) 
             colorPrimaryActive: color,
             primaryShadow: "none",
             paddingContentHorizontal: 24,
-            paddingContentVertical: 12,
+            paddingContentVertical: 12
           }
         }
       }}

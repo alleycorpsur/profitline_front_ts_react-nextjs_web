@@ -8,9 +8,10 @@ interface Props {
   clients?: any[];
   subscribers?: any[];
   activeUsers?: "all" | "active" | "inactive";
+  noLimit?: boolean;
 }
 
-export const useClientsGroups = ({ page, idProject, clients, subscribers, activeUsers }: Props) => {
+export const useClientsGroups = ({ page, idProject, clients, subscribers, activeUsers, noLimit }: Props) => {
   const clientsQuery = (clients?.length ?? 0) > 0 ? `&zone=${clients?.join(",")}` : "";
   const subsQuery = (subscribers?.length ?? 0) > 0 ? `&rol=${subscribers?.join(",")}` : "";
 
@@ -20,8 +21,9 @@ export const useClientsGroups = ({ page, idProject, clients, subscribers, active
       : "";
 
   const pageQuery = page ? `&page=${page}` : "";
+  const limitQuery = noLimit ? "&noLimit=true" : "";
 
-  const pathKey = `/group-client/?project_id=${idProject}${pageQuery}${clientsQuery}${subsQuery}${statusQuery}`;
+  const pathKey = `/group-client/?project_id=${idProject}${pageQuery}${clientsQuery}${subsQuery}${statusQuery}${limitQuery}`;
 
   const { data, error, isLoading } = useSWR<IClientsGroupsFull>(pathKey, fetcher, {});
 

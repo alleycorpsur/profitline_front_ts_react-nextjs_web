@@ -39,6 +39,16 @@ export const DocumentButton = ({
     customRequest: () => {
       return;
     },
+    beforeUpload: (file) => {
+      const reader = new FileReader();
+
+      reader.onload = (e) => {
+      };
+      reader.readAsText(file);
+
+      // Prevent upload
+      return false;
+    },
     disabled,
     onRemove: () => false
   };
