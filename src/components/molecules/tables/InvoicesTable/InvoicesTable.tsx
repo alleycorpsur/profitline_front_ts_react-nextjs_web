@@ -99,7 +99,7 @@ export const InvoicesTable = ({
       sorter: (a, b) => Date.parse(a.expiration_date) - Date.parse(b.expiration_date),
       showSorterTooltip: false,
       align: "right",
-      width: 116
+      width: 140
     },
     {
       title: "Monto inicial",

@@ -1,0 +1,67 @@
+.createDebitCustom {
+    .ant-modal-content {
+        max-height: 80vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .modalContentScroll {
+        overflow-y: auto;
+        max-height: calc(70vh - 112px);
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .modalContent {
+
+        .containterForm {
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: 1fr 1fr;
+            padding: 1rem 0 0 0;
+        }
+
+        .subTitleModalAction {
+            font-size: 1rem;
+            font-style: normal;
+            font-weight: 300;
+            line-height: 1.25rem;
+            padding: 1rem 0 1.5rem 0;
+        }
+
+        .button__create__action {
+            display: flex;
+            align-items: center;
+            font-size: 1.125rem;
+            font-weight: 500;
+            line-height: 1.25rem;
+            gap: 0.5rem;
+            padding: 1.5rem 0;
+            border: none;
+            background-color: #ffff;
+            cursor: pointer;
+        }
+
+        .button__action__text {
+            height: 2.5rem;
+            border-radius: 0.5rem;
+            padding: 0 0.5rem;
+            font-size: 1.125rem;
+            font-weight: 500;
+            line-height: 1.25rem;
+            flex-grow: 1;
+            border: none;
+            box-shadow: none;
+
+            &__green {
+                background-color: #CBE71E;
+            }
+
+            &__white {
+                background-color: #ffff;
+                border: solid 2px;
+            }
+        }
+    }
+}

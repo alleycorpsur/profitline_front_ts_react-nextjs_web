@@ -11,6 +11,7 @@ import { Button, Flex, Spin } from "antd";
 import UiTab from "@/components/ui/ui-tab";
 import { InvoiceAction } from "../../constants/invoice-actions.constants";
 import AccountingAdjustmentsTab from "../accounting-adjustments-tab";
+import Link from "next/link";
 
 interface ClientDetailsProps {}
 export const ClientDetailsContext = createContext<any>({});
@@ -64,16 +65,16 @@ export const ClientDetails: FC<ClientDetailsProps> = () => {
         <Flex vertical className={styles.containerDetailClient}>
           <Flex className={styles.stickyHeader} align="center" justify="space-between">
             <Flex className={styles.infoHeader} align="center" justify="center">
-              <a href={`/clientes/all`}>
+              <Link href={`/clientes/all`}>
                 <Button
                   type="text"
                   size="large"
                   className={styles.buttonGoBack}
                   icon={<CaretLeft size={"1.6rem"} />}
                 >
-                  {portfolioData ? portfolioData.data_wallet.client_name : "Loading..."}
+                  {portfolioData ? portfolioData?.data_wallet?.client_name : "Loading..."}
                 </Button>
-              </a>
+              </Link>
             </Flex>
           </Flex>
 

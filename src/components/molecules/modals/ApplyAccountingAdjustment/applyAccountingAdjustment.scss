@@ -1,0 +1,86 @@
+@import "@styles/variables.scss";
+
+.modalContentApply {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  gap: 1.5rem;
+
+  .subTitleModalApply {
+    font-size: 1rem;
+    font-style: normal;
+    font-weight: 300;
+    line-height: 1.25rem;
+  }
+
+
+  .ant-table-thead .ant-table-cell {
+    background-color: transparent;
+    padding: 0 0 0.5rem 0;
+    text-align: center;
+    border: none;
+  }
+}
+
+.scrollableTabs {
+  display: flex;
+  overflow-x: auto;
+  white-space: nowrap; // Evita el salto de línea
+
+  &::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: darkgrey;
+    border-radius: 10px;
+  }
+
+  .tab {
+    flex-shrink: 0;
+    padding: 10px 20px; // Ajusta el padding según la necesidad
+    cursor: pointer; // Hace que el ratón cambie a mano cuando se pasa sobre las pestañas
+    box-sizing: border-box; // Incluye el padding en el cálculo del ancho del elemento
+    border: 1px solid transparent;
+
+    &:hover {
+      border-color: rgba(0, 0, 0, 0.1);
+    }
+  }
+}
+
+.button__number__adjustment {
+  background-color: $background !important;
+  border-radius: 0;
+  border-radius: 0.25rem;
+  font-size: 1rem;
+
+  input {
+    &::placeholder {
+      color: $dark-gray !important;
+    }
+
+    &::-webkit-input-placeholder {
+      color: $dark-gray !important;
+    }
+
+    &:-moz-placeholder {
+      color: $dark-gray !important;
+    }
+
+    &::-moz-placeholder {
+      color: $dark-gray !important;
+    }
+
+    &:-ms-input-placeholder {
+      color: $dark-gray !important;
+    }
+
+  }
+}
+
+.column__apply__value {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

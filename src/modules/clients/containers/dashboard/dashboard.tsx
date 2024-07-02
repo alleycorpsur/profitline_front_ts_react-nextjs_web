@@ -21,8 +21,8 @@ interface DashboardProps {}
 const Dashboard: FC<DashboardProps> = () => {
   const { portfolioData } = useContext(ClientDetailsContext);
 
-  const appliedPayments = formatMoney(portfolioData?.data_wallet.applied_payments_ammount);
-  const unappliedPayments = formatMoney(portfolioData?.data_wallet.unapplied_payments_ammount);
+  const appliedPayments = formatMoney(portfolioData?.data_wallet?.applied_payments_ammount);
+  const unappliedPayments = formatMoney(portfolioData?.data_wallet?.unapplied_payments_ammount);
   const dsoValue = portfolioData?.dso;
 
   return (

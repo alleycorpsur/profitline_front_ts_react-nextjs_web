@@ -11,7 +11,7 @@ interface DashboardExpiredPortfolioProps {
 
 const DashboardExpiredPortfolio: FC<DashboardExpiredPortfolioProps> = ({ className }) => {
   const { portfolioData } = useContext(ClientDetailsContext);
-  const pastDuePortfolio = formatMoney(portfolioData?.data_wallet.past_due_ammount);
+  const pastDuePortfolio = formatMoney(portfolioData?.data_wallet?.past_due_ammount);
 
   return (
     <div className={`${styles.wrapper} ${className}`}>
