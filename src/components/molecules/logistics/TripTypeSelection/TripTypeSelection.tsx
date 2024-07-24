@@ -12,21 +12,9 @@ const TripTypeSelection: FunctionComponent<TripTypeSelectionType> = ({
 }) => {
   return (
     <Flex gap="middle">
-      <TripTypes truck="/images/logistics/truck.svg" carga="Carga" />
-          <TripTypes
-            truck="/images/logistics/izaje.svg"
-            carga="Izaje"
-            propWidth="32.5px"
-            propTextDecoration="unset"
-            propMinWidth="36px"
-          />
-          <TripTypes
-            truck="/images/logistics/users.svg"
-            carga="Personal"
-            propWidth="27px"
-            propTextDecoration="none"
-            propMinWidth="69px"
-          />
+      <TripTypes icon="/images/logistics/truck.svg" text="Carga" id="1"/>
+      <TripTypes icon="/images/logistics/izaje.svg" text="Izaje" id="2"/>
+      <TripTypes icon="/images/logistics/users.svg" text="Personal" id="3"/>
     </Flex>
   );
 };

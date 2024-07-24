@@ -1,0 +1,25 @@
+.mainProject {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    .contentProject {
+			height: 100%;
+			width: 100%;
+			margin: 0 0 32px 0;
+			background-color: white;
+			padding: 2rem;
+			padding-left: 2.5rem;
+			overflow-y: auto;
+        .titleName {
+						margin: auto;
+            font-weight: 600;
+						width: 398px;
+						height: 32px;
+						color: #141414;
+						line-height: 124%;
+						font-style: normal;
+						font-size: 24px;
+        }
+    }
+}

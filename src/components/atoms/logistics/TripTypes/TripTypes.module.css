@@ -1,10 +1,10 @@
 
-.truckIcon {
+  .icon {
     width: 27px;
     height: 27px;
     position: relative;
   }
-  .carga {
+  .text {
     text-decoration: none;
     position: relative;
     color: inherit;
@@ -36,4 +36,9 @@
     color: var(--black);
     font-family: var(--font-poppins);
   }
+
+  .active {
+    background-color: var(--green);
+  }
   
+ 

@@ -1,8 +1,12 @@
+@import "@/styles/variables.scss";
+
 .uploadimg {
     margin-bottom: 1rem;
     .uploadText {
 			margin-top: .5rem;
 			color: #DDD;
+			font-size: var(--font-size-xsm) !important;
+			font-style: italic;
     }
     .img {
 			width: 100%;

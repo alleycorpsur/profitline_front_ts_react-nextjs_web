@@ -1,0 +1,39 @@
+@import "@styles/variables.scss";
+
+.selectInputGlasses {
+    width: 100%;
+    margin-bottom: 0.2rem;
+    background-color: $background;
+    padding: 0.45rem !important;
+    border-radius: 0.25rem;
+    border-bottom: none;
+    height: 3rem !important;
+
+    span {
+        font-size: 1rem;
+    }
+
+    div {
+        .ant-select-selection-placeholder {
+            color: $dark-gray;
+        }
+    }
+}
+
+.selectInputCurrenciesError {
+    width: 100%;
+    border: 1px dashed red;
+    height: 3rem !important;
+    margin-bottom: 0.2rem;
+    background-color: $background;
+    padding: 0.45rem;
+    border-radius: 0.25rem;
+    font-weight: 300;
+
+    .ant-select-selector {
+        .ant-select-selection-placeholder {
+            color: $dark-gray;
+            font-size: 1rem;
+        }
+    }
+}

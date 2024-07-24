@@ -1,53 +1,41 @@
-import { FunctionComponent, useMemo, type CSSProperties } from "react";
+import { FunctionComponent, useState} from "react";
 import styles from "./TripTypes.module.css";
 
 export type TripTypesType = {
   className?: string;
-  truck?: string;
-  carga?: string;
-
-  /** Style props */
-  propWidth?: CSSProperties["width"];
-  propTextDecoration?: CSSProperties["textDecoration"];
-  propMinWidth?: CSSProperties["minWidth"];
+  icon?: string;
+  text?: string;
+  id?: string;
 };
 
 const TripTypes: FunctionComponent<TripTypesType> = ({
   className = "",
-  truck,
-  carga,
-  propWidth,
-  propTextDecoration,
-  propMinWidth,
+  icon,
+  text,
+  id
 }) => {
-  const truckIconStyle: CSSProperties = useMemo(() => {
-    return {
-      width: propWidth,
-    };
-  }, [propWidth]);
 
-  const cargaStyle: CSSProperties = useMemo(() => {
-    return {
-      textDecoration: propTextDecoration,
-      minWidth: propMinWidth,
-    };
-  }, [propTextDecoration, propMinWidth]);
+  const [active, setActive] = useState("");
+ 
+  const handleClick = (event:any) => {
+    setActive(event.target.id);
+    console.log(event);
+  }
 
   return (
-    <div className={[styles.tripTypes, className].join(" ")}>
+    <button id={id} className={[styles.tripTypes, (active === id ? styles.active : undefined), className].join(" ")} onClick={handleClick}>
       <div className={styles.tripTypeIcons}>
         <img
-          className={styles.truckIcon}
+          className={styles.icon}
           loading="lazy"
           alt=""
-          src={truck}
-          style={truckIconStyle}
+          src={icon}
         />
-        <a className={styles.carga} style={cargaStyle}>
-          {carga}
+        <a className={styles.text}>
+          {text}
         </a>
       </div>
-    </div>
+    </button>
   );
 };
 

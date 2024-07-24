@@ -32,6 +32,12 @@ export interface IClientLocationResponse {
   message: string;
 }
 
+export interface IClientLocationResponse {
+  data: IClientLocation[];
+  error: boolean;
+  message: string;
+}
+
 interface IDocument {
   URL: string;
 }

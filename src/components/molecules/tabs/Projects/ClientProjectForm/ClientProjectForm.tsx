@@ -140,6 +140,21 @@ export const ClientProjectForm = ({
     isNonEmptyObject(dataClient.data)
   );
 
+  // // useEffect(() => {
+  // //   // UseEffect para actualizar el valor de billingPeriod
+  // //   if (dataClient.data.billing_period) {
+  // //     setBillingPeriod(dataClient.data.billing_period_config);
+  // //     return;
+  // //   }
+
+  // //   const formattedBillingPeriod = billingPeriod?.day_flag
+  // //     ? `El dia ${billingPeriod?.day} del mes`
+  // //     : `El ${billingPeriod?.order} ${billingPeriod?.day_of_week} del mes`;
+
+  // //   // Establecer el valor formateado al string de billing period
+  // //   setValue("infoClient.billing_period", formattedBillingPeriod, { shouldValidate: true });
+  // // }, [billingPeriod, setValue, dataClient.data.billing_period]);
+
   useEffect(() => {
     // UseEffect tu update billingPeriod Value in the form
     // so react-hook-form can validate the field
@@ -163,6 +178,7 @@ export const ClientProjectForm = ({
       });
       const response = await getClientById(isViewDetailsClient.id.toString(), idProject);
       const finalData = response.data.data;
+      console.log(finalData);
 
       setDataClient({
         isLoading: false,

@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Button, Flex } from "antd";
 
-import { ArrowLineRight, BellSimpleRinging, Gear, Megaphone, User } from "phosphor-react";
+import { ArrowLineRight, BellSimpleRinging, Gear, Megaphone, User, UsersThree, Truck } from "phosphor-react";
 import Image from "next/image";
 
 import "./sidebar.scss";
@@ -11,6 +11,9 @@ import { logOut } from "../../../../firebase-utils";
 import Link from "next/link";
 import { useAppStore } from "@/lib/store/store";
 import useStore from "@/lib/hook/useStore";
+import config from "@/config";
+
+const { isLogistics } = config;
 
 export const SideBar = () => {
   const [isSideBarLarge, setIsSideBarLarge] = useState(false);
@@ -33,6 +36,7 @@ export const SideBar = () => {
           </Flex>
         )}
 
+        {!isLogistics && (
         <Link href="/clientes/all">
           <Button
             type="primary"
@@ -43,6 +47,8 @@ export const SideBar = () => {
             {isSideBarLarge && "Clientes"}
           </Button>
         </Link>
+        )}
+        {!isLogistics && (
         <Link href="/descuentos" passHref legacyBehavior>
           <Button
             type="primary"
@@ -53,32 +59,76 @@ export const SideBar = () => {
             {isSideBarLarge && "Descuentos"}
           </Button>
         </Link>
-        <Link href="/notificaciones" passHref legacyBehavior>
+        )}
+        {!isLogistics && (
+        <><Link href="/notificaciones" passHref legacyBehavior>
+            <Button
+              type="primary"
+              size="large"
+              icon={<BellSimpleRinging size={26} />}
+              className={path.startsWith("/notificaciones") ? "buttonIcon" : "buttonIconActive"}
+            >
+              {isSideBarLarge && "Notificaciones"}
+            </Button>
+          </Link><Link href="/comercio" passHref legacyBehavior>
+              <Button
+                type="primary"
+                size="large"
+                icon={<Megaphone size={26} />}
+                className={path.startsWith("/comercio") ? "buttonIcon" : "buttonIconActive"}
+              >
+                {isSideBarLarge && "Descuentos"}
+              </Button>
+            </Link><Link href="/comercio" passHref legacyBehavior>
+              <Button
+                type="primary"
+                size="large"
+                icon={<Megaphone size={26} />}
+                className={path.startsWith("/comercio") ? "buttonIcon" : "buttonIconActive"}
+              >
+                {isSideBarLarge && "Descuentos"}
+              </Button>
+            </Link></>
+        )}
+        <Link href="/logistics/orders" passHref legacyBehavior>
           <Button
             type="primary"
             size="large"
-            icon={<BellSimpleRinging size={26} />}
-            className={path.startsWith("/notificaciones") ? "buttonIcon" : "buttonIconActive"}
+            icon={<Truck size={26} />}
+            className={path.startsWith("/logistics/orders") ? "buttonIcon" : "buttonIconActive"}
           >
-            {isSideBarLarge && "Notificaciones"}
+            {isSideBarLarge && "Solicitudes"}
           </Button>
         </Link>
-        <Link href="/comercio" passHref legacyBehavior>
+        <Link href="/logistics/providers/all" passHref legacyBehavior>
           <Button
             type="primary"
             size="large"
-            icon={<Megaphone size={26} />}
-            className={path.startsWith("/comercio") ? "buttonIcon" : "buttonIconActive"}
+            icon={<UsersThree size={26} />}
+            className={path.startsWith("/logistics/providers") ? "buttonIcon" : "buttonIconActive"}
           >
-            {isSideBarLarge && "Descuentos"}
+            {isSideBarLarge && "Clientes"}
           </Button>
         </Link>
+        {!isLogistics && (
         <Link href="/" passHref legacyBehavior>
           <Button
             type="primary"
             size="large"
             icon={<Gear size={26} />}
-            className={path === "/" ? "buttonIcon" : "buttonIconActive"}
+            className={path.startsWith("/clientes") ? "buttonIcon" : "buttonIconActive"}
+          >
+            {isSideBarLarge && "Clientes"}
+          </Button>
+        </Link>
+        )}
+
+        <Link href="/logistics/configuration" passHref legacyBehavior>
+          <Button
+            type="primary"
+            size="large"
+            icon={<Gear size={26} />}
+            className={path.startsWith("/logistics/configuration") ? "buttonIcon" : "buttonIconActive"}
           >
             {isSideBarLarge && "Ajustes"}
           </Button>

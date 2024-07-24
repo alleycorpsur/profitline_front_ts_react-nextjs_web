@@ -1,0 +1,247 @@
+@import "@styles/variables";
+
+.vehiclesFormTab {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    overflow-y: scroll;
+    flex-direction: column;
+
+    .title {
+        font-size: 1rem;
+        color: #141414;
+        font-weight: 600;
+        font-style: normal;
+        line-height: normal;
+    }
+
+    .buttonNewProject {
+        display: flex;
+        padding: 0 24px;
+        margin: 24px 24px;
+        justify-content: flex-end;
+
+        .button {
+            width: 240px;
+            height: 40px;
+            display: flex;
+            font-size: 16px;
+            font-weight: 600;
+            color: #141414;
+            border-radius: 8px;
+            align-items: center;
+            line-height: normal;
+            justify-content: center;
+            background: var(--Dark-Grey, #ddd);
+
+            &.active {
+                background-color: #cbe71e;
+            }
+        }
+    }
+
+    .textError {
+        color: red;
+        padding-left: 0.5rem;
+    }
+
+    .headerProyectsForm {
+        padding: 0.5rem 0;
+        padding-right: 0.5rem;
+        margin-bottom: 0.5rem;
+        justify-content: space-between;
+        align-items: center;
+
+        h2,
+        h3,
+        h4 {
+            color: $secondary-gray;
+        }
+
+        .buttons {
+            gap: 10px;
+            width: 210px;
+            display: flex;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 8px;
+            line-height: normal;
+            align-items: center;
+            justify-content: center;
+            color: var(--Black, #141414);
+            border: 1px solid #ddd;
+        }
+
+        .containerInput {
+            width: 30%;
+            margin: 0.25rem 0.5rem;
+
+            .title {
+                font-size: 0.75rem;
+                font-weight: 600;
+                font-style: normal;
+                line-height: normal;
+            }
+        }
+
+        .buttonGoBack {
+            justify-content: flex-start;
+            color: #141414;
+            box-shadow: none;
+            padding: inherit;
+            font-weight: 600;
+
+            &:hover {
+                opacity: 0.8;
+                color: black;
+            }
+        }
+    }
+
+    .ant-upload-wrapper {
+        width: 100% !important;
+    }
+
+    .uploadText {
+        display: none !important;
+    }
+
+    .colfoto .ant-upload-select {
+        width: 100% !important;
+        max-width: 19rem !important;
+        height: 14rem !important;
+        border-radius: 8px;
+    }
+
+    .colfotomin .ant-upload-select {
+        width: 60px !important;
+        height: 60px !important;
+        flex-shrink: 0;
+        border-radius: 8px;
+        background: #f7f7f7;
+    }
+
+
+
+
+
+
+    .buttonAction {
+        color: #141414;
+        display: flex;
+
+        &:hover {
+            opacity: 0.8;
+            color: #141414;
+        }
+    }
+
+    .generalProject {
+        display: flex;
+        width: 100%;
+        flex-wrap: wrap;
+
+        .description {
+            width: 47% !important;
+        }
+
+        h2,
+        h3,
+
+
+        h5 {
+            color: $gray;
+        }
+
+        .containerInput {
+            width: 30%;
+            margin: 0.25rem 0.5rem;
+
+            .title {
+                font-size: 0.75rem;
+                font-weight: 600;
+                font-style: normal;
+                line-height: normal;
+            }
+
+            .ant-color-picker-trigger {
+                background-color: $background;
+                justify-content: flex-start;
+                padding: 1.5rem;
+                border: none;
+            }
+
+            .ant-popover-inner {
+                background-color: $background;
+            }
+
+            .ant-select-selection-item-content {
+                color: black;
+            }
+
+            .ant-input-disabled {
+                color: black;
+            }
+
+            .ant-select-selection-item {
+                color: #141414;
+            }
+
+            .ant-input-disabled {
+                color: #141414;
+            }
+
+            .ant-color-picker-trigger-text {
+                color: #141414;
+            }
+
+            .Controller {
+                .selectDocument {
+                    padding: 0.7rem;
+                }
+            }
+        }
+
+        .selectInput {
+            width: 100%;
+            margin-bottom: 0.2rem;
+            background-color: $background;
+            padding: 1.4rem 0.45rem !important;
+            border-radius: 0.25rem;
+            border-bottom: none;
+
+            span {
+                font-size: 1rem;
+            }
+
+            .ant-select-selection-placeholder {
+                color: $dark-gray;
+            }
+
+            &.ant-select-disabled {
+                span {
+                    color: $dark-gray !important;
+                }
+            }
+        }
+
+        .selectInputError {
+            border: 1px dashed red;
+            width: 100%;
+            margin-bottom: 0.2rem;
+            background-color: $background;
+            padding: 0.45rem;
+            border-radius: 0.25rem;
+        }
+    }
+}
+
+.btnagregarpsl {
+    padding: 8px;
+    border: none;
+    border-radius: 5px;
+    margin-top: 8px;
+    margin-bottom: 8px;
+    background: none !important;
+    cursor: pointer;
+}

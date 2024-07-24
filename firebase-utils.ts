@@ -2,6 +2,9 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } f
 import { auth } from "./firebase";
 import { STORAGE_TOKEN } from "@/utils/constants/globalConstants";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import config from "@/config";
+
+const { isLogistics } = config;
 
 const getAuth = async (
   email: string,
@@ -42,7 +45,7 @@ const getAuth = async (
         }).then((response) => {
           localStorage.setItem(STORAGE_TOKEN, token);
           if (response.status === 200) {
-            router.push("/");
+            isLogistics ? router.push("/logistics/providers/all") : router.push("/");
           }
         });
       })
@@ -55,6 +58,6 @@ const getAuth = async (
 const logOut = (router: AppRouterInstance) => {
   signOut(auth);
   localStorage.removeItem(STORAGE_TOKEN);
-  router.replace("auth/login");
+  router.replace("/auth/login");
 };
 export { getAuth, logOut };

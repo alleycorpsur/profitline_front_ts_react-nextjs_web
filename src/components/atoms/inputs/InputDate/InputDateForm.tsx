@@ -4,6 +4,7 @@ import { Control, Controller, FieldError, RegisterOptions } from "react-hook-for
 import { Calendar } from "phosphor-react";
 
 import "./inputDateFormStyle.scss";
+import dayjs from "dayjs";
 
 interface InputDateFormProps {
   titleInput: string;
@@ -26,33 +27,32 @@ export const InputDateForm = ({
   placeholder = "",
   disabled,
   validationRules,
-  className
+  className,
 }: InputDateFormProps) => {
-  return (
-    <Flex vertical className={`datePickerContainer ${className}`}>
-      {!hiddenTitle && <p className="input-date-custom-title">{titleInput}</p>}
-      <Controller
-        name={nameInput}
-        rules={{ required: true, ...validationRules }}
-        control={control}
-        render={({ field }) => (
-          <DatePicker
-            {...field}
-            onChange={(date) => field.onChange(date)}
-            value={field.value}
-            size="large"
-            disabled={disabled}
-            placeholder={placeholder || `Select ${titleInput.toLowerCase()}`}
-            suffixIcon={<Calendar className="dateInputForm__icon" />}
-            className={!error ? "dateInputForm" : "dateInputFormError"}
-          />
+    return (
+      <Flex vertical className={`datePickerContainer ${className}`}>
+        {!hiddenTitle && <p className="input-date-custom-title">{titleInput}</p>}
+        <Controller
+          name={nameInput}
+          rules={{ required: true, ...validationRules }}
+          control={control}
+          render={({ field }) => (
+            <DatePicker
+              {...field}
+              onChange={(date) => field.onChange(date)}
+              size="large"
+              disabled={disabled}
+              placeholder={placeholder || `Select ${titleInput.toLowerCase()}`}
+              suffixIcon={<Calendar className="dateInputForm__icon" />}
+              className={!error ? "dateInputForm" : "dateInputFormError"}
+            />
+          )}
+        />
+        {error && (
+          <Typography.Text className="textError">
+            {error.message || `${titleInput} is required`}
+          </Typography.Text>
         )}
-      />
-      {error && (
-        <Typography.Text className="textError">
-          {error.message || `${titleInput} is required`}
-        </Typography.Text>
-      )}
-    </Flex>
-  );
+      </Flex>
+    );
 };

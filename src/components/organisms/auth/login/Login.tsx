@@ -11,17 +11,13 @@ export const LoginView = () => {
     <main className={styles.home}>
       <Flex align="center" className={styles.container}>
         <Flex className={styles.companySection}>
-          <Image
-            className={styles.imageLogo}
-            src="/images/login/01-example-login-logo.png"
-            alt="Logo Company"
-            preview={false}
-            width={"70%"}
-          />
+          <Title level={1} style={{ fontSize: "3.6rem", fontWeight: 500, color: "white" }}>
+            Transport Management System
+          </Title>
           <div className={styles.textCompanyContainer}>
             <Divider />
             <Title level={1} style={{ fontSize: "1.6rem", fontWeight: 500, color: "white" }}>
-              Sistema de gestion de cobranzas
+              The leading supply chain logistics platform
             </Title>
           </div>
         </Flex>

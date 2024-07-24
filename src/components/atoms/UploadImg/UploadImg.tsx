@@ -6,9 +6,10 @@ interface Props {
   imgDefault?: string;
   setImgFile: Dispatch<SetStateAction<any>>;
   disabled?: boolean;
+  uploadInstructionsText?: string
 }
 
-export const UploadImg = ({ disabled = false, imgDefault = "", setImgFile }: Props) => {
+export const UploadImg = ({ disabled = false, imgDefault = "", setImgFile, uploadInstructionsText = "*Sube una imagen"}: Props) => {
   const [loading, setLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState<string>(imgDefault);
 
@@ -71,7 +72,7 @@ export const UploadImg = ({ disabled = false, imgDefault = "", setImgFile }: Pro
         )}
       </Upload>
       <Typography.Text className="uploadText">
-        * Sube la imagen del logo del proyecto que vas a crear
+        {uploadInstructionsText}
       </Typography.Text>
     </Flex>
   );
