@@ -1400,7 +1400,148 @@ export interface IPsl {
   idcc: number;
   desccc: string;
 }
-
+/**
+ * Exposes all fields present in transfer_orders_request as a typescript
+ * interface.
+ */
+export interface ITransferOrdersRequest {
+  orders: ITransferOrderRequest[]
+}
+/**
+ * Exposes all fields present in transfer_order_request as a typescript
+ * interface.
+ */
+export interface ITransferOrderRequest {
+  id: number;
+  id_service_type: number;
+  id_user: number;
+  id_start_location: number;
+  id_end_location: number;
+  start_date: string;
+  end_date: string;
+  start_freight_equipment: boolean;
+  end_freight_equipment: boolean;
+  rotation: boolean;
+  start_date_flexible: number;
+  end_date_flexible: number;
+  id_route: string;
+  id_company: number;
+  id_client: number;
+  status: string;
+  active: boolean;
+  created_at: string;
+  created_by: string;
+  modified_at: string;
+  modified_by: string;
+  observation: string;
+  freight_origin_time: number;
+  freight_destination_time: number;
+  service_type_desc: string;
+  client_desc: string;
+  start_location?: ILocation | null | undefined;
+  end_location?: ILocation | null | undefined;
+  //geometry
+  geometry: any;
+  //datos de contacto
+  transfer_order_contacts?: ITransferOrderRequestContacts[] | null;
+  //centros de costo
+  transfer_order_cost_center?: ITransferOrderCostCenter[] | null;
+  //documentos
+  transfer_order_documents?: ITransferOrderDocuments[] | null;
+  //materiales
+  transfer_order_material?: ITransferOrderRequestMaterials[] | null;
+  //other_requirements
+  transfer_order_other_requeriments?: ITransferOrderRequestOtherRequeriments[] | null;
+  //personas
+  transfer_order_persons?: ITransferOrderPersons[] | null;
+  //productos
+  transfer_order_products?: ITransferOrderProducts[] | null;
+  //vehiculos
+  transfer_order_vehicles?: ITransferOrderRequestVehicles[] | null;
+  //journey
+  transfer_order_journey?: ITransferOrderRequestJourney[] | null;
+}
+/**
+ * Exposes all fields present in transfer_order_request_contacts as a typescript
+ * interface.
+ */
+export interface ITransferOrderRequestContacts {
+  id: number;
+  id_transfer_order: number;
+  id_contact: number;
+  contact_type: number;
+  name: string;
+  contact_number: number;
+  id_psl: string | null | undefined;
+  id_cost_center: string | null | undefined;
+  active: number;
+  created_at: string;
+  created_by: string;
+  modified_at: string;
+  modified_by: string;
+}
+/**
+ * Exposes all fields present in transfer_order_request_materials as a typescript
+ * interface.
+ */
+export interface ITransferOrderRequestMaterials {
+  id: number;
+  id_transfer_order: number;
+  id_material: number;
+  quantity: number;
+  created_at: string;
+  created_by: string;
+  modified_at: string;
+  modified_by: string;
+  material: IMaterial[]
+}
+/**
+ * Exposes all fields present in transfer_order_request_materials as a typescript
+ * interface.
+ */
+export interface ITransferOrderRequestOtherRequeriments {
+  id: number;
+  id_transfer_order: number;
+  id_other_requeriments: number;
+  quantity: number;
+  created_at: string;
+  created_by: string;
+  modified_at: string;
+  modified_by: string;
+  other_requirement_desc: string;
+}
+/**
+ * Exposes all fields present in transfer_order_request_vehicles as a typescript
+ * interface.
+ */
+export interface ITransferOrderRequestVehicles {
+  id: number;
+  id_transfer_order: number;
+  id_vehicle_type: number;
+  quantity: number;
+  created_at: string;
+  created_by: string;
+  modified_at: string;
+  modified_by: string;
+  id_journey: number | string | null | undefined;
+  vehicle_type_desc: string;
+}
+/**
+ * Exposes all fields present in transfer_order_request_journey as a typescript
+ * interface.
+ */
+export interface ITransferOrderRequestJourney {
+  id: number;
+  id_transfer_order: number;
+  id_start_location: number;
+  id_end_location: number;
+  id_type_service: number;
+  order_to: number;
+  created_at: number;
+  created_by: number;
+  modified_at: number;
+  modified_by: number;
+}
 /**
  * Exposes all fields present in transfer_order as a typescript
  * interface.
