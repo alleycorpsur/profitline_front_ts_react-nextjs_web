@@ -6,11 +6,15 @@ import { OrderViewContext } from "../../containers/create-order/create-order";
 import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
 import { InputForm } from "@/components/atoms/inputs/InputForm/InputForm";
 import { Controller, useForm } from "react-hook-form";
-import { ISelectType } from "@/types/clients/IClients";
 import styles from "./create-order-checkout.module.scss";
 import GeneralSelect from "@/components/ui/general-select";
 import AlternativeBlackButton from "@/components/atoms/buttons/alternativeBlackButton/alternativeBlackButton";
-import { createDraft, createOrder, getAdresses } from "@/services/commerce/commerce";
+import {
+  createDraft,
+  createOrder,
+  createOrderFromDraft,
+  getAdresses
+} from "@/services/commerce/commerce";
 import { useAppStore } from "@/lib/store/store";
 import { ICommerceAdresses, IShippingInformation } from "@/types/commerce/ICommerce";
 import { useMessageApi } from "@/context/MessageContext";
@@ -31,6 +35,7 @@ interface IShippingInfoForm {
 const CreateOrderCheckout: FC = ({}) => {
   const { setCheckingOut, client, confirmOrderData, shippingInfo } = useContext(OrderViewContext);
   const { ID: projectId } = useAppStore((state) => state.selectedProject);
+  const { draftInfo } = useAppStore((state) => state);
   const [radioValue, setRadioValue] = useState(0);
   const [loading, setLoading] = useState(false);
   const [addresses, setAddresses] = useState<ICommerceAdresses[]>([]);
@@ -116,6 +121,24 @@ const CreateOrderCheckout: FC = ({}) => {
       },
       order_summary: confirmOrderData
     };
+
+    if (!!draftInfo?.id || (!!draftInfo.client_name && draftInfo.id !== undefined)) {
+      const response = (await createOrderFromDraft(
+        projectId,
+        client.id,
+        draftInfo.id,
+        createOrderModelData,
+        showMessage
+      )) as GenericResponse<{ id_order: number }>;
+
+      if (response.status === 200) {
+        const url = `/comercio/pedidoConfirmado/${draftInfo.id}`;
+        router.prefetch(url);
+        router.push(url);
+      }
+      setLoading(false);
+      return;
+    }
 
     const response = (await createOrder(
       projectId,
@@ -232,6 +255,7 @@ const CreateOrderCheckout: FC = ({}) => {
             onClick={handleSubmit(onSubmitSaveDraft)}
             fullWidth
             loading={loading}
+            disabled={!!draftInfo?.id || !!draftInfo.client_name}
           >
             Guardar borrador
           </AlternativeBlackButton>

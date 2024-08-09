@@ -131,3 +131,27 @@ export const deleteOrders = async (
     return error;
   }
 };
+
+export const createOrderFromDraft = async (
+  projectId: number,
+  clientId: number,
+  orderId: number,
+  data: ICreateOrderData,
+  // eslint-disable-next-line no-unused-vars
+  showMessage: (type: MessageType, content: string) => void
+) => {
+  try {
+    const response: GenericResponse<{ id_order: number }> = await API.put(
+      `/marketplace/projects/${projectId}/clients/${clientId}/draft-to-order/${orderId}`,
+      data
+    );
+    if (response.status !== 200) {
+      throw response;
+    }
+    showMessage("success", "Orden creada correctamente");
+    return response;
+  } catch (error) {
+    showMessage("error", "Error al crear orden");
+    return error;
+  }
+};

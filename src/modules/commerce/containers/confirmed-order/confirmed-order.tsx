@@ -23,7 +23,7 @@ export const ConfirmedOrderView: FC = () => {
     if (!orderIdParam || !projectId) return;
     const fetchOrder = async () => {
       const response = await getSingleOrder(projectId, parseInt(orderIdParam));
-      setOrder(response.data[0]);
+      setOrder(response?.data[0]);
     };
     fetchOrder();
   }, [params, projectId]);

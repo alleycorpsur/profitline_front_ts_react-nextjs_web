@@ -69,7 +69,7 @@ export const CreateOrderView: FC = () => {
           category_id: category.id_category,
           category: category.category,
           products: category.products.map((product) => ({
-            id: parseInt(product.product_sku),
+            id: product.id,
             name: product.product_name,
             price: product.price,
             discount: product.discount,

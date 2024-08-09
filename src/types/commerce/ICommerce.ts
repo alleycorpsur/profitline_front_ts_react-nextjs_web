@@ -53,6 +53,7 @@ export interface IConfirmOrderData {
 }
 
 export interface IProductInDetail {
+  id: number;
   product_sku: string;
   product_name: string;
   quantity: number;
