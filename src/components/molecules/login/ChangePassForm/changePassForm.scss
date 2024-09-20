@@ -1,7 +1,8 @@
 @import "@/styles/variables.scss";
 
-.loginForm {
+.changePassForm {
     width: 95%;
+    margin: 1rem 0;
     height: 100%;
     display: flex;
     gap: 1.5rem;
@@ -17,15 +18,26 @@
         font-size: 0.875rem;
         font-weight: 600;
         color: $black;
+        margin-bottom: 8px;
     }
 
     &__content {
-        margin: 2.75rem 0;
+        margin: 2rem 0;
+        margin-bottom: 4rem;
+
+        .errorMessage {
+            color: red;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+
+        .iconEyePassword {
+            cursor: pointer;
+        }
     }
 
     .inputPassword {
         background-color: $background;
-        border-radius: 0;
         padding: 0.7rem;
         border-radius: 0.25rem;
         font-size: 1rem;
@@ -49,38 +61,6 @@
         &.-readOnly {
             background-color: $dark-gray;
             color: $darker-gray;
-        }
-    }
-
-    .forgotPassword {
-        font-size: 0.95rem;
-        color: $black;
-        text-decoration: underline;
-        align-self: flex-end;
-        cursor: pointer;
-        transition: all 0.1s ease-in-out;
-        margin-top: -1rem;
-
-        &:hover {
-            color: $darker-gray;
-        }
-    }
-
-    .buttonContainer {
-        height: 50%;
-        width: 95%;
-        margin-top: 5rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding-right: 1rem;
-    }
-}
-
-@media (max-height: 720px) {
-    .loginForm {
-        &__content {
-            margin: 0;
         }
     }
 }

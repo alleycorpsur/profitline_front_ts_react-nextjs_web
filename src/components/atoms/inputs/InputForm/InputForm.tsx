@@ -8,7 +8,7 @@ interface Props {
   titleInput?: string;
   nameInput: string;
   control: Control<any> | undefined;
-  error: FieldError | undefined;
+  error?: FieldError;
   typeInput?: string;
   customStyle?: any;
   hiddenTitle?: boolean;
@@ -21,6 +21,7 @@ interface Props {
   changeInterceptor?: (value: any) => void;
   // eslint-disable-next-line no-unused-vars
   oninputInterceptor?: (e: any) => void;
+  suffix?: React.ReactNode;
 }
 
 export const InputForm = ({
@@ -37,7 +38,8 @@ export const InputForm = ({
   className,
   readOnly,
   changeInterceptor,
-  oninputInterceptor
+  oninputInterceptor,
+  suffix
 }: Props) => {
   return (
     <Flex vertical className={`containerInput ${className}`} style={customStyle}>
@@ -62,9 +64,10 @@ export const InputForm = ({
               onChange(e);
               changeInterceptor?.(e.target.value);
             }}
-            onInput={(e) =>{
+            onInput={(e) => {
               oninputInterceptor?.(e);
             }}
+            suffix={suffix}
             {...field}
           />
         )}

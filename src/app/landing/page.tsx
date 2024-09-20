@@ -14,7 +14,7 @@ export default function Page() {
         Transport Management System
       </Title>
       <div>
-        <Divider style={{color: "black"}} />
+        <Divider style={{ color: "black" }} />
         <Title level={1} style={{ fontSize: "1.6rem", fontWeight: 500 }}>
           The leading supply chain logistics platform
         </Title>

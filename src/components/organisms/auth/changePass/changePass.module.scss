@@ -1,6 +1,6 @@
 @import "@/styles/variables.scss";
 
-.containerLogin {
+.containerChangePass {
     height: 100%;
     overflow-y: scroll;
     scrollbar-width: none;
@@ -16,6 +16,7 @@
 
         .login {
             height: auto;
+            padding: 3rem 0;
             border-radius: 12px;
             width: 380px;
 
@@ -28,16 +29,30 @@
                 font-size: 3.125rem;
                 color: $black;
                 font-weight: 700;
-                margin-bottom: 2.2rem;
-                height: 100px;
+                margin-bottom: 1.5rem;
             }
+
+            .imageLogo {
+                background-color: $black;
+                border-radius: 50%;
+                max-width: 70px;
+                padding: 0.4rem;
+            }
+        }
+
+        .contactButton {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            border-radius: 16px;
+            border: 1px solid $secondary;
         }
     }
 }
 
 //media queries
 @media (max-width: 1024px) {
-    .container {
+    .containerChangePass {
         display: flex;
         gap: 3rem;
         flex-direction: column;
@@ -45,7 +60,7 @@
 }
 
 @media (max-width: 680px) {
-    .container {
+    .containerChangePass {
         padding: 0.2rem;
         padding-bottom: 1rem;
     }

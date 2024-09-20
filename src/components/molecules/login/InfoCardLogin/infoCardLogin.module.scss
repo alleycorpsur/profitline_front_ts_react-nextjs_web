@@ -1,0 +1,73 @@
+@import "@/styles/variables.scss";
+
+.companySection {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2rem;
+    padding: 1rem 4rem;
+    background-color: $black;
+    border-radius: 32px;
+    position: relative;
+
+    .main_title {
+        font-size: 4.375rem;
+        line-height: 5rem;
+        color: $white;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        letter-spacing: -1px;
+    }
+
+    .subTitle {
+        font-size: 1.625rem;
+        line-height: 2.375rem;
+        font-weight: 100;
+        color: $white;
+
+        strong {
+            font-weight: 500;
+        }
+    }
+    .topLine {
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+
+    .bottomLine {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+    }
+}
+@media (max-width: 1024px) {
+    .companySection {
+        padding: 8rem 4rem;
+    }
+}
+
+@media (max-height: 720px) {
+    .companySection {
+        .main_title {
+            font-size: 3rem;
+            line-height: 4rem;
+        }
+
+        .subTitle {
+            font-size: 1.25rem;
+            line-height: 2rem;
+        }
+    }
+}
+
+@media (max-width: 680px) {
+    .companySection {
+        .main_title {
+            font-size: 3rem;
+            line-height: 4rem;
+        }
+    }
+}
