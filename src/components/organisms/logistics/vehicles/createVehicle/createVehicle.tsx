@@ -62,14 +62,14 @@ export const CreateVehicleView = ({ params }: Props) => {
   return (
     <>
       {contextHolder}
-      <Skeleton loading={isLoadingSubmit || isLoadingDocuments || isLoadingVehicles}>
+      <Skeleton active loading={isLoadingDocuments || isLoadingVehicles}>
         <VehicleFormTab
           onSubmitForm={handleSubmit}
           statusForm={"create"}
           params={params}
           documentsTypesList={documentsType ?? []}
           vehiclesTypesList={vehiclesTypesData?.data ?? []}
-          isLoading={isLoadingSubmit || isLoadingDocuments || isLoadingVehicles}
+          isLoadingSubmit={isLoadingSubmit}
         />
       </Skeleton>
     </>

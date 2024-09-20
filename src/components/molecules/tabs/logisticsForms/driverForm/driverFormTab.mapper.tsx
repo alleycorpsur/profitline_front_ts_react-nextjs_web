@@ -1,6 +1,6 @@
 import { FileObject } from "@/components/atoms/UploadDocumentButton/UploadDocumentButton";
 import { IBillingPeriodForm } from "@/types/billingPeriod/IBillingPeriod";
-import { DocumentCompleteType } from "@/types/logistics/certificate/certificate";
+import { CertificateType, DocumentCompleteType } from "@/types/logistics/certificate/certificate";
 import { IAPIDriver, ICertificates, IFormDriver, VehicleType } from "@/types/logistics/schema";
 import { IFormProject } from "@/types/projects/IFormProject";
 import Title from "antd/es/typography/Title";
@@ -8,6 +8,7 @@ import dayjs from "dayjs";
 import { SetStateAction } from "react";
 import { UseFormSetValue } from "react-hook-form";
 import utc from "dayjs/plugin/utc";
+import { MessageInstance } from "antd/es/message/interface";
 dayjs.extend(utc);
 
 export type StatusForm = "review" | "create" | "edit";
@@ -25,6 +26,10 @@ export interface DriverFormTabProps {
     driverId: string;
   };
   handleFormState?: (newFormState: StatusForm) => void;
+  documentsTypesList: CertificateType[];
+  vehiclesTypesList: VehicleType[];
+  isLoadingSubmit: boolean;
+  messageApi: MessageInstance;
 }
 
 export type DriverData = IAPIDriver & { licence?: string } & { documents?: ICertificates[] };
@@ -82,19 +87,12 @@ export const _onSubmit = (
   data: any,
   files: DocumentCompleteType[],
   imageFile: FileObject[] | undefined,
-  setImageError: (value: SetStateAction<boolean>) => void,
-  setloading: (value: SetStateAction<boolean>) => void,
   onSubmitForm: (data: any) => void
 ) => {
-  setloading(true);
   try {
-    const hasImage = imageFile || data.general.photo;
-    if (!hasImage) return setImageError(true);
     onSubmitForm({ ...data, logo: imageFile, files });
   } catch (error) {
     console.warn({ error });
-  } finally {
-    setloading(false);
   }
 };
 

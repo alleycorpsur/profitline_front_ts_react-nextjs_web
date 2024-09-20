@@ -30,7 +30,7 @@ export interface VehicleFormTabProps {
   };
   documentsTypesList: CertificateType[];
   vehiclesTypesList: VehicleType[];
-  isLoading: boolean;
+  isLoadingSubmit: boolean;
 }
 export interface VehicleImage {
   id: number;

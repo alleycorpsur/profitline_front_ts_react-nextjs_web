@@ -77,8 +77,6 @@ export const VehicleInfoView = ({ isEdit = false, idParam = "", params }: Props)
     getVehicleType,
     { revalidateIfStale: false, revalidateOnFocus: false, revalidateOnReconnect: false }
   );
-  console.log("documentsType", documentsType);
-  console.log("vehiclesTypesData", vehiclesTypesData);
 
   return (
     <>
@@ -86,13 +84,8 @@ export const VehicleInfoView = ({ isEdit = false, idParam = "", params }: Props)
       <Flex className="vehicleFormContainer">
         <Row style={{ width: "100%" }}>
           <Skeleton
-            loading={
-              isLoading ||
-              isLoadingSubmit ||
-              isLoadingDocuments ||
-              isLoadingVehicles ||
-              isValidating
-            }
+            active
+            loading={isLoadingDocuments || isLoadingVehicles || isLoading || isValidating}
           >
             <VehicleFormTab
               statusForm={statusForm}
@@ -102,13 +95,7 @@ export const VehicleInfoView = ({ isEdit = false, idParam = "", params }: Props)
               onSubmitForm={handleSubmit}
               documentsTypesList={documentsType ?? []}
               vehiclesTypesList={vehiclesTypesData?.data ?? []}
-              isLoading={
-                isLoading ||
-                isLoadingSubmit ||
-                isLoadingDocuments ||
-                isLoadingVehicles ||
-                isValidating
-              }
+              isLoadingSubmit={isLoadingSubmit}
             />
           </Skeleton>
         </Row>

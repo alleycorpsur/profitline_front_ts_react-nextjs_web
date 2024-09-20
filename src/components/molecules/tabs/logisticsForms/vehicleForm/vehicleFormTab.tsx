@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button, Col, Flex, Row, Switch, Typography, message } from "antd";
 import { Controller, useForm } from "react-hook-form";
-import { ArrowsClockwise, CaretLeft, Pencil, Plus } from "phosphor-react";
+import { ArrowsClockwise, CaretLeft, Pencil } from "phosphor-react";
 
 // components
 import { ModalChangeStatus } from "@/components/molecules/modals/ModalChangeStatus/ModalChangeStatus";
@@ -18,20 +18,15 @@ import {
 } from "./vehicleFormTab.mapper";
 import "./vehicleformtab.scss";
 import { IFormVehicle, VehicleType } from "@/types/logistics/schema";
-import { getDocumentsByEntityType } from "@/services/logistics/certificates";
-import useSWR from "swr";
 import ModalDocuments from "@/components/molecules/modals/ModalDocuments/ModalDocuments";
-import { addVehicle, getVehicleType, updateVehicle } from "@/services/logistics/vehicle";
 import { DocumentCompleteType } from "@/types/logistics/certificate/certificate";
 import { UploadDocumentButton } from "@/components/atoms/UploadDocumentButton/UploadDocumentButton";
 import UploadDocumentChild from "@/components/atoms/UploadDocumentChild/UploadDocumentChild";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import dayjs from "dayjs";
 import SubmitFormButton from "@/components/atoms/SubmitFormButton/SubmitFormButton";
 import LoadDocumentsButton from "@/components/atoms/LoadDocumentsButton/LoadDocumentsButton";
 import { SelectInputForm } from "@/components/molecules/logistics/SelectInputForm/SelectInputForm";
-import { _onSubmit } from "../driverForm/driverFormTab.mapper";
 
 const { Title, Text } = Typography;
 
@@ -50,7 +45,7 @@ export const VehicleFormTab = ({
   params,
   documentsTypesList,
   vehiclesTypesList,
-  isLoading
+  isLoadingSubmit
 }: VehicleFormTabProps) => {
   const [isOpenModal, setIsOpenModal] = useState(false);
 
@@ -71,7 +66,6 @@ export const VehicleFormTab = ({
     resetField,
     reset,
     setValue,
-    getValues,
     trigger,
     formState: { errors, isValid }
   } = useForm<IFormVehicle>({
@@ -79,9 +73,7 @@ export const VehicleFormTab = ({
     disabled: statusForm === "review",
     mode: "onChange"
   });
-  const formValues = watch();
-  console.log("formValues", formValues);
-  const { push } = useRouter();
+
   const formImages = watch("images");
 
   const hasImages = () => {
@@ -90,7 +82,7 @@ export const VehicleFormTab = ({
   const isFormCompleted = () => {
     return isValid && hasImages();
   };
-  const isSubmitButtonEnabled = isFormCompleted() && !isLoading;
+  const isSubmitButtonEnabled = isFormCompleted();
 
   useEffect(() => {
     if (!hasGPS) {
@@ -212,12 +204,10 @@ export const VehicleFormTab = ({
   };
 
   const convertToSelectOptions = (vehicleTypes: VehicleType[]) => {
-    console.log("convertToSelectOptions vehicleTypes", vehicleTypes);
     const newValues = vehicleTypes?.map((vehicleType) => ({
       value: vehicleType.description,
       id: Number(vehicleType.id)
     }));
-    console.log("convertToSelectOptions newValues", newValues);
     return newValues;
   };
 
@@ -370,7 +360,6 @@ export const VehicleFormTab = ({
                         placeholder="Selecciona tipo de vehículo"
                         error={errors?.general?.id_vehicle_type}
                         field={field}
-                        loading={isLoading}
                         options={convertToSelectOptions(vehiclesTypesList || [])}
                       />
                     )}
@@ -555,6 +544,7 @@ export const VehicleFormTab = ({
                 text={validationButtonText(statusForm)}
                 disabled={!isSubmitButtonEnabled}
                 onClick={handleSubmit(onSubmit)}
+                loading={isLoadingSubmit}
               />
             </Row>
           )}
@@ -572,7 +562,7 @@ export const VehicleFormTab = ({
         mockFiles={selectedFiles}
         setFiles={setFiles}
         documentsType={documentsTypesList}
-        isLoadingDocuments={isLoading}
+        isLoadingDocuments={false}
         onClose={() => setIsOpenModalDocuments(false)}
         handleChange={handleChange}
         handleChangeExpirationDate={handleChangeExpirationDate}
