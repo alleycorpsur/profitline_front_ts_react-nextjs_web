@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { Button, Flex, Table, TableProps, Tooltip, Typography } from "antd";
 import { DotsThreeVertical, DownloadSimple, Paperclip, Trash, Triangle } from "phosphor-react";
+
 import useScreenHeight from "@/components/hooks/useScreenHeight";
+import { IHistoryRecord } from "../../containers/history-tab/history-tab";
+import { ModalConfirmAction } from "@/components/molecules/modals/ModalConfirmAction/ModalConfirmAction";
 
 import "./history-tab-table.scss";
-import { IHistoryRecord } from "../../containers/history-tab/history-tab";
+
 const { Text } = Typography;
 
 interface PropsHistoryTable {
@@ -13,10 +16,20 @@ interface PropsHistoryTable {
 
 const HistoryTable = ({ dataAllRecords: data }: PropsHistoryTable) => {
   const [page, setPage] = useState(1);
+  const [isConfirmCancelModalOpen, setIsConfirmCancelModalOpen] = useState({
+    isOpen: false,
+    id: 0
+  });
+
   const height = useScreenHeight();
 
   const onChangePage = (pagePagination: number) => {
     setPage(pagePagination);
+  };
+
+  const handleCancelApplication = () => {
+    console.info("Anular aplicación con id", isConfirmCancelModalOpen.id);
+    setIsConfirmCancelModalOpen({ isOpen: false, id: 0 });
   };
 
   const tootlTipOptions = [
@@ -33,7 +46,7 @@ const HistoryTable = ({ dataAllRecords: data }: PropsHistoryTable) => {
     {
       title: "Anular aplicación",
       icon: <Trash size={"1.2rem"} />,
-      onClick: () => console.info("Anular app")
+      onClick: (recordId: number) => setIsConfirmCancelModalOpen({ isOpen: true, id: recordId })
     }
   ];
 
@@ -88,7 +101,7 @@ const HistoryTable = ({ dataAllRecords: data }: PropsHistoryTable) => {
                     key={option.title}
                     className="tooltipButton"
                     icon={option.icon}
-                    onClick={option.onClick}
+                    onClick={() => option.onClick(record.id)}
                   >
                     <p>{option.title}</p>
                   </Button>
@@ -130,6 +143,18 @@ const HistoryTable = ({ dataAllRecords: data }: PropsHistoryTable) => {
             return originalElement;
           }
         }}
+      />
+      <ModalConfirmAction
+        isOpen={isConfirmCancelModalOpen.isOpen}
+        onClose={() =>
+          setIsConfirmCancelModalOpen({
+            isOpen: false,
+            id: 0
+          })
+        }
+        title="¿Estás seguro que deseas anular esta apliación?"
+        content="Esta acción es definitiva"
+        onOk={handleCancelApplication}
       />
     </>
   );

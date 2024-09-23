@@ -64,7 +64,7 @@ const mockData = [
   },
   {
     id: 2,
-    create_at: "2021-09-01",
+    create_at: "2021-10-01",
     event: "Conciliacion",
     payment_id: 345678,
     payment_amount: 100000000,
@@ -72,7 +72,7 @@ const mockData = [
   },
   {
     id: 3,
-    create_at: "2021-09-01",
+    create_at: "2021-11-01",
     event: "Aplicacion de pago",
     payment_id: 345678,
     payment_amount: 100000000,
@@ -80,7 +80,7 @@ const mockData = [
   },
   {
     id: 4,
-    create_at: "2021-09-01",
+    create_at: "2021-12-01",
     event: "Circularizacion",
     payment_id: 345678,
     payment_amount: 1000000,
@@ -88,7 +88,7 @@ const mockData = [
   },
   {
     id: 5,
-    create_at: "2021-09-01",
+    create_at: "2021-13-01",
     event: "Envio estado de cuenta",
     payment_id: 345678,
     payment_amount: 2340000000,
