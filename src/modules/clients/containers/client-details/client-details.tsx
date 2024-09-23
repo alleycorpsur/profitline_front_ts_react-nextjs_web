@@ -1,16 +1,19 @@
 import { CaretLeft } from "phosphor-react";
 import { Dispatch, FC, SetStateAction, createContext, useMemo, useState } from "react";
 import { Button, Flex, Spin } from "antd";
+import Link from "next/link";
+
+import { useClientDetails } from "../../hooks/client-details/client-details.hook";
 import { WalletTab } from "@/components/organisms/Customers/WalletTab/WalletTab";
 import Dashboard from "../dashboard";
 import InvoiceActionsModal from "../invoice-actions-modal";
-import { useClientDetails } from "../../hooks/client-details/client-details.hook";
-import Link from "next/link";
 import UiTab from "@/components/ui/ui-tab";
 import { InvoiceAction } from "../../constants/invoice-actions.constants";
 import AccountingAdjustmentsTab from "../accounting-adjustments-tab";
 import PaymentsTab from "@/modules/clients/containers/payments-tab";
 import ContactsTab from "../contacts-tab";
+import HistoryTab from "../history-tab";
+
 import { IDataSection } from "@/types/portfolios/IPortfolios";
 
 import styles from "./client-details.module.scss";
@@ -75,6 +78,11 @@ export const ClientDetails: FC<ClientDetailsProps> = () => {
       key: "5",
       label: "Contactos",
       children: <ContactsTab />
+    },
+    {
+      key: "6",
+      label: "Historial",
+      children: <HistoryTab />
     }
   ];
 
