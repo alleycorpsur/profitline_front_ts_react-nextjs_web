@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Button, Flex, Table, TableProps, Typography } from "antd";
-import { DotsThree, Paperclip, Triangle } from "phosphor-react";
+import { Button, Flex, Table, TableProps, Tooltip, Typography } from "antd";
+import { DotsThreeVertical, DownloadSimple, Paperclip, Trash, Triangle } from "phosphor-react";
 import useScreenHeight from "@/components/hooks/useScreenHeight";
 
 import "./history-tab-table.scss";
@@ -18,6 +18,24 @@ const HistoryTable = ({ dataAllRecords: data }: PropsHistoryTable) => {
   const onChangePage = (pagePagination: number) => {
     setPage(pagePagination);
   };
+
+  const tootlTipOptions = [
+    {
+      title: "PDF",
+      icon: <DownloadSimple size={"1.2rem"} />,
+      onClick: () => console.info("PDF")
+    },
+    {
+      title: "Excel",
+      icon: <DownloadSimple size={"1.2rem"} />,
+      onClick: () => console.info("Excel")
+    },
+    {
+      title: "Anular aplicación",
+      icon: <Trash size={"1.2rem"} />,
+      onClick: () => console.info("Anular app")
+    }
+  ];
 
   const columns: TableProps<IHistoryRecord>["columns"] = [
     {
@@ -47,7 +65,6 @@ const HistoryTable = ({ dataAllRecords: data }: PropsHistoryTable) => {
       ),
       sorter: (a, b) => a.payment_amount - b.payment_amount,
       showSorterTooltip: false
-      // width: 140
     },
     {
       title: "Usuario",
@@ -56,17 +73,36 @@ const HistoryTable = ({ dataAllRecords: data }: PropsHistoryTable) => {
       render: (text) => <Text className="cell">{text}</Text>,
       sorter: (a, b) => a.user.localeCompare(b.user),
       showSorterTooltip: false
-      // width: 140
     },
     {
       title: "",
       render: (_, record) => (
         <Flex gap="0.5rem">
           <Button className="eyeButton" icon={<Paperclip size={"1.2rem"} />} />
-          <Button className="eyeButton" icon={<DotsThree size={"1.2rem"} />} />
+          <Tooltip
+            overlayClassName="tooltipHistoryOptions"
+            title={
+              <Flex vertical gap={"0.5rem"}>
+                {tootlTipOptions.map((option) => (
+                  <Button
+                    key={option.title}
+                    className="tooltipButton"
+                    icon={option.icon}
+                    onClick={option.onClick}
+                  >
+                    <p>{option.title}</p>
+                  </Button>
+                ))}
+              </Flex>
+            }
+            color={"white"}
+            key={record.id}
+          >
+            <Button className="eyeButton" icon={<DotsThreeVertical size={"1.2rem"} />} />
+          </Tooltip>
         </Flex>
       ),
-      width: 80
+      width: 100
     }
   ];
 
@@ -76,7 +112,6 @@ const HistoryTable = ({ dataAllRecords: data }: PropsHistoryTable) => {
         className="historyTable"
         columns={columns}
         dataSource={data?.map((data) => ({ ...data, key: data.id }))}
-        // rowSelection={false}
         virtual
         scroll={{ y: height - 400, x: 100 }}
         pagination={{
