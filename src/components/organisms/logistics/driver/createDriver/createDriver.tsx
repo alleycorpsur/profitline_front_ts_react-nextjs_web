@@ -30,22 +30,28 @@ export const CreateDriverView = ({ params }: Props) => {
       );
 
       if (response.status === 200) {
-        messageApi.open({
-          type: "success",
-          content: "El conductor fue creado exitosamente."
-        });
-        push(`/logistics/providers/${params.id}/driver`);
+        messageApi
+          .open({
+            type: "success",
+            content: "El conductor fue creado exitosamente.",
+            duration: 2
+          })
+          .then(() => {
+            push(`/logistics/providers/${params.id}/driver`);
+          });
       }
     } catch (error) {
       if (error instanceof Error) {
         messageApi.open({
           type: "error",
-          content: error.message
+          content: error.message,
+          duration: 3
         });
       } else {
         messageApi.open({
           type: "error",
-          content: "Oops, hubo un error por favor intenta mas tarde."
+          content: "Oops, hubo un error por favor intenta mas tarde.",
+          duration: 3
         });
       }
     }
@@ -54,11 +60,7 @@ export const CreateDriverView = ({ params }: Props) => {
   return (
     <>
       {contextHolder}
-      <DriverFormTab
-        onSubmitForm={onCreateDriver}
-        statusForm={"create"}
-        params={params}
-      />
+      <DriverFormTab onSubmitForm={onCreateDriver} statusForm={"create"} params={params} />
     </>
   );
 };

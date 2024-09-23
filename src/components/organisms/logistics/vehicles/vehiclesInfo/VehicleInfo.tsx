@@ -45,22 +45,28 @@ export const VehicleInfoView = ({ isEdit = false, idParam = "", params }: Props)
       setIsLoadingSubmit(true);
       const response = await updateVehicle({ ...data }, data.files, data.images);
       if (response && response.status === 200) {
-        messageApi.open({
-          type: "success",
-          content: `El vehículo fue editado exitosamente.`
-        });
-        push(`/logistics/providers/${params.id}/vehicle`);
+        messageApi
+          .open({
+            type: "success",
+            content: `El vehículo fue editado exitosamente.`,
+            duration: 2
+          })
+          .then(() => {
+            push(`/logistics/providers/${params.id}/vehicle`);
+          });
       }
     } catch (error) {
       if (error instanceof Error) {
         messageApi.open({
           type: "error",
-          content: error.message
+          content: error.message,
+          duration: 3
         });
       } else {
         message.open({
           type: "error",
-          content: "Oops, hubo un error por favor intenta más tarde."
+          content: "Oops, hubo un error por favor intenta más tarde.",
+          duration: 3
         });
       }
     } finally {
@@ -77,23 +83,13 @@ export const VehicleInfoView = ({ isEdit = false, idParam = "", params }: Props)
     getVehicleType,
     { revalidateIfStale: false, revalidateOnFocus: false, revalidateOnReconnect: false }
   );
-  console.log("documentsType", documentsType);
-  console.log("vehiclesTypesData", vehiclesTypesData);
 
   return (
     <>
       {contextHolder}
       <Flex className="vehicleFormContainer">
         <Row style={{ width: "100%" }}>
-          <Skeleton
-            loading={
-              isLoading ||
-              isLoadingSubmit ||
-              isLoadingDocuments ||
-              isLoadingVehicles ||
-              isValidating
-            }
-          >
+          <Skeleton loading={isLoading || isValidating || isLoadingDocuments || isLoadingVehicles}>
             <VehicleFormTab
               statusForm={statusForm}
               handleFormState={handleFormState}
@@ -102,13 +98,7 @@ export const VehicleInfoView = ({ isEdit = false, idParam = "", params }: Props)
               onSubmitForm={handleSubmit}
               documentsTypesList={documentsType ?? []}
               vehiclesTypesList={vehiclesTypesData?.data ?? []}
-              isLoading={
-                isLoading ||
-                isLoadingSubmit ||
-                isLoadingDocuments ||
-                isLoadingVehicles ||
-                isValidating
-              }
+              isLoading={isLoadingSubmit}
             />
           </Skeleton>
         </Row>

@@ -79,8 +79,7 @@ export const VehicleFormTab = ({
     disabled: statusForm === "review",
     mode: "onChange"
   });
-  const formValues = watch();
-  console.log("formValues", formValues);
+
   const { push } = useRouter();
   const formImages = watch("images");
 
@@ -370,7 +369,6 @@ export const VehicleFormTab = ({
                         placeholder="Selecciona tipo de vehículo"
                         error={errors?.general?.id_vehicle_type}
                         field={field}
-                        loading={isLoading}
                         options={convertToSelectOptions(vehiclesTypesList || [])}
                       />
                     )}
@@ -555,6 +553,7 @@ export const VehicleFormTab = ({
                 text={validationButtonText(statusForm)}
                 disabled={!isSubmitButtonEnabled}
                 onClick={handleSubmit(onSubmit)}
+                loading={isLoading}
               />
             </Row>
           )}
@@ -572,7 +571,7 @@ export const VehicleFormTab = ({
         mockFiles={selectedFiles}
         setFiles={setFiles}
         documentsType={documentsTypesList}
-        isLoadingDocuments={isLoading}
+        isLoadingDocuments={false}
         onClose={() => setIsOpenModalDocuments(false)}
         handleChange={handleChange}
         handleChangeExpirationDate={handleChangeExpirationDate}
