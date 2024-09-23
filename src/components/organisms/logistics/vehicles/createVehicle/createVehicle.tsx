@@ -26,22 +26,28 @@ export const CreateVehicleView = ({ params }: Props) => {
       setIsLoadingSubmit(true);
       const response = await addVehicle({ ...data }, data.files, data.images);
       if (response && response.status === 200) {
-        messageApi.open({
-          type: "success",
-          content: `El vehículo fue creado exitosamente.`
-        });
-        push(`/logistics/providers/${params.id}/vehicle`);
+        await messageApi
+          .open({
+            type: "success",
+            content: `El vehículo fue creado exitosamente.`,
+            duration: 2
+          })
+          .then(() => {
+            push(`/logistics/providers/${params.id}/vehicle`);
+          });
       }
     } catch (error) {
       if (error instanceof Error) {
         messageApi.open({
           type: "error",
-          content: error.message
+          content: error.message,
+          duration: 3
         });
       } else {
         message.open({
           type: "error",
-          content: "Oops, hubo un error por favor intenta más tarde."
+          content: "Oops, hubo un error por favor intenta más tarde.",
+          duration: 3
         });
       }
     } finally {
@@ -62,14 +68,14 @@ export const CreateVehicleView = ({ params }: Props) => {
   return (
     <>
       {contextHolder}
-      <Skeleton loading={isLoadingSubmit || isLoadingDocuments || isLoadingVehicles}>
+      <Skeleton loading={isLoadingDocuments || isLoadingVehicles}>
         <VehicleFormTab
           onSubmitForm={handleSubmit}
           statusForm={"create"}
           params={params}
           documentsTypesList={documentsType ?? []}
           vehiclesTypesList={vehiclesTypesData?.data ?? []}
-          isLoading={isLoadingSubmit || isLoadingDocuments || isLoadingVehicles}
+          isLoading={isLoadingSubmit}
         />
       </Skeleton>
     </>
