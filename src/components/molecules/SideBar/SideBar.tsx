@@ -55,7 +55,7 @@ export const SideBar = () => {
         response?.data?.map((project) => ({
           ID: project.project_id,
           NAME: project.name,
-          LOGO: project.logo ? project.logo : "",
+          LOGO: project.logo ? `${project.logo.trim()}?v=${new Date().getTime()}` : "",
           views_permissions: project.views_permissions,
           action_permissions: project.action_permissions,
           isSuperAdmin: project.is_super_admin
@@ -74,9 +74,7 @@ export const SideBar = () => {
       }
     };
 
-    if (projects?.length === 0) {
-      fetchProjects();
-    }
+    fetchProjects();
   }, []);
 
   return (
