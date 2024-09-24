@@ -1,5 +1,6 @@
 import { useCallback, useContext } from "react";
-import { ISelectedProduct, OrderViewContext } from "../../containers/create-order/create-order";
+import {  OrderViewContext } from "../../containers/create-order/create-order";
+import { ISelectedProduct } from "@/types/commerce/ICommerce";
 
 export const useHandleProductsItems = (product: ISelectedProduct, categoryName: string) => {
   const { selectedCategories, setSelectedCategories } = useContext(OrderViewContext);
@@ -28,7 +29,8 @@ export const useHandleProductsItems = (product: ISelectedProduct, categoryName: 
       quantity: 1,
       image: product.image,
       category_id: product.category_id,
-      SKU: product.SKU
+      SKU: product.SKU,
+      stock: product.stock
     };
 
     if (categoryIndex === -1) {

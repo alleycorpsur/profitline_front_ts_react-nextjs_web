@@ -27,6 +27,12 @@
     .name {
         font-size: 1rem;
         font-weight: 400;
+
+        .noStock {
+            color: red;
+            font-weight: bold;
+            white-space: nowrap;
+        }
     }
 
     .price {
