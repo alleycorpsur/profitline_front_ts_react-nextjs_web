@@ -9,19 +9,30 @@ interface Props {
   onOk?: () => void;
   title: string;
   content?: React.ReactNode;
+  okText?: string;
+  cancelText?: string;
 }
-export const ModalConfirmAction = ({ isOpen, onClose, onOk, title, content }: Props) => {
+export const ModalConfirmAction = ({
+  isOpen,
+  onClose,
+  onOk,
+  title,
+  content,
+  okText = "Aceptar",
+  cancelText = "Cancelar"
+}: Props) => {
   return (
     <Modal
       className="ModalConfirmAction"
-      width={"60%"}
+      width={"50%"}
       open={isOpen}
       onCancel={onClose}
       okButtonProps={{ className: "acceptButton" }}
-      okText="Aceptar"
+      okText={okText}
       cancelButtonProps={{
         className: "cancelButton"
       }}
+      cancelText={cancelText}
       title={title}
       onOk={onOk}
     >

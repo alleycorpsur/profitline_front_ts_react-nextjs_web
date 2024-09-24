@@ -57,7 +57,8 @@ const HistoryTable = ({ dataAllRecords: data }: PropsHistoryTable) => {
       key: "create_at",
       render: (create_at) => <Text className="cell">{create_at}</Text>,
       sorter: (a, b) => a.create_at.localeCompare(b.create_at),
-      showSorterTooltip: false
+      showSorterTooltip: false,
+      width: 120
     },
     {
       title: "Evento",
@@ -72,9 +73,9 @@ const HistoryTable = ({ dataAllRecords: data }: PropsHistoryTable) => {
       key: "payment_amount",
       dataIndex: "payment_amount",
       render: (payment_amount, row) => (
-        <Text className="cell">
-          Pago #{row.payment_id} por {payment_amount}
-        </Text>
+        <span className="cell">
+          Pago {<span className="highlightText">#{row.payment_id}</span>} por {payment_amount}
+        </span>
       ),
       sorter: (a, b) => a.payment_amount - b.payment_amount,
       showSorterTooltip: false
@@ -155,6 +156,7 @@ const HistoryTable = ({ dataAllRecords: data }: PropsHistoryTable) => {
         title="¿Estás seguro que deseas anular esta apliación?"
         content="Esta acción es definitiva"
         onOk={handleCancelApplication}
+        okText="Anular aplicación"
       />
     </>
   );

@@ -5,6 +5,7 @@
     .ant-modal-header {
         background-color: $white !important;
         text-align: center;
+        margin: 0px !important;
     }
 
     .ant-modal-body {
@@ -19,6 +20,7 @@
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 10px;
+        margin: 0px !important;
     }
 
     .acceptButton {
