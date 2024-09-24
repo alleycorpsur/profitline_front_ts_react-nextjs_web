@@ -14,6 +14,7 @@ import ContactsTab from "../contacts-tab";
 import { IDataSection } from "@/types/portfolios/IPortfolios";
 
 import styles from "./client-details.module.scss";
+import ApplyTab from "../apply-tab";
 
 type ClientDetailsContextType = {
   selectedOption: InvoiceAction;
@@ -74,7 +75,7 @@ export const ClientDetails: FC<ClientDetailsProps> = () => {
     {
       key: "5",
       label: "Aplicación",
-      children: <PaymentsTab />
+      children: <ApplyTab />
     },
     {
       key: "6",
