@@ -1,18 +1,22 @@
 import { FC, useContext, useEffect, useState } from "react";
 import { Flex } from "antd";
-import { ISelectType } from "@/types/clients/IClients";
+import { AxiosError } from "axios";
+import { BagSimple } from "phosphor-react";
+
+import { formatMoney } from "@/utils/utils";
+import { useAppStore } from "@/lib/store/store";
+import { confirmOrder } from "@/services/commerce/commerce";
+
 import { OrderViewContext } from "../../containers/create-order/create-order";
 import CreateOrderItem from "../create-order-cart-item";
-import { BagSimple } from "phosphor-react";
 import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
 import CreateOrderDiscountsModal from "../create-order-discounts-modal";
 
-import styles from "./create-order-cart.module.scss";
-import { useAppStore } from "@/lib/store/store";
-import { confirmOrder } from "@/services/commerce/commerce";
 import { IOrderConfirmedResponse } from "@/types/commerce/ICommerce";
 import { GenericResponse } from "@/types/global/IGlobal";
-import { formatMoney } from "@/utils/utils";
+import { ISelectType } from "@/types/clients/IClients";
+
+import styles from "./create-order-cart.module.scss";
 export interface selectClientForm {
   client: ISelectType;
 }
@@ -56,13 +60,21 @@ const CreateOrderCart: FC = ({}) => {
           discount_id: discountId,
           order_summary: products
         };
-        const response = (await confirmOrder(
-          projectId,
-          client.id,
-          confirmOrderData
-        )) as GenericResponse<IOrderConfirmedResponse>;
-        if (response.status === 200) {
-          setConfirmOrderData(response.data);
+        try {
+          const response = (await confirmOrder(
+            projectId,
+            client.id,
+            confirmOrderData
+          )) as GenericResponse<IOrderConfirmedResponse>;
+          if (response.status === 200) {
+            setConfirmOrderData(response.data);
+          }
+        } catch (error) {
+          if (error instanceof AxiosError) {
+            console.error("Error confirmando orden", error.message);
+          } else {
+            console.error("Unexpected error", error);
+          }
         }
       }
     };

@@ -37,6 +37,7 @@ export interface ISelectedProduct {
   image: string;
   category_id: number;
   SKU: string;
+  stock: boolean;
 }
 
 export interface IFetchedCategories {
@@ -73,6 +74,7 @@ export interface IOrderConfirmedResponse {
   discounts: number;
   total: number;
   total_pronto_pago: number;
+  insufficientStockProducts: string[] | [];
 }
 
 export interface IShippingInformation {
