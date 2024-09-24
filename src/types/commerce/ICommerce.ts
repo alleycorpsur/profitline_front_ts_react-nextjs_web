@@ -74,7 +74,7 @@ export interface IOrderConfirmedResponse {
   discounts: number;
   total: number;
   total_pronto_pago: number;
-  insufficientStockProducts: string[] | [];
+  insufficientStockProducts: string[];
 }
 
 export interface IShippingInformation {

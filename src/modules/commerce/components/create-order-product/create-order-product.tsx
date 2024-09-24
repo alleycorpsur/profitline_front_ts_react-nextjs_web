@@ -38,7 +38,10 @@ const CreateOrderProduct: FC<CreateOrderProductProps> = ({ product, categoryName
       </div>
 
       <hr className={styles.separator} />
-      <h4 className={styles.name}>{product.name}</h4>
+      <h4 className={styles.name}>
+        {product.name}
+        {!product.stock && <span className={styles.noStock}> No hay stock</span>}
+      </h4>
       <div className={styles.price}>
         {product.discount ? (
           <>

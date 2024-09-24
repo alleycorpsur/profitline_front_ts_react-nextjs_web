@@ -34,7 +34,7 @@ const CreateOrderItem: FC<CreateOrderItemProps> = ({ product, categoryName }) =>
       </div>
       <h4 className={styles.name}>
         {product.name}
-        {!product.stock && <span className={styles.noStock}>No hay stock</span>}
+        {!product.stock && <span className={styles.noStock}> No hay stock</span>}
       </h4>
 
       <div className={styles.price}>

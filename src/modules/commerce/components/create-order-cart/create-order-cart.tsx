@@ -24,14 +24,18 @@ export interface selectClientForm {
 const CreateOrderCart: FC = ({}) => {
   const { ID: projectId } = useAppStore((state) => state.selectedProject);
   const [openDiscountsModal, setOpenDiscountsModal] = useState(false);
+  const [insufficientStockProducts, setInsufficientStockProducts] = useState<string[]>([]);
   const {
     selectedCategories,
+    setSelectedCategories,
     checkingOut,
     setCheckingOut,
     client,
     confirmOrderData,
     setConfirmOrderData,
-    discountId
+    discountId,
+    categories,
+    setCategories
   } = useContext(OrderViewContext);
 
   const numberOfSelectedProducts = selectedCategories.reduce(
@@ -68,6 +72,7 @@ const CreateOrderCart: FC = ({}) => {
           )) as GenericResponse<IOrderConfirmedResponse>;
           if (response.status === 200) {
             setConfirmOrderData(response.data);
+            setInsufficientStockProducts(response.data.insufficientStockProducts);
           }
         } catch (error) {
           if (error instanceof AxiosError) {
@@ -86,6 +91,26 @@ const CreateOrderCart: FC = ({}) => {
       clearTimeout(timeOut);
     };
   }, [selectedCategories, discountId]);
+
+  useEffect(() => {
+    const newState = selectedCategories.map((category) => ({
+      ...category,
+      products: category.products.map((product) => ({
+        ...product,
+        stock: !insufficientStockProducts.includes(product.SKU)
+      }))
+    }));
+    setSelectedCategories(newState);
+
+    const updatedCategories = categories.map((category) => ({
+      ...category,
+      products: category.products.map((product) => ({
+        ...product,
+        stock: !insufficientStockProducts.includes(product.SKU)
+      }))
+    }));
+    setCategories(updatedCategories);
+  }, [insufficientStockProducts]);
 
   return (
     <div className={styles.cartContainer}>
