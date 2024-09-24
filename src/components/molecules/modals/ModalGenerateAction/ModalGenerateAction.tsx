@@ -9,7 +9,8 @@ import {
   LinkBreak,
   CaretRight,
   WarningDiamond,
-  HandTap
+  HandTap,
+  Paperclip
 } from "@phosphor-icons/react";
 
 import "./modalgenerateaction.scss";
@@ -114,7 +115,7 @@ export const ModalGenerateAction = ({
           }}
         />
         <ButtonGenerateAction
-          icon={<LinkBreak size={16} />}
+          icon={<Paperclip size={16} />}
           title="Vincular orden de compra"
           onClick={() => {
             handleOpenModal(5);
