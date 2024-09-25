@@ -252,7 +252,6 @@ export const WalletTab = () => {
         isOpen={isSelectOpen.selected === 7}
         onClose={onCloseModal}
         messageShow={messageShow}
-        clientId={clientId}
         projectId={projectId}
         invoiceSelected={selectedRows}
       />

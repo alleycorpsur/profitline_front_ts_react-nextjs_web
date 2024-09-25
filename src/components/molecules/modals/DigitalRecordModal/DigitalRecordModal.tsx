@@ -4,7 +4,10 @@ import { MessageInstance } from "antd/es/message/interface";
 import { CaretLeft, Plus } from "@phosphor-icons/react";
 
 import { useAppStore } from "@/lib/store/store";
-import { getDigitalRecordFormInfo } from "@/services/accountingAdjustment/accountingAdjustment";
+import {
+  createDigitalRecord,
+  getDigitalRecordFormInfo
+} from "@/services/accountingAdjustment/accountingAdjustment";
 import { DocumentButton } from "@/components/atoms/DocumentButton/DocumentButton";
 import { useForm, Controller, FieldError } from "react-hook-form";
 import { InputForm } from "@/components/atoms/inputs/InputForm/InputForm";
@@ -19,7 +22,6 @@ import "./digitalRecordModal.scss";
 interface DigitalRecordModalProps {
   isOpen: boolean;
   onClose: () => void;
-  clientId: number;
   projectId: number;
   invoiceSelected: IInvoice[] | undefined;
   messageShow: MessageInstance;
@@ -45,7 +47,6 @@ export interface IFormDigitalRecordModal {
 const DigitalRecordModal = ({
   isOpen,
   onClose,
-  clientId,
   invoiceSelected,
   messageShow
 }: DigitalRecordModalProps) => {
@@ -82,7 +83,7 @@ const DigitalRecordModal = ({
       }
     };
     fetchFormInfo();
-  }, [projectId]);
+  }, [projectId, isOpen]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -131,7 +132,12 @@ const DigitalRecordModal = ({
   const onSubmit = async (data: IFormDigitalRecordModal) => {
     console.log("data ", data);
     console.log("invoiceSelected", invoiceSelected);
-    console.log("clientId", clientId);
+    const res = await createDigitalRecord(
+      data,
+      invoiceSelected?.map((invoice) => invoice.id) || [],
+      projectId,
+      "2"
+    );
   };
 
   return (
@@ -140,7 +146,7 @@ const DigitalRecordModal = ({
       width="50%"
       footer={null}
       open={isOpen}
-      closable={true}
+      closable={false}
       destroyOnClose
     >
       <button className="digitalRecordModal__goBackBtn" onClick={onClose}>

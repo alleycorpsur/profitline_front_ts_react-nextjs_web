@@ -260,24 +260,29 @@ export const getDigitalRecordFormInfo = async (
 
 export const createDigitalRecord = async (
   data: IFormDigitalRecordModal,
-  clientId: number,
-  invoicesIds: number[]
+  invoicesIds: number[],
+  project_id: number,
+  user_id: string
 ): Promise<AxiosResponse<any>> => {
   const token = await getIdToken();
 
+  const forward_to = data.forward_to.map((user) => user.value);
+  const copy_to = data?.copy_to?.map((user) => user.value);
+
   const formData = new FormData();
 
-  formData.append("invoices_id", JSON.stringify(invoicesIds));
-  formData.append("forward_to", JSON.stringify(data.forward_to));
-  formData.append("copy_to", JSON.stringify(data.copy_to));
+  formData.append("invoice_ids", JSON.stringify(invoicesIds));
+  formData.append("forward_to", JSON.stringify(forward_to));
+  if (copy_to) formData.append("copy_to", JSON.stringify(copy_to));
   formData.append("subject", data.subject);
-  formData.append("comment", data.comment);
+  formData.append("commentary", data.comment);
+  formData.append("user_id", user_id);
   data.attachments.forEach((file) => {
-    formData.append("files", file);
+    formData.append("attachments", file);
   });
 
   const response: AxiosResponse<any> = await axios.post(
-    `${config.API_HOST}/invoice/digitalRecord/client/${clientId}`,
+    `${config.API_HOST}/client/digital-record?projectId=${project_id}`,
     formData,
     {
       headers: {
