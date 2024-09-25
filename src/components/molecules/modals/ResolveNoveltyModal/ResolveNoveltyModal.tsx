@@ -8,6 +8,7 @@ import { IIncidentDetail } from "@/hooks/useNoveltyDetail";
 import { SelectNoveltyNode } from "../SelectNoveltyNote/SelectNoveltyNode";
 import { MessageInstance } from "antd/es/message/interface";
 import { ApplyNoveltyModal } from "../ApplyNoveltyModal/ApplyNoveltyModal";
+import { useAppStore } from "@/lib/store/store";
 interface ResolveNoveltyModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -30,6 +31,7 @@ const ResolveNoveltyModal: React.FC<ResolveNoveltyModalProps> = ({
   novelty,
   messageApi
 }) => {
+  const { ID } = useAppStore((state) => state.selectedProject);
   const [file, setFile] = useState<File | null>(null);
   const [comment, setComment] = useState("");
   const [isAccountingAdjustment, setIsAccountingAdjustment] = useState(false);
@@ -74,7 +76,6 @@ const ResolveNoveltyModal: React.FC<ResolveNoveltyModalProps> = ({
       setIsAccountingAdjustment(false);
     }
   }, [isOpen]);
-
 
   const handleAdjustmentTypeSelect = (type: string) => {
     setAdjustmentType(type);
@@ -215,8 +216,8 @@ const ResolveNoveltyModal: React.FC<ResolveNoveltyModalProps> = ({
           setSelectedNotes={setSelectedNotes}
           onClose={() => setCurrentView("selectAdjust")}
           onContinue={() => setCurrentView("apply")}
-          clientId={"811041214"} // TODO CAMBIAR ESTO
-          projectId={"81"} // TODO CAMBIAR ESTO
+          clientId={novelty.client_id} // TODO CAMBIAR ESTO
+          projectId={ID} // TODO CAMBIAR ESTO
         />
       )}
       {currentView === "apply" && (

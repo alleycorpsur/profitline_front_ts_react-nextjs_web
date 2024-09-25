@@ -162,7 +162,8 @@ export const ApplyNoveltyModal = ({
         [selectedEvidence],
         projectIdParam as string,
         clientIdParam as string,
-        typeAjustment
+        typeAjustment,
+        comment
       );
       if (response.status === 200) {
         messageApi.open({

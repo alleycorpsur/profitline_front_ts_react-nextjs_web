@@ -196,7 +196,7 @@ const WalletTabChangeStatusModal: React.FC<Props> = ({
               id="fileInput"
               style={{ display: "none" }}
               onChange={handleFileChange}
-              accept=".pdf,.png,.doc,.docx"
+              accept=".pdf, .png, .doc, .docx, .xls, .xlsx, .msg, .txt, .eml"
             />
           </>
         )}

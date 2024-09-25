@@ -12,9 +12,16 @@ interface UiTabProps {
   tabs: ITab[];
   sticky?: boolean;
   tabBarExtraContent?: ReactNode;
+  // eslint-disable-next-line no-unused-vars
+  onChangeTab?: (activeKey: string) => void;
 }
 
-const UiTab: FC<UiTabProps> = ({ tabs, tabBarExtraContent, sticky = false }: UiTabProps) => {
+const UiTab: FC<UiTabProps> = ({
+  tabs,
+  tabBarExtraContent,
+  onChangeTab,
+  sticky = false
+}: UiTabProps) => {
   return (
     <div className={`tabsContainer ${sticky && "-sticky"}`}>
       <Tabs
@@ -23,6 +30,7 @@ const UiTab: FC<UiTabProps> = ({ tabs, tabBarExtraContent, sticky = false }: UiT
         items={tabs}
         tabBarExtraContent={tabBarExtraContent}
         size="small"
+        onChange={onChangeTab}
       />
     </div>
   );

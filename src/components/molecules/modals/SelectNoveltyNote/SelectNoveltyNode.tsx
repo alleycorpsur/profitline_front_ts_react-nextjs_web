@@ -10,8 +10,8 @@ interface Props {
   setSelectedNotes: Dispatch<SetStateAction<any[]>>;
   onClose: () => void;
   onContinue: () => void;
-  clientId?: string;
-  projectId?: string;
+  clientId?: number;
+  projectId?: number;
 }
 
 export const SelectNoveltyNode: React.FC<Props> = ({
@@ -23,7 +23,11 @@ export const SelectNoveltyNode: React.FC<Props> = ({
   clientId,
   projectId
 }) => {
-  const { data, isLoading } = useAcountingAdjustment(clientId || "0", projectId || "0", type);
+  const { data, isLoading } = useAcountingAdjustment(
+    clientId?.toString() || "0",
+    projectId?.toString() || "0",
+    type
+  );
 
   const handleNoteSelection = (item: any) => {
     setSelectedNotes((prevNotes) =>
@@ -33,30 +37,32 @@ export const SelectNoveltyNode: React.FC<Props> = ({
     );
   };
 
-  const concatData = data?.[0].financial_discounts
+  const concatData = data?.[0]?.financial_discounts;
   return (
     <div className="acn-modalContent">
       <Flex vertical className="acn-content-modal-select-note">
-        <p className="acn-subTitleModalAction">{titleApplyMap[type || 1]}</p>
-        <div className="acn-modalContentScroll">
-          {isLoading ? (
-            <Spin size="large" style={{ margin: "auto" }} />
-          ) : (
-            concatData?.map((item, index) => (
-              <ItemsActionsModal
-                key={index}
-                item={{
-                  id: item.id,
-                  current_value: item.current_value,
-                  selected: selectedNotes.some((note) => note.id === item.id),
-                  motive_name: item.motive_name,
-                  percentage: item.percentage
-                }}
-                type={type}
-                onHeaderClick={() => handleNoteSelection(item)}
-              />
-            ))
-          )}
+        <div>
+          <p className="acn-subTitleModalAction">{titleApplyMap[type || 1]}</p>
+          <div className="acn-modalContentScroll">
+            {isLoading ? (
+              <Spin size="large" style={{ margin: "auto" }} />
+            ) : (
+              concatData?.map((item, index) => (
+                <ItemsActionsModal
+                  key={index}
+                  item={{
+                    id: item.id,
+                    current_value: item.current_value,
+                    selected: selectedNotes.some((note) => note.id === item.id),
+                    motive_name: item.motive_name,
+                    percentage: item.percentage
+                  }}
+                  type={type}
+                  onHeaderClick={() => handleNoteSelection(item)}
+                />
+              ))
+            )}
+          </div>
         </div>
         <Flex gap="8px" justify="flex-end">
           <button

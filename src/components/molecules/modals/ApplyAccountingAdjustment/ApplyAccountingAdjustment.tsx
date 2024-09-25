@@ -200,7 +200,8 @@ export const ApplyAccountingAdjustment = ({
         selectedEvidence,
         projectIdParam as string,
         clientIdParam as string,
-        typeAjustment
+        typeAjustment,
+        commentary
       );
       if (response.status === 200) {
         messageApi.open({

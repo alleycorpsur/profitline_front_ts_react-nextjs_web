@@ -204,7 +204,7 @@ const ModalDetailAdjustment: FC<ModalDetailAdjustmentProps> = ({
 
                                   <Flex gap={"4px"}>
                                     ID del ajuste:
-                                    <div className={styles.idAdjustment}>{item.id}</div>
+                                    <div className={styles.idAdjustment}>{item.id_financial_discount}</div>
                                   </Flex>
                                 </div>
                               </div>

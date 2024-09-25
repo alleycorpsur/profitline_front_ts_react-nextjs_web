@@ -25,7 +25,14 @@ dayjs.extend(utcPlugin);
 const DashboardSellsVsPayments: FC<DashboardSellsVsPaymentsProps> = ({ className }) => {
   const { portfolioData } = useContext(ClientDetailsContext);
 
-  const data2 = portfolioData?.payments_vs_invoices?.map((item) => {
+  const uniqueItemsMap = new Map();
+
+  portfolioData?.payments_vs_invoices?.forEach((item) => {
+    const name = capitalize(dayjs(item.month).utc().locale("es").format("MMM YY"));
+    uniqueItemsMap.set(name, item);
+  });
+
+  const data = Array.from(uniqueItemsMap?.values())?.map((item) => {
     return {
       name: capitalize(dayjs(item.month).utc().locale("es").format("MMM YY")),
       ventas: item.sales,
@@ -67,7 +74,7 @@ const DashboardSellsVsPayments: FC<DashboardSellsVsPaymentsProps> = ({ className
       </div>
       <div className={styles.chart}>
         <ResponsiveContainer>
-          <LineChart margin={{ right: 15, left: 0 }} barCategoryGap={10} data={data2} barSize={20}>
+          <LineChart margin={{ right: 15, left: 0 }} barCategoryGap={10} data={data} barSize={20}>
             <XAxis padding={{ left: 20, right: 20 }} dataKey="name" scale="point" />
             <YAxis
               padding={{ top: 10 }}

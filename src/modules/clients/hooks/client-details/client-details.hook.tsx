@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 
 export const useClientDetails = () => {
   const [portfolioData, setPortfolioData] = useState<IDataSection | undefined>(undefined);
+  const [mutate, setMutate] = useState<boolean>(false);
   const params = useParams();
 
   const clientIdParam = extractSingleParam(params.clientId);
@@ -16,13 +17,11 @@ export const useClientDetails = () => {
 
   useEffect(() => {
     const fetchPortfolioData = async () => {
-      if (!portfolioData) {
-        const response: IDataSection = await getPortfolioFromClient(projectId, clientId);
-        setPortfolioData(response);
-      }
+      const response: IDataSection = await getPortfolioFromClient(projectId, clientId);
+      setPortfolioData(response);
     };
     fetchPortfolioData();
-  }, [clientId, portfolioData, projectId]);
+  }, [clientId, projectId, mutate]);
 
-  return { portfolioData };
+  return { portfolioData, setMutate };
 };

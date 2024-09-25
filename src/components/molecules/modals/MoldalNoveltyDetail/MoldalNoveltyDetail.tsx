@@ -77,18 +77,21 @@ const MoldalNoveltyDetail: FC<MoldalNoveltyDetailProps> = ({ onClose, noveltyId 
             <CaretDoubleRight />
           </button>
         </div>
+
         <div className="header">
           <Title level={4}>{incidentData.incident_name}</Title>
-          <div className="header-buttons">
-            <Button onClick={() => handleOpenResolveModal(false)}>
-              <X />
-              Rechazar
-            </Button>
-            <Button type="primary" onClick={() => handleOpenResolveModal(true)}>
-              <Check />
-              Resolver
-            </Button>
-          </div>
+          {incidentData.is_rejected !== 1 && incidentData.is_rejected !== 0 && (
+            <div className="header-buttons">
+              <Button onClick={() => handleOpenResolveModal(false)}>
+                <X />
+                Rechazar
+              </Button>
+              <Button type="primary" onClick={() => handleOpenResolveModal(true)}>
+                <Check />
+                Resolver
+              </Button>
+            </div>
+          )}
         </div>
       </div>
       <InfoSection

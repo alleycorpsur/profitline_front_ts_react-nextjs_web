@@ -11,7 +11,13 @@ interface Props {
   invoices?: InfoConcilation;
 }
 
+const formatNumber = (num: number) => {
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+};
+
 export const ModalNextConcilation = ({ visible, onClose, changeView, invoices }: Props) => {
+  const percentage = calculatePercentage(invoices);
+
   return (
     <Modal
       open={visible}
@@ -26,9 +32,20 @@ export const ModalNextConcilation = ({ visible, onClose, changeView, invoices }:
           <Wallet size={22} />
         </div>
         <h2>¡Cartera conciliada!</h2>
-        <h3>El {calculatePercentage(invoices).toFixed(2)}% de la cartera fue conciliada</h3>
-        {invoices && invoices.reconciled_invoices.invoices.length > 0 && (
-          <p> {invoices?.invoices_with_differences.quantity} facturas con diferencia de precios</p>
+        <h3>El <span className="semi-bold">{percentage.toFixed(2)}%</span> de la cartera fue conciliada</h3>
+        {invoices && (
+          <>
+            <label className="text_conciliation">
+              Factura conciliadas: <span className="semi-bold">{formatNumber(invoices.reconciled_invoices.invoices.length)}</span>
+            </label>
+            <label className="text_conciliation">
+              Facturas con diferencia de precios:{" "}
+              <span className="semi-bold">{formatNumber(invoices.invoices_with_differences.invoices.length)}</span>
+            </label>
+            <label className="text_conciliation">
+              Facturas no cargadas: <span className="semi-bold">{formatNumber(invoices.invoices_not_found?.invoices?.length || 0)}</span>
+            </label>
+          </>
         )}
 
         <div className="button-row">

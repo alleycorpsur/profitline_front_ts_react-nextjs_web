@@ -365,3 +365,10 @@ export function capitalize(str: string): string {
   if (typeof str !== "string" || str.length === 0) return "";
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
+
+export const calculateDaysDifference = (startDate: Date, endDate: Date) => {
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  const differenceInTime = end.getTime() - start.getTime();
+  return Math.ceil(differenceInTime / (1000 * 3600 * 24));
+};

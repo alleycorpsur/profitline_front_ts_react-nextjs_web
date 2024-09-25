@@ -21,11 +21,13 @@ export interface IIncidentDetail {
   incident_name: string;
   is_open: boolean;
   client: string;
+  client_id: number;
   responsible_user: string;
   invoice_cashport_value: number;
   invoice_client_value: number;
   approvers_users: string;
   events: IEvent[];
+  is_rejected: number;
 }
 
 interface IIncidentDetailResponse {

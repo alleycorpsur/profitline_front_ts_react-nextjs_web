@@ -71,9 +71,21 @@ export const ModalActionAdjusment = ({ isOpen, onClose, adjustment, clientId }: 
         } else {
           messageApi.error(response.message || "Error al legalizar el ajuste contable");
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error in legalizeFinancialDiscount:", error);
-        if (error instanceof Error) {
+        if (error.response && error.response.status === 400) {
+          const errorMessage = error.response.data.message;
+          if (
+            errorMessage ===
+            "The current value of the financial discount to be legalized is less than the current value of the financial discount not to be legalized"
+          ) {
+            messageApi.error(
+              "El valor actual de la nota seleccionada es menor al valor de la nota por legalizar"
+            );
+          } else {
+            messageApi.error(errorMessage || "Error 400: Solicitud incorrecta");
+          }
+        } else if (error instanceof Error) {
           messageApi.error(`Error: ${error.name}`);
         } else {
           messageApi.error("Error desconocido al legalizar el ajuste contable");

@@ -58,11 +58,13 @@ export const ConcilationTable = ({
       dataIndex: "create_at",
       key: "create_at",
       render: (text, record) => (
-        <Text className="cell -alignRight">
-          {formatDate(record?.financialRecordDate?.toString())}
-        </Text>
+        <Text className="cell -alignRight">{formatDate(record?.financialRecordDate?.toString())}</Text>
       ),
-      sorter: (a, b) => Number(a.create_at) - Number(b.create_at),
+      sorter: (a, b) => {
+        const dateA = new Date(a.financialRecordDate);
+        const dateB = new Date(b.financialRecordDate);
+        return dateA.getTime() - dateB.getTime();
+      },
       showSorterTooltip: false,
       align: "right",
       width: 120
@@ -81,6 +83,7 @@ export const ConcilationTable = ({
       key: "current_value",
       dataIndex: "current_value",
       render: (amount) => <Text className="cell -alignRight">{formatMoney(amount)}</Text>,
+      sorter: (a, b) => a.current_value - b.current_value,
       showSorterTooltip: false,
       align: "right",
       width: 150

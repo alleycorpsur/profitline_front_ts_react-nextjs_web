@@ -122,11 +122,17 @@ const RegisterNewsConcilation = ({
       if (!invoices) return;
       const invoiceList = Object.entries(invoices).flatMap(([key, category]) =>
         category.invoices.map(
-          (invoice: { id: string; motive_id: string; difference_amount: string }) => ({
+          (invoice: {
+            id: string;
+            motive_id: string;
+            difference_amount: string;
+            observation?: string;
+          }) => ({
             invoice_id: invoice.id,
             motive_id: invoice.motive_id,
             difference: invoice.difference_amount,
-            status: key
+            status: key,
+            observation: invoice.observation
           })
         )
       );
@@ -213,7 +219,7 @@ const RegisterNewsConcilation = ({
                   id="fileInput"
                   style={{ display: "none" }}
                   onChange={handleFileChange}
-                  accept=".pdf,.png,.doc,.docx"
+                  accept=".pdf, .png, .doc, .docx, .xls, .xlsx, .msg, .txt, .eml"
                 />
               </>
             )}

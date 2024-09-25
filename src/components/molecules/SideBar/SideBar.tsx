@@ -1,7 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Avatar, Button, Flex } from "antd";
-
+import { usePathname, useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   ArrowLineRight,
   BellSimpleRinging,
@@ -12,15 +13,15 @@ import {
   Bank
 } from "phosphor-react";
 
-import "./sidebar.scss";
-import { usePathname, useRouter } from "next/navigation";
 import { logOut } from "../../../../firebase-utils";
-import Link from "next/link";
 import { useAppStore } from "@/lib/store/store";
 import useStore from "@/lib/hook/useStore";
-import { ModalProjectSelector } from "../modals/ModalProjectSelector/ModalProjectSelector";
 import { getUserPermissions } from "@/services/permissions/userPermissions";
 import { checkUserViewPermissions } from "@/utils/utils";
+
+import { ModalProjectSelector } from "../modals/ModalProjectSelector/ModalProjectSelector";
+
+import "./sidebar.scss";
 
 export const SideBar = () => {
   const [isSideBarLarge, setIsSideBarLarge] = useState(false);
@@ -31,7 +32,6 @@ export const SideBar = () => {
   const project = useStore(useAppStore, (state) => state.selectedProject);
   const setProjectsBasicInfo = useAppStore((state) => state.setProjectsBasicInfo);
   const setSelectedProject = useAppStore((state) => state.setSelectedProject);
-  const projects = useAppStore((state) => state.projectsBasicInfo);
 
   const LOGO = project?.LOGO;
 
@@ -52,31 +52,29 @@ export const SideBar = () => {
     const fetchProjects = async () => {
       const response = await getUserPermissions();
       setProjectsBasicInfo(
-        response?.data?.map((project) => ({
+        response?.data?.permissions.map((project) => ({
           ID: project.project_id,
           NAME: project.name,
-          LOGO: project.logo ? project.logo : "",
+          LOGO: project.logo ? `${project.logo.trim()}?v=${new Date().getTime()}` : "",
           views_permissions: project.views_permissions,
           action_permissions: project.action_permissions,
           isSuperAdmin: project.is_super_admin
         }))
       );
 
-      if (response?.data?.length === 1) {
+      if (response?.data?.permissions?.length === 1) {
         setSelectedProject({
-          ID: response?.data[0].project_id,
-          NAME: response?.data[0].name,
-          LOGO: response?.data[0].logo ? response?.data[0].logo : "",
-          views_permissions: response?.data[0].views_permissions,
-          action_permissions: response?.data[0].action_permissions,
-          isSuperAdmin: response?.data[0].is_super_admin
+          ID: response?.data.permissions[0].project_id,
+          NAME: response?.data.permissions[0].name,
+          LOGO: response?.data.permissions[0].logo ? response?.data.permissions[0].logo : "",
+          views_permissions: response?.data.permissions[0].views_permissions,
+          action_permissions: response?.data.permissions[0].action_permissions,
+          isSuperAdmin: response?.data?.permissions[0].is_super_admin
         });
       }
     };
 
-    if (projects?.length === 0) {
-      fetchProjects();
-    }
+    fetchProjects();
   }, []);
 
   return (
@@ -85,7 +83,11 @@ export const SideBar = () => {
         <button className="logoContainer" onClick={() => setModalProjectSelectorOpen(true)}>
           {LOGO ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img alt="logo company" src={LOGO.trim()} className="logoContainer__image" />
+            <img
+              alt="logo company"
+              src={`${LOGO.trim()}?v=${new Date().getTime()}`}
+              className="logoContainer__image"
+            />
           ) : (
             <Avatar shape="square" className="imageWithoutImage" size={50} icon={<Clipboard />} />
           )}

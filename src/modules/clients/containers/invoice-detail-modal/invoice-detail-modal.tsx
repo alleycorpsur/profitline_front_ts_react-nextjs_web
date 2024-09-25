@@ -91,6 +91,8 @@ const InvoiceDetailModal: FC<InvoiceDetailModalProps> = ({
         return "Radicación";
       case "Registrar novedad":
         return "Novedad";
+      case "Emision de factura":
+        return "Emisión de factura";
       default:
         return item;
     }
@@ -249,9 +251,12 @@ const InvoiceDetailModal: FC<InvoiceDetailModalProps> = ({
                                     ID del ajuste:
                                     <div
                                       className={styles.idAdjustment}
-                                      onClick={() => item.id && handelOpenAdjusmentDetail(item.id)}
+                                      onClick={() =>
+                                        item.financial_discount_id &&
+                                        handelOpenAdjusmentDetail(item.financial_discount_id)
+                                      }
                                     >
-                                      {item.id ?? "N/A"}
+                                      {item.financial_discount_id ?? "N/A"}
                                     </div>
                                   </div>
                                 </div>

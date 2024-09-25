@@ -135,7 +135,7 @@ export const StateConcilationTable = ({ invoices, clientId, setInvoices }: Props
         for (const invoice of invoiceCategory.invoices) {
           if (invoice.motive_id == null) {
             messageApi.error(
-              "Por favor seleccione un motivo para todas las facturas no encontradas y con direncias"
+              "Por favor seleccione un motivo para todas las facturas no encontradas y con diferencias"
             );
             return;
           }
