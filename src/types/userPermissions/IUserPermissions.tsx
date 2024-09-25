@@ -1,10 +1,15 @@
 export interface IUserPermissions {
   status: number;
   message: string;
-  data: IPermissionData[];
+  data: IPermissionData;
 }
 
 interface IPermissionData {
+  permissions: IPermissionsByProject[];
+  id_user: number;
+}
+
+interface IPermissionsByProject {
   project_id: number;
   rol_id: number;
   name: string;
