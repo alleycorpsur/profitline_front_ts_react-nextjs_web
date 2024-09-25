@@ -264,7 +264,7 @@ export const createDigitalRecord = async (
   data: IFormDigitalRecordModal,
   invoicesIds: number[],
   project_id: number,
-  user_id: string
+  user_id: number
 ): Promise<AxiosResponse<any>> => {
   const token = await getIdToken();
 
@@ -278,21 +278,26 @@ export const createDigitalRecord = async (
   if (copy_to) formData.append("copy_to", JSON.stringify(copy_to));
   formData.append("subject", data.subject);
   formData.append("commentary", data.comment);
-  formData.append("user_id", user_id);
+  formData.append("user_id", user_id.toString());
   data.attachments.forEach((file) => {
     formData.append("attachments", file);
   });
 
-  const response: AxiosResponse<any> = await axios.post(
-    `${config.API_HOST}/client/digital-record?projectId=${project_id}`,
-    formData,
-    {
-      headers: {
-        Accept: "application/json, text/plain, */*",
-        Authorization: `Bearer ${token}`
+  try {
+    const response: AxiosResponse<any> = await axios.post(
+      `${config.API_HOST}/client/digital-record?projectId=${project_id}`,
+      formData,
+      {
+        headers: {
+          Accept: "application/json, text/plain, */*",
+          Authorization: `Bearer ${token}`
+        }
       }
-    }
-  );
+    );
 
-  return response;
+    return response;
+  } catch (error) {
+    console.error("Error creating digital record", error);
+    throw error;
+  }
 };

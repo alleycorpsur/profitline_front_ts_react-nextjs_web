@@ -58,6 +58,8 @@ const DigitalRecordModal = ({
     }[]
   >([]);
 
+  const userId = useAppStore((state) => state.userId);
+
   const {
     control,
     handleSubmit,
@@ -130,14 +132,18 @@ const DigitalRecordModal = ({
   };
 
   const onSubmit = async (data: IFormDigitalRecordModal) => {
-    console.log("data ", data);
-    console.log("invoiceSelected", invoiceSelected);
-    const res = await createDigitalRecord(
-      data,
-      invoiceSelected?.map((invoice) => invoice.id) || [],
-      projectId,
-      "2"
-    );
+    try {
+      await createDigitalRecord(
+        data,
+        invoiceSelected?.map((invoice) => invoice.id) || [],
+        projectId,
+        userId
+      );
+
+      messageShow.success("Acta digital enviada correctamente");
+    } catch (error) {
+      messageShow.error("Error al enviar acta digital");
+    }
   };
 
   return (

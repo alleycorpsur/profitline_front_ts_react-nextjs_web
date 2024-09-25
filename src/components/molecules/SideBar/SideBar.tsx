@@ -32,6 +32,7 @@ export const SideBar = () => {
   const project = useStore(useAppStore, (state) => state.selectedProject);
   const setProjectsBasicInfo = useAppStore((state) => state.setProjectsBasicInfo);
   const setSelectedProject = useAppStore((state) => state.setSelectedProject);
+  const setUserId = useAppStore((state) => state.setUserId);
 
   const LOGO = project?.LOGO;
 
@@ -61,6 +62,8 @@ export const SideBar = () => {
           isSuperAdmin: project.is_super_admin
         }))
       );
+
+      setUserId(response?.data.id_user);
 
       if (response?.data?.permissions?.length === 1) {
         setSelectedProject({
