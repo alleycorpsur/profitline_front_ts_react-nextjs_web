@@ -141,6 +141,8 @@ const DigitalRecordModal = ({
       );
 
       messageShow.success("Acta digital enviada correctamente");
+
+      onClose();
     } catch (error) {
       messageShow.error("Error al enviar acta digital");
     }
