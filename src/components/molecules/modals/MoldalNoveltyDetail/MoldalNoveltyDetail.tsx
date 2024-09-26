@@ -25,6 +25,7 @@ const MoldalNoveltyDetail: FC<MoldalNoveltyDetailProps> = ({ onClose, noveltyId 
 
   const [messageShow, contextHolder] = message.useMessage();
   useEffect(() => {
+    
     if (data && data.length > 0) {
       setIncidentData(data[0]);
     }
