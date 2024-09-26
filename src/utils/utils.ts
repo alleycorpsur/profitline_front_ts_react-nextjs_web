@@ -208,7 +208,7 @@ export function formatMoney(
   countryCode?: CountryCode
 ): string {
   if (!amount) {
-    return "";
+    return "$0";
   }
   const { currency, id } = countryFormater(countryCode);
   const number = typeof amount === "string" ? parseFloat(amount) : amount;
