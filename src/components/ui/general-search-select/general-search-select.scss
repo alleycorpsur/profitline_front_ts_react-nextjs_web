@@ -112,19 +112,33 @@
 
         .ant-select-item-option-selected {
             background-color: $dark-gray !important;
+
+            .option {
+                background-color: $dark-gray !important;
+            }
         }
 
         .ant-select-item-option-active {
             background-color: $dark-gray !important;
+            .option {
+                background-color: $dark-gray !important;
+            }
         }
     }
 
-    .selectOptions {
+    .option {
         background-color: $background !important;
-        margin-bottom: 0.25rem;
-        border-radius: 6px;
-        padding: 0.7rem !important;
-        font-size: 1rem !important;
         font-size: 1rem;
+        transition: all 0.19s ease-in-out;
+
+        .label {
+            font-size: 0.875rem;
+        }
+
+        .value {
+            font-weight: 300;
+            font-size: 0.625rem;
+            color: $gray;
+        }
     }
 }
