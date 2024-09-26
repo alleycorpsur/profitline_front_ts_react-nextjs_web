@@ -2,10 +2,15 @@
 
 .products {
     .line {
-        width: 400px;
+        flex: 1;
         border: 1px solid #eee;
         border-radius: 5px;
         padding: 12px;
+        margin-bottom: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+
         .product {
             color: #333;
             font-weight: bold;

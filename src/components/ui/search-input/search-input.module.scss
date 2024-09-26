@@ -17,6 +17,7 @@
         font-size: 20px;
         font-weight: bold;
     }
+
     input {
         flex: 1;
         border: none;
@@ -25,8 +26,25 @@
         font-weight: 600;
         line-height: 24px;
         background-color: transparent;
+
         &::placeholder {
             color: #07070778;
+        }
+    }
+
+    .clearButton {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+        color: #07070778;
+        font-size: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &:hover {
+            color: #070707;
         }
     }
 }
