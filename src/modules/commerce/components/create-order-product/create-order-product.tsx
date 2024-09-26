@@ -1,15 +1,18 @@
 import { FC } from "react";
 import Image from "next/image";
+import { Flex } from "antd";
+import { Minus, Plus } from "phosphor-react";
 
 import { formatMoney } from "@/utils/utils";
+import { useHandleProductsItems } from "../../hooks/create-order/handle-products-items.hook";
+
 import SecondaryButton from "@/components/atoms/buttons/secondaryButton/SecondaryButton";
-import { Minus, Plus } from "phosphor-react";
 import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
+import SimpleTag from "@/components/atoms/SimpleTag/SimpleTag";
+
+import { ISelectedProduct } from "@/types/commerce/ICommerce";
 
 import styles from "./create-order-product.module.scss";
-import { useHandleProductsItems } from "../../hooks/create-order/handle-products-items.hook";
-import { Flex } from "antd";
-import { ISelectedProduct } from "@/types/commerce/ICommerce";
 
 export interface CreateOrderProductProps {
   product: ISelectedProduct;
@@ -38,7 +41,17 @@ const CreateOrderProduct: FC<CreateOrderProductProps> = ({ product, categoryName
       </div>
 
       <hr className={styles.separator} />
-      <h4 className={styles.name}>{product.name}</h4>
+      <h4 className={styles.name}>
+        {product.name}{" "}
+        {!product.stock && (
+          <SimpleTag
+            text="Stock insuficiente"
+            colorTag="#ff350d"
+            colorText="#ffffff"
+            fontSize="0.75rem"
+          />
+        )}
+      </h4>
       <div className={styles.price}>
         {product.discount ? (
           <>

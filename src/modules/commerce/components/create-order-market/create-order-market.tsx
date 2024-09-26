@@ -1,25 +1,25 @@
-import { FC, useContext, useEffect, useState } from "react";
+import { FC, useContext, useEffect } from "react";
 import { Button, Flex } from "antd";
 import { CaretLeft } from "phosphor-react";
+
+import { useAppStore } from "@/lib/store/store";
 import UiSearchInput from "@/components/ui/search-input";
 import FilterDiscounts from "@/components/atoms/Filters/FilterDiscounts/FilterDiscounts";
 import UiTab from "@/components/ui/ui-tab";
 import { OrderViewContext } from "../../containers/create-order/create-order";
 import CreateOrderProduct from "../create-order-product";
+import { getProductsByClient } from "@/services/commerce/commerce";
+
 import { ISelectType } from "@/types/clients/IClients";
 
 import styles from "./create-order-market.module.scss";
-import { getProductsByClient } from "@/services/commerce/commerce";
-import { useAppStore } from "@/lib/store/store";
-import { IFetchedCategories } from "@/types/commerce/ICommerce";
 export interface selectClientForm {
   client: ISelectType;
 }
 
 const CreateOrderMarket: FC = ({}) => {
   const { ID } = useAppStore((state) => state.selectedProject);
-  const { client, setClient } = useContext(OrderViewContext);
-  const [categories, setCategories] = useState<IFetchedCategories[]>([]);
+  const { client, setClient, categories, setCategories } = useContext(OrderViewContext);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -37,7 +37,8 @@ const CreateOrderMarket: FC = ({}) => {
               quantity: 0,
               image: product.image,
               category_id: product.id_category,
-              SKU: product.SKU
+              SKU: product.SKU,
+              stock: true
             }))
           }));
 

@@ -273,7 +273,6 @@ export const UsersProjectTable: React.FC<Props> = ({
       <main className="mainUsersProjectTable">
         <Flex justify="space-between" className="mainUsersProjectTable_header">
           <Flex gap={"0.625rem"} align="center">
-            {/* create a input for search  */}
             <UiSearchInput
               placeholder="Buscar usuarios"
               onChange={(e) => setSearchQuery(e.target.value)}

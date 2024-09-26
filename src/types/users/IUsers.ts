@@ -8,10 +8,6 @@ export interface IUsers {
 }
 
 export interface IUserSingle {
-  USER_NAME: string;
-}
-
-export interface IUserSingle {
   ACTIVE: number;
   BUSSINESS_RULES: IBusinessRules[];
   EMAIL: string;
