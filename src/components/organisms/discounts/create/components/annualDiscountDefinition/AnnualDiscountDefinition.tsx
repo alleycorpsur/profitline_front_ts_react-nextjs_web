@@ -120,7 +120,6 @@ export default function AnnualDiscountDefinition({
                   options={options}
                   disabled={statusForm !== "create"}
                   {...field}
-                  labelInValue
                 ></Select>
                 <Text type="danger" hidden={!errors.client}>
                   {errors?.client?.message}
