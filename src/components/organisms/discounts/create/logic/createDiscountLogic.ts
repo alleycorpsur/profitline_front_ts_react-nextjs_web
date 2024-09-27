@@ -21,12 +21,18 @@ export const mapDiscountGetOneToDiscountSchema: (discount: DiscountGetOne) => Di
     start_date: dayjs(discount.start_date) as any,
     end_date: discount.end_date ? (dayjs(discount.end_date) as any) : undefined,
     ranges:
-      discount.ranges?.map((e) => ({
-        id: e.id,
-        unitsMin: e.units_from || e.min_units_by_order_by_sku || e.min_units_by_channel,
-        unitsMax: e.units_to || e.min_channel,
-        discount: e.discount
-      })) || [],
+      discount.ranges?.map((e) => {
+        const [unitsMin, unitsMax] =
+          discount.discount_type_id === 3
+            ? [e.min_channel, e.min_units_by_channel]
+            : [e.min_channel, e.min_units_by_order_by_sku];
+        return {
+          id: e.id,
+          unitsMin: e.units_from || unitsMin,
+          unitsMax: e.units_to || unitsMax,
+          discount: e.discount
+        };
+      }) || [],
     annual_ranges:
       discount.contracts?.map((e) => ({
         id: e.id,
