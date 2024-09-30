@@ -320,11 +320,7 @@ export const formatMillionNumber = (number: number | undefined | null): string =
 
   const formatNumber = number / 1000000;
 
-  if (number.toString().length < 9) {
-    return formatNumber.toFixed(2);
-  }
-
-  return formatNumber.toFixed();
+  return formatNumber.toFixed(1);
 };
 
 export const formatCurrencyMoney = (value: number): string => {
