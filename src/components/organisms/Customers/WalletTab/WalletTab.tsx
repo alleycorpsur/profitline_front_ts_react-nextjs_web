@@ -119,6 +119,13 @@ export const WalletTab = () => {
     return true;
   };
 
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value?.trim();
+    // Separar los IDs por saltos de línea y luego unirlos con comas
+    const formattedValue = value.split(/\s+/).join(",");
+    setSearch(formattedValue);
+  };
+
   return (
     <>
       {contextHolder}
@@ -131,9 +138,7 @@ export const WalletTab = () => {
             <UiSearchInput
               className="search"
               placeholder="Buscar por ID"
-              onChange={(event) => {
-                setSearch(event.target.value);
-              }}
+              onChange={handleSearchChange}
             />
             <WalletTabFilter setSelectedFilters={setFilters} />
             <Button
