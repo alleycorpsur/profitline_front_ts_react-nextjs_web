@@ -1,6 +1,8 @@
+import React, { useState, useEffect } from "react";
 import { Controller, UseFormReturn, useFieldArray } from "react-hook-form";
-import style from "./AnnualDiscountDefinition.module.scss";
 import { Button, DatePicker, Flex, Select, Typography } from "antd";
+import { useInfiniteQuery } from "react-query";
+
 import { InputForm } from "@/components/atoms/inputs/InputForm/InputForm";
 import {
   FileObject,
@@ -8,21 +10,22 @@ import {
 } from "@/components/atoms/UploadDocumentButton/UploadDocumentButton";
 import AnnualFeatures from "./annualFeatures/AnnualFeatures";
 import { getOptionsByType } from "../../../constants/discountTypes";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { DiscountSchema } from "../../resolvers/generalResolver";
-import { getAllByProject } from "@/services/clients/clients";
 import { useAppStore } from "@/lib/store/store";
 import { Pencil } from "phosphor-react";
 import UploadDocumentChild from "@/components/atoms/UploadDocumentChild/UploadDocumentChild";
+import style from "./AnnualDiscountDefinition.module.scss";
+
+import { fetcher } from "@/utils/api/api";
+import { useDebounce } from "@/hooks/useDeabouce";
 
 const { Title, Text } = Typography;
 
 type Props = {
   selectedType: number;
   form: UseFormReturn<DiscountSchema, any, undefined>;
-  setFiles: Dispatch<SetStateAction<FileObject[]>>;
+  setFiles: React.Dispatch<React.SetStateAction<FileObject[]>>;
   statusForm: "create" | "edit" | "review";
-  // eslint-disable-next-line no-unused-vars
   handleChangeStatusForm: (status: "create" | "edit" | "review") => void;
   loadingMain: boolean;
   handleUpdateContract: () => void;
@@ -38,38 +41,31 @@ export default function AnnualDiscountDefinition({
   handleUpdateContract
 }: Props) {
   const { ID: projectId } = useAppStore((project) => project.selectedProject);
-  const [loading, setLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
-  const fetchClients = async () => {
-    setLoading(true);
-    try {
-      const res = await getAllByProject({ idProject: projectId.toString() });
-      setOptions(res?.map((client) => ({ label: client.client_name, value: client.nit })));
-    } catch (error) {
-      console.warn("error fetching clients: ", error);
-    } finally {
-      setLoading(false);
-    }
+  const fetchClients = async ({ pageParam = 1 }) => {
+    const limit = 50;
+    const searchQueryParam = debouncedSearchQuery
+      ? `&searchQuery=${encodeURIComponent(debouncedSearchQuery.toLowerCase().trim())}`
+      : "";
+
+    const pathKey = `/portfolio/client/project/${projectId}?page=${pageParam}&limit=${limit}${searchQueryParam}`;
+
+    return fetcher(pathKey);
   };
 
-  const [options, setOptions] = useState<
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useInfiniteQuery(
+    ["clients", debouncedSearchQuery, projectId],
+    fetchClients,
     {
-      label: string;
-      value: number;
-    }[]
-  >([]);
-
-  useEffect(() => {
-    fetchClients();
-  }, []);
-
-  useEffect(() => {
-    const options = getOptionsByType(selectedType);
-    setValue("discount_type", options[0].value);
-    return () => {
-      setValue("discount_type", undefined);
-    };
-  }, [selectedType]);
+      getNextPageParam: (lastPage, pages) => {
+        if (lastPage.message === "no rows" || lastPage?.data?.clientsPortfolio?.length < 50)
+          return undefined;
+        return pages.length + 1;
+      }
+    }
+  );
 
   const {
     setValue,
@@ -83,6 +79,31 @@ export default function AnnualDiscountDefinition({
     name: "annual_ranges"
   });
 
+  useEffect(() => {
+    const options = getOptionsByType(selectedType);
+    setValue("discount_type", options[0].value);
+    return () => {
+      setValue("discount_type", undefined);
+    };
+  }, [selectedType, setValue]);
+
+  const options =
+    data?.pages.flatMap(
+      (page) =>
+        page.data?.clientsPortfolio?.map((client: { client_name: string; client_id: string }) => ({
+          label: client.client_name,
+          value: client.client_id
+        })) || []
+    ) || [];
+
+  const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
+    const { currentTarget } = event;
+    if (currentTarget.scrollTop + currentTarget.clientHeight >= currentTarget.scrollHeight - 20) {
+      if (hasNextPage && !isFetchingNextPage) {
+        fetchNextPage();
+      }
+    }
+  };
   return (
     <Flex className={style.HeaderContainer} vertical gap={20}>
       <Flex gap={20} justify="space-between">
@@ -106,27 +127,30 @@ export default function AnnualDiscountDefinition({
         <Controller
           name="client"
           control={control}
-          render={({ field }) => {
-            return (
-              <>
-                <Select
-                  showSearch
-                  optionFilterProp="label"
-                  placeholder="Selecciona cliente"
-                  className={`${style.selectInput} translate`}
-                  loading={loading}
-                  variant="borderless"
-                  optionLabelProp="label"
-                  options={options}
-                  disabled={statusForm !== "create"}
-                  {...field}
-                ></Select>
-                <Text type="danger" hidden={!errors.client}>
-                  {errors?.client?.message}
-                </Text>
-              </>
-            );
-          }}
+          render={({ field }) => (
+            <>
+              <Select
+                showSearch
+                optionFilterProp="label"
+                placeholder="Selecciona cliente"
+                className={`${style.selectInput} translate`}
+                loading={isFetchingNextPage || isLoading}
+                variant="borderless"
+                optionLabelProp="label"
+                options={options}
+                disabled={statusForm !== "create"}
+                onSearch={setSearchQuery}
+                filterOption={false}
+                onPopupScroll={handleScroll}
+                {...field}
+              >
+                {isFetchingNextPage && <Select.Option disabled>Cargando más...</Select.Option>}
+              </Select>
+              <Text type="danger" hidden={!errors.client}>
+                {errors?.client?.message}
+              </Text>
+            </>
+          )}
         />
       </Flex>
       <Title level={4}>{statusForm === "create" ? "Adjuntar contrato" : "Ver contrato"}</Title>
