@@ -22,6 +22,7 @@ import { checkUserViewPermissions } from "@/utils/utils";
 import { ModalProjectSelector } from "../modals/ModalProjectSelector/ModalProjectSelector";
 
 import "./sidebar.scss";
+import { SealPercent } from "@phosphor-icons/react";
 
 export const SideBar = () => {
   const [isSideBarLarge, setIsSideBarLarge] = useState(false);
@@ -112,7 +113,7 @@ export const SideBar = () => {
             <Button
               type="primary"
               size="large"
-              icon={<BellSimpleRinging size={26} />}
+              icon={<SealPercent size={26} />}
               className={path.startsWith("/descuentos") ? "buttonIcon" : "buttonIconActive"}
             >
               {isSideBarLarge && "Descuentos"}
