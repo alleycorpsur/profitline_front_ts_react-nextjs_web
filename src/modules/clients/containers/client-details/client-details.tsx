@@ -86,7 +86,7 @@ export const ClientDetails: FC<ClientDetailsProps> = () => {
       children: <ContactsTab />
     },
     {
-      key: "6",
+      key: "7",
       label: "Historial",
       children: <HistoryTab />
     }
