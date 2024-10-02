@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button, Flex } from "antd";
-import { MagnifyingGlassPlus } from "phosphor-react";
+import { DotsThree, MagnifyingGlassPlus } from "phosphor-react";
 import LabelCollapse from "@/components/ui/label-collapse";
 import UiSearchInput from "@/components/ui/search-input";
 import Collapse from "@/components/ui/collapse";
@@ -10,6 +10,7 @@ import PaymentsTable from "@/modules/clients/components/payments-table";
 import { IPayment } from "@/types/payments/IPayments";
 
 import "./payments-tab.scss";
+import { ModalActionPayment } from "@/components/molecules/modals/ModalActionPayment/ModalActionPayment";
 
 const PaymentsTab = () => {
   const [selectedRows, setSelectedRows] = useState<IPayment[] | undefined>(undefined);
@@ -18,6 +19,7 @@ const PaymentsTab = () => {
     paymentId: number;
   }>({} as { isOpen: boolean; paymentId: number });
   const [search, setSearch] = useState("");
+  const [isModalActionPaymentOpen, setIsModalActionPaymentOpen] = useState(false);
 
   return (
     <>
@@ -34,6 +36,15 @@ const PaymentsTab = () => {
               }}
             />
             <UiFilterDropdown />
+            <Button
+              className="button__actions"
+              size="large"
+              icon={<DotsThree size={"1.5rem"} />}
+              disabled={false}
+              onClick={() => setIsModalActionPaymentOpen(true)}
+            >
+              Generar acción
+            </Button>
             <DotsDropdown />
           </Flex>
 
@@ -58,6 +69,10 @@ const PaymentsTab = () => {
           }))}
         />
       </div>
+      <ModalActionPayment
+        isOpen={isModalActionPaymentOpen}
+        onClose={() => setIsModalActionPaymentOpen(false)}
+      />
     </>
   );
 };
