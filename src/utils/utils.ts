@@ -313,6 +313,7 @@ export const formatDateAndTime = (date: string): string => {
   return `${day}/${month}/${year} - ${hours}:${minutes} ${period}`;
 };
 
+
 export const formatMillionNumber = (number: number | undefined | null): string => {
   if (!number) {
     return "0";
