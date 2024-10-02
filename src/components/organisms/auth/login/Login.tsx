@@ -10,6 +10,7 @@ import styles from "./login.module.scss";
 
 export const LoginView = () => {
   const [resetPassword, setResetPassword] = useState(false);
+  console.log("entre");
 
   return (
     <main className={styles.container}>
