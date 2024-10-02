@@ -200,6 +200,23 @@ const InvoiceDetailModal: FC<InvoiceDetailModalProps> = ({
                                     {item.is_legalized === 1 ? "Legalizada" : "Por legalizar"}
                                   </span>
                                 )}
+                                {item.event_type_name === "Registrar novedad" && (
+                                  <span
+                                    className={`${styles.tagLabel} ${
+                                      item.is_rejected === 1
+                                        ? styles.tagLabelGreen
+                                        : item.is_rejected === 0
+                                          ? styles.tagLabelRose
+                                          : styles.tagLabelRed
+                                    }`}
+                                  >
+                                    {item.is_rejected === 1
+                                      ? "Rechazada"
+                                      : item.is_rejected === 0
+                                        ? "Aprobada"
+                                        : "Pendiente"}
+                                  </span>
+                                )}
                               </h5>
                               <div className={styles.date}>
                                 {item.event_type_name === "Acuerdo de pago"

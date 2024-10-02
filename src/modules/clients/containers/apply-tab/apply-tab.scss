@@ -1,0 +1,126 @@
+@import "@styles/variables.scss";
+
+.applyContainerApp {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background-color: #FFFFFF;
+    padding: 1rem 1rem;
+    margin-top: 0.2rem;
+    border-radius: 8px;
+    gap: 0.5rem;
+
+
+
+}
+
+.buttonActionApply {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.2rem;
+    border: 1px solid #DDDDDD;
+    padding: 0  0.5rem;
+    border-radius: 8px;
+    margin-left: 4px;
+    color: #DDDDDD;
+}
+
+.sectionContainerTable {
+    &__id {
+        color: $link !important;
+        text-decoration: underline;
+        cursor: pointer;
+    }
+
+    .selectedRow {
+        td {
+            background-color: inherit !important;
+        }
+    }
+
+    .negativeAdjustment {
+        color: red;
+    }
+
+    .expirationText {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .table {
+        border-collapse: collapse;
+    }
+
+    .column {
+        border-right: 1px solid #DDDDDD !important;
+        border-radius: 0 !important;
+
+    }
+
+    .ant-table-thead>tr>th {
+        border: 1px solid #DDDDDD !important;
+        border-radius: 0 !important;
+
+    }
+
+    .ant-table-tbody>tr>td {
+        border: 1px solid #DDDDDD !important;
+        border-radius: 0 !important;
+
+    }
+
+    .ant-table {
+        border-radius: 0 !important;
+    }
+
+    .ant-table-container table {
+        border-radius: 0 !important;
+    }
+
+    .ant-table-cell {
+        padding: 0.5rem !important;
+    }
+
+    .ant-collapse-item {
+        border: none !important;
+    }
+}
+
+.toolTip {
+    color: $black;
+    font-weight: 300;
+    padding: 0.3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    strong {
+        font-weight: 600;
+    }
+}
+
+.logosWrapper {
+    padding-right: 0.3rem !important;
+
+    .logos {
+        display: flex;
+        gap: 0.25rem;
+        justify-content: flex-end;
+
+        button {
+            background-color: $background;
+            padding: 0;
+
+            border: none;
+
+            &:hover {
+                border: 1px solid $black;
+            }
+        }
+    }
+}

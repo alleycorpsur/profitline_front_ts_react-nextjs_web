@@ -3,22 +3,15 @@ import SearchClient from "../../components/create-order-search-client/create-ord
 import CreateOrderMarket from "../../components/create-order-market";
 import CreateOrderCart from "../../components/create-order-cart";
 import CreateOrderCheckout from "../../components/create-order-checkout";
-import { IOrderConfirmedResponse, IShippingInformation } from "@/types/commerce/ICommerce";
+import {
+  IFetchedCategories,
+  IOrderConfirmedResponse,
+  ISelectedProduct,
+  IShippingInformation
+} from "@/types/commerce/ICommerce";
 import { useAppStore } from "@/lib/store/store";
 import styles from "./create-order.module.scss";
 import { getSingleOrder } from "@/services/commerce/commerce";
-
-export interface ISelectedProduct {
-  id: number;
-  name: string;
-  price: number;
-  discount: number | undefined;
-  discount_percentage: number | undefined;
-  quantity: number;
-  image: string;
-  category_id: number;
-  SKU: string;
-}
 
 export interface ISelectedCategories {
   category_id: number;
@@ -45,12 +38,15 @@ interface IOrderViewContext {
   setShippingInfo: Dispatch<IShippingInformation>;
   discountId: number;
   setDiscountId: Dispatch<number>;
+  categories: IFetchedCategories[];
+  setCategories: Dispatch<IFetchedCategories[]>;
 }
 
 export const OrderViewContext = createContext<IOrderViewContext>({} as IOrderViewContext);
 
 export const CreateOrderView: FC = () => {
   const [client, setClient] = useState({} as IOrderViewContext["client"]);
+  const [categories, setCategories] = useState<IFetchedCategories[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<ISelectedCategories[]>([]);
   const [checkingOut, setCheckingOut] = useState(false);
   const [confirmOrderData, setConfirmOrderData] = useState({} as IOrderConfirmedResponse);
@@ -80,7 +76,8 @@ export const CreateOrderView: FC = () => {
             quantity: product.quantity,
             image: product.image,
             category_id: product.id_category,
-            SKU: product.product_sku
+            SKU: product.product_sku,
+            stock: true
           }))
         }));
         setSelectedCategories(selectedCategories);
@@ -109,7 +106,9 @@ export const CreateOrderView: FC = () => {
         shippingInfo,
         setShippingInfo,
         discountId,
-        setDiscountId
+        setDiscountId,
+        categories,
+        setCategories
       }}
     >
       <div className={styles.ordersView}>

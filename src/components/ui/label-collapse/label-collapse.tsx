@@ -9,6 +9,8 @@ interface PropsLabelCollapseInvoice {
   quantity?: number;
   color?: string;
   removeIcons?: boolean;
+  onAction?: () => void;
+  titleAction?: string;
 }
 
 const randomColors = [

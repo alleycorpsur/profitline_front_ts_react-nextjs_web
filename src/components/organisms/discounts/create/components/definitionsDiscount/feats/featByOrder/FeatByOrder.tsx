@@ -50,8 +50,8 @@ export default function FeatByOrder({ discountType, form, statusForm }: FeatByOr
       };
     } else if (discountType === 3) {
       return {
-        unitsFrom: "Minimo de canales",
-        unitsTo: "Mínimo de unidades por canal"
+        unitsFrom: "Minimo de lineas",
+        unitsTo: "Mínimo de unidades por linea"
       };
     } else {
       return {

@@ -1,0 +1,85 @@
+@import "@styles/variables.scss";
+
+.modal__apply__panel {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    width: 300px;
+    max-width: 25rem;
+    min-width: 15rem;
+    background-color: $white;
+    color: $black;
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 24px rgba(0, 0, 0, 0.1);
+    cursor: move;
+    z-index: 20;
+
+    .ant-collapse {
+        background-color: transparent;
+        border: none;
+        padding: 0;
+
+        .ant-collapse-header {
+            padding: 0 !important;
+            color: #DDDDDD !important;
+        }
+
+        .ant-collapse-item {
+            border-bottom: none;
+        }
+
+        .ant-collapse-content {
+            padding: 0 !important;
+            border-top: none;
+        }
+
+        .ant-collapse-content-box {
+            padding: 0 !important;
+
+        }
+    }
+
+    .ant-flex {
+        margin-bottom: 8px;
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    .divider__conciliation {
+        border-top: 1px solid #e8e8e8;
+        padding-top: 12px;
+        margin-top: 8px;
+        font-weight: 600;
+    }
+
+    // Estilos específicos para cada línea
+    .facturas,
+    .pagos,
+    .descuentos,
+    .saldo {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .facturas {
+        padding-top: 6px;
+    }
+
+
+    .descuentos {
+        color: #E53261;
+    }
+
+    // Estilo para los valores que no están disponibles
+    .no-value {
+        color: #999;
+    }
+}
+
+// Ajuste para el icono de expansión
+.ant-collapse-expand-icon {
+    color: $black;
+}

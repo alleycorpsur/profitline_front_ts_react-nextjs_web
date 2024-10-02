@@ -1,13 +1,16 @@
 import { FC } from "react";
 import Image from "next/image";
-import { formatMoney } from "@/utils/utils";
-
+import { Button, Flex } from "antd";
 import { Minus, Plus, Trash } from "phosphor-react";
 
-import styles from "./create-order-cart-item.module.scss";
-import { Button, Flex } from "antd";
+import { formatMoney } from "@/utils/utils";
+
 import { useHandleProductsItems } from "../../hooks/create-order/handle-products-items.hook";
+import SimpleTag from "@/components/atoms/SimpleTag/SimpleTag";
+
 import { ISelectedProduct } from "@/types/commerce/ICommerce";
+
+import styles from "./create-order-cart-item.module.scss";
 export interface CreateOrderItemProps {
   product: ISelectedProduct;
   categoryName: string;
@@ -32,7 +35,17 @@ const CreateOrderItem: FC<CreateOrderItemProps> = ({ product, categoryName }) =>
           height={100}
         />
       </div>
-      <h4 className={styles.name}>{product.name}</h4>
+      <h4 className={styles.name}>
+        {product.name}{" "}
+        {!product.stock && (
+          <SimpleTag
+            text="Stock insuficiente"
+            colorTag="#ff350d"
+            colorText="#ffffff"
+            fontSize="0.75rem"
+          />
+        )}
+      </h4>
 
       <div className={styles.price}>
         {product.discount ? (

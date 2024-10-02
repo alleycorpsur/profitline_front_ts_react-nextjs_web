@@ -30,6 +30,7 @@ export interface IData {
   status: number;
   incident_status: number;
   user_name: string | null;
+  is_rejected: number | null;
   event_type_name: string;
   status_name: string;
   previous_status: string | null;

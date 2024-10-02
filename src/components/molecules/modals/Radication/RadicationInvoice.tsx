@@ -133,7 +133,7 @@ const RadicationInvoice = ({
     <Modal className="contentRegisterNews" width="50%" footer={null} open={isOpen} closable={false}>
       <button className="contentRegisterNews__header" onClick={onClose}>
         <CaretLeft size="1.25rem" />
-        <h4>Radiación</h4>
+        <h4>Radicación</h4>
       </button>
       <p className="contentRegisterNews__description">
         Adjunta la evidencia e ingresa un comentario

@@ -16,6 +16,7 @@ import PaymentAgreementModal from "@/modules/clients/components/wallet-tab-payme
 import { ModalActionDiscountCredit } from "@/components/molecules/modals/ModalActionDiscountCredit/ModalActionDiscountCredit";
 import RadicationInvoice from "@/components/molecules/modals/Radication/RadicationInvoice";
 import RegisterNews from "@/components/molecules/modals/RegisterNews/RegisterNews";
+import DigitalRecordModal from "@/components/molecules/modals/DigitalRecordModal/DigitalRecordModal";
 import { useModalDetail } from "@/context/ModalContext";
 import { useDebounce } from "@/hooks/useDeabouce";
 import {
@@ -118,6 +119,13 @@ export const WalletTab = () => {
     return true;
   };
 
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value?.trim();
+    // Separar los IDs por saltos de línea y luego unirlos con comas
+    const formattedValue = value.split(/\s+/).join(",");
+    setSearch(formattedValue);
+  };
+
   return (
     <>
       {contextHolder}
@@ -130,9 +138,7 @@ export const WalletTab = () => {
             <UiSearchInput
               className="search"
               placeholder="Buscar por ID"
-              onChange={(event) => {
-                setSearch(event.target.value);
-              }}
+              onChange={handleSearchChange}
             />
             <WalletTabFilter setSelectedFilters={setFilters} />
             <Button
@@ -246,6 +252,13 @@ export const WalletTab = () => {
         projectId={projectId}
         messageShow={messageShow}
         onCloseAllModals={closeAllModal}
+      />
+      <DigitalRecordModal
+        isOpen={isSelectOpen.selected === 7}
+        onClose={onCloseModal}
+        messageShow={messageShow}
+        projectId={projectId}
+        invoiceSelected={selectedRows}
       />
     </>
   );

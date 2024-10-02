@@ -44,9 +44,7 @@ export const useInvoices = ({
   const sublinesQuery = sublines && sublines.length > 0 ? `&line=${sublines.join(",")}` : "";
   const zonesQuery = zones && zones.length > 0 ? `&zone=${zones.join(",")}` : "";
   const channelsQuery = channels && channels.length > 0 ? `&channel=${channels.join(",")}` : "";
-  const searchQueryParam = searchQuery
-    ? `&id=${encodeURIComponent(searchQuery.toLowerCase().trim())}`
-    : "";
+  const searchQueryParam = searchQuery ? `&id=${searchQuery.toLowerCase().trim()}` : "";
 
   const pathKey = `/invoice/client/${clientId}/project/${projectId}?${pageQuery}${limitQuery}${paymentAgreementQuery}${radicationTypeQuery}${linesQuery}${zonesQuery}${channelsQuery}${searchQueryParam}${sublinesQuery}`;
 

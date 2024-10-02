@@ -19,9 +19,11 @@
         gap: 0.2rem;
         align-items: center;
         opacity: 50%;
+
         &__icon {
             color: $black;
         }
+
         &__title {
             font-size: 0.875rem;
             font-weight: 600;
@@ -35,9 +37,11 @@
         align-items: center;
         opacity: 50%;
         margin-right: 1rem;
+
         &__icon {
             color: $black;
         }
+
         &__title {
             font-size: 0.875rem;
             font-weight: 300;
