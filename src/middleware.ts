@@ -21,12 +21,17 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/auth/login", request.url));
   }
 
+  if (request.nextUrl.pathname === "/") {
+    return NextResponse.redirect(new URL("/clientes/all", request.url));
+  }
+
   return NextResponse.next();
 }
 
 //Our protected routes
 export const config = {
   matcher: [
+    "/",
     "/banco/:path*",
     "/clientes/:path*",
     "/comercio/:path*",
