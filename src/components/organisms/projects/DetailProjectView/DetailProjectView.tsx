@@ -179,7 +179,7 @@ export const DetailsProjectView = ({ isEdit = false, idProjectParam = "" }: Prop
           {!loading && data.length === 0 ? (
             <Flex vertical>
               <Flex align="center" gap={"2rem"}>
-                <Button href="/">Volver</Button>
+                <Button href="/settings">Volver</Button>
                 <Text>Informacion No encontrada</Text>
               </Flex>
               <Result
@@ -187,7 +187,7 @@ export const DetailsProjectView = ({ isEdit = false, idProjectParam = "" }: Prop
                 title="404"
                 subTitle="Lo siento este proyecto no existe"
                 extra={
-                  <Button type="primary" href="/">
+                  <Button type="primary" href="/settings">
                     Back Home
                   </Button>
                 }

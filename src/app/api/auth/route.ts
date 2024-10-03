@@ -11,28 +11,34 @@ export async function POST() {
 
   if (authorization?.startsWith("Bearer ")) {
     const idToken = authorization.split("Bearer ")[1];
-    const decodedToken = await auth().verifyIdToken(idToken);
 
-    if (decodedToken) {
-      //Generar cookie
-      const expiresIn = 60 * 60 * 24 * 1 * 1000;
-      const sessionCookie = await auth().createSessionCookie(idToken, {
-        expiresIn
-      });
+    try {
+      const decodedToken = await auth().verifyIdToken(idToken);
 
-      const options = {
-        name: COOKIE_NAME,
-        value: sessionCookie,
-        maxAge: expiresIn,
-        httpOnly: true,
-        secure: true
-      };
+      if (decodedToken) {
+        //Generar cookie
+        const expiresIn = 60 * 60 * 24 * 1 * 1000;
+        const sessionCookie = await auth().createSessionCookie(idToken, {
+          expiresIn
+        });
 
-      cookies().set(options as any);
+        const options = {
+          name: COOKIE_NAME,
+          value: sessionCookie,
+          maxAge: expiresIn,
+          httpOnly: true,
+          secure: true
+        };
+
+        cookies().set(options as any);
+      }
+
+      return NextResponse.json({}, { status: 200 });
+    } catch (error) {
+      console.error("Error en la validación del token route.ts");
+      return NextResponse.json({}, { status: 401 });
     }
   }
-
-  return NextResponse.json({}, { status: 200 });
 }
 
 export async function GET() {
@@ -45,6 +51,7 @@ export async function GET() {
   const decodedClaims = await auth().verifySessionCookie(session, true);
 
   if (!decodedClaims) {
+    console.info("Error en la validación del token route.ts");
     return NextResponse.json({ isLogged: false }, { status: 401 });
   }
 
