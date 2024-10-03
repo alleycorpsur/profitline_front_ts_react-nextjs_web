@@ -10,11 +10,13 @@ import PaymentsTable from "./tables/PaymentsTable";
 import DiscountTable from "./tables/DiscountTable";
 import { Plus } from "phosphor-react";
 import { ModalResultAppy } from "./Modals/ModalResultApply/ModalResultAppy";
+import { useSelectedPayments } from "@/context/SelectedPaymentsContext";
 
 const ApplyTab: React.FC = () => {
   const [search, setSearch] = useState("");
   const [filters, setFilters] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const { selectedPayments } = useSelectedPayments();
 
   const data: SectionData[] = [
     {

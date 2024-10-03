@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Flex } from "antd";
 import { DotsThree, MagnifyingGlassPlus } from "phosphor-react";
 import LabelCollapse from "@/components/ui/label-collapse";
@@ -7,19 +7,23 @@ import Collapse from "@/components/ui/collapse";
 import { DotsDropdown } from "@/components/atoms/DotsDropdown/DotsDropdown";
 import UiFilterDropdown from "@/components/ui/ui-filter-dropdown";
 import PaymentsTable from "@/modules/clients/components/payments-table";
-import { IPayment } from "@/types/payments/IPayments";
 
 import "./payments-tab.scss";
 import { ModalActionPayment } from "@/components/molecules/modals/ModalActionPayment/ModalActionPayment";
+import { useSelectedPayments } from "@/context/SelectedPaymentsContext";
 
 const PaymentsTab = () => {
-  const [selectedRows, setSelectedRows] = useState<IPayment[] | undefined>(undefined);
+  const { selectedPayments, setSelectedPayments } = useSelectedPayments();
   const [showPaymentDetail, setShowPaymentDetail] = useState<{
     isOpen: boolean;
     paymentId: number;
   }>({} as { isOpen: boolean; paymentId: number });
   const [search, setSearch] = useState("");
   const [isModalActionPaymentOpen, setIsModalActionPaymentOpen] = useState(false);
+
+  useEffect(() => {
+    console.log("selectedPayments", selectedPayments);
+  }, [selectedPayments]);
 
   return (
     <>
@@ -63,7 +67,7 @@ const PaymentsTab = () => {
                 setShowPaymentDetail={setShowPaymentDetail}
                 paymentStatusId={PaymentStatus.status_id}
                 paymentsByStatus={PaymentStatus.payments}
-                setSelectedRows={setSelectedRows}
+                setSelectedRows={setSelectedPayments}
               />
             )
           }))}

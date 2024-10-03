@@ -1,10 +1,11 @@
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Button, Table, TableProps, Typography } from "antd";
 import { Eye } from "phosphor-react";
 import { formatDate, formatMoney } from "@/utils/utils";
 import { IPayment } from "@/types/payments/IPayments";
 
 import "./payments-table.scss";
+import { useSelectedPayments } from "@/context/SelectedPaymentsContext";
 
 const { Text } = Typography;
 
@@ -26,54 +27,39 @@ const PaymentsTable = ({
   setShowPaymentDetail,
   paymentStatusId
 }: PropsInvoicesTable) => {
+  const { selectedPayments, setSelectedPayments } = useSelectedPayments();
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
 
   const openPaymentDetail = (paymentId: number) => {
     setShowPaymentDetail({ isOpen: true, paymentId });
   };
 
-  const onSelectChange = (newSelectedRowKeys: React.Key[], newSelectedRows: any) => {
+  useEffect(() => {
+    // Update selectedRowKeys based on global selectedPayments
+    setSelectedRowKeys(selectedPayments.map((payment) => payment.id));
+  }, [selectedPayments]);
+
+  const onSelectChange = (newSelectedRowKeys: React.Key[], newSelectedRows: IPayment[]) => {
     setSelectedRowKeys(newSelectedRowKeys);
-    if (newSelectedRowKeys.length >= 1) {
-      // set the selected Rows but adding to the previous selected rows
-      setSelectedRows((prevSelectedRows) => {
-        if (prevSelectedRows) {
-          //check if the new selected rows are already in the selected rows
-          const filteredSelectedRows = newSelectedRows.filter(
-            (newSelectedRow: IPayment) =>
-              !prevSelectedRows.some((prevSelectedRow) => prevSelectedRow.id === newSelectedRow.id)
-          );
 
-          //filters the unselected rows but only the ones that have the status_id equal to paymentStatusId
-          const unCheckedRows = prevSelectedRows?.filter(
-            (prevSelectedRow) =>
-              !newSelectedRowKeys.includes(prevSelectedRow.id) &&
-              prevSelectedRow.payment_status_id === paymentStatusId
-          );
-          if (unCheckedRows.length > 0) {
-            // remove form the prevState the ones present in the unCheckedRows
-            const filteredPrevSelectedRows = prevSelectedRows.filter(
-              (prevSelectedRow) => !unCheckedRows.includes(prevSelectedRow)
-            );
-            return filteredPrevSelectedRows;
-          }
+    setSelectedPayments((prevSelectedPayments) => {
+      if (newSelectedRowKeys.length >= 1) {
+        // Filter out newly selected rows that aren't already in prevSelectedPayments
+        const filteredNewRows = newSelectedRows.filter(
+          (newRow) => !prevSelectedPayments.some((prevRow) => prevRow.id === newRow.id)
+        );
 
-          return [...prevSelectedRows, ...filteredSelectedRows];
-        } else {
-          return newSelectedRows;
-        }
-      });
-    }
-    //traverse the alreadySelectedRows and remove the ones that have the status_id of the paymentStatusId
-    if (newSelectedRowKeys.length === 0) {
-      setSelectedRows((prevSelectedRows) => {
-        if (prevSelectedRows) {
-          return prevSelectedRows.filter(
-            (prevSelectedRow) => prevSelectedRow.payment_status_id !== paymentStatusId
-          );
-        }
-      });
-    }
+        // Filter out unselected rows for this payment status
+        const remainingRows = prevSelectedPayments.filter(
+          (row) => row.payment_status_id !== paymentStatusId || newSelectedRowKeys.includes(row.id)
+        );
+
+        return [...remainingRows, ...filteredNewRows];
+      } else {
+        // If no rows are selected for this status, remove all rows of this status
+        return prevSelectedPayments.filter((row) => row.payment_status_id !== paymentStatusId);
+      }
+    });
   };
 
   const rowSelection = {
