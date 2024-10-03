@@ -262,7 +262,7 @@ export const getDigitalRecordFormInfo = async (
 
 export const createDigitalRecord = async (
   data: IFormDigitalRecordModal,
-  invoicesIds: number[],
+
   project_id: number,
   user_id: number,
   clientId: number
@@ -273,7 +273,6 @@ export const createDigitalRecord = async (
 
   const formData = new FormData();
 
-  formData.append("invoice_ids", JSON.stringify(invoicesIds));
   formData.append("forward_to", JSON.stringify(forward_to));
   if (copy_to) formData.append("copy_to", JSON.stringify(copy_to));
   formData.append("subject", data.subject);
