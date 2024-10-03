@@ -172,3 +172,27 @@ export const createOrderFromDraft = async (
     return error;
   }
 };
+
+export const changeOrderState = async (
+  ordersIds: number[],
+  // eslint-disable-next-line no-unused-vars
+  showMessage: (type: MessageType, content: string) => void
+) => {
+  const modelData = {
+    ids: ordersIds
+  };
+  try {
+    const response: GenericResponse<any> = await API.put(
+      `/marketplace/orders/change-status`,
+      modelData
+    );
+    if (response.status !== 200) {
+      throw response;
+    }
+    showMessage("success", "Estado cambiado correctamente");
+    return response;
+  } catch (error) {
+    showMessage("error", "Error al cambiar el estado de la orden");
+    throw error;
+  }
+};
