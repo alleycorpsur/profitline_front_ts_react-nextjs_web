@@ -2,6 +2,9 @@
 import { Flex, Modal, Typography } from "antd";
 import { NewspaperClipping } from "@phosphor-icons/react";
 
+import { useMessageApi } from "@/context/MessageContext";
+import { changeOrderState } from "@/services/commerce/commerce";
+
 import { ButtonGenerateAction } from "@/components/atoms/ButtonGenerateAction/ButtonGenerateAction";
 
 import "./orders-generate-action-modal.scss";
@@ -14,6 +17,14 @@ interface Props {
 }
 
 export const OrdersGenerateActionModal = ({ isOpen, onClose, ordersId }: Props) => {
+  const { showMessage } = useMessageApi();
+
+  const handleChangeOrderState = async () => {
+    console.info("pedidos a facturados con id", ordersId);
+    await changeOrderState(ordersId, showMessage);
+    // TO DO: Mutate the fetch orders
+  };
+
   return (
     <Modal
       className="ordersGenerateActionModal"
@@ -33,9 +44,7 @@ export const OrdersGenerateActionModal = ({ isOpen, onClose, ordersId }: Props) 
       </p>
       <Flex vertical gap="0.75rem">
         <ButtonGenerateAction
-          onClick={() => {
-            console.info("pedidos a facturados con id", ordersId);
-          }}
+          onClick={handleChangeOrderState}
           icon={<NewspaperClipping size={16} />}
           title="Enviar pedido a facturado"
         />
