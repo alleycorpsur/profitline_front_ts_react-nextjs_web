@@ -259,6 +259,7 @@ export const WalletTab = () => {
         messageShow={messageShow}
         projectId={projectId}
         invoiceSelected={selectedRows}
+        clientId={clientId}
       />
     </>
   );

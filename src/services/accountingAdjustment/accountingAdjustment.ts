@@ -264,7 +264,8 @@ export const createDigitalRecord = async (
   data: IFormDigitalRecordModal,
   invoicesIds: number[],
   project_id: number,
-  user_id: number
+  user_id: number,
+  clientId: number
 ): Promise<AxiosResponse<any>> => {
   const token = await getIdToken();
 
@@ -279,6 +280,8 @@ export const createDigitalRecord = async (
   formData.append("subject", data.subject);
   formData.append("commentary", data.comment);
   formData.append("user_id", user_id.toString());
+  formData.append("project_id", project_id.toString());
+  formData.append("client_id", clientId.toString());
   data.attachments.forEach((file) => {
     formData.append("attachments", file);
   });
