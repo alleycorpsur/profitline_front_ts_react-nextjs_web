@@ -1,10 +1,11 @@
 "use client";
 import { Dispatch, SetStateAction } from "react";
 import { Flex, Modal, Typography } from "antd";
-import { NewspaperClipping } from "@phosphor-icons/react";
+import { DownloadSimple, NewspaperClipping } from "@phosphor-icons/react";
 
+import { useAppStore } from "@/lib/store/store";
 import { useMessageApi } from "@/context/MessageContext";
-import { changeOrderState } from "@/services/commerce/commerce";
+import { changeOrderState, dowloadOrderCSV } from "@/services/commerce/commerce";
 import { ButtonGenerateAction } from "@/components/atoms/ButtonGenerateAction/ButtonGenerateAction";
 
 import { IOrder } from "@/types/commerce/ICommerce";
@@ -27,12 +28,24 @@ export const OrdersGenerateActionModal = ({
   setFetchMutate,
   setSelectedRows
 }: Props) => {
+  const { ID: projectId } = useAppStore((state) => state.selectedProject);
   const { showMessage } = useMessageApi();
 
   const handleChangeOrderState = async () => {
     try {
       await changeOrderState(ordersId, showMessage);
       setFetchMutate((prev) => !prev);
+      setSelectedRows([]);
+      onClose();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleDownloadCSV = async () => {
+    try {
+      await dowloadOrderCSV(ordersId, projectId, showMessage);
+      // TODO: Implement the download logic here
       setSelectedRows([]);
       onClose();
     } catch (error) {
@@ -62,6 +75,11 @@ export const OrdersGenerateActionModal = ({
           onClick={handleChangeOrderState}
           icon={<NewspaperClipping size={16} />}
           title="Enviar pedido a facturado"
+        />
+        <ButtonGenerateAction
+          onClick={handleDownloadCSV}
+          icon={<DownloadSimple size={16} />}
+          title="Descargar CSV"
         />
       </Flex>
     </Modal>

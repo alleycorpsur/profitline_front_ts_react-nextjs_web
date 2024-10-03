@@ -196,3 +196,31 @@ export const changeOrderState = async (
     throw error;
   }
 };
+
+export const dowloadOrderCSV = async (
+  ordersIds: number[],
+  projectId: number,
+  // eslint-disable-next-line no-unused-vars
+  showMessage: (type: MessageType, content: string) => void
+) => {
+  const ordersIdsObject = {
+    order_ids: ordersIds
+  };
+  const formData = new FormData();
+  formData.append("request", JSON.stringify(ordersIdsObject));
+
+  try {
+    const response: GenericResponse<any> = await API.post(
+      `/marketplace/projects/${projectId}/downloadtxtorders`,
+      formData
+    );
+    if (response.status !== 200) {
+      throw response;
+    }
+    showMessage("success", "Descarga exitosa");
+    return response;
+  } catch (error) {
+    showMessage("error", "Error al descargar archivo");
+    throw error;
+  }
+};

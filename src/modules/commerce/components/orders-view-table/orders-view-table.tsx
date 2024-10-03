@@ -13,7 +13,7 @@ const { Text } = Typography;
 
 interface PropsOrdersViewTable {
   dataSingleOrder: any[];
-  setSelectedRows: Dispatch<SetStateAction<any[] | undefined>>;
+  setSelectedRows: Dispatch<SetStateAction<IOrder[] | undefined>>;
   orderStatus: string;
 }
 

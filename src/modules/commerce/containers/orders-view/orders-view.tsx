@@ -31,7 +31,7 @@ export const OrdersView: FC = () => {
   const [ordersByCategory, setOrdersByCategory] = useState<IOrdersByCategory[]>();
   const [isOpenModalRemove, setIsOpenModalRemove] = useState<boolean>(false);
   const [isGenerateActionModalOpen, setIsGenerateActionModalOpen] = useState<boolean>(false);
-  const [selectedRows, setSelectedRows] = useState<IOrder[]>();
+  const [selectedRows, setSelectedRows] = useState<IOrder[] | undefined>([]);
   const [fetchMutate, setFetchMutate] = useState<boolean>(false);
 
   const { showMessage } = useMessageApi();
@@ -57,11 +57,11 @@ export const OrdersView: FC = () => {
   };
 
   const handleisGenerateActionOpen = () => {
-    if (selectedRows?.length === 0) {
-      showMessage("error", "Selecciona al menos un pedido");
+    if (selectedRows && selectedRows?.length > 0) {
+      setIsGenerateActionModalOpen(!isGenerateActionModalOpen);
       return;
     }
-    setIsGenerateActionModalOpen(!isGenerateActionModalOpen);
+    showMessage("error", "Selecciona al menos un pedido");
   };
 
   const items: MenuProps["items"] = [
