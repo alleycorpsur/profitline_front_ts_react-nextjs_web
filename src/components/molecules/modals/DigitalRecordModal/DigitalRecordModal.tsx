@@ -23,6 +23,7 @@ interface DigitalRecordModalProps {
   isOpen: boolean;
   onClose: () => void;
   projectId: number;
+  clientId: number;
   invoiceSelected: IInvoice[] | undefined;
   messageShow: MessageInstance;
 }
@@ -47,6 +48,7 @@ export interface IFormDigitalRecordModal {
 const DigitalRecordModal = ({
   isOpen,
   onClose,
+  clientId,
   invoiceSelected,
   messageShow
 }: DigitalRecordModalProps) => {
@@ -57,6 +59,7 @@ const DigitalRecordModal = ({
       label: string;
     }[]
   >([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const userId = useAppStore((state) => state.userId);
 
@@ -132,12 +135,14 @@ const DigitalRecordModal = ({
   };
 
   const onSubmit = async (data: IFormDigitalRecordModal) => {
+    setIsSubmitting(true);
     try {
       await createDigitalRecord(
         data,
         invoiceSelected?.map((invoice) => invoice.id) || [],
         projectId,
-        userId
+        userId,
+        clientId
       );
 
       messageShow.success("Acta digital enviada correctamente");
@@ -145,6 +150,8 @@ const DigitalRecordModal = ({
       onClose();
     } catch (error) {
       messageShow.error("Error al enviar acta digital");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -279,9 +286,9 @@ const DigitalRecordModal = ({
 
         <PrincipalButton
           onClick={handleSubmit(onSubmit)}
-          disabled={attachments.length === 0 || !isValid}
+          disabled={attachments.length === 0 || !isValid || isSubmitting}
         >
-          Enviar acta
+          {isSubmitting ? "...enviando" : "Enviar acta"}
         </PrincipalButton>
       </div>
     </Modal>
