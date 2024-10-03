@@ -268,7 +268,6 @@ export const createDigitalRecord = async (
   clientId: number
 ): Promise<AxiosResponse<any>> => {
   const token = await getIdToken();
-
   const forward_to = data.forward_to.map((user) => user.value);
   const copy_to = data?.copy_to?.map((user) => user.value);
 
