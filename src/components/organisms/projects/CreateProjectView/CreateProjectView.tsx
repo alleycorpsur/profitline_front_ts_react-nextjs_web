@@ -27,7 +27,7 @@ export const CreateProjectView = () => {
           type: "success",
           content: "El proyecto fue creado exitosamente."
         });
-        push("/");
+        push("/settings");
       }
     } catch (error) {
       messageApi.open({

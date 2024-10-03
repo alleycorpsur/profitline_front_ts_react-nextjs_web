@@ -5,7 +5,6 @@ import { ProjectTable } from "@/components/molecules/tables/ProjectsTable/Projec
 import "./projects.scss";
 import Header from "../../header";
 
-
 export const ProjectsView = () => {
   return (
     <main className="mainProject">
