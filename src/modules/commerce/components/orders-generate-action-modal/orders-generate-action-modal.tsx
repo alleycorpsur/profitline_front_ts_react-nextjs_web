@@ -1,11 +1,13 @@
 "use client";
+import { Dispatch, SetStateAction } from "react";
 import { Flex, Modal, Typography } from "antd";
 import { NewspaperClipping } from "@phosphor-icons/react";
 
 import { useMessageApi } from "@/context/MessageContext";
 import { changeOrderState } from "@/services/commerce/commerce";
-
 import { ButtonGenerateAction } from "@/components/atoms/ButtonGenerateAction/ButtonGenerateAction";
+
+import { IOrder } from "@/types/commerce/ICommerce";
 
 import "./orders-generate-action-modal.scss";
 const { Title } = Typography;
@@ -14,15 +16,28 @@ interface Props {
   isOpen: boolean;
   onClose: () => void;
   ordersId: number[];
+  setFetchMutate: Dispatch<SetStateAction<boolean>>;
+  setSelectedRows: Dispatch<SetStateAction<IOrder[] | undefined>>;
 }
 
-export const OrdersGenerateActionModal = ({ isOpen, onClose, ordersId }: Props) => {
+export const OrdersGenerateActionModal = ({
+  isOpen,
+  onClose,
+  ordersId,
+  setFetchMutate,
+  setSelectedRows
+}: Props) => {
   const { showMessage } = useMessageApi();
 
   const handleChangeOrderState = async () => {
-    console.info("pedidos a facturados con id", ordersId);
-    await changeOrderState(ordersId, showMessage);
-    // TO DO: Mutate the fetch orders
+    try {
+      await changeOrderState(ordersId, showMessage);
+      setFetchMutate((prev) => !prev);
+      setSelectedRows([]);
+      onClose();
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (

@@ -32,6 +32,7 @@ export const OrdersView: FC = () => {
   const [isOpenModalRemove, setIsOpenModalRemove] = useState<boolean>(false);
   const [isGenerateActionModalOpen, setIsGenerateActionModalOpen] = useState<boolean>(false);
   const [selectedRows, setSelectedRows] = useState<IOrder[]>();
+  const [fetchMutate, setFetchMutate] = useState<boolean>(false);
 
   const { showMessage } = useMessageApi();
 
@@ -45,7 +46,7 @@ export const OrdersView: FC = () => {
   useEffect(() => {
     if (!projectId) return;
     fetchOrders();
-  }, [projectId]);
+  }, [projectId, fetchMutate]);
 
   const handleDeleteOrders = async () => {
     const selectedOrdersIds = selectedRows?.map((order) => order.id);
@@ -56,6 +57,10 @@ export const OrdersView: FC = () => {
   };
 
   const handleisGenerateActionOpen = () => {
+    if (selectedRows?.length === 0) {
+      showMessage("error", "Selecciona al menos un pedido");
+      return;
+    }
     setIsGenerateActionModalOpen(!isGenerateActionModalOpen);
   };
 
@@ -71,7 +76,7 @@ export const OrdersView: FC = () => {
     {
       key: "2",
       label: (
-        <Button className="buttonOutlined" onClick={() => setIsGenerateActionModalOpen(true)}>
+        <Button className="buttonOutlined" onClick={handleisGenerateActionOpen}>
           Generar acción
         </Button>
       )
@@ -126,8 +131,10 @@ export const OrdersView: FC = () => {
       />
       <OrdersGenerateActionModal
         isOpen={isGenerateActionModalOpen}
-        onClose={handleisGenerateActionOpen}
+        onClose={() => setIsGenerateActionModalOpen((prev) => !prev)}
         ordersId={selectedRows?.map((order) => order.id) || []}
+        setFetchMutate={setFetchMutate}
+        setSelectedRows={setSelectedRows}
       />
     </div>
   );

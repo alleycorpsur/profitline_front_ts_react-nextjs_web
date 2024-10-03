@@ -178,10 +178,13 @@ export const changeOrderState = async (
   // eslint-disable-next-line no-unused-vars
   showMessage: (type: MessageType, content: string) => void
 ) => {
+  const modelData = {
+    ids: ordersIds
+  };
   try {
     const response: GenericResponse<any> = await API.put(
       `/marketplace/orders/change-status`,
-      ordersIds
+      modelData
     );
     if (response.status !== 200) {
       throw response;
@@ -190,6 +193,6 @@ export const changeOrderState = async (
     return response;
   } catch (error) {
     showMessage("error", "Error al cambiar el estado de la orden");
-    return error;
+    throw error;
   }
 };
