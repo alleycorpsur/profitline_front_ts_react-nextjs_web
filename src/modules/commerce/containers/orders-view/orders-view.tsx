@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import { FC, Key, useEffect, useState } from "react";
 import Link from "next/link";
 import { Button, Flex, MenuProps } from "antd";
 
@@ -31,7 +31,9 @@ export const OrdersView: FC = () => {
   const [ordersByCategory, setOrdersByCategory] = useState<IOrdersByCategory[]>();
   const [isOpenModalRemove, setIsOpenModalRemove] = useState<boolean>(false);
   const [isGenerateActionModalOpen, setIsGenerateActionModalOpen] = useState<boolean>(false);
-  const [selectedRows, setSelectedRows] = useState<IOrder[]>();
+  const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
+  const [selectedRows, setSelectedRows] = useState<IOrder[] | undefined>([]);
+  const [fetchMutate, setFetchMutate] = useState<boolean>(false);
 
   const { showMessage } = useMessageApi();
 
@@ -45,7 +47,7 @@ export const OrdersView: FC = () => {
   useEffect(() => {
     if (!projectId) return;
     fetchOrders();
-  }, [projectId]);
+  }, [projectId, fetchMutate]);
 
   const handleDeleteOrders = async () => {
     const selectedOrdersIds = selectedRows?.map((order) => order.id);
@@ -56,7 +58,11 @@ export const OrdersView: FC = () => {
   };
 
   const handleisGenerateActionOpen = () => {
-    setIsGenerateActionModalOpen(!isGenerateActionModalOpen);
+    if (selectedRows && selectedRows?.length > 0) {
+      setIsGenerateActionModalOpen(!isGenerateActionModalOpen);
+      return;
+    }
+    showMessage("error", "Selecciona al menos un pedido");
   };
 
   const items: MenuProps["items"] = [
@@ -71,7 +77,7 @@ export const OrdersView: FC = () => {
     {
       key: "2",
       label: (
-        <Button className="buttonOutlined" onClick={() => setIsGenerateActionModalOpen(true)}>
+        <Button className="buttonOutlined" onClick={handleisGenerateActionOpen}>
           Generar acción
         </Button>
       )
@@ -111,6 +117,8 @@ export const OrdersView: FC = () => {
               <OrdersViewTable
                 dataSingleOrder={order.orders}
                 setSelectedRows={setSelectedRows}
+                selectedRowKeys={selectedRowKeys}
+                setSelectedRowKeys={setSelectedRowKeys}
                 orderStatus={order.status}
               />
             )
@@ -126,8 +134,11 @@ export const OrdersView: FC = () => {
       />
       <OrdersGenerateActionModal
         isOpen={isGenerateActionModalOpen}
-        onClose={handleisGenerateActionOpen}
+        onClose={() => setIsGenerateActionModalOpen((prev) => !prev)}
         ordersId={selectedRows?.map((order) => order.id) || []}
+        setFetchMutate={setFetchMutate}
+        setSelectedRows={setSelectedRows}
+        setSelectedRowKeys={setSelectedRowKeys}
       />
     </div>
   );

@@ -7,18 +7,21 @@
     background-color: $white;
     padding: 2rem;
     padding-left: 2.5rem;
-    overflow-y: auto;
     border-radius: 1rem;
     border: 1px solid $dark-gray;
+
     span {
         font-weight: bold;
+        color: $dark-gray;
     }
+
     hr {
         margin: 0;
         border: none;
         border-bottom: 1px solid $dark-gray;
         width: 100%;
     }
+
     .buttonEdit {
         background-color: #f7f7f7;
         border: 1px solid transparent;
@@ -37,7 +40,8 @@
         justify-content: center;
         color: #141414;
         border: 1px solid #ddd;
-        > span {
+
+        >span {
             color: $black;
         }
     }
@@ -84,6 +88,7 @@
     font-size: 1rem;
     font-weight: 300;
     border-width: 0 !important;
+
     ::placeholder {
         color: $dark-gray !important;
     }

@@ -34,7 +34,7 @@ export interface IContactForm {
 export interface IResponseContactOptions {
   status: number;
   message: string;
-  data: IContactOptions;
+  data: IContactOptions | [];
 }
 
 interface IContactOptions {

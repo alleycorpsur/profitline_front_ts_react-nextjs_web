@@ -22,11 +22,12 @@ interface PropsGeneralSelect<T extends FieldValues> {
   field: ControllerRenderProps<T, any>;
   title?: string;
   placeholder: string;
-  options: { value: number; label: string }[] | string[] | undefined;
+  options: { value: number | string; label: string }[] | string[] | undefined;
   loading?: boolean;
   customStyleContainer?: React.CSSProperties;
   disabled?: boolean;
   suffixIcon?: ReactNode;
+  showLabelAndValue?: boolean;
 }
 
 const GeneralSearchSelect = <T extends FieldValues>({
@@ -38,7 +39,8 @@ const GeneralSearchSelect = <T extends FieldValues>({
   loading = false,
   customStyleContainer,
   disabled = false,
-  suffixIcon
+  suffixIcon,
+  showLabelAndValue
 }: PropsGeneralSelect<T>) => {
   const [usedOptions, setUsedOptions] = useState<
     {
@@ -109,6 +111,24 @@ const GeneralSearchSelect = <T extends FieldValues>({
         options={usedOptions}
         labelInValue
         disabled={disabled}
+        optionRender={
+          showLabelAndValue
+            ? (option) => {
+                return (
+                  <div className="option">
+                    <p className="label">{option.label}</p>
+                    <p className="value">{option.value}</p>
+                  </div>
+                );
+              }
+            : (option) => {
+                return (
+                  <div className="option">
+                    <p className="label">{option.label}</p>
+                  </div>
+                );
+              }
+        }
       />
       {errors && <Typography.Text className="textError">{title} es obligatorio *</Typography.Text>}
     </Flex>

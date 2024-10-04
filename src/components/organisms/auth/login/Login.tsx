@@ -10,7 +10,6 @@ import styles from "./login.module.scss";
 
 export const LoginView = () => {
   const [resetPassword, setResetPassword] = useState(false);
-
   return (
     <main className={styles.container}>
       <InfoCardLogin />

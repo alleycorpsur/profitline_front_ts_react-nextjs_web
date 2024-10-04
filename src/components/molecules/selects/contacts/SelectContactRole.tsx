@@ -29,13 +29,18 @@ export const SelectContactRole = <T extends FieldValues>({ errors, field, readOn
     {}
   );
 
-  const options = data?.data.contact_position.map((option) => {
-    return {
-      value: option.id,
-      label: option.name,
-      className: "selectOptions"
-    };
-  });
+  const options =
+    data?.data && typeof data.data === "object"
+      ? "contact_position" in data.data
+        ? data?.data?.contact_position?.map((option) => {
+            return {
+              value: option.id,
+              label: option.name,
+              className: "selectOptions"
+            };
+          })
+        : []
+      : [];
 
   return (
     <>

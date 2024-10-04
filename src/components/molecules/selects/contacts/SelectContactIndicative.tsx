@@ -33,13 +33,18 @@ export const SelectContactIndicative = <T extends FieldValues>({
     {}
   );
 
-  const options = data?.data.country_calling_code.map((option) => {
-    return {
-      value: option.id,
-      label: `${option.code} ${option.country_name}`,
-      className: "selectOptions"
-    };
-  });
+  const options =
+    data?.data && typeof data.data === "object"
+      ? "country_calling_code" in data.data
+        ? data?.data?.country_calling_code?.map((option) => {
+            return {
+              value: option.id,
+              label: `${option.code} ${option.country_name}`,
+              className: "selectOptions"
+            };
+          })
+        : []
+      : [];
 
   return (
     <>

@@ -7,7 +7,7 @@ import useScreenHeight from "@/components/hooks/useScreenHeight";
 import "./contacts-tab-table.scss";
 const { Text } = Typography;
 
-interface PropsInvoicesTable {
+interface PropsContactsTable {
   dataAllContacts: IContact[];
   setSelectedRows: Dispatch<SetStateAction<IContact[] | undefined>>;
   setShowContactModal: Dispatch<
@@ -22,7 +22,7 @@ const ContactsTable = ({
   dataAllContacts: data,
   setSelectedRows,
   setShowContactModal
-}: PropsInvoicesTable) => {
+}: PropsContactsTable) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [page, setPage] = useState(1);
   const height = useScreenHeight();

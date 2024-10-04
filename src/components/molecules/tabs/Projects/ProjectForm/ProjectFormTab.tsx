@@ -75,7 +75,7 @@ export const ProjectFormTab = ({
     <>
       <form className="mainProyectsForm" onSubmit={handleSubmit(onSubmit)}>
         <Flex component={"header"} className="headerProyectsForm">
-          <Link href="/">
+          <Link href="/settings">
             <Button
               type="text"
               size="large"

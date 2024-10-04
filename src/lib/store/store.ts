@@ -1,10 +1,10 @@
-import { UserSlice, createUserSlice } from "@/lib/slices/createProductSlice";
+import { IUserSlice, createUserSlice } from "@/lib/slices/createUserSlice";
 import { ProjectSlice, createProjectSlice } from "@/lib/slices/createProjectSlice";
 import { ICommerceSlice, createCommerceSlice } from "@/lib/slices/commerceSlice";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-interface AppStore extends ProjectSlice, UserSlice, ICommerceSlice {
+interface AppStore extends ProjectSlice, IUserSlice, ICommerceSlice {
   resetStore: () => void;
 }
 
