@@ -79,7 +79,7 @@ const DigitalRecordModal = ({
   useEffect(() => {
     const fetchFormInfo = async () => {
       try {
-        const response = await getDigitalRecordFormInfo(projectId);
+        const response = await getDigitalRecordFormInfo(projectId, clientId);
         setRecipients(response.usuarios);
         setValue("subject", response.asunto);
       } catch (error) {
