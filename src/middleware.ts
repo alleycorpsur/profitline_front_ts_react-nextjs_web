@@ -6,6 +6,7 @@ export async function middleware(request: NextRequest) {
 
   //Return to /login if there is no session cookie
   if (!session) {
+    console.info("No hay cookie de sesión");
     return NextResponse.redirect(new URL("/auth/login", request.url));
   }
   //Call the API to validate the token
@@ -16,7 +17,12 @@ export async function middleware(request: NextRequest) {
   });
   //Return to /login if validation fails
   if (responseAPI.status !== 200) {
+    console.error("Error en la validación del token");
     return NextResponse.redirect(new URL("/auth/login", request.url));
+  }
+
+  if (request.nextUrl.pathname === "/") {
+    return NextResponse.redirect(new URL("/clientes/all", request.url));
   }
 
   return NextResponse.next();
@@ -24,5 +30,15 @@ export async function middleware(request: NextRequest) {
 
 //Our protected routes
 export const config = {
-  matcher: ["/", "/proyectos/:path*"]
+  matcher: [
+    "/",
+    "/banco/:path*",
+    "/clientes/:path*",
+    "/comercio/:path*",
+    "/conciliacion/:path*",
+    "/descuentos/:path*",
+    "/notificaciones/:path*",
+    "/proyectos/:path*",
+    "/settings"
+  ]
 };

@@ -160,13 +160,13 @@ export const SideBar = () => {
         )}
 
         {checkUserViewPermissions(project, "Configuracion") && (
-          <Link href="/" passHref legacyBehavior>
+          <Link href="/settings" passHref legacyBehavior>
             <Button
               type="primary"
               size="large"
               icon={<Gear size={26} />}
               className={
-                path === "/" || path.startsWith("/proyectos/review")
+                path === "/settings" || path.startsWith("/proyectos/review")
                   ? "buttonIcon"
                   : "buttonIconActive"
               }
