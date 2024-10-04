@@ -1,0 +1,51 @@
+.modal-add-invoice {
+    .ant-modal-content {
+        border-radius: 8px;
+    }
+
+    .ant-modal-header {
+        border-bottom: none;
+        padding: 24px 24px 0;
+    }
+
+    .ant-modal-body {
+        padding: 24px;
+    }
+
+    .search-container {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 12px;
+
+
+    }
+
+    .container-paste {
+        display: flex;
+        align-items: end;
+        margin-bottom: 12px;
+    }
+
+    .select-all {
+        margin-bottom: 12px;
+    }
+
+    .invoices-list {
+        display: flex;
+        max-height: 300px;
+        overflow-y: auto;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 24px;
+        gap: 8px;
+    }
+
+    .custom-input {
+        width: 100% !important;
+    }
+}

@@ -9,14 +9,31 @@ import InvoiceTable from "./tables/InvoiceTable";
 import PaymentsTable from "./tables/PaymentsTable";
 import DiscountTable from "./tables/DiscountTable";
 import { Plus } from "phosphor-react";
-import { ModalResultAppy } from "./Modals/ModalResultApply/ModalResultAppy";
+
 import { useSelectedPayments } from "@/context/SelectedPaymentsContext";
+import { ModalResultAppy } from "./Modals/ModalResultApply/ModalResultAppy";
+import ModalAddInvoice from "./Modals/ModalAddInvoice/ModalAddInvoice";
 
 const ApplyTab: React.FC = () => {
   const [search, setSearch] = useState("");
-  const [filters, setFilters] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const { selectedPayments } = useSelectedPayments();
+
+  console.log("selectedPayments", selectedPayments);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
+
+  const handleAdd = () => {
+    // Handle adding selected invoices
+    setIsModalVisible(false);
+  };
 
   const data: SectionData[] = [
     {
@@ -202,7 +219,11 @@ const ApplyTab: React.FC = () => {
 
                   <Flex
                     className="buttonActionApply"
-                    onClick={() => console.log("click en la accion")}
+                    onClick={() => {
+                      if (section.statusName === "facturas") {
+                        showModal();
+                      }
+                    }}
                   >
                     <Plus />
                     <h5 className="">Agregar {`${section.statusName}`}</h5>
@@ -220,6 +241,7 @@ const ApplyTab: React.FC = () => {
           />
         )}
       </div>
+      <ModalAddInvoice visible={isModalVisible} onCancel={handleCancel} onAdd={handleAdd} />
     </>
   );
 };
