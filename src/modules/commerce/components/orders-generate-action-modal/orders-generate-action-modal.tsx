@@ -1,10 +1,11 @@
 "use client";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, Key, SetStateAction } from "react";
 import { Flex, Modal, Typography } from "antd";
 import { DownloadSimple, NewspaperClipping } from "@phosphor-icons/react";
 
 import { useAppStore } from "@/lib/store/store";
 import { useMessageApi } from "@/context/MessageContext";
+import { createAndDownloadTxt } from "@/utils/utils";
 import { changeOrderState, dowloadOrderCSV } from "@/services/commerce/commerce";
 import { ButtonGenerateAction } from "@/components/atoms/ButtonGenerateAction/ButtonGenerateAction";
 
@@ -19,6 +20,7 @@ interface Props {
   ordersId: number[];
   setFetchMutate: Dispatch<SetStateAction<boolean>>;
   setSelectedRows: Dispatch<SetStateAction<IOrder[] | undefined>>;
+  setSelectedRowKeys: Dispatch<SetStateAction<Key[]>>;
 }
 
 export const OrdersGenerateActionModal = ({
@@ -26,7 +28,8 @@ export const OrdersGenerateActionModal = ({
   onClose,
   ordersId,
   setFetchMutate,
-  setSelectedRows
+  setSelectedRows,
+  setSelectedRowKeys
 }: Props) => {
   const { ID: projectId } = useAppStore((state) => state.selectedProject);
   const { showMessage } = useMessageApi();
@@ -36,6 +39,7 @@ export const OrdersGenerateActionModal = ({
       await changeOrderState(ordersId, showMessage);
       setFetchMutate((prev) => !prev);
       setSelectedRows([]);
+      setSelectedRowKeys([]);
       onClose();
     } catch (error) {
       console.error(error);
@@ -44,9 +48,8 @@ export const OrdersGenerateActionModal = ({
 
   const handleDownloadCSV = async () => {
     try {
-      await dowloadOrderCSV(ordersId, projectId, showMessage);
-      // TODO: Implement the download logic here
-      setSelectedRows([]);
+      const res = await dowloadOrderCSV(ordersId, projectId, showMessage);
+      createAndDownloadTxt(res);
       onClose();
     } catch (error) {
       console.error(error);

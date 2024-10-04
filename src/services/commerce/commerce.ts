@@ -210,13 +210,11 @@ export const dowloadOrderCSV = async (
   formData.append("request", JSON.stringify(ordersIdsObject));
 
   try {
-    const response: GenericResponse<any> = await API.post(
+    const response: string = await API.post(
       `/marketplace/projects/${projectId}/downloadtxtorders`,
       formData
     );
-    if (response.status !== 200) {
-      throw response;
-    }
+
     showMessage("success", "Descarga exitosa");
     return response;
   } catch (error) {

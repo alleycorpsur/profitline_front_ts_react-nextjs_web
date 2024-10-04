@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, Key, SetStateAction } from "react";
 import { Button, Table, TableProps, Typography } from "antd";
 import { useRouter } from "next/navigation";
 import { Eye } from "phosphor-react";
@@ -14,15 +14,18 @@ const { Text } = Typography;
 interface PropsOrdersViewTable {
   dataSingleOrder: any[];
   setSelectedRows: Dispatch<SetStateAction<IOrder[] | undefined>>;
+  setSelectedRowKeys: Dispatch<SetStateAction<Key[]>>;
+  selectedRowKeys: Key[];
   orderStatus: string;
 }
 
 const OrdersViewTable = ({
   dataSingleOrder: data,
   setSelectedRows,
+  setSelectedRowKeys,
+  selectedRowKeys,
   orderStatus
 }: PropsOrdersViewTable) => {
-  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const router = useRouter();
   const setDraftInfo = useAppStore((state) => state.setDraftInfo);
 
@@ -163,7 +166,6 @@ const OrdersViewTable = ({
         columns={columns}
         dataSource={data.map((data) => ({ ...data, key: data.id }))}
         rowSelection={rowSelection}
-        rowClassName={(record) => (selectedRowKeys.includes(record.id) ? "selectedRow" : "")}
         pagination={false}
       />
     </>

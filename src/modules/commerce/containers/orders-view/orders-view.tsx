@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import { FC, Key, useEffect, useState } from "react";
 import Link from "next/link";
 import { Button, Flex, MenuProps } from "antd";
 
@@ -31,6 +31,7 @@ export const OrdersView: FC = () => {
   const [ordersByCategory, setOrdersByCategory] = useState<IOrdersByCategory[]>();
   const [isOpenModalRemove, setIsOpenModalRemove] = useState<boolean>(false);
   const [isGenerateActionModalOpen, setIsGenerateActionModalOpen] = useState<boolean>(false);
+  const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
   const [selectedRows, setSelectedRows] = useState<IOrder[] | undefined>([]);
   const [fetchMutate, setFetchMutate] = useState<boolean>(false);
 
@@ -116,6 +117,8 @@ export const OrdersView: FC = () => {
               <OrdersViewTable
                 dataSingleOrder={order.orders}
                 setSelectedRows={setSelectedRows}
+                selectedRowKeys={selectedRowKeys}
+                setSelectedRowKeys={setSelectedRowKeys}
                 orderStatus={order.status}
               />
             )
@@ -135,6 +138,7 @@ export const OrdersView: FC = () => {
         ordersId={selectedRows?.map((order) => order.id) || []}
         setFetchMutate={setFetchMutate}
         setSelectedRows={setSelectedRows}
+        setSelectedRowKeys={setSelectedRowKeys}
       />
     </div>
   );
