@@ -238,13 +238,14 @@ interface DigitalRecordResponse {
 }
 
 export const getDigitalRecordFormInfo = async (
-  projectId: number
+  projectId: number,
+  clientId: number
 ): Promise<DigitalRecordResponse> => {
   const token = await getIdToken();
 
   try {
     const response: AxiosResponse<DigitalRecordResponse> = await axios.get(
-      `${config.API_HOST}/client/digital-record?projectId=${projectId}`,
+      `${config.API_HOST}/client/digital-record?projectId=${projectId}&clientId=${clientId}`,
       {
         headers: {
           Accept: "application/json, text/plain, */*",
