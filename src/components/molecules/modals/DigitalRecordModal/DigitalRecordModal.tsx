@@ -49,7 +49,6 @@ const DigitalRecordModal = ({
   isOpen,
   onClose,
   clientId,
-  invoiceSelected,
   messageShow
 }: DigitalRecordModalProps) => {
   const { ID: projectId } = useAppStore((state) => state.selectedProject);
@@ -137,13 +136,7 @@ const DigitalRecordModal = ({
   const onSubmit = async (data: IFormDigitalRecordModal) => {
     setIsSubmitting(true);
     try {
-      await createDigitalRecord(
-        data,
-        invoiceSelected?.map((invoice) => invoice.id) || [],
-        projectId,
-        userId,
-        clientId
-      );
+      await createDigitalRecord(data, projectId, userId, clientId);
 
       messageShow.success("Acta digital enviada correctamente");
 

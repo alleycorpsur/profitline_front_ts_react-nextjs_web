@@ -262,19 +262,17 @@ export const getDigitalRecordFormInfo = async (
 
 export const createDigitalRecord = async (
   data: IFormDigitalRecordModal,
-  invoicesIds: number[],
+
   project_id: number,
   user_id: number,
   clientId: number
 ): Promise<AxiosResponse<any>> => {
   const token = await getIdToken();
-
   const forward_to = data.forward_to.map((user) => user.value);
   const copy_to = data?.copy_to?.map((user) => user.value);
 
   const formData = new FormData();
 
-  formData.append("invoice_ids", JSON.stringify(invoicesIds));
   formData.append("forward_to", JSON.stringify(forward_to));
   if (copy_to) formData.append("copy_to", JSON.stringify(copy_to));
   formData.append("subject", data.subject);
