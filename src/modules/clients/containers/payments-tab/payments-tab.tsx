@@ -12,7 +12,11 @@ import "./payments-tab.scss";
 import { ModalActionPayment } from "@/components/molecules/modals/ModalActionPayment/ModalActionPayment";
 import { useSelectedPayments } from "@/context/SelectedPaymentsContext";
 
-const PaymentsTab = () => {
+interface PaymentProd {
+  onChangeTab: (activeKey: string) => void;
+}
+
+const PaymentsTab: React.FC<PaymentProd> = ({ onChangeTab }) => {
   const { selectedPayments, setSelectedPayments } = useSelectedPayments();
   const [showPaymentDetail, setShowPaymentDetail] = useState<{
     isOpen: boolean;
@@ -24,6 +28,11 @@ const PaymentsTab = () => {
   useEffect(() => {
     console.log("selectedPayments", selectedPayments);
   }, [selectedPayments]);
+
+  const onChangetabWithCloseModal = (activeKey: string) => {
+    setIsModalActionPaymentOpen(false);
+    onChangeTab(activeKey);
+  };
 
   return (
     <>
@@ -76,6 +85,7 @@ const PaymentsTab = () => {
       <ModalActionPayment
         isOpen={isModalActionPaymentOpen}
         onClose={() => setIsModalActionPaymentOpen(false)}
+        onChangeTab={onChangetabWithCloseModal}
       />
     </>
   );

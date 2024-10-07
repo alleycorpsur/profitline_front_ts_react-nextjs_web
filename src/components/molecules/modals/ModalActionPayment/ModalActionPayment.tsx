@@ -7,9 +7,14 @@ import "./modalActionPayment.scss";
 type ModalActionPaymentProps = {
   isOpen: boolean;
   onClose: () => void;
+  onChangeTab: (activeKey: string) => void;
 };
 
-export const ModalActionPayment: React.FC<ModalActionPaymentProps> = ({ isOpen, onClose }) => {
+export const ModalActionPayment: React.FC<ModalActionPaymentProps> = ({
+  isOpen,
+  onClose,
+  onChangeTab
+}) => {
   return (
     <Modal
       open={isOpen}
@@ -33,6 +38,8 @@ export const ModalActionPayment: React.FC<ModalActionPaymentProps> = ({ isOpen, 
           title="Aplicar pagos"
           onClick={() => {
             console.log("Aplicar pagos clicked");
+
+            onChangeTab("5");
           }}
         />
         <ButtonGenerateAction

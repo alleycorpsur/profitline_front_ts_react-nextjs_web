@@ -1,4 +1,10 @@
 .modal-add-invoice {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    gap: 1.5rem;
+
+
     .ant-modal-content {
         border-radius: 8px;
     }
@@ -20,19 +26,16 @@
 
     }
 
-    .container-paste {
-        display: flex;
-        align-items: end;
-        margin-bottom: 12px;
-    }
-
     .select-all {
         margin-bottom: 12px;
+        margin-left: 14px;
     }
+
+
 
     .invoices-list {
         display: flex;
-        max-height: 300px;
+        max-height: 40vh;
         overflow-y: auto;
         flex-direction: column;
         gap: 8px;
@@ -40,12 +43,50 @@
 
     .modal-footer {
         display: flex;
-        justify-content: flex-end;
         margin-top: 24px;
-        gap: 8px;
+        gap: 1rem;
+
+
+        .button__action__text {
+            height: 2.5rem;
+            border-radius: 0.5rem;
+            padding: 0 0.5rem;
+            font-size: 1.125rem;
+            font-weight: 500;
+            line-height: 1.25rem;
+            flex-grow: 1;
+            border: none;
+            box-shadow: none;
+
+
+            &__green {
+                background-color: #CBE71E;
+            }
+
+            &__white {
+                background-color: #ffff;
+                border: solid 2px;
+            }
+        }
     }
 
     .custom-input {
         width: 100% !important;
     }
+}
+
+.excel-button-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-left: auto;
+}
+
+
+.container-paste-invoice {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
 }

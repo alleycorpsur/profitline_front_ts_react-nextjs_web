@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Modal, Button, Checkbox } from "antd";
+import { Modal, Button, Checkbox, Spin, Flex } from "antd";
 
 import "./ModalAddInvoice.scss";
 import ItemsActionsModalInvoice from "@/components/atoms/ItemsModalInvoice/ItemsActionsModalInvoice";
@@ -68,7 +68,7 @@ const ModalAddInvoice: React.FC<ModalAddInvoiceProps> = ({ visible, onCancel, on
     );
     setInvoices(newInvoices);
   };
-
+  const isLoading = false;
   return (
     <Modal
       title="Agregar factura"
@@ -76,16 +76,17 @@ const ModalAddInvoice: React.FC<ModalAddInvoiceProps> = ({ visible, onCancel, on
       onCancel={onCancel}
       footer={null}
       width={700}
+      height={"calc(80vh - 20px)"}
       className="modal-add-invoice"
     >
       <div className="search-container">
         <UiSearchInputLong placeholder="Buscar" className={"custom-input"} />
       </div>
-      <div className="container-paste">
-        <Button className="excel-button">
+      <div className="container-paste-invoice">
+        <div className="excel-button-container">
           <CopySimple size={18} />
           Pegar desde excel
-        </Button>
+        </div>
       </div>
       <div className="select-all">
         <Checkbox onChange={handleSelectAll}>Seleccionar todo</Checkbox>
@@ -101,11 +102,27 @@ const ModalAddInvoice: React.FC<ModalAddInvoiceProps> = ({ visible, onCancel, on
         ))}
       </div>
       <div className="modal-footer">
+        <button
+          type="button"
+          className="button__action__text button__action__text__white"
+          onClick={onCancel}
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          className={`button__action__text ${false ? "button__action__text__green" : ""}`}
+          onClick={() => onAdd()}
+        >
+          {isLoading ? <Spin size="small" /> : "Agregar factura"}
+        </button>
+      </div>
+      {/* <div className="modal-footer">
         <Button onClick={onCancel}>Cancelar</Button>
         <Button type="primary" onClick={onAdd}>
           Agregar factura
         </Button>
-      </div>
+      </div> */}
     </Modal>
   );
 };
