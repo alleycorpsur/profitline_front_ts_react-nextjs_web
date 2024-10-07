@@ -1,25 +1,23 @@
-import { FC, useContext } from "react";
+import { FC } from "react";
 import { Poppins } from "@next/font/google";
 import ReactApexChart from "react-apexcharts";
-import styles from "./dashboard-porfolio-ages.module.scss";
-import { ApexOptions } from "apexcharts";
-import { ClientDetailsContext } from "../../containers/client-details/client-details";
 import { formatMoney } from "@/utils/utils";
+import { ApexOptions } from "apexcharts";
+
+import styles from "./dashboard-porfolio-ages.module.scss";
 const poppins = Poppins({ weight: "400", style: "normal", subsets: ["latin"] });
 
 interface DashboardPortfolioAgesProps {
+  invoiceAges:
+    | {
+        name: string;
+        data: number[];
+      }[]
+    | undefined;
   className?: string;
 }
 
-const DashboardPortfolioAges: FC<DashboardPortfolioAgesProps> = ({ className }) => {
-  const { portfolioData } = useContext(ClientDetailsContext);
-  const invoiceAges = portfolioData?.invoice_ages
-    ?.map((item) => ({
-      name: item.days_range,
-      data: [item.total]
-    }))
-    .reverse();
-
+const DashboardPortfolioAges: FC<DashboardPortfolioAgesProps> = ({ invoiceAges, className }) => {
   const options: ApexOptions = {
     chart: {
       type: "bar",

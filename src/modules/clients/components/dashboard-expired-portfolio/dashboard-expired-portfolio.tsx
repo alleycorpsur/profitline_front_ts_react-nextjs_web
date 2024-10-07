@@ -1,21 +1,19 @@
-import { FC, useContext } from "react";
+import { FC } from "react";
 import Image from "next/image";
 import styles from "./dashboard-expired-portfolio.module.scss";
 import DashboardGenericItem from "../dashboard-generic-item";
-import { ClientDetailsContext } from "../../containers/client-details/client-details";
-import { formatMillionNumber, formatMoney } from "@/utils/utils";
 
 interface DashboardExpiredPortfolioProps {
+  pastDuePortfolio: string;
+  expiredPercentage: string;
   className?: string;
 }
 
-const DashboardExpiredPortfolio: FC<DashboardExpiredPortfolioProps> = ({ className }) => {
-  const { portfolioData } = useContext(ClientDetailsContext);
-  const formattedPastDuePortfolio = formatMillionNumber(
-    portfolioData?.data_wallet?.past_due_ammount
-  );
-  const pastDuePortfolio = formatMoney(formattedPastDuePortfolio);
-  const expiredPercentage = portfolioData?.percentages?.past_due_percentage || "0";
+const DashboardExpiredPortfolio: FC<DashboardExpiredPortfolioProps> = ({
+  pastDuePortfolio,
+  expiredPercentage,
+  className
+}) => {
   return (
     <div className={`${styles.wrapper} ${className}`}>
       <DashboardGenericItem

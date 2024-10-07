@@ -1,5 +1,8 @@
 import { FC, useContext } from "react";
 import dynamic from "next/dynamic";
+
+import { formatMillionNumber, formatMoney } from "@/utils/utils";
+
 import DashboardTotalPortfolio from "@/modules/clients/components/dashboard-total-portfolio";
 import DashboardExpiredPortfolio from "@/modules/clients/components/dashboard-expired-portfolio";
 import DashboardBudget from "@/modules/clients/components/dashboard-budget";
@@ -9,7 +12,7 @@ import DashboardGenericItem from "@/modules/clients/components/dashboard-generic
 import DashboardSellsVsPayments from "@/modules/clients/components/dashboard-sells-vs-payments";
 import DashboardHistoricDso from "@/modules/clients/components/dashboard-historic-dso";
 import { ClientDetailsContext } from "@/modules/clients/containers/client-details/client-details";
-import { formatMillionNumber, formatMoney } from "@/utils/utils";
+
 import styles from "./generalDashboard.module.scss";
 
 const DynamicPortfoliAges = dynamic(
@@ -45,12 +48,32 @@ const GeneralDashboard: FC<GeneralDashboardViewProps> = () => {
   return (
     <div className={styles.wrapper}>
       <div className={styles.a}>
-        <DashboardTotalPortfolio className={styles.item} />
-        <DashboardExpiredPortfolio className={styles.item} />
-        <DashboardBudget className={styles.item} />
-        <DynamicPortfoliAges className={styles.item} />
-        <DashboardInvoiceStatus className={styles.item} />
-        <DashboardAlerts className={styles.item} />
+        <DashboardTotalPortfolio className={styles.item} totalWallet="0" />
+        <DashboardExpiredPortfolio
+          className={styles.item}
+          expiredPercentage="0"
+          pastDuePortfolio="0"
+        />
+        <DashboardBudget className={styles.item} budget="0" />
+        <DynamicPortfoliAges className={styles.item} invoiceAges={undefined} />
+        <DashboardInvoiceStatus
+          className={styles.item}
+          totalBalance=""
+          totalBalanceCount={0}
+          totalReconciled=""
+          totalReconciledCount={0}
+          totalUnreconciled=""
+          totalUnreconciledCount={0}
+        />
+        <DashboardAlerts
+          className={styles.item}
+          creditNotes=""
+          creditNotesCount={0}
+          discount=""
+          discountCount={0}
+          openAlerts=""
+          openAlertsCount={0}
+        />
       </div>
       <div className={styles.b}>
         <div className={styles.item}>
@@ -93,8 +116,8 @@ const GeneralDashboard: FC<GeneralDashboardViewProps> = () => {
         </div>
       </div>
       <div className={styles.c}>
-        <DashboardSellsVsPayments className={styles.item} />
-        <DashboardHistoricDso className={styles.item} />
+        <DashboardSellsVsPayments className={styles.item} chartData={[]} />
+        <DashboardHistoricDso className={styles.item} history_dso={undefined} />
       </div>
     </div>
   );
