@@ -133,7 +133,9 @@ export const ModalGenerateAction = ({
           icon={<PaperPlaneTilt size={16} />}
           title="Acta digital"
           onClick={() => {
-            handleOpenModal(7);
+            setSelectOpen({
+              selected: 7
+            });
           }}
         />
       </Flex>

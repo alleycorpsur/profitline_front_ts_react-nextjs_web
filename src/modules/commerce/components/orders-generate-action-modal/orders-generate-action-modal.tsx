@@ -1,10 +1,12 @@
 "use client";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, Key, SetStateAction } from "react";
 import { Flex, Modal, Typography } from "antd";
-import { NewspaperClipping } from "@phosphor-icons/react";
+import { DownloadSimple, NewspaperClipping } from "@phosphor-icons/react";
 
+import { useAppStore } from "@/lib/store/store";
 import { useMessageApi } from "@/context/MessageContext";
-import { changeOrderState } from "@/services/commerce/commerce";
+import { createAndDownloadTxt } from "@/utils/utils";
+import { changeOrderState, dowloadOrderCSV } from "@/services/commerce/commerce";
 import { ButtonGenerateAction } from "@/components/atoms/ButtonGenerateAction/ButtonGenerateAction";
 
 import { IOrder } from "@/types/commerce/ICommerce";
@@ -18,6 +20,7 @@ interface Props {
   ordersId: number[];
   setFetchMutate: Dispatch<SetStateAction<boolean>>;
   setSelectedRows: Dispatch<SetStateAction<IOrder[] | undefined>>;
+  setSelectedRowKeys: Dispatch<SetStateAction<Key[]>>;
 }
 
 export const OrdersGenerateActionModal = ({
@@ -25,8 +28,10 @@ export const OrdersGenerateActionModal = ({
   onClose,
   ordersId,
   setFetchMutate,
-  setSelectedRows
+  setSelectedRows,
+  setSelectedRowKeys
 }: Props) => {
+  const { ID: projectId } = useAppStore((state) => state.selectedProject);
   const { showMessage } = useMessageApi();
 
   const handleChangeOrderState = async () => {
@@ -34,6 +39,17 @@ export const OrdersGenerateActionModal = ({
       await changeOrderState(ordersId, showMessage);
       setFetchMutate((prev) => !prev);
       setSelectedRows([]);
+      setSelectedRowKeys([]);
+      onClose();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleDownloadCSV = async () => {
+    try {
+      const res = await dowloadOrderCSV(ordersId, projectId, showMessage);
+      createAndDownloadTxt(res);
       onClose();
     } catch (error) {
       console.error(error);
@@ -62,6 +78,11 @@ export const OrdersGenerateActionModal = ({
           onClick={handleChangeOrderState}
           icon={<NewspaperClipping size={16} />}
           title="Enviar pedido a facturado"
+        />
+        <ButtonGenerateAction
+          onClick={handleDownloadCSV}
+          icon={<DownloadSimple size={16} />}
+          title="Descargar CSV"
         />
       </Flex>
     </Modal>

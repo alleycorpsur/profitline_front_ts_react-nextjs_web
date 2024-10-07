@@ -313,7 +313,6 @@ export const formatDateAndTime = (date: string): string => {
   return `${day}/${month}/${year} - ${hours}:${minutes} ${period}`;
 };
 
-
 export const formatMillionNumber = (number: number | undefined | null): string => {
   if (!number) {
     return "0";
@@ -369,4 +368,17 @@ export const calculateDaysDifference = (startDate: Date, endDate: Date) => {
   const end = new Date(endDate);
   const differenceInTime = end.getTime() - start.getTime();
   return Math.ceil(differenceInTime / (1000 * 3600 * 24));
+};
+
+export const createAndDownloadTxt = (rawData: string) => {
+  const blob = new Blob([rawData], { type: "text/plain;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+
+  const downloadLink = document.createElement("a");
+  downloadLink.href = url;
+  downloadLink.download = `ordersCSV_${Date.now()}.txt`;
+
+  document.body.appendChild(downloadLink);
+  downloadLink.click();
+  document.body.removeChild(downloadLink);
 };
