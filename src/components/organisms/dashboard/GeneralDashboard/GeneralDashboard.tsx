@@ -1,7 +1,5 @@
-import { FC, useContext } from "react";
+import { FC } from "react";
 import dynamic from "next/dynamic";
-
-import { formatMillionNumber, formatMoney } from "@/utils/utils";
 
 import DashboardTotalPortfolio from "@/modules/clients/components/dashboard-total-portfolio";
 import DashboardExpiredPortfolio from "@/modules/clients/components/dashboard-expired-portfolio";
@@ -11,7 +9,6 @@ import DashboardAlerts from "@/modules/clients/components/dashboard-alerts";
 import DashboardGenericItem from "@/modules/clients/components/dashboard-generic-item";
 import DashboardSellsVsPayments from "@/modules/clients/components/dashboard-sells-vs-payments";
 import DashboardHistoricDso from "@/modules/clients/components/dashboard-historic-dso";
-import { ClientDetailsContext } from "@/modules/clients/containers/client-details/client-details";
 
 import styles from "./generalDashboard.module.scss";
 
@@ -25,26 +22,6 @@ const DynamicPortfoliAges = dynamic(
 interface GeneralDashboardViewProps {}
 
 const GeneralDashboard: FC<GeneralDashboardViewProps> = () => {
-  const { portfolioData } = useContext(ClientDetailsContext);
-
-  const formattedAppliedPayments = formatMillionNumber(
-    portfolioData?.data_wallet?.applied_payments_ammount
-  );
-  const appliedPayments = formatMoney(formattedAppliedPayments);
-  const appliedPaymentPercentage = portfolioData?.percentages?.applied_payments_percentage;
-
-  const formattedUnappliedPayments = formatMillionNumber(
-    portfolioData?.data_wallet?.unapplied_payments_ammount
-  );
-  const unappliedPayments = formatMoney(formattedUnappliedPayments);
-  const unnappliedPaymentPercentage = portfolioData?.percentages?.unapplied_payments_percentage;
-
-  const dsoValue = portfolioData?.dso;
-
-  const formattedQuota = formatMillionNumber(portfolioData?.quota);
-  const quota = formatMoney(formattedQuota);
-  const quotaPercentage = portfolioData?.percentages?.quota_percentage || "0";
-
   return (
     <div className={styles.wrapper}>
       <div className={styles.a}>
@@ -78,41 +55,23 @@ const GeneralDashboard: FC<GeneralDashboardViewProps> = () => {
       <div className={styles.b}>
         <div className={styles.item}>
           <div className={styles.list}>
-            <DashboardGenericItem
-              name="R. aplicado"
-              value={appliedPayments}
-              unit="M"
-              badgeText={
-                appliedPaymentPercentage && appliedPaymentPercentage > 0
-                  ? `${appliedPaymentPercentage.toFixed(1)}%`
-                  : ""
-              }
-            />
-            <DashboardGenericItem
-              name="Pagos no ap."
-              value={unappliedPayments}
-              unit="M"
-              badgeText={
-                unnappliedPaymentPercentage && parseInt(unnappliedPaymentPercentage) > 0
-                  ? `${parseFloat(unnappliedPaymentPercentage).toFixed(1)}%`
-                  : ""
-              }
-            />
+            <DashboardGenericItem name="R. aplicado" value={""} unit="M" badgeText={""} />
+            <DashboardGenericItem name="Pagos no ap." value={""} unit="M" badgeText={""} />
           </div>
         </div>
         <div className={styles.item}>
           <div className={styles.list}>
             <DashboardGenericItem
               name="Cupo"
-              value={quota}
+              value={""}
               unit="M"
-              badgeText={`${parseFloat(quotaPercentage).toFixed(1)}%`}
+              badgeText={`${parseFloat("0").toFixed(1)}%`}
             />
           </div>
         </div>
         <div className={styles.dso}>
           <div className={styles.label}>DSO</div>
-          <div className={styles.value}>{dsoValue}</div>
+          <div className={styles.value}>{""}</div>
         </div>
       </div>
       <div className={styles.c}>
