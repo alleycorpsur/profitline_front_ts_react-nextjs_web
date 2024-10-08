@@ -14,6 +14,7 @@ import { useSelectedPayments } from "@/context/SelectedPaymentsContext";
 import { ModalResultAppy } from "./Modals/ModalResultApply/ModalResultAppy";
 import ModalAddInvoice from "./Modals/ModalAddInvoice/ModalAddInvoice";
 import { ModalSelectAjustements } from "./Modals/ModalSelectAjustements/ModalSelectAjustements";
+import ModalNoteInvoice from "./Modals/ModalNoteInvoice/ModalNoteInvoice";
 
 const ApplyTab: React.FC = () => {
   const [search, setSearch] = useState("");
@@ -255,7 +256,7 @@ const ApplyTab: React.FC = () => {
       </div>
       <ModalAddInvoice visible={isModalVisible} onCancel={handleCancel} onAdd={handleAdd} />
       <ModalSelectAjustements
-        isOpen={modalActionPayment && (modalActionPayment.isOpen || modalActionPayment.modal === 0)}
+        isOpen={modalActionPayment && modalActionPayment.isOpen && modalActionPayment.modal === 0}
         onClose={() =>
           setModalActionPayment({
             isOpen: false,
@@ -268,6 +269,16 @@ const ApplyTab: React.FC = () => {
             modal: e
           });
         }}
+      />
+      <ModalNoteInvoice
+        visible={modalActionPayment && modalActionPayment.isOpen && modalActionPayment.modal === 1}
+        onCancel={() =>
+          setModalActionPayment({
+            isOpen: false,
+            modal: 0
+          })
+        }
+        onAdd={() => console.log("add")}
       />
     </>
   );
