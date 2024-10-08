@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Modal, Spin } from "antd";
-import "./ModalNoteInvoice.scss";
+import "./modalNoteInvoice.scss";
 import { ArrowLeft } from "phosphor-react";
 import UiSearchInputLong from "@/components/ui/search-input-long";
 import ItemsActionsModal from "@/components/atoms/ItemsModal/ItemsActionsModal";

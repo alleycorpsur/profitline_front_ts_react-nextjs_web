@@ -1,5 +1,5 @@
 import { FC } from "react";
-import "./itemsActionsModalInvoice.scss";
+import "./itemsActionsModalInvoiceStyle.scss";
 import { Checkbox } from "antd";
 import { formatMoney } from "@/utils/utils";
 import { DividerVerticalModal } from "../DividerVertical/DividerVerticalModal";

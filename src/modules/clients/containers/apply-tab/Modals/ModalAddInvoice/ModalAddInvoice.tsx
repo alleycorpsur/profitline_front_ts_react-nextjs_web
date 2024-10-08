@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { Modal, Checkbox, Spin, message, Flex } from "antd";
-import "./ModalAddInvoice.scss";
+import "./modalAddInvoice.scss";
 import ItemsActionsModalInvoice from "@/components/atoms/ItemsModalInvoice/ItemsActionsModalInvoice";
 import { CheckboxChangeEvent } from "antd/es/checkbox";
 import { CopySimple } from "phosphor-react";
