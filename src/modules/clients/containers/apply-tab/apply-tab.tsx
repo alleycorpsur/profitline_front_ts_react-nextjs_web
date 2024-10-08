@@ -13,15 +13,20 @@ import { Plus } from "phosphor-react";
 import { useSelectedPayments } from "@/context/SelectedPaymentsContext";
 import { ModalResultAppy } from "./Modals/ModalResultApply/ModalResultAppy";
 import ModalAddInvoice from "./Modals/ModalAddInvoice/ModalAddInvoice";
+import { ModalSelectAjustements } from "./Modals/ModalSelectAjustements/ModalSelectAjustements";
 
 const ApplyTab: React.FC = () => {
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { selectedPayments } = useSelectedPayments();
 
-  console.log("selectedPayments", selectedPayments);
+  //TODO this is the context that is not being used
+  // const { selectedPayments } = useSelectedPayments();
+
   const [isModalVisible, setIsModalVisible] = useState(false);
 
+  const [modalActionPayment, setModalActionPayment] = useState(
+    {} as { isOpen: boolean; modal: number }
+  );
   const showModal = () => {
     setIsModalVisible(true);
   };
@@ -223,6 +228,13 @@ const ApplyTab: React.FC = () => {
                       if (section.statusName === "facturas") {
                         showModal();
                       }
+                      if (section.statusName === "ajustes") {
+                        setModalActionPayment(
+                          modalActionPayment.isOpen
+                            ? { isOpen: false, modal: 0 }
+                            : { isOpen: true, modal: 0 }
+                        );
+                      }
                     }}
                   >
                     <Plus />
@@ -242,6 +254,21 @@ const ApplyTab: React.FC = () => {
         )}
       </div>
       <ModalAddInvoice visible={isModalVisible} onCancel={handleCancel} onAdd={handleAdd} />
+      <ModalSelectAjustements
+        isOpen={modalActionPayment && (modalActionPayment.isOpen || modalActionPayment.modal === 0)}
+        onClose={() =>
+          setModalActionPayment({
+            isOpen: false,
+            modal: 0
+          })
+        }
+        setModalAction={(e: number) => {
+          setModalActionPayment({
+            isOpen: true,
+            modal: e
+          });
+        }}
+      />
     </>
   );
 };
