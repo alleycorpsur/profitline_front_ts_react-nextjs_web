@@ -11,7 +11,7 @@ const { Text } = Typography;
 
 interface PropsInvoicesTable {
   paymentsByStatus: IPayment[];
-  setSelectedRows: Dispatch<SetStateAction<IPayment[] | undefined>>;
+  setSelectedRows: Dispatch<SetStateAction<IPayment[]>>;
   setShowPaymentDetail: Dispatch<
     SetStateAction<{
       isOpen: boolean;
