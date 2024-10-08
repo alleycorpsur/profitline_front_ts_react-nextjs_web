@@ -1,0 +1,143 @@
+.modal-add-invoice {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    gap: 1.5rem;
+
+
+    .ant-modal-content {
+        border-radius: 8px;
+    }
+
+    .ant-modal-header {
+        border-bottom: none;
+        padding: 24px 24px 0;
+    }
+
+    .ant-modal-body {
+        padding: 24px;
+    }
+
+    .search-container {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 12px;
+
+
+    }
+
+    .select-all {
+        margin-bottom: 12px;
+        margin-left: 14px;
+    }
+
+
+
+    .invoices-list {
+        display: flex;
+        max-height: 40vh;
+        overflow-y: auto;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .modal-footer {
+        display: flex;
+        margin-top: 24px;
+        gap: 1rem;
+
+
+        .button__action__text {
+            height: 2.5rem;
+            border-radius: 0.5rem;
+            padding: 0 0.5rem;
+            font-size: 1.125rem;
+            font-weight: 500;
+            line-height: 1.25rem;
+            flex-grow: 1;
+            border: none;
+            box-shadow: none;
+
+
+            &__green {
+                background-color: #CBE71E;
+            }
+
+            &__white {
+                background-color: #ffff;
+                border: solid 2px;
+            }
+        }
+    }
+
+    .custom-input {
+        width: 100% !important;
+    }
+
+
+}
+
+.summary-section {
+    background-color: #f5f5f5;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+
+    .summary-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+
+        &.pending {
+            font-weight: bold;
+        }
+    }
+}
+
+.not-found-invoices {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 4px;
+
+
+    button {
+        background-color: transparent;
+        border: none;
+        color: #0056b3;
+        cursor: pointer;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+
+
+}
+
+.excel-button-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: .5rem;
+    margin-left: auto;
+    cursor: pointer;
+}
+
+
+.container-paste-invoice {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.buld-text-excel-not-found {
+    font-weight: bold;
+
+}
