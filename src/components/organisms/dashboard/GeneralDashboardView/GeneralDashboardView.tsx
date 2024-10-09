@@ -24,9 +24,13 @@ const GeneralDashboardView: FC<GeneralDashboardViewProps> = () => {
   const fetchProjectPortfolio = async () => {
     setPortfolioData({ loading: true, data: undefined });
     // Call the API to get the data
-    const response: IDataSection = await getProjectPortfolio(projectId);
-    console.log("resPROpORt: ", response);
-    setPortfolioData({ loading: false, data: response });
+    try {
+      const response: IDataSection = await getProjectPortfolio(projectId);
+      setPortfolioData({ loading: false, data: response });
+    } catch (error) {
+      console.warn("error getting project portfolio", error);
+      setPortfolioData({ loading: false, data: undefined });
+    }
   };
 
   useEffect(() => {

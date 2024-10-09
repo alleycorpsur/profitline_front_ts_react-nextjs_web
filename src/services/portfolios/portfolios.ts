@@ -42,6 +42,6 @@ export const getProjectPortfolio = async (projectId: number): Promise<any> => {
     return response.data.data as IDataSection;
   } catch (error) {
     console.warn("error getting project portfolio", error);
-    return error as any;
+    throw error;
   }
 };

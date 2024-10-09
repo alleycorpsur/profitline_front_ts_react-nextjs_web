@@ -21,15 +21,7 @@ export const useDashboardInfo = (portfolioData: IDataSection | undefined) => {
   // Portfolio Ages
   const invoiceAges = portfolioData?.invoice_ages
     ?.map((item) => {
-      const dataKey =
-        item.total > 0
-          ? [item.total]
-          : [
-              {
-                x: 0,
-                y: 0
-              }
-            ];
+      const dataKey = item.total > 0 ? [item.total] : [item.total];
 
       return {
         name: item.days_range,
