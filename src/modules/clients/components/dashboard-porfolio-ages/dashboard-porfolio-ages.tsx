@@ -11,7 +11,7 @@ interface DashboardPortfolioAgesProps {
   invoiceAges:
     | {
         name: string;
-        data: number[];
+        data: number[] | { x: number; y: number }[];
       }[]
     | undefined;
   className?: string;
@@ -83,6 +83,7 @@ const DashboardPortfolioAges: FC<DashboardPortfolioAgesProps> = ({ invoiceAges, 
           series={invoiceAges}
           type="bar"
           height={210}
+          key={Math.random()}
         />
       </div>
 
