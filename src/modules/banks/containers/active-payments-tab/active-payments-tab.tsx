@@ -1,5 +1,5 @@
 import { FC, useState } from "react";
-import { Flex } from "antd";
+import { Button, Flex, MenuProps } from "antd";
 import UiSearchInput from "@/components/ui/search-input";
 import FilterDiscounts from "@/components/atoms/Filters/FilterDiscounts/FilterDiscounts";
 import { DotsDropdown } from "@/components/atoms/DotsDropdown/DotsDropdown";
@@ -14,10 +14,15 @@ import styles from "./active-payments-tab.module.scss";
 import BanksRules from "../bank-rules";
 import { useModalDetail } from "@/context/ModalContext";
 import { useAppStore } from "@/lib/store/store";
+import ModalActionsBanksPayments from "../../components/modal-actions-banks-payments";
 
 export const ActivePaymentsTab: FC = () => {
   const [selectedRows, setSelectedRows] = useState<any[] | undefined>();
   const [showBankRules, setShowBankRules] = useState<boolean>(false);
+  const [isGenerateActionOpen, setisGenerateActionOpen] = useState(false);
+  const [isSelectOpen, setIsSelectOpen] = useState({
+    selected: 0
+  });
 
   const { ID } = useAppStore((state) => state.selectedProject);
   const { openModal } = useModalDetail();
@@ -31,6 +36,17 @@ export const ActivePaymentsTab: FC = () => {
       projectId: ID
     });
   };
+
+  const items: MenuProps["items"] = [
+    {
+      key: "1",
+      label: (
+        <Button className="buttonOutlined" onClick={() => setisGenerateActionOpen(true)}>
+          Generar acción
+        </Button>
+      )
+    }
+  ];
 
   return (
     <>
@@ -48,7 +64,7 @@ export const ActivePaymentsTab: FC = () => {
               }}
             />
             <FilterDiscounts />
-            <DotsDropdown />
+            <DotsDropdown items={items} />
             <PrincipalButton onClick={handleOpenBankRules} customStyles={{ marginLeft: "auto" }}>
               Reglas de bancos
               <Bank size={16} />
@@ -80,6 +96,17 @@ export const ActivePaymentsTab: FC = () => {
                 />
               )
             }))}
+          />
+          <ModalActionsBanksPayments
+            isOpen={isGenerateActionOpen}
+            onClose={() => {
+              setisGenerateActionOpen(false);
+            }}
+            setSelectOpen={(e) => {
+              setisGenerateActionOpen((prev) => !prev);
+              setIsSelectOpen(e);
+            }}
+            validateInvoiceIsSelected={() => true}
           />
         </Flex>
       )}
