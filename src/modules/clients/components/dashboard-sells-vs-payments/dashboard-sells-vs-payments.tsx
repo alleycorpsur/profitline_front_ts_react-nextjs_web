@@ -1,4 +1,4 @@
-import { FC, useContext } from "react";
+import { FC } from "react";
 import {
   XAxis,
   YAxis,
@@ -11,35 +11,22 @@ import {
 import dayjs from "dayjs";
 import utcPlugin from "dayjs/plugin/utc";
 
-import { ClientDetailsContext } from "../../containers/client-details/client-details";
 import { capitalize, formatMillionNumber, formatMoney } from "@/utils/utils";
 
 import styles from "./dashboard-sells-vs-payments.module.scss";
 
 interface DashboardSellsVsPaymentsProps {
+  chartData: {
+    name: string;
+    ventas: any;
+    pagos: any;
+  }[];
   className?: string;
 }
 
 dayjs.extend(utcPlugin);
 
-const DashboardSellsVsPayments: FC<DashboardSellsVsPaymentsProps> = ({ className }) => {
-  const { portfolioData } = useContext(ClientDetailsContext);
-
-  const uniqueItemsMap = new Map();
-
-  portfolioData?.payments_vs_invoices?.forEach((item) => {
-    const name = capitalize(dayjs(item.month).utc().locale("es").format("MMM YY"));
-    uniqueItemsMap.set(name, item);
-  });
-
-  const data = Array.from(uniqueItemsMap?.values())?.map((item) => {
-    return {
-      name: capitalize(dayjs(item.month).utc().locale("es").format("MMM YY")),
-      ventas: item.sales,
-      pagos: item.payments
-    };
-  });
-
+const DashboardSellsVsPayments: FC<DashboardSellsVsPaymentsProps> = ({ chartData, className }) => {
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
@@ -74,7 +61,12 @@ const DashboardSellsVsPayments: FC<DashboardSellsVsPaymentsProps> = ({ className
       </div>
       <div className={styles.chart}>
         <ResponsiveContainer>
-          <LineChart margin={{ right: 15, left: 0 }} barCategoryGap={10} data={data} barSize={20}>
+          <LineChart
+            margin={{ right: 15, left: 0 }}
+            barCategoryGap={10}
+            data={chartData}
+            barSize={20}
+          >
             <XAxis padding={{ left: 20, right: 20 }} dataKey="name" scale="point" />
             <YAxis
               padding={{ top: 10 }}

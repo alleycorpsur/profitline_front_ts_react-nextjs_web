@@ -1,29 +1,26 @@
-import { FC, useContext } from "react";
+import { FC } from "react";
 import DashboardGenericItem from "../dashboard-generic-item";
 import styles from "./dashboard-alerts.module.scss";
-import { ClientDetailsContext } from "../../containers/client-details/client-details";
-import { formatMillionNumber, formatMoney } from "@/utils/utils";
 
 interface DashboardAlertsProps {
+  openAlerts: string;
+  openAlertsCount: number | undefined;
+  discount: string;
+  discountCount: number | undefined;
+  creditNotes: string;
+  creditNotesCount: number | undefined;
   className?: string;
 }
 
-const DashboardAlerts: FC<DashboardAlertsProps> = ({ className }) => {
-  const { portfolioData } = useContext(ClientDetailsContext);
-
-  const formattedOpenAlerts = formatMillionNumber(
-    portfolioData?.invoice_alerts?.accounting_updates?.total_value
-  );
-  const openAlerts = formatMoney(formattedOpenAlerts);
-  const formattedDiscounts = formatMillionNumber(
-    portfolioData?.invoice_alerts?.financial_discounts?.discount.total_value
-  );
-  const discount = formatMoney(formattedDiscounts);
-  const formattedCreditNotes = formatMillionNumber(
-    portfolioData?.invoice_alerts?.financial_discounts?.creditNote.total_value
-  );
-  const creditNotes = formatMoney(formattedCreditNotes);
-
+const DashboardAlerts: FC<DashboardAlertsProps> = ({
+  openAlerts,
+  openAlertsCount,
+  discount,
+  discountCount,
+  creditNotes,
+  creditNotesCount,
+  className
+}) => {
   return (
     <div className={`${styles.wrapper} ${className}`}>
       <div className={styles.name}>Alertas</div>
@@ -32,19 +29,19 @@ const DashboardAlerts: FC<DashboardAlertsProps> = ({ className }) => {
           name="Novedades abiertas"
           value={openAlerts}
           unit="M"
-          quantity={portfolioData?.invoice_alerts?.accounting_updates?.count}
+          quantity={openAlertsCount}
         />
         <DashboardGenericItem
           name="DPP disponibles"
           value={discount}
           unit="M"
-          quantity={portfolioData?.invoice_alerts?.financial_discounts.discount?.count}
+          quantity={discountCount}
         />
         <DashboardGenericItem
           name="NC disponibles"
           value={creditNotes}
           unit="M"
-          quantity={portfolioData?.invoice_alerts?.financial_discounts.creditNote?.count}
+          quantity={creditNotesCount}
         />
       </div>
     </div>

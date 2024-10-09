@@ -10,7 +10,8 @@ import {
   Megaphone,
   User,
   Clipboard,
-  Bank
+  Bank,
+  SquaresFour
 } from "phosphor-react";
 
 import { logOut } from "../../../../firebase-utils";
@@ -96,6 +97,18 @@ export const SideBar = () => {
             <Avatar shape="square" className="imageWithoutImage" size={50} icon={<Clipboard />} />
           )}
         </button>
+
+        <Link href="/dashboard" passHref legacyBehavior>
+          <Button
+            type="primary"
+            size="large"
+            icon={<SquaresFour size={28} />}
+            className={path.startsWith("/dashboard") ? "buttonIcon" : "buttonIconActive"}
+          >
+            {isSideBarLarge && "Dashboard"}
+          </Button>
+        </Link>
+
         {checkUserViewPermissions(project, "Clientes") && (
           <Link href="/clientes/all">
             <Button
