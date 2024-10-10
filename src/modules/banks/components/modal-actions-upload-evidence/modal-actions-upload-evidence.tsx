@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Modal, Typography } from "antd";
 
 import SecondaryButton from "@/components/atoms/buttons/secondaryButton/SecondaryButton";
@@ -31,6 +31,12 @@ const ModalActionsUploadEvidence = ({ isOpen, onClose }: Props) => {
 
   const evidence = watch("evidence");
 
+  useEffect(() => {
+    return () => {
+      reset();
+    };
+  }, [isOpen]);
+
   const handleOnChangeDocument: any = (info: infoObject) => {
     const { file: rawFile } = info;
     if (rawFile) {
@@ -54,13 +60,13 @@ const ModalActionsUploadEvidence = ({ isOpen, onClose }: Props) => {
   const onSubmit = async (data: { evidence: File }) => {
     setIsSubmitting(true);
     try {
-      console.log("archivo enviado: ", data);
+      console.info("archivo enviado: ", data);
 
-      showMessage("success", "Acta digital enviada correctamente");
+      showMessage("success", "Tirilla enviada correctamente");
 
       onClose();
     } catch (error) {
-      showMessage("error", "Error al enviar acta digital");
+      showMessage("error", "Error al enviar tirilla");
     } finally {
       setIsSubmitting(false);
     }

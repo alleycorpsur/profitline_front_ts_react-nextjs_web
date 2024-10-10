@@ -16,6 +16,7 @@ import BanksTable from "../../components/banks-table/Banks-table";
 import BanksRules from "../bank-rules";
 import ModalActionsBanksPayments from "../../components/modal-actions-banks-payments";
 import ModalActionsUploadEvidence from "../../components/modal-actions-upload-evidence";
+import ModalActionsAssignClient from "../../components/modal-actions-assign-client";
 
 import styles from "./active-payments-tab.module.scss";
 
@@ -45,6 +46,7 @@ export const ActivePaymentsTab: FC = () => {
   const onCloseModal = () => {
     setisGenerateActionOpen(!isGenerateActionOpen);
     setIsSelectOpen({ selected: 0 });
+    // TODO: uncomment when mutate is implemented
     // mutate();
   };
 
@@ -56,7 +58,7 @@ export const ActivePaymentsTab: FC = () => {
           className="buttonOutlined"
           onClick={() => {
             if (!selectedRows || selectedRows.length === 0) {
-              showMessage("error", "Seleccione al menos una factura");
+              showMessage("error", "Seleccione al menos un pago");
               return;
             }
 
@@ -129,6 +131,7 @@ export const ActivePaymentsTab: FC = () => {
             }}
           />
 
+          <ModalActionsAssignClient isOpen={isSelectOpen.selected === 2} onClose={onCloseModal} />
           <ModalActionsUploadEvidence isOpen={isSelectOpen.selected === 5} onClose={onCloseModal} />
         </Flex>
       )}
