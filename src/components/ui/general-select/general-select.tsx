@@ -24,6 +24,7 @@ interface PropsGeneralSelect<T extends FieldValues> {
   titleAbsolute?: boolean;
   errorSmall?: boolean;
   readOnly?: boolean;
+  showSearch?: boolean;
 }
 
 const GeneralSelect = <T extends FieldValues>({
@@ -36,7 +37,8 @@ const GeneralSelect = <T extends FieldValues>({
   customStyleContainer,
   titleAbsolute,
   errorSmall,
-  readOnly
+  readOnly,
+  showSearch = false
 }: PropsGeneralSelect<T>) => {
   const [usedOptions, setUsedOptions] = useState<
     {
@@ -72,16 +74,20 @@ const GeneralSelect = <T extends FieldValues>({
     <Flex vertical style={customStyleContainer} className="generalSelectContainer">
       {title && <h4 className={`inputTitle ${titleAbsolute && "-absolute"}`}>{title}</h4>}
       <Select
+        showSearch={showSearch}
         placeholder={placeholder}
         className={`${errors ? "selectInputError" : "selectInputCustom"} ${readOnly ? "-readOnly" : ""}`}
         loading={loading}
         variant="borderless"
         optionLabelProp="label"
         {...field}
-        popupClassName="selectDrop"
+        popupClassName="generalSelectContainer__selectDrop"
         options={usedOptions}
         labelInValue
         disabled={readOnly || field.disabled}
+        filterOption={(input, option) =>
+          option ? option.label.toLowerCase().includes(input.toLowerCase()) : false
+        }
       />
       {errors && (
         <Typography.Text className={`textError ${errorSmall && "-smallFont"}`}>

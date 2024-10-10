@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import Loader from "@/components/atoms/loaders/loader";
 
 import { QueryClient, QueryClientProvider } from "react-query";
+import { MessageProvider } from "@/context/MessageContext";
 
 const queryClient = new QueryClient();
 
@@ -34,7 +35,13 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <QueryClientProvider client={queryClient}>
           <body>
             <AntdRegistry>
-              {loading ? <Loader /> : <ModalProvider>{children}</ModalProvider>}
+              {loading ? (
+                <Loader />
+              ) : (
+                <MessageProvider>
+                  <ModalProvider>{children}</ModalProvider>
+                </MessageProvider>
+              )}
             </AntdRegistry>
           </body>
         </QueryClientProvider>
