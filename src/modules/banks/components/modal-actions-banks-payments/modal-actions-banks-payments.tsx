@@ -24,14 +24,9 @@ const ModalActionsBanksPayments = ({ isOpen, onClose, setSelectOpen }: Props) =>
   return (
     <Modal
       className="modalActionsBanksPayments"
-      width={"40%"}
+      width={686}
       open={isOpen}
-      centered
-      title={
-        <Title className="modalActionsBanksPayments__title" level={4}>
-          Generar acción
-        </Title>
-      }
+      title={null}
       footer={null}
       onCancel={onClose}
     >
