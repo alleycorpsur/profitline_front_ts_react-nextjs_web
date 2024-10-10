@@ -12,22 +12,14 @@ const { Title } = Typography;
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  validateInvoiceIsSelected: () => boolean;
   setSelectOpen: Dispatch<SetStateAction<{ selected: number }>>;
 }
 
-const ModalActionsBanksPayments = ({
-  isOpen,
-  onClose,
-  validateInvoiceIsSelected,
-  setSelectOpen
-}: Props) => {
+const ModalActionsBanksPayments = ({ isOpen, onClose, setSelectOpen }: Props) => {
   const handleOpenModal = (type: number) => {
-    if (validateInvoiceIsSelected()) {
-      setSelectOpen({
-        selected: type
-      });
-    }
+    setSelectOpen({
+      selected: type
+    });
   };
   return (
     <Modal

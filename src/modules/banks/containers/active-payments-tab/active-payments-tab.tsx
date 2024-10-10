@@ -1,20 +1,23 @@
 import { FC, useState } from "react";
 import { Button, Flex, MenuProps } from "antd";
+import { Bank } from "phosphor-react";
+
+import { useModalDetail } from "@/context/ModalContext";
+import { useMessageApi } from "@/context/MessageContext";
+import { useAppStore } from "@/lib/store/store";
+
 import UiSearchInput from "@/components/ui/search-input";
 import FilterDiscounts from "@/components/atoms/Filters/FilterDiscounts/FilterDiscounts";
 import { DotsDropdown } from "@/components/atoms/DotsDropdown/DotsDropdown";
 import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
-import { Bank } from "phosphor-react";
-
 import Collapse from "@/components/ui/collapse";
 import LabelCollapse from "@/components/ui/label-collapse";
 import BanksTable from "../../components/banks-table/Banks-table";
+import BanksRules from "../bank-rules";
+import ModalActionsBanksPayments from "../../components/modal-actions-banks-payments";
+import ModalActionsUploadEvidence from "../../components/modal-actions-upload-evidence";
 
 import styles from "./active-payments-tab.module.scss";
-import BanksRules from "../bank-rules";
-import { useModalDetail } from "@/context/ModalContext";
-import { useAppStore } from "@/lib/store/store";
-import ModalActionsBanksPayments from "../../components/modal-actions-banks-payments";
 
 export const ActivePaymentsTab: FC = () => {
   const [selectedRows, setSelectedRows] = useState<any[] | undefined>();
@@ -23,8 +26,10 @@ export const ActivePaymentsTab: FC = () => {
   const [isSelectOpen, setIsSelectOpen] = useState({
     selected: 0
   });
-
   const { ID } = useAppStore((state) => state.selectedProject);
+
+  const { showMessage } = useMessageApi();
+
   const { openModal } = useModalDetail();
   const handleOpenBankRules = () => {
     setShowBankRules(true);
@@ -37,11 +42,27 @@ export const ActivePaymentsTab: FC = () => {
     });
   };
 
+  const onCloseModal = () => {
+    setisGenerateActionOpen(!isGenerateActionOpen);
+    setIsSelectOpen({ selected: 0 });
+    // mutate();
+  };
+
   const items: MenuProps["items"] = [
     {
       key: "1",
       label: (
-        <Button className="buttonOutlined" onClick={() => setisGenerateActionOpen(true)}>
+        <Button
+          className="buttonOutlined"
+          onClick={() => {
+            if (!selectedRows || selectedRows.length === 0) {
+              showMessage("error", "Seleccione al menos una factura");
+              return;
+            }
+
+            setisGenerateActionOpen(true);
+          }}
+        >
           Generar acción
         </Button>
       )
@@ -106,8 +127,9 @@ export const ActivePaymentsTab: FC = () => {
               setisGenerateActionOpen((prev) => !prev);
               setIsSelectOpen(e);
             }}
-            validateInvoiceIsSelected={() => true}
           />
+
+          <ModalActionsUploadEvidence isOpen={isSelectOpen.selected === 5} onClose={onCloseModal} />
         </Flex>
       )}
     </>
