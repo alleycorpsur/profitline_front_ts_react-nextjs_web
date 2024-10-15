@@ -133,6 +133,7 @@ const ModalActionsEditClient = ({ isOpen, onClose }: Props) => {
               options={clients}
               showSearch
               customStyleContainer={{ width: "100%" }}
+              customStyleTitle={{ marginBottom: "4px" }}
             />
           )}
         />
