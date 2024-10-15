@@ -18,6 +18,7 @@ import ModalActionsBanksPayments from "../../components/modal-actions-banks-paym
 import ModalActionsEditClient from "../../components/modal-actions-edit-client";
 import ModalActionsUploadEvidence from "../../components/modal-actions-upload-evidence";
 import ModalActionsAssignClient from "../../components/modal-actions-assign-client";
+import ModalActionsSplitPayment from "../../components/modal-actions-split-payment";
 
 import styles from "./active-payments-tab.module.scss";
 
@@ -127,6 +128,11 @@ export const ActivePaymentsTab: FC = () => {
               setisGenerateActionOpen(false);
             }}
             setSelectOpen={(e) => {
+              const { selected } = e;
+              if (selected !== 2 && selectedRows && selectedRows.length > 1) {
+                showMessage("error", "Solo puedes seleccionar un pago para esta acción");
+                return;
+              }
               setisGenerateActionOpen((prev) => !prev);
               setIsSelectOpen(e);
             }}
@@ -134,6 +140,11 @@ export const ActivePaymentsTab: FC = () => {
 
           <ModalActionsEditClient isOpen={isSelectOpen.selected === 1} onClose={onCloseModal} />
           <ModalActionsAssignClient isOpen={isSelectOpen.selected === 2} onClose={onCloseModal} />
+          <ModalActionsSplitPayment
+            isOpen={isSelectOpen.selected === 4}
+            onClose={onCloseModal}
+            selectedRows={selectedRows}
+          />
           <ModalActionsUploadEvidence isOpen={isSelectOpen.selected === 5} onClose={onCloseModal} />
         </Flex>
       )}
@@ -159,7 +170,8 @@ const mockBank = [
         account_number: 123456,
         account_bank: "Bancolombia",
         state_name: "identificado",
-        state_color: "#0085FF"
+        state_color: "#0085FF",
+        status_id: 1
       },
       {
         id: 2,
@@ -170,7 +182,8 @@ const mockBank = [
         account_number: 123456,
         account_bank: "Bancolombia",
         state_name: "Auditoria",
-        state_color: "#FE7A01"
+        state_color: "#FE7A01",
+        status_id: 1
       }
     ]
   },
@@ -189,7 +202,8 @@ const mockBank = [
         account_number: 123456,
         account_bank: "Bancolombia",
         state_name: "identificado",
-        state_color: "#0085FF"
+        state_color: "#0085FF",
+        status_id: 2
       },
       {
         id: 4,
@@ -200,7 +214,8 @@ const mockBank = [
         account_number: 123456,
         account_bank: "Bancolombia",
         state_name: "Auditoria",
-        state_color: "#FE7A01"
+        state_color: "#FE7A01",
+        status_id: 2
       }
     ]
   }

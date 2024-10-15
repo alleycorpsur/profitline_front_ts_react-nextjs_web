@@ -1,4 +1,4 @@
-import { Flex, Input, InputNumber, Typography } from "antd";
+import { Flex, Input, Typography } from "antd";
 import { Control, Controller, FieldError, RegisterOptions } from "react-hook-form";
 import "./inputFormMoney.scss";
 

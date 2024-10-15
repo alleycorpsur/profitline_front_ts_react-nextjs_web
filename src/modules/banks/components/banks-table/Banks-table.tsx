@@ -11,6 +11,7 @@ const { Text } = Typography;
 interface PropsBanksTable {
   clientsByStatus: any[];
   setSelectedRows: Dispatch<SetStateAction<ISingleBank[] | undefined>>;
+  // eslint-disable-next-line no-unused-vars
   handleOpenPaymentDetail?: (payment: any) => void;
   bankStatusId: number;
 }
