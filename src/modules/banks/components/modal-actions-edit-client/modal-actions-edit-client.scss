@@ -1,6 +1,6 @@
 @import "@/styles/variables.scss";
 
-.modalActionsUploadEvidence {
+.modalActionsEditClient {
     max-height: 90%;
     .ant-modal-content {
         padding: 2rem !important;
@@ -25,6 +25,12 @@
             font-size: 0.75rem;
             font-weight: 600;
             width: fit-content;
+            color: $gray;
+        }
+
+        em {
+            font-size: 0.75rem;
+            font-weight: 300;
             color: $gray;
         }
     }

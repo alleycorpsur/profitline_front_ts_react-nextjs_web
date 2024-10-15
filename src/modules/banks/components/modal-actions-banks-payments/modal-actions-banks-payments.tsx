@@ -1,13 +1,11 @@
 "use client";
 import { Dispatch, SetStateAction } from "react";
-import { Flex, Modal, Typography } from "antd";
+import { Flex, Modal } from "antd";
 import { PencilLine, User, CheckCircle, CirclesFour, FileArrowUp } from "@phosphor-icons/react";
 
 import { ButtonGenerateAction } from "@/components/atoms/ButtonGenerateAction/ButtonGenerateAction";
 
 import "./modal-actions-banks-payments.scss";
-
-const { Title } = Typography;
 
 interface Props {
   isOpen: boolean;

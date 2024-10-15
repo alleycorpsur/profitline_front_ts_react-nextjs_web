@@ -38,13 +38,13 @@
     &__footer {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 0.5rem;
+        gap: 1rem;
     }
 
     .ant-modal-body {
         display: flex;
         flex-direction: column;
-        gap: 0.75rem;
+        gap: 1rem;
     }
 
     .ant-collapse-header {

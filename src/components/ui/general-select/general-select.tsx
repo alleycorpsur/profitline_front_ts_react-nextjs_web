@@ -21,6 +21,7 @@ interface PropsGeneralSelect<T extends FieldValues> {
   options: { value: number | string; label: string }[] | undefined | string[];
   loading?: boolean;
   customStyleContainer?: React.CSSProperties;
+  customStyleTitle?: React.CSSProperties;
   titleAbsolute?: boolean;
   errorSmall?: boolean;
   readOnly?: boolean;
@@ -35,6 +36,7 @@ const GeneralSelect = <T extends FieldValues>({
   options,
   loading,
   customStyleContainer,
+  customStyleTitle,
   titleAbsolute,
   errorSmall,
   readOnly,
@@ -72,7 +74,11 @@ const GeneralSelect = <T extends FieldValues>({
 
   return (
     <Flex vertical style={customStyleContainer} className="generalSelectContainer">
-      {title && <h4 className={`inputTitle ${titleAbsolute && "-absolute"}`}>{title}</h4>}
+      {title && (
+        <h4 className={`inputTitle ${titleAbsolute && "-absolute"}`} style={customStyleTitle}>
+          {title}
+        </h4>
+      )}
       <Select
         showSearch={showSearch}
         placeholder={placeholder}
