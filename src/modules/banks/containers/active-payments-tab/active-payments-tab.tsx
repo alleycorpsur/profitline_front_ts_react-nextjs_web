@@ -15,6 +15,7 @@ import LabelCollapse from "@/components/ui/label-collapse";
 import BanksTable from "../../components/banks-table/Banks-table";
 import BanksRules from "../bank-rules";
 import ModalActionsBanksPayments from "../../components/modal-actions-banks-payments";
+import ModalActionsEditClient from "../../components/modal-actions-edit-client";
 import ModalActionsUploadEvidence from "../../components/modal-actions-upload-evidence";
 import ModalActionsAssignClient from "../../components/modal-actions-assign-client";
 
@@ -131,6 +132,7 @@ export const ActivePaymentsTab: FC = () => {
             }}
           />
 
+          <ModalActionsEditClient isOpen={isSelectOpen.selected === 1} onClose={onCloseModal} />
           <ModalActionsAssignClient isOpen={isSelectOpen.selected === 2} onClose={onCloseModal} />
           <ModalActionsUploadEvidence isOpen={isSelectOpen.selected === 5} onClose={onCloseModal} />
         </Flex>
