@@ -21,9 +21,11 @@ interface PropsGeneralSelect<T extends FieldValues> {
   options: { value: number | string; label: string }[] | undefined | string[];
   loading?: boolean;
   customStyleContainer?: React.CSSProperties;
+  customStyleTitle?: React.CSSProperties;
   titleAbsolute?: boolean;
   errorSmall?: boolean;
   readOnly?: boolean;
+  showSearch?: boolean;
 }
 
 const GeneralSelect = <T extends FieldValues>({
@@ -34,9 +36,11 @@ const GeneralSelect = <T extends FieldValues>({
   options,
   loading,
   customStyleContainer,
+  customStyleTitle,
   titleAbsolute,
   errorSmall,
-  readOnly
+  readOnly,
+  showSearch = false
 }: PropsGeneralSelect<T>) => {
   const [usedOptions, setUsedOptions] = useState<
     {
@@ -70,18 +74,26 @@ const GeneralSelect = <T extends FieldValues>({
 
   return (
     <Flex vertical style={customStyleContainer} className="generalSelectContainer">
-      {title && <h4 className={`inputTitle ${titleAbsolute && "-absolute"}`}>{title}</h4>}
+      {title && (
+        <h4 className={`inputTitle ${titleAbsolute && "-absolute"}`} style={customStyleTitle}>
+          {title}
+        </h4>
+      )}
       <Select
+        showSearch={showSearch}
         placeholder={placeholder}
         className={`${errors ? "selectInputError" : "selectInputCustom"} ${readOnly ? "-readOnly" : ""}`}
         loading={loading}
         variant="borderless"
         optionLabelProp="label"
         {...field}
-        popupClassName="selectDrop"
+        popupClassName="generalSelectContainer__selectDrop"
         options={usedOptions}
         labelInValue
         disabled={readOnly || field.disabled}
+        filterOption={(input, option) =>
+          option ? option.label.toLowerCase().includes(input.toLowerCase()) : false
+        }
       />
       {errors && (
         <Typography.Text className={`textError ${errorSmall && "-smallFont"}`}>

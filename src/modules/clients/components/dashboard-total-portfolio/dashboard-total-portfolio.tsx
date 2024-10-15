@@ -1,19 +1,15 @@
-import { FC, useContext } from "react";
+import { FC } from "react";
 import Image from "next/image";
 import DashboardGenericItem from "../dashboard-generic-item";
-import { ClientDetailsContext } from "../../containers/client-details/client-details";
-import { formatMillionNumber, formatMoney } from "@/utils/utils";
+
 import styles from "./dashboard-total-portfolio.module.scss";
 
 interface DashboardTotalPortfolioProps {
+  totalWallet: string;
   className?: string;
 }
 
-const DashboardTotalPortfolio: FC<DashboardTotalPortfolioProps> = ({ className }) => {
-  const { portfolioData } = useContext(ClientDetailsContext);
-  const formattedTotalWallet = formatMillionNumber(portfolioData?.total_wallet);
-  const totalWallet = formatMoney(formattedTotalWallet);
-
+const DashboardTotalPortfolio: FC<DashboardTotalPortfolioProps> = ({ totalWallet, className }) => {
   return (
     <div className={`${styles.wrapper} ${className}`}>
       <DashboardGenericItem name="Total cartera" value={totalWallet} unit="M" />
