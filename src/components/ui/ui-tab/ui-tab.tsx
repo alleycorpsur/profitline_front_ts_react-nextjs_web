@@ -14,19 +14,21 @@ interface UiTabProps {
   tabBarExtraContent?: ReactNode;
   // eslint-disable-next-line no-unused-vars
   onChangeTab?: (activeKey: string) => void;
+  activeKey?: string;
 }
 
 const UiTab: FC<UiTabProps> = ({
   tabs,
   tabBarExtraContent,
   onChangeTab,
+  activeKey,
   sticky = false
 }: UiTabProps) => {
   return (
-    <div className={`tabsContainer ${sticky && "-sticky"}`}>
+    <div className={`tabsContainer ${sticky ? "-sticky" : ""}`}>
       <Tabs
         style={{ width: "100%", height: "100%" }}
-        defaultActiveKey="1"
+        activeKey={activeKey}
         items={tabs}
         tabBarExtraContent={tabBarExtraContent}
         size="small"

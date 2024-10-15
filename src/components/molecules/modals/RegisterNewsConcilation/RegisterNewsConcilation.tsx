@@ -45,6 +45,7 @@ const RegisterNewsConcilation = ({
   invoices,
   messageShow
 }: RegisterNewsProps) => {
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
   const {
     control,
     handleSubmit,
@@ -118,6 +119,7 @@ const RegisterNewsConcilation = ({
   };
 
   const onSubmit = async (data: IFormRegisterNews) => {
+    setIsSubmitting(true);
     try {
       if (!invoices) return;
       const invoiceList = Object.entries(invoices).flatMap(([key, category]) =>
@@ -151,6 +153,7 @@ const RegisterNewsConcilation = ({
       console.error("Error al registrar una novedad:", error);
       messageShow.error("Error al adjuntar la evidencia");
     }
+    setIsSubmitting(false);
   };
 
   const handleClose = () => {
@@ -242,6 +245,7 @@ const RegisterNewsConcilation = ({
 
           <Button
             className={`acceptButton ${isValid ? "acceptButton__green" : ""}`}
+            disabled={!isValid || isSubmitting}
             htmlType="submit"
           >
             Finalizar conciliación

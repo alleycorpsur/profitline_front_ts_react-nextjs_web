@@ -1,0 +1,11 @@
+@import "@/styles/variables.scss";
+
+.generalDashboardView {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    background-color: $white;
+    padding: 1rem 2rem;
+    overflow-y: auto;
+    border-radius: 0.5rem;
+}

@@ -35,8 +35,10 @@ export const ClientDetails: FC<ClientDetailsProps> = () => {
   const { portfolioData, setMutate } = useClientDetails();
   const [showInvoiceActionsModal, setShowInvoiceActionsModal] = useState<boolean>(false);
   const [selectedOption, setSelectedOption] = useState<InvoiceAction>(InvoiceAction.GenerateAction);
+  const [activeTab, setActiveTab] = useState<string>("1");
 
   const onChangeTab = (activeKey: string) => {
+    setActiveTab(activeKey);
     if (activeKey === "1") {
       setMutate((prev) => !prev);
     }
@@ -73,7 +75,7 @@ export const ClientDetails: FC<ClientDetailsProps> = () => {
     {
       key: "4",
       label: "Pagos",
-      children: <PaymentsTab />
+      children: <PaymentsTab onChangeTab={onChangeTab} />
     },
     {
       key: "5",
@@ -122,7 +124,7 @@ export const ClientDetails: FC<ClientDetailsProps> = () => {
             </Flex>
           </Flex>
 
-          <UiTab tabs={items} sticky onChangeTab={onChangeTab} />
+          <UiTab tabs={items} sticky onChangeTab={onChangeTab} activeKey={activeTab} />
         </Flex>
       </main>
       {showInvoiceActionsModal && <InvoiceActionsModal />}

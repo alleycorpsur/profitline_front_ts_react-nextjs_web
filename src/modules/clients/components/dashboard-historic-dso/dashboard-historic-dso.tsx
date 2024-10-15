@@ -1,10 +1,10 @@
-import { FC, useContext, useEffect, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 import styles from "./dashboard-historic-dso.module.scss";
-import { ClientDetailsContext } from "../../containers/client-details/client-details";
 import dayjs from "dayjs";
 
 interface DashboardHistoricDsoProps {
+  history_dso: historic_dso[] | undefined;
   className?: string;
 }
 
@@ -19,12 +19,8 @@ type historic_dso = {
   date: string;
 };
 
-const DashboardHistoricDso: FC<DashboardHistoricDsoProps> = ({ className }) => {
-  const { portfolioData } = useContext(ClientDetailsContext);
-  const history_dso = portfolioData?.payments_vs_invoices?.map((month) => ({
-    dso: month.dso,
-    date: month.month
-  }));
+const DashboardHistoricDso: FC<DashboardHistoricDsoProps> = ({ history_dso, className }) => {
+  const [data, setData] = useState([] as history_chart[]);
 
   const currentDate = new Date();
   const currentMonth = currentDate.getMonth();
@@ -43,8 +39,6 @@ const DashboardHistoricDso: FC<DashboardHistoricDsoProps> = ({ className }) => {
     "Nov",
     "Dic"
   ];
-
-  const [data, setData] = useState([] as history_chart[]);
 
   useEffect(() => {
     // Initialize the data array with default values
@@ -74,7 +68,7 @@ const DashboardHistoricDso: FC<DashboardHistoricDsoProps> = ({ className }) => {
     initialData.splice(0, 6);
 
     setData(initialData);
-  }, [portfolioData]);
+  }, [history_dso]);
 
   return (
     <div className={`${styles.wrapper} ${className}`}>

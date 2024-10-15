@@ -9,12 +9,37 @@ import InvoiceTable from "./tables/InvoiceTable";
 import PaymentsTable from "./tables/PaymentsTable";
 import DiscountTable from "./tables/DiscountTable";
 import { Plus } from "phosphor-react";
+
+import { useSelectedPayments } from "@/context/SelectedPaymentsContext";
 import { ModalResultAppy } from "./Modals/ModalResultApply/ModalResultAppy";
+import ModalAddInvoice from "./Modals/ModalAddInvoice/ModalAddInvoice";
+import { ModalSelectAjustements } from "./Modals/ModalSelectAjustements/ModalSelectAjustements";
+import ModalNoteInvoice from "./Modals/ModalNoteInvoice/ModalNoteInvoice";
 
 const ApplyTab: React.FC = () => {
   const [search, setSearch] = useState("");
-  const [filters, setFilters] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+
+  //TODO this is the context that is not being used
+  // const { selectedPayments } = useSelectedPayments();
+
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const [modalActionPayment, setModalActionPayment] = useState(
+    {} as { isOpen: boolean; modal: number }
+  );
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
+
+  const handleAdd = () => {
+    // Handle adding selected invoices
+    setIsModalVisible(false);
+  };
 
   const data: SectionData[] = [
     {
@@ -200,7 +225,18 @@ const ApplyTab: React.FC = () => {
 
                   <Flex
                     className="buttonActionApply"
-                    onClick={() => console.log("click en la accion")}
+                    onClick={() => {
+                      if (section.statusName === "facturas") {
+                        showModal();
+                      }
+                      if (section.statusName === "ajustes") {
+                        setModalActionPayment(
+                          modalActionPayment.isOpen
+                            ? { isOpen: false, modal: 0 }
+                            : { isOpen: true, modal: 0 }
+                        );
+                      }
+                    }}
                   >
                     <Plus />
                     <h5 className="">Agregar {`${section.statusName}`}</h5>
@@ -218,6 +254,32 @@ const ApplyTab: React.FC = () => {
           />
         )}
       </div>
+      <ModalAddInvoice visible={isModalVisible} onCancel={handleCancel} onAdd={handleAdd} />
+      <ModalSelectAjustements
+        isOpen={modalActionPayment && modalActionPayment.isOpen && modalActionPayment.modal === 0}
+        onClose={() =>
+          setModalActionPayment({
+            isOpen: false,
+            modal: 0
+          })
+        }
+        setModalAction={(e: number) => {
+          setModalActionPayment({
+            isOpen: true,
+            modal: e
+          });
+        }}
+      />
+      <ModalNoteInvoice
+        visible={modalActionPayment && modalActionPayment.isOpen && modalActionPayment.modal === 1}
+        onCancel={() =>
+          setModalActionPayment({
+            isOpen: false,
+            modal: 0
+          })
+        }
+        onAdd={() => console.log("add")}
+      />
     </>
   );
 };

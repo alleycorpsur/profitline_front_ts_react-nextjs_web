@@ -9,7 +9,8 @@ import DashboardGenericItem from "../../components/dashboard-generic-item";
 import DashboardSellsVsPayments from "../../components/dashboard-sells-vs-payments";
 import DashboardHistoricDso from "../../components/dashboard-historic-dso";
 import { ClientDetailsContext } from "../client-details/client-details";
-import { formatMillionNumber, formatMoney } from "@/utils/utils";
+import { useDashboardInfo } from "@/components/hooks/useDashboardInfo";
+
 import styles from "./dashboard.module.scss";
 
 const DynamicPortfoliAges = dynamic(() => import("../../components/dashboard-porfolio-ages"), {
@@ -21,33 +22,64 @@ interface DashboardProps {}
 const Dashboard: FC<DashboardProps> = () => {
   const { portfolioData } = useContext(ClientDetailsContext);
 
-  const formattedAppliedPayments = formatMillionNumber(
-    portfolioData?.data_wallet?.applied_payments_ammount
-  );
-  const appliedPayments = formatMoney(formattedAppliedPayments);
-  const appliedPaymentPercentage = portfolioData?.percentages?.applied_payments_percentage;
-
-  const formattedUnappliedPayments = formatMillionNumber(
-    portfolioData?.data_wallet?.unapplied_payments_ammount
-  );
-  const unappliedPayments = formatMoney(formattedUnappliedPayments);
-  const unnappliedPaymentPercentage = portfolioData?.percentages?.unapplied_payments_percentage;
-
-  const dsoValue = portfolioData?.dso;
-
-  const formattedQuota = formatMillionNumber(portfolioData?.quota);
-  const quota = formatMoney(formattedQuota);
-  const quotaPercentage = portfolioData?.percentages?.quota_percentage || "0";
+  const {
+    totalWallet,
+    pastDuePortfolio,
+    expiredPercentage,
+    budget,
+    invoiceAges,
+    totalUnreconciled,
+    totalUnreconciledCount,
+    totalReconciled,
+    totalReconciledCount,
+    totalBalance,
+    totalBalanceCount,
+    openAlerts,
+    openAlertsCount,
+    discount,
+    discountCount,
+    creditNotes,
+    creditNotesCount,
+    appliedPayments,
+    appliedPaymentPercentage,
+    unappliedPayments,
+    unnappliedPaymentPercentage,
+    quota,
+    quotaPercentage,
+    dsoValue,
+    sellsVsPaymentsData,
+    history_dso
+  } = useDashboardInfo(portfolioData);
 
   return (
     <div className={styles.wrapper}>
       <div className={styles.a}>
-        <DashboardTotalPortfolio className={styles.item} />
-        <DashboardExpiredPortfolio className={styles.item} />
-        <DashboardBudget className={styles.item} />
-        <DynamicPortfoliAges className={styles.item} />
-        <DashboardInvoiceStatus className={styles.item} />
-        <DashboardAlerts className={styles.item} />
+        <DashboardTotalPortfolio className={styles.item} totalWallet={totalWallet} />
+        <DashboardExpiredPortfolio
+          className={styles.item}
+          pastDuePortfolio={pastDuePortfolio}
+          expiredPercentage={expiredPercentage}
+        />
+        <DashboardBudget className={styles.item} budget={budget} />
+        <DynamicPortfoliAges className={styles.item} invoiceAges={invoiceAges} />
+        <DashboardInvoiceStatus
+          className={styles.item}
+          totalUnreconciled={totalUnreconciled}
+          totalUnreconciledCount={totalUnreconciledCount}
+          totalReconciled={totalReconciled}
+          totalReconciledCount={totalReconciledCount}
+          totalBalance={totalBalance}
+          totalBalanceCount={totalBalanceCount}
+        />
+        <DashboardAlerts
+          className={styles.item}
+          openAlerts={openAlerts}
+          openAlertsCount={openAlertsCount}
+          discount={discount}
+          discountCount={discountCount}
+          creditNotes={creditNotes}
+          creditNotesCount={creditNotesCount}
+        />
       </div>
       <div className={styles.b}>
         <div className={styles.item}>
@@ -90,8 +122,8 @@ const Dashboard: FC<DashboardProps> = () => {
         </div>
       </div>
       <div className={styles.c}>
-        <DashboardSellsVsPayments className={styles.item} />
-        <DashboardHistoricDso className={styles.item} />
+        <DashboardSellsVsPayments className={styles.item} chartData={sellsVsPaymentsData} />
+        <DashboardHistoricDso className={styles.item} history_dso={history_dso} />
       </div>
     </div>
   );
