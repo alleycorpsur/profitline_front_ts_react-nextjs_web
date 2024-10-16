@@ -2,7 +2,7 @@
 import { ConfigProvider } from "antd";
 import theme from "@/theme/themeConfig";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
-import { Poppins } from "@next/font/google";
+import { Poppins } from "next/font/google";
 import { ModalProvider } from "@/context/ModalContext";
 import "../styles/globals.scss";
 import { useEffect, useState } from "react";
