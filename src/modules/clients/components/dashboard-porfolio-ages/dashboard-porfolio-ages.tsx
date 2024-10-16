@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { Poppins } from "@next/font/google";
+import { Poppins } from "next/font/google";
 import ReactApexChart from "react-apexcharts";
 import { formatMoney } from "@/utils/utils";
 import { ApexOptions } from "apexcharts";

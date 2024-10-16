@@ -8,9 +8,9 @@ import SecondaryButton from "@/components/atoms/buttons/secondaryButton/Secondar
 import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
 import { DocumentButton } from "@/components/atoms/DocumentButton/DocumentButton";
 import GeneralSelect from "@/components/ui/general-select";
+import { InputForm } from "@/components/atoms/inputs/InputForm/InputForm";
 
 import "./modal-actions-edit-client.scss";
-import { InputForm } from "@/components/atoms/inputs/InputForm/InputForm";
 const { Title } = Typography;
 
 interface infoObject {
