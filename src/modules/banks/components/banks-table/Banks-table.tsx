@@ -40,7 +40,7 @@ export const BanksTable = ({
           const unCheckedRows = prevSelectedRows?.filter(
             (prevSelectedRow) =>
               !newSelectedRowKeys.includes(prevSelectedRow.id) &&
-              prevSelectedRow.status_id === bankStatusId
+              prevSelectedRow.id_status === bankStatusId
           );
           if (unCheckedRows.length > 0) {
             // remove form the prevState the ones present in the unCheckedRows
@@ -61,7 +61,7 @@ export const BanksTable = ({
       setSelectedRows((prevSelectedRows) => {
         if (prevSelectedRows) {
           return prevSelectedRows.filter(
-            (prevSelectedRow) => prevSelectedRow.status_id !== bankStatusId
+            (prevSelectedRow) => prevSelectedRow.id_status !== bankStatusId
           );
         }
       });

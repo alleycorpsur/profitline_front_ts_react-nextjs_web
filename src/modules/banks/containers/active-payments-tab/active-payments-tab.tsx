@@ -21,6 +21,7 @@ import ModalActionsAssignClient from "../../components/modal-actions-assign-clie
 import ModalActionsSplitPayment from "../../components/modal-actions-split-payment";
 
 import styles from "./active-payments-tab.module.scss";
+import { useBankPayments } from "@/hooks/useBankPayments";
 
 export const ActivePaymentsTab: FC = () => {
   const [selectedRows, setSelectedRows] = useState<any[] | undefined>();
@@ -34,9 +35,12 @@ export const ActivePaymentsTab: FC = () => {
   const { showMessage } = useMessageApi();
 
   const { openModal } = useModalDetail();
+
+  const { data, isLoading, error } = useBankPayments({ projectId: ID });
   const handleOpenBankRules = () => {
     setShowBankRules(true);
   };
+  console.log(error);
 
   const handleOpenPaymentDetail = (payment: any) => {
     openModal("payment", {
