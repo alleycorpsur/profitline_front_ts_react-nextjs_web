@@ -39,7 +39,9 @@ const GeneralDashboardView: FC<GeneralDashboardViewProps> = () => {
 
   return (
     <div className={styles.generalDashboardView}>
-      <FilterDiscounts />
+      <div>
+        <FilterDiscounts />
+      </div>
       {portfolioData.loading ? (
         <Spin size="large" style={{ margin: "70px auto" }} />
       ) : (

@@ -162,7 +162,7 @@ const DigitalRecordModal = ({
         Enviar acta digital
       </button>
 
-      <Flex vertical gap="1rem">
+      <Flex vertical gap="0.5rem">
         <Controller
           name="forward_to"
           control={control}
@@ -244,33 +244,33 @@ const DigitalRecordModal = ({
                 fileSize={file.size}
               />
             ))}
-            {attachments.length > 0 && (
-              <>
-                <Button
-                  onClick={() => {
-                    const fileInput = document.getElementById("fileInput");
-                    if (fileInput) {
-                      fileInput.click();
-                    }
-                  }}
-                  className="digitalRecordModal__addDocument"
-                  icon={<Plus size={"1rem"} />}
-                >
-                  <p>Cargar otro documento</p>
-                </Button>
-                <input
-                  type="file"
-                  id="fileInput"
-                  style={{ display: "none" }}
-                  onChange={handleFileChange}
-                  accept=".pdf,.png,.doc,.docx, .xls, .xlsx, .msg,  .eml"
-                />
-              </>
-            )}
             {errors.attachments && (
               <p className="error">{(errors.attachments as FieldError).message}</p>
             )}
           </Flex>
+          {attachments.length > 0 && (
+            <>
+              <Button
+                onClick={() => {
+                  const fileInput = document.getElementById("fileInput");
+                  if (fileInput) {
+                    fileInput.click();
+                  }
+                }}
+                className="digitalRecordModal__addDocument"
+                icon={<Plus size={"1rem"} />}
+              >
+                Cargar otro documento
+              </Button>
+              <input
+                type="file"
+                id="fileInput"
+                style={{ display: "none" }}
+                onChange={handleFileChange}
+                accept=".pdf,.png,.doc,.docx, .xls, .xlsx, .msg,  .eml"
+              />
+            </>
+          )}
         </div>
       </Flex>
 
