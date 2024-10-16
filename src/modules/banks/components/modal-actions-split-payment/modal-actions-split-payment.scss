@@ -10,6 +10,47 @@
         }
     }
 
+    &__availAmount {
+        font-size: 1rem;
+        font-weight: 500;
+    }
+
+    &__totalAmount {
+        font-size: 1rem;
+        font-weight: 300;
+        color: $gray;
+    }
+
+    &__payments {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        max-height: 400px;
+        overflow-y: scroll;
+        scrollbar-width: none;
+    }
+
+    &__addPayment {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-family: inherit;
+        background-color: transparent;
+        transition: all 0.3s;
+        width: fit-content;
+        border: none;
+        box-shadow: none;
+        font-size: 1rem;
+        font-weight: 500;
+        padding: 6px 2px;
+        cursor: pointer;
+        border-radius: 8px;
+
+        &:hover {
+            background-color: $background !important;
+        }
+    }
+
     &__file {
         display: grid;
         grid-template-columns: 1fr 3fr;

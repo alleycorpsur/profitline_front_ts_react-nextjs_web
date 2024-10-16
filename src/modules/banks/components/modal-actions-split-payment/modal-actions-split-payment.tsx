@@ -4,6 +4,8 @@ import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { Flex, Modal, Typography } from "antd";
 import { Plus } from "phosphor-react";
 
+import { formatMoney } from "@/utils/utils";
+
 import { useMessageApi } from "@/context/MessageContext";
 import SecondaryButton from "@/components/atoms/buttons/secondaryButton/SecondaryButton";
 import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
@@ -39,6 +41,7 @@ interface PaymentForm {
 }
 
 const ModalActionsSplitPayment = ({ isOpen, onClose, selectedRows }: Props) => {
+  const [availableMoney, setAvailableMoney] = useState(12000000);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { showMessage } = useMessageApi();
 
@@ -56,6 +59,7 @@ const ModalActionsSplitPayment = ({ isOpen, onClose, selectedRows }: Props) => {
     reset,
     formState: { errors, isValid }
   } = useForm<{ payments: PaymentForm[] }>({
+    mode: "onChange",
     defaultValues: { payments: [] }
   });
 
@@ -70,6 +74,27 @@ const ModalActionsSplitPayment = ({ isOpen, onClose, selectedRows }: Props) => {
       append({ client: null, value: 0, evidence: undefined }); // Start with one payment
     }
   }, [isOpen, append, reset]);
+
+  const handleValueChange = (index: number, value: string) => {
+    const numericValue = parseInt(value.replace(/\./g, ""), 10) || 0;
+    const currentPayments = watch("payments");
+    const totalUsed = currentPayments.reduce(
+      (sum, payment, idx) => sum + (idx !== index ? payment.value || 0 : 0),
+      0
+    );
+
+    // Calculate the remaining available money
+    const remainingMoney = paymentInfo.available - totalUsed;
+
+    if (numericValue > remainingMoney) {
+      setValue(`payments.${index}.value`, remainingMoney);
+      setAvailableMoney(0);
+    } else {
+      setValue(`payments.${index}.value`, numericValue);
+      setAvailableMoney(remainingMoney - numericValue);
+      trigger(`payments.${index}.value`);
+    }
+  };
 
   const handleOnChangeDocument: any = (index: number, info: infoObject) => {
     const { file: rawFile } = info;
@@ -107,8 +132,6 @@ const ModalActionsSplitPayment = ({ isOpen, onClose, selectedRows }: Props) => {
     }
   };
 
-  console.log("selectedRows", selectedRows);
-
   return (
     <Modal
       className="modalActionsSplitPayment"
@@ -123,66 +146,93 @@ const ModalActionsSplitPayment = ({ isOpen, onClose, selectedRows }: Props) => {
       </Title>
 
       <Flex justify="space-between">
-        <Title level={5}>Pago {selectedRows && selectedRows[0].id}</Title>
-        <Flex vertical>
-          <strong>{paymentInfo.available}</strong>
-          <p>{paymentInfo.total}</p>
+        <Title style={{ fontWeight: 500 }} level={5}>
+          Pago {selectedRows && selectedRows[0].id}
+        </Title>
+        <Flex vertical align="flex-end">
+          <strong className="modalActionsSplitPayment__availAmount">
+            {formatMoney(availableMoney)}
+          </strong>
+          <p className="modalActionsSplitPayment__totalAmount">{formatMoney(paymentInfo.total)}</p>
         </Flex>
       </Flex>
 
-      {fields.map((field, index) => (
-        <Flex key={field.id} vertical gap={"1rem"}>
-          <Flex gap={"1rem"}>
-            <Controller
-              name={`payments.${index}.client`}
-              control={control}
-              rules={{ required: true }}
-              render={({ field }) => (
-                <GeneralSelect
-                  errors={errors?.payments?.[index]?.client}
-                  field={field}
-                  title="Cliente"
-                  placeholder="Ingresar cliente"
-                  options={clients}
-                  showSearch
-                  customStyleContainer={{ width: "100%" }}
-                  customStyleTitle={{ marginBottom: "4px" }}
-                />
-              )}
-            />
-            <InputFormMoney
-              titleInput="Valor"
-              nameInput={`payments.${index}.value`}
-              control={control}
-              error={errors?.payments?.[index]?.value}
-              placeholder="Valor"
-              typeInput="number"
-              customStyle={{ width: "100%" }}
-            />
-          </Flex>
+      <div className="modalActionsSplitPayment__payments">
+        {fields.map((field, index) => (
+          <Flex style={{ paddingBottom: "10px" }} key={field.id} vertical gap={"1rem"}>
+            <Title style={{ fontWeight: 500 }} level={5}>
+              Pago {selectedRows && selectedRows[0].id} - {index + 1}
+            </Title>
+            <Flex gap={"1rem"}>
+              <Controller
+                name={`payments.${index}.client`}
+                control={control}
+                rules={{ required: "Cliente es obligatorio" }}
+                render={({ field }) => (
+                  <GeneralSelect
+                    errors={errors?.payments?.[index]?.client}
+                    field={field}
+                    title="Cliente"
+                    placeholder="Ingresar cliente"
+                    options={clients}
+                    showSearch
+                    customStyleContainer={{ width: "100%" }}
+                    customStyleTitle={{ marginBottom: "4px" }}
+                  />
+                )}
+              />
 
-          <div className="modalActionsSplitPayment__file">
-            <Flex vertical>
-              <p>Evidencia</p>
-              <em>*Obligatorio</em>
+              <InputFormMoney
+                titleInput="Valor"
+                nameInput={`payments.${index}.value`}
+                control={control}
+                error={errors?.payments?.[index]?.value}
+                placeholder="Valor"
+                customStyle={{ width: "100%" }}
+                validationRules={{
+                  required: "Valor es obligatorio",
+                  min: { value: 1, message: "El valor debe ser mayor a 0" }
+                }}
+                changeInterceptor={(numericValue) => handleValueChange(index, numericValue)}
+              />
             </Flex>
-            <DocumentButton
-              key={watch(`payments.${index}.evidence`)?.name}
-              title={watch(`payments.${index}.evidence`)?.name}
-              handleOnChange={(info) => handleOnChangeDocument(index, info)}
-              handleOnDelete={() => handleOnDeleteDocument(index)}
-              fileName={watch(`payments.${index}.evidence`)?.name}
-              fileSize={watch(`payments.${index}.evidence`)?.size}
-            />
-          </div>
-        </Flex>
-      ))}
-      <SecondaryButton
-        icon={<Plus />}
+
+            <div className="modalActionsSplitPayment__file">
+              <Flex vertical>
+                <p>Evidencia</p>
+                <em>*Obligatorio</em>
+              </Flex>
+
+              <Controller
+                name={`payments.${index}.evidence`}
+                control={control}
+                rules={{ required: "Evidencia es obligatoria" }}
+                render={() => (
+                  <>
+                    <DocumentButton
+                      key={watch(`payments.${index}.evidence`)?.name}
+                      title={watch(`payments.${index}.evidence`)?.name}
+                      handleOnChange={(info) => handleOnChangeDocument(index, info)}
+                      handleOnDelete={() => handleOnDeleteDocument(index)}
+                      fileName={watch(`payments.${index}.evidence`)?.name}
+                      fileSize={watch(`payments.${index}.evidence`)?.size}
+                    />
+                  </>
+                )}
+              />
+            </div>
+          </Flex>
+        ))}
+      </div>
+
+      <button
+        className="modalActionsSplitPayment__addPayment"
         onClick={() => append({ client: null, value: 0, evidence: undefined })}
+        disabled={availableMoney <= 0} // Disable the button if there's no more money left
       >
+        <Plus />
         Agregar pago
-      </SecondaryButton>
+      </button>
 
       <div className="modalActionsSplitPayment__footer">
         <SecondaryButton onClick={onClose} bordered={false}>
