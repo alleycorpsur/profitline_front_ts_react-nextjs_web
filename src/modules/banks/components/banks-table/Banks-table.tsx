@@ -13,7 +13,7 @@ interface PropsBanksTable {
   clientsByStatus: any[];
   setSelectedRows: Dispatch<SetStateAction<ISingleBank[] | undefined>>;
   // eslint-disable-next-line no-unused-vars
-  handleOpenPaymentDetail?: (payment: any) => void;
+  handleOpenPaymentDetail?: (payment: ISingleBank) => void;
   bankStatusId: number;
 }
 
@@ -121,7 +121,7 @@ export const BanksTable = ({
       key: "seeProject",
       width: "40px",
       dataIndex: "",
-      render: (_, recoder) => (
+      render: (_, record) => (
         <Flex gap={"0.5rem"}>
           <Button className="buttonSeeEvidence" icon={<Receipt size={"1.3rem"} />} />
           <Button
@@ -129,7 +129,7 @@ export const BanksTable = ({
             icon={
               <Eye
                 size={"1.3rem"}
-                onClick={() => handleOpenPaymentDetail && handleOpenPaymentDetail(recoder.id)}
+                onClick={() => handleOpenPaymentDetail && handleOpenPaymentDetail(record)}
               />
             }
           />
