@@ -2,8 +2,9 @@ import { Dispatch, SetStateAction, useState } from "react";
 import { Button, Flex, Table, TableProps, Typography } from "antd";
 import { Eye, Receipt } from "phosphor-react";
 
+import { formatDateDMY, formatMoney } from "@/utils/utils";
 import { ISingleBank } from "@/types/banks/IBanks";
-import { formatMoney } from "@/utils/utils";
+
 import "./banks-table.scss";
 
 const { Text } = Typography;
@@ -82,20 +83,20 @@ export const BanksTable = ({
     },
     {
       title: "Cliente",
-      dataIndex: "client_name",
-      key: "client_name",
+      dataIndex: "CLIENT_NAME",
+      key: "CLIENT_NAME",
       render: (text) => <Text>{text}</Text>
     },
     {
       title: "Fecha",
-      dataIndex: "date",
-      key: "date",
-      render: (text) => <Text>{text}</Text>
+      dataIndex: "created_at",
+      key: "created_at",
+      render: (text) => <Text>{formatDateDMY(text)}</Text>
     },
     {
       title: "Monto",
-      key: "amount",
-      dataIndex: "amount",
+      key: "current_value",
+      dataIndex: "current_value",
       render: (text) => <Text>{formatMoney(text)}</Text>
     },
     {
@@ -106,12 +107,12 @@ export const BanksTable = ({
     },
     {
       title: "Cuenta",
-      key: "account_number",
-      dataIndex: "account_number",
+      key: "bank_description",
+      dataIndex: "bank_description",
       render: (text) => (
         <>
-          <Text>{text}</Text>
-          <p className="accountBankText">Bancolombia</p>
+          <Text>123456</Text>
+          <p className="accountBankText">{text}</p>
         </>
       )
     },

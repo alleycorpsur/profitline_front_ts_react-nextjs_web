@@ -147,7 +147,7 @@ const ModalActionsSplitPayment = ({ isOpen, onClose, selectedRows }: Props) => {
 
       <Flex justify="space-between">
         <Title style={{ fontWeight: 500 }} level={5}>
-          Pago {selectedRows && selectedRows[0].id}
+          Pago {selectedRows && selectedRows.length > 0 ? selectedRows[0].id : ""}
         </Title>
         <Flex vertical align="flex-end">
           <strong className="modalActionsSplitPayment__availAmount">
