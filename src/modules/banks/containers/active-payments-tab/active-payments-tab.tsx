@@ -1,10 +1,11 @@
 import { FC, useState } from "react";
-import { Button, Flex, MenuProps } from "antd";
+import { Button, Flex, MenuProps, Spin } from "antd";
 import { Bank } from "phosphor-react";
 
 import { useModalDetail } from "@/context/ModalContext";
 import { useMessageApi } from "@/context/MessageContext";
 import { useAppStore } from "@/lib/store/store";
+import { useBankPayments } from "@/hooks/useBankPayments";
 
 import UiSearchInput from "@/components/ui/search-input";
 import FilterDiscounts from "@/components/atoms/Filters/FilterDiscounts/FilterDiscounts";
@@ -20,10 +21,12 @@ import ModalActionsUploadEvidence from "../../components/modal-actions-upload-ev
 import ModalActionsAssignClient from "../../components/modal-actions-assign-client";
 import ModalActionsSplitPayment from "../../components/modal-actions-split-payment";
 
+import { ISingleBank } from "@/types/banks/IBanks";
+
 import styles from "./active-payments-tab.module.scss";
 
 export const ActivePaymentsTab: FC = () => {
-  const [selectedRows, setSelectedRows] = useState<any[] | undefined>();
+  const [selectedRows, setSelectedRows] = useState<ISingleBank[]>();
   const [showBankRules, setShowBankRules] = useState<boolean>(false);
   const [isGenerateActionOpen, setisGenerateActionOpen] = useState(false);
   const [isSelectOpen, setIsSelectOpen] = useState({
@@ -34,6 +37,8 @@ export const ActivePaymentsTab: FC = () => {
   const { showMessage } = useMessageApi();
 
   const { openModal } = useModalDetail();
+
+  const { data, isLoading } = useBankPayments({ projectId: ID });
   const handleOpenBankRules = () => {
     setShowBankRules(true);
   };
@@ -77,6 +82,10 @@ export const ActivePaymentsTab: FC = () => {
     <>
       {showBankRules ? (
         <BanksRules onClickBack={() => setShowBankRules(false)} />
+      ) : isLoading ? (
+        <Flex justify="center">
+          <Spin style={{ margin: "30px" }} />
+        </Flex>
       ) : (
         <Flex className={styles.activePaymentsTab} vertical>
           <div className={styles.header}>
@@ -97,27 +106,27 @@ export const ActivePaymentsTab: FC = () => {
           </div>
 
           <Collapse
-            items={mockBank?.map((status) => ({
-              key: status.status_id,
+            items={data?.map((status) => ({
+              key: status.payments_status_id,
               label: (
                 <LabelCollapse
-                  status={status.status_name}
+                  status={status.payments_status}
                   color={status.color}
-                  quantity={status.clients.length}
-                  total={status.total}
+                  quantity={status.payments_count}
+                  total={status.total_account || 0}
                 />
               ),
               children: (
                 <BanksTable
-                  clientsByStatus={status.clients.map((client) => {
+                  clientsByStatus={status.payments.map((client) => {
                     return {
                       ...client,
-                      client_status_id: status.status_id
+                      client_status_id: status.payments_status_id
                     };
                   })}
                   handleOpenPaymentDetail={handleOpenPaymentDetail}
                   setSelectedRows={setSelectedRows}
-                  bankStatusId={status.status_id}
+                  bankStatusId={status.payments_status_id}
                 />
               )
             }))}
@@ -153,70 +162,3 @@ export const ActivePaymentsTab: FC = () => {
 };
 
 export default ActivePaymentsTab;
-
-const mockBank = [
-  {
-    status_id: 1,
-    status_name: "Identificado",
-    color: "#0085FF",
-    total: 300000,
-    clients: [
-      {
-        id: 1,
-        client_name: "Cliente 1",
-        date: "30/09/2021",
-        amount: 150000,
-        description: "Descripcion",
-        account_number: 123456,
-        account_bank: "Bancolombia",
-        state_name: "identificado",
-        state_color: "#0085FF",
-        status_id: 1
-      },
-      {
-        id: 2,
-        client_name: "Cliente 2",
-        date: "30/09/2021",
-        amount: 150000,
-        description: "Descripcion2",
-        account_number: 123456,
-        account_bank: "Bancolombia",
-        state_name: "Auditoria",
-        state_color: "#FE7A01",
-        status_id: 1
-      }
-    ]
-  },
-  {
-    status_id: 2,
-    status_name: "En auditoria",
-    total: 300000,
-    color: "#FE7A01",
-    clients: [
-      {
-        id: 3,
-        client_name: "Cliente 3",
-        date: "30/09/2021",
-        amount: 150000,
-        description: "Descripcion",
-        account_number: 123456,
-        account_bank: "Bancolombia",
-        state_name: "identificado",
-        state_color: "#0085FF",
-        status_id: 2
-      },
-      {
-        id: 4,
-        client_name: "Cliente 4",
-        date: "30/09/2021",
-        amount: 150000,
-        description: "Descripcion2",
-        account_number: 123456,
-        account_bank: "Bancolombia",
-        state_name: "Auditoria",
-        state_color: "#FE7A01",
-        status_id: 2
-      }
-    ]
-  }
-];
