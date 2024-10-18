@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { Button, Flex, MenuProps, Spin } from "antd";
 import { Bank } from "phosphor-react";
 
@@ -29,6 +29,7 @@ export const ActivePaymentsTab: FC = () => {
   const [selectedRows, setSelectedRows] = useState<ISingleBank[]>();
   const [showBankRules, setShowBankRules] = useState<boolean>(false);
   const [isGenerateActionOpen, setisGenerateActionOpen] = useState(false);
+  const [clearSelected, setClearSelected] = useState(false);
   const [isSelectOpen, setIsSelectOpen] = useState({
     selected: 0
   });
@@ -53,6 +54,8 @@ export const ActivePaymentsTab: FC = () => {
   const onCloseModal = () => {
     setisGenerateActionOpen(!isGenerateActionOpen);
     setIsSelectOpen({ selected: 0 });
+    setClearSelected(!clearSelected);
+    setSelectedRows([]);
 
     mutate();
   };
@@ -127,6 +130,7 @@ export const ActivePaymentsTab: FC = () => {
                   handleOpenPaymentDetail={handleOpenPaymentDetail}
                   setSelectedRows={setSelectedRows}
                   bankStatusId={status.payments_status_id}
+                  clearSelected={clearSelected}
                 />
               )
             }))}
@@ -147,7 +151,11 @@ export const ActivePaymentsTab: FC = () => {
             }}
           />
 
-          <ModalActionsEditClient isOpen={isSelectOpen.selected === 1} onClose={onCloseModal} />
+          <ModalActionsEditClient
+            isOpen={isSelectOpen.selected === 1}
+            onClose={onCloseModal}
+            selectedRows={selectedRows}
+          />
           <ModalActionsAssignClient
             isOpen={isSelectOpen.selected === 2}
             onClose={onCloseModal}

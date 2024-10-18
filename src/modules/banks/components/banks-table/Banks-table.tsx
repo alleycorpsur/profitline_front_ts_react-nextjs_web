@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Button, Flex, Table, TableProps, Typography } from "antd";
 import { Eye, Receipt } from "phosphor-react";
 
@@ -15,15 +15,21 @@ interface PropsBanksTable {
   // eslint-disable-next-line no-unused-vars
   handleOpenPaymentDetail?: (payment: ISingleBank) => void;
   bankStatusId: number;
+  clearSelected: boolean;
 }
 
 export const BanksTable = ({
   clientsByStatus,
   setSelectedRows,
   handleOpenPaymentDetail,
-  bankStatusId
+  bankStatusId,
+  clearSelected
 }: PropsBanksTable) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+
+  useEffect(() => {
+    setSelectedRowKeys([]);
+  }, [clearSelected]);
 
   const onSelectChange = (newSelectedRowKeys: React.Key[], newSelectedRows: ISingleBank[]) => {
     setSelectedRowKeys(newSelectedRowKeys);

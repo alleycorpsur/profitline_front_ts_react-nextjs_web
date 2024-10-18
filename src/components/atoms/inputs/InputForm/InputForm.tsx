@@ -18,6 +18,7 @@ interface Props {
   className?: string;
   readOnly?: boolean;
   suffix?: React.ReactNode;
+  defaultValue?: string;
   // eslint-disable-next-line no-unused-vars
   changeInterceptor?: (value: any) => void;
 }
@@ -36,6 +37,7 @@ export const InputForm = ({
   className,
   readOnly,
   suffix,
+  defaultValue,
   changeInterceptor
 }: Props) => {
   return (
@@ -46,6 +48,7 @@ export const InputForm = ({
         </Typography.Title>
       )}
       <Controller
+        defaultValue={defaultValue}
         name={nameInput}
         rules={{ required: true, maxLength: 123, ...validationRules }}
         control={control}
