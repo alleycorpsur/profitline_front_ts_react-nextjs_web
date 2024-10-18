@@ -33,3 +33,23 @@ export interface ISingleBank {
 export interface IClientsByProject {
   [key: string]: number;
 }
+
+export interface IAllRules {
+  id: number;
+  project_id: number;
+  description: string;
+  id_client: number;
+  is_exactly: number;
+  created_at: string;
+  created_by: string;
+  updated_at: string;
+  updated_by: string | null;
+  is_delete: any | null;
+}
+
+export interface IPostRule {
+  project_id: number;
+  description: string;
+  id_client: number;
+  is_exactly: boolean;
+}

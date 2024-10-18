@@ -1,14 +1,15 @@
 import { Button, Flex, MenuProps } from "antd";
 import { useState } from "react";
+import { Bank, CaretLeft } from "phosphor-react";
+
 import UiSearchInput from "@/components/ui/search-input";
 import FilterDiscounts from "@/components/atoms/Filters/FilterDiscounts/FilterDiscounts";
 import { DotsDropdown } from "@/components/atoms/DotsDropdown/DotsDropdown";
 import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
-import { Bank, CaretLeft } from "phosphor-react";
-
-import styles from "./banks-rules.module.scss";
 import BanksRulesTable from "../../components/banks-rules-table/Banks-rules-table";
 import { BankRuleModal } from "../../components/bank-rule-modal/Bank-rule-modal";
+
+import styles from "./banks-rules.module.scss";
 
 interface PropsBanksRules {
   onClickBack: () => void;
