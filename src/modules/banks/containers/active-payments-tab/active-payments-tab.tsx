@@ -38,7 +38,7 @@ export const ActivePaymentsTab: FC = () => {
 
   const { openModal } = useModalDetail();
 
-  const { data, isLoading } = useBankPayments({ projectId: ID });
+  const { data, isLoading, mutate } = useBankPayments({ projectId: ID });
   const handleOpenBankRules = () => {
     setShowBankRules(true);
   };
@@ -53,8 +53,8 @@ export const ActivePaymentsTab: FC = () => {
   const onCloseModal = () => {
     setisGenerateActionOpen(!isGenerateActionOpen);
     setIsSelectOpen({ selected: 0 });
-    // TODO: uncomment when mutate is implemented
-    // mutate();
+
+    mutate();
   };
 
   const items: MenuProps["items"] = [
@@ -148,7 +148,11 @@ export const ActivePaymentsTab: FC = () => {
           />
 
           <ModalActionsEditClient isOpen={isSelectOpen.selected === 1} onClose={onCloseModal} />
-          <ModalActionsAssignClient isOpen={isSelectOpen.selected === 2} onClose={onCloseModal} />
+          <ModalActionsAssignClient
+            isOpen={isSelectOpen.selected === 2}
+            onClose={onCloseModal}
+            selectedRows={selectedRows}
+          />
           <ModalActionsSplitPayment
             isOpen={isSelectOpen.selected === 4}
             onClose={onCloseModal}

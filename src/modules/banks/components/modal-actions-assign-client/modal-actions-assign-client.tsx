@@ -4,10 +4,15 @@ import { Controller, useForm } from "react-hook-form";
 import { Flex, Modal, Typography } from "antd";
 
 import { useMessageApi } from "@/context/MessageContext";
+import { useAppStore } from "@/lib/store/store";
+import { assignClient, getClientsByProject } from "@/services/banksPayments/banksPayments";
+
 import SecondaryButton from "@/components/atoms/buttons/secondaryButton/SecondaryButton";
 import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
 import { DocumentButton } from "@/components/atoms/DocumentButton/DocumentButton";
 import GeneralSelect from "@/components/ui/general-select";
+
+import { ISingleBank } from "@/types/banks/IBanks";
 
 import "./modal-actions-assign-client.scss";
 const { Title } = Typography;
@@ -22,14 +27,46 @@ interface ISelect {
   label: string;
 }
 
+interface IFormAssignClient {
+  client: ISelect;
+  evidence: File | undefined;
+}
+
 interface Props {
   isOpen: boolean;
   onClose: () => void;
+  selectedRows: ISingleBank[] | undefined;
 }
 
-const ModalActionsAssignClient = ({ isOpen, onClose }: Props) => {
+const ModalActionsAssignClient = ({ isOpen, onClose, selectedRows }: Props) => {
+  const [clients, setClients] = useState<ISelect[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { ID } = useAppStore((state) => state.selectedProject);
+  const userId = useAppStore((state) => state.userId);
+
   const { showMessage } = useMessageApi();
+
+  useEffect(() => {
+    const fetchClients = async () => {
+      try {
+        const response = await getClientsByProject(ID);
+
+        const testClients = response.map((client) => {
+          const key = Object.keys(client)[0];
+          const value = client[key];
+          return {
+            value: value.toString(),
+            label: key
+          };
+        });
+
+        setClients(testClients);
+      } catch (error) {
+        console.error("Error al cargar los clientes del input");
+      }
+    };
+    fetchClients();
+  }, []);
 
   const {
     control,
@@ -39,10 +76,7 @@ const ModalActionsAssignClient = ({ isOpen, onClose }: Props) => {
     trigger,
     reset,
     formState: { errors, isValid }
-  } = useForm<{
-    client: ISelect[];
-    evidence: File | undefined;
-  }>();
+  } = useForm<IFormAssignClient>();
 
   const evidence = watch("evidence");
 
@@ -73,16 +107,21 @@ const ModalActionsAssignClient = ({ isOpen, onClose }: Props) => {
     trigger("evidence");
   };
 
-  const onSubmit = async (data: { evidence: File | undefined }) => {
+  const onSubmit = async (data: IFormAssignClient) => {
     setIsSubmitting(true);
     try {
-      console.info("asignacion enviada: ", data);
+      if (!selectedRows) return;
+      await assignClient({
+        id_user: userId,
+        payment_ids: selectedRows?.map((row) => row.id),
+        client_id: data.client.value,
+        evidence: data.evidence as File
+      });
 
       showMessage("success", "Cliente asignado correctamente");
-
       onClose();
     } catch (error) {
-      showMessage("error", "Error al asignar cliente digital");
+      showMessage("error", "Error al asignar cliente");
     } finally {
       setIsSubmitting(false);
     }
@@ -154,26 +193,3 @@ const ModalActionsAssignClient = ({ isOpen, onClose }: Props) => {
 };
 
 export default ModalActionsAssignClient;
-
-const clients = [
-  {
-    value: "1",
-    label: "Cliente 1"
-  },
-  {
-    value: "2",
-    label: "Cliente 2"
-  },
-  {
-    value: "3",
-    label: "Cliente 3"
-  },
-  {
-    value: "4",
-    label: "Cliente 4"
-  },
-  {
-    value: "5",
-    label: "Cliente 5"
-  }
-];
