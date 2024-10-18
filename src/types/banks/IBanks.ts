@@ -29,3 +29,7 @@ export interface ISingleBank {
   account_description: string;
   bank_description: string;
 }
+
+export interface IClientsByProject {
+  [key: string]: number;
+}
