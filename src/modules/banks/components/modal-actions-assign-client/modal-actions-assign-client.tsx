@@ -66,7 +66,7 @@ const ModalActionsAssignClient = ({ isOpen, onClose, selectedRows }: Props) => {
       }
     };
     fetchClients();
-  }, []);
+  }, [ID]);
 
   const {
     control,
