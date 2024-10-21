@@ -45,6 +45,7 @@ export interface IAllRules {
   updated_at: string;
   updated_by: string | null;
   is_delete: any | null;
+  client_name: string;
 }
 
 export interface IPostRule {
