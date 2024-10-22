@@ -24,7 +24,7 @@ export const BanksRules = ({ onClickBack }: PropsBanksRules) => {
     ruleId: 0
   });
 
-  const { data, isLoading } = useBankRules();
+  const { data, isLoading, mutate } = useBankRules();
 
   const handleDeleteRules = () => {
     console.info("Delete rules with ids", selectedRowKeys);
@@ -103,6 +103,7 @@ export const BanksRules = ({ onClickBack }: PropsBanksRules) => {
             ruleId: 0
           })
         }
+        mutate={mutate}
       />
     </div>
   );

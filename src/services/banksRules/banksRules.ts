@@ -3,12 +3,9 @@ import config from "@/config";
 import { API } from "@/utils/api/api";
 import { IPostRule } from "@/types/banks/IBanks";
 
-export const createBankRule = async (projectId: number, rule: IPostRule) => {
+export const createBankRule = async (rule: IPostRule) => {
   try {
-    const response: GenericResponse<any> = await API.post(
-      `${config.API_HOST}/bank-rule/project/${projectId}`,
-      rule
-    );
+    const response: GenericResponse<any> = await API.post(`${config.API_HOST}/bank-rule`, rule);
 
     return response.data;
   } catch (error) {
