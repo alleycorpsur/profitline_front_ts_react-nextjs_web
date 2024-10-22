@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useState } from "react";
 import { Button, Flex, MenuProps, Spin } from "antd";
 import { Bank } from "phosphor-react";
 

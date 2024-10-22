@@ -1,26 +1,67 @@
+import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Button, Modal } from "antd";
 import { Plus } from "phosphor-react";
+import { KeyedMutator } from "swr";
+
+import { getClientsByProject } from "@/services/banksPayments/banksPayments";
+import { useAppStore } from "@/lib/store/store";
+import { createBankRule } from "@/services/banksRules/banksRules";
+import { useMessageApi } from "@/context/MessageContext";
 
 import SecondaryButton from "@/components/atoms/buttons/secondaryButton/SecondaryButton";
 import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
 import GeneralSelect from "@/components/ui/general-select";
 import { InputForm } from "@/components/atoms/inputs/InputForm/InputForm";
 
+import { GenericResponse } from "@/types/global/IGlobal";
+import { IAllRules } from "@/types/banks/IBanks";
+
 import "./bank-rule-modal.scss";
-import { useEffect, useState } from "react";
 
 type Selector = { value: number | string; label: string };
+
+interface ISelect {
+  value: string;
+  label: string;
+}
 interface Props {
   onClose: () => void;
   showBankRuleModal: {
     isOpen: boolean;
     ruleId: number;
   };
+  mutate: KeyedMutator<GenericResponse<IAllRules[]>>;
 }
 
-export const BankRuleModal = ({ showBankRuleModal, onClose }: Props) => {
+export const BankRuleModal = ({ showBankRuleModal, onClose, mutate }: Props) => {
   const [ruleCount, setRuleCount] = useState(1);
+  const [clients, setClients] = useState<ISelect[]>([]);
+  const { ID } = useAppStore((state) => state.selectedProject);
+
+  const { showMessage } = useMessageApi();
+
+  useEffect(() => {
+    const fetchClients = async () => {
+      try {
+        const response = await getClientsByProject(ID);
+
+        const testClients = response.map((client) => {
+          const key = Object.keys(client)[0];
+          const value = client[key];
+          return {
+            value: value.toString(),
+            label: key
+          };
+        });
+
+        setClients(testClients);
+      } catch (error) {
+        console.error("Error al cargar los clientes del input");
+      }
+    };
+    fetchClients();
+  }, [ID]);
 
   const {
     control,
@@ -40,13 +81,26 @@ export const BankRuleModal = ({ showBankRuleModal, onClose }: Props) => {
     setRuleCount((prevCount) => prevCount + 1);
   };
 
-  const handleAddEditRule = (data: any) => {
+  const handleAddEditRule = async (data: any) => {
     if (showBankRuleModal.ruleId) {
       console.info("Edit rule with id", showBankRuleModal.ruleId);
     } else {
-      console.info("Create new rule");
+      const modelData = {
+        project_id: ID,
+        description: data.rules[0].description,
+        id_client: parseInt(data.rules[0].client_name.value),
+        is_exactly: data.rules[0].coincidence.value === "1"
+      };
+
+      try {
+        await createBankRule(modelData);
+        showMessage("success", "Regla creada con éxito");
+        mutate();
+        onClose();
+      } catch (error) {
+        showMessage("error", "Error al crear la regla");
+      }
     }
-    console.info(data);
   };
 
   useEffect(() => {
@@ -87,7 +141,7 @@ export const BankRuleModal = ({ showBankRuleModal, onClose }: Props) => {
                   field={field}
                   title="Nombre del cliente"
                   placeholder="Ingresar nombre"
-                  options={mockCoincidences?.map((coincidence) => coincidence.value)}
+                  options={clients?.map((client) => client)}
                 />
               )}
             />
@@ -100,7 +154,7 @@ export const BankRuleModal = ({ showBankRuleModal, onClose }: Props) => {
                   field={field}
                   title="Coincidencia"
                   placeholder="Seleccione coincidencia"
-                  options={mockCoincidences?.map((coincidence) => coincidence.value)}
+                  options={mockCoincidences?.map((coincidence) => coincidence)}
                 />
               )}
             />
@@ -108,7 +162,8 @@ export const BankRuleModal = ({ showBankRuleModal, onClose }: Props) => {
         ))}
       </div>
 
-      {!showBankRuleModal.ruleId && (
+      {/* Here is the button to add more rules but backend does not exist */}
+      {/* {!showBankRuleModal.ruleId && (
         <Button
           type="text"
           size="large"
@@ -118,7 +173,7 @@ export const BankRuleModal = ({ showBankRuleModal, onClose }: Props) => {
         >
           Agregar otra
         </Button>
-      )}
+      )} */}
       <div className="bankRuleModal__footer">
         <SecondaryButton onClick={onClose}>Cancelar</SecondaryButton>
         <PrincipalButton disabled={!isValid} onClick={handleSubmit(handleAddEditRule)}>
@@ -130,6 +185,6 @@ export const BankRuleModal = ({ showBankRuleModal, onClose }: Props) => {
 };
 
 const mockCoincidences = [
-  { value: "Coincidencia exacta", label: "Coincidencia exacta" },
-  { value: "Contiene", label: "Contiene" }
+  { value: "1", label: "Coincidencia exacta" },
+  { value: "0", label: "Contiene" }
 ];

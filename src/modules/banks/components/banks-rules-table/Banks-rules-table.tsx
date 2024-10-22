@@ -3,18 +3,12 @@ import { Button, Table, TableProps } from "antd";
 import { PencilLine } from "phosphor-react";
 
 import "./banks-rules-table.scss";
-
-export type bankRule = {
-  id: number;
-  description: string;
-  client_name: string;
-  coincidence: string;
-};
+import { IAllRules } from "@/types/banks/IBanks";
 
 interface PropsBanksRulesTable {
   selectedRowKeys: Key[];
   setSelectedRowKeys: Dispatch<SetStateAction<Key[]>>;
-  rules: bankRule[];
+  rules: IAllRules[] | undefined;
   setShowBankRuleModal: Dispatch<
     SetStateAction<{
       isOpen: boolean;
@@ -45,7 +39,7 @@ export const BanksRulesTable = ({
     });
   };
 
-  const columns: TableProps<bankRule>["columns"] = [
+  const columns: TableProps<IAllRules>["columns"] = [
     {
       title: "Descripción",
       dataIndex: "description",
@@ -61,13 +55,15 @@ export const BanksRulesTable = ({
       title: "Nombre de cliente",
       dataIndex: "client_name",
       className: "tableColumn",
-      render: (text) => <p className="tableInfo">{text}</p>
+      render: (client_name) => <p className="tableInfo">{client_name || "-"}</p>
     },
     {
       title: "Coincidencia",
-      dataIndex: "coincidence",
+      dataIndex: "is_exactly",
       className: "tableColumn",
-      render: (text) => <p className="tableInfo">{text}</p>
+      render: (is_exactly) => (
+        <p className="tableInfo">{is_exactly ? "Coincidencia exacta" : "Contiene"}</p>
+      )
     },
     {
       width: "1rem",
@@ -85,7 +81,7 @@ export const BanksRulesTable = ({
       className="banksRulesTable"
       columns={columns}
       rowClassName={"banksRules__tableRow"}
-      dataSource={rules.map((data) => ({ ...data, key: data.id }))}
+      dataSource={rules?.map((data) => ({ ...data, key: data.id }))}
       rowSelection={rowSelection}
       pagination={false}
     />
