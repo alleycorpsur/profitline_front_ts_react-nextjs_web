@@ -236,6 +236,7 @@ const CreateOrderCheckout: FC = ({}) => {
                   {...field}
                   placeholder="Ingresar un comentario"
                   style={errors.comment ? { borderColor: "red" } : {}}
+                  maxLength={35}
                 />
               </div>
             )}
