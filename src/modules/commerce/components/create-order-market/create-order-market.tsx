@@ -161,7 +161,6 @@ const CreateOrderMarket: FC = () => {
         <UiSearchInput
           placeholder="Buscar"
           onChange={(event) => setSearchTerm(event.target.value)}
-          value={searchTerm}
         />
         <FilterDiscounts />
       </Flex>
