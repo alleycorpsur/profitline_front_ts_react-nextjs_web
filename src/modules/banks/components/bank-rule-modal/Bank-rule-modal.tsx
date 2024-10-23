@@ -142,6 +142,7 @@ export const BankRuleModal = ({ showBankRuleModal, onClose, mutate }: Props) => 
                   title="Nombre del cliente"
                   placeholder="Ingresar nombre"
                   options={clients?.map((client) => client)}
+                  showSearch
                 />
               )}
             />
