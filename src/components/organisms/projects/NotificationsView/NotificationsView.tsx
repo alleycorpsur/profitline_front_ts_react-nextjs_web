@@ -94,7 +94,9 @@ export const NotificationsView = () => {
           <div className="list-item">
             <div>
               <Flex gap="1rem">
-                <p className="item__title">{item.notification_type_name}</p>
+                <p className="item__title">
+                  {item.notification_type_name} - {item.incident_id}
+                </p>
                 <p className="item__name">{item.client_name}</p>
                 <p className="item__date">{item.days}</p>
               </Flex>
@@ -139,7 +141,7 @@ export const NotificationsView = () => {
         style={{ width: "100%", height: "100%" }}
         items={ListPanel.map((item, i) => {
           return {
-            label: `${item.value}`,
+            label: `${item.value} (${item.key === "abiertas" ? filteredOpenNotifications.length : filteredClosedNotifications.length})`,
             key: String(i),
             children: (
               <Flex vertical>

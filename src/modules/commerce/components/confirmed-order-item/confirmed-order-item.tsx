@@ -22,7 +22,7 @@ const ConfirmedOrderItem: FC<ConfirmedOrderItemProps> = ({ product }) => {
           height={100}
         />
       </div>
-      <h4 className={styles.name}>Nombre</h4>
+      <h4 className={styles.name}>{product.product_name}</h4>
 
       <div className={styles.price}>
         {product.discount ? (
