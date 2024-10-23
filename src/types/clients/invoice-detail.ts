@@ -24,7 +24,7 @@ export interface IData {
   ammount: number | null;
   financial_discount_id: number | null;
   previous_status_id: number | null;
-  incident_id: number | null;
+  incident_id: number;
   email_id: number | null;
   radication_type_id: number | null;
   status: number;
@@ -38,4 +38,5 @@ export interface IData {
   client_id: number;
   is_legalized: number;
   type_incident: string | null;
+  sequence: number | null;
 }

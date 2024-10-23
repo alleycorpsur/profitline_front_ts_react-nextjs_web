@@ -152,10 +152,6 @@ const InvoiceDetailModal: FC<InvoiceDetailModalProps> = ({
             </Button>
           )}
         </div>
-        {/* <div className={styles.idOrder}>
-          ID orden de compra
-          <div className={styles.id}>XXXXX</div>
-        </div> */}
 
         <div className={styles.body}>
           <div className={styles.headerBody}>
@@ -413,12 +409,14 @@ const InvoiceDetailModal: FC<InvoiceDetailModalProps> = ({
                                   >{`Tipo novedad: ${item.type_incident}`}</div>
                                   <div className={styles.name}>{`Acción: ${item.user_name}`}</div>
                                   <div className={styles.adjustment}>
-                                    ID del novedad:
+                                    ID novedad:
                                     <div
                                       className={styles.idAdjustment}
-                                      onClick={() => item.id && handelOpenNoveltyDetail(item.id)}
+                                      onClick={() =>
+                                        item.id && handelOpenNoveltyDetail(item.incident_id)
+                                      }
                                     >
-                                      {item.id}
+                                      {item.sequence || item.id}
                                     </div>
                                   </div>
                                 </div>

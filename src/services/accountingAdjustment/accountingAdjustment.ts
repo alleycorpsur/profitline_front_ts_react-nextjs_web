@@ -119,11 +119,13 @@ export const reportInvoiceIncident = async (
   motiveId: string,
   files: File[] | null,
   clientId: string,
+  project_id: string,
   amount?: string
 ): Promise<AxiosResponse<any>> => {
   const token = await getIdToken();
 
   const formData = new FormData();
+  formData.append("project_id", project_id);
   formData.append("invoices_id", JSON.stringify(invoicesId));
   formData.append("comments", comments);
   formData.append("motive_id", motiveId);
