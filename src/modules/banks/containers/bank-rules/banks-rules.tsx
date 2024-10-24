@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Bank, CaretLeft } from "phosphor-react";
 
 import { useBankRules } from "@/hooks/useBankRules";
+import { useDebounce } from "@/hooks/useDeabouce";
 
 import UiSearchInput from "@/components/ui/search-input";
 import FilterDiscounts from "@/components/atoms/Filters/FilterDiscounts/FilterDiscounts";
@@ -24,7 +25,23 @@ export const BanksRules = ({ onClickBack }: PropsBanksRules) => {
     ruleId: 0
   });
 
-  const { data, isLoading, mutate } = useBankRules();
+  const [page, setPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
+
+  const { data, isLoading, mutate } = useBankRules({
+    page,
+    search: debouncedSearchQuery
+  });
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    setPage(1);
+  };
+
+  const onChangePage = (pagePagination: number) => {
+    setPage(pagePagination);
+  };
 
   const handleDeleteRules = () => {
     console.info("Delete rules with ids", selectedRowKeys);
@@ -70,14 +87,7 @@ export const BanksRules = ({ onClickBack }: PropsBanksRules) => {
       </Flex>
 
       <div className={styles.tableHeaderButtons}>
-        <UiSearchInput
-          placeholder="Buscar"
-          onChange={(event) => {
-            setTimeout(() => {
-              console.info(event.target.value);
-            }, 1000);
-          }}
-        />
+        <UiSearchInput placeholder="Buscar" onChange={(e) => handleSearch(e.target.value)} />
         <FilterDiscounts />
         <DotsDropdown items={items} />
       </div>
@@ -92,6 +102,8 @@ export const BanksRules = ({ onClickBack }: PropsBanksRules) => {
           setSelectedRowKeys={setSelectedRowKeys}
           rules={data}
           setShowBankRuleModal={setShowBankRuleModal}
+          page={page}
+          onChangePage={onChangePage}
         />
       )}
 

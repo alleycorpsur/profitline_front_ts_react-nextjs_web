@@ -31,7 +31,7 @@ interface Props {
     isOpen: boolean;
     ruleId: number;
   };
-  mutate: KeyedMutator<GenericResponse<IAllRules[]>>;
+  mutate: KeyedMutator<GenericResponse<IAllRules>>;
 }
 
 export const BankRuleModal = ({ showBankRuleModal, onClose, mutate }: Props) => {
