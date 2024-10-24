@@ -35,6 +35,14 @@ export interface IClientsByProject {
 }
 
 export interface IAllRules {
+  data: IRules[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}
+
+export interface IRules {
   id: number;
   project_id: number;
   description: string;
