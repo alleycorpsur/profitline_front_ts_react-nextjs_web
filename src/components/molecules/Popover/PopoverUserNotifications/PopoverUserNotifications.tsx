@@ -1,15 +1,16 @@
-import { Badge, List, Popover, Tabs, Spin, Flex } from "antd";
+import { Badge, List, Popover, Spin, Flex } from "antd";
 import React, { useState, useCallback } from "react";
-import "./popoverUserNotifications.scss";
+import { useQuery, useQueryClient } from "react-query";
 import Link from "next/link";
 import { BellSimpleRinging, Envelope, Eye } from "phosphor-react";
-import { timeAgo } from "@/utils/utils";
-import TabPane from "antd/es/tabs/TabPane";
+
+import { markNotificationAsRead } from "@/services/notifications/notification";
+import { API } from "@/utils/api/api";
 import { useModalDetail } from "@/context/ModalContext";
 import { useNotificationStore } from "@/context/CountNotification";
-import { markNotificationAsRead } from "@/services/notifications/notification";
-import { useQuery, useQueryClient } from "react-query";
-import { API } from "@/utils/api/api";
+import UiTab from "@/components/ui/ui-tab";
+
+import "./popoverUserNotifications.scss";
 
 interface Notification {
   create_at: string;
@@ -146,13 +147,26 @@ export const PopoverUserNotifications: React.FC<PopoverUserNotificationsProps> =
                 handleVisibleChange(false);
               }}
             >
-              <Eye size={28} />
+              <Eye size={24} />
             </div>
           </List.Item>
         )}
       />
     );
   };
+
+  const items = [
+    {
+      key: "1",
+      label: `Abiertos ${openNotifications && openNotifications.length > 0 ? `(${openNotifications.length})` : ""}`,
+      children: renderList(openNotifications, isLoadingOpen)
+    },
+    {
+      key: "2",
+      label: `Cerradas ${rejectedNotifications && rejectedNotifications.length > 0 ? `(${rejectedNotifications.length})` : ""}`,
+      children: renderList(rejectedNotifications, isLoadingRejected)
+    }
+  ];
 
   const content = (
     <div className="notificationsPopoverContent">
@@ -166,20 +180,7 @@ export const PopoverUserNotifications: React.FC<PopoverUserNotificationsProps> =
           </Link>
         </div>
       </div>
-      <Tabs defaultActiveKey="1">
-        <TabPane
-          tab={`Abiertos ${openNotifications && openNotifications.length > 0 ? `(${openNotifications.length})` : ""}`}
-          key="1"
-        >
-          {renderList(openNotifications, isLoadingOpen)}
-        </TabPane>
-        <TabPane
-          tab={`Cerradas ${rejectedNotifications && rejectedNotifications.length > 0 ? `(${rejectedNotifications.length})` : ""}`}
-          key="2"
-        >
-          {renderList(rejectedNotifications, isLoadingRejected)}
-        </TabPane>
-      </Tabs>
+      <UiTab tabs={items} />
     </div>
   );
 
