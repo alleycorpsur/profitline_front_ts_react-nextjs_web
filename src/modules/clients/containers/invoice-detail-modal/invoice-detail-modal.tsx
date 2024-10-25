@@ -45,6 +45,7 @@ const InvoiceDetailModal: FC<InvoiceDetailModalProps> = ({
 }) => {
   const { mutate } = useSWRConfig();
   const { data: invoiceData, loading } = useInvoiceDetail({ invoiceId, clientId, projectId });
+  console.log("invoiceData:", invoiceData);
   const [urlStep, setUrlStep] = useState<string | undefined>(undefined);
   const [isModalAgreenOpen, setIsModalAgreenOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);

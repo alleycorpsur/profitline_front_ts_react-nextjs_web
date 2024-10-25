@@ -26,6 +26,7 @@ export const useNotificationStore = create<NotificationStore>((set) => ({
     if (projectId !== null) {
       try {
         const response = await API.get(`/notification/count/project/${projectId}/user`);
+        console.log("Notification count response:", response);
         set({ notificationCount: response.data });
       } catch (error) {
         console.error("Error fetching notification count:", error);

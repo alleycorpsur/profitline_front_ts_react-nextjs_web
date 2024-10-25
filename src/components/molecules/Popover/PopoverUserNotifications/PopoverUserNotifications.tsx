@@ -81,38 +81,12 @@ export const PopoverUserNotifications: React.FC<PopoverUserNotificationsProps> =
         // Refetch notifications when popover opens
         queryClient.invalidateQueries(["openNotifications", projectId]);
         queryClient.invalidateQueries(["rejectedNotifications", projectId]);
-        setTimeout(markNotificationsAsRead, 500);
       } else {
         setShouldFetchData(false);
       }
     },
     [setIsPopoverVisible, updateNotificationCount, queryClient, projectId]
   );
-
-  const markNotificationsAsRead = async () => {
-    const allNotifications = [...(openNotifications || []), ...(rejectedNotifications || [])];
-
-    const markPromises = allNotifications.map((notification) =>
-      markNotificationAsRead(notification.id)
-        .then((response) => {
-          if (response.data.status !== 200) {
-            console.warn(
-              `Failed to mark notification ${notification.id} as read:`,
-              response.data.message
-            );
-          }
-        })
-        .catch((error) => {
-          console.error(`Error marking notification ${notification.id} as read:`, error);
-        })
-    );
-
-    await Promise.allSettled(markPromises);
-
-    // Refresh the notification lists after marking as read
-    queryClient.invalidateQueries(["openNotifications", projectId]);
-    queryClient.invalidateQueries(["rejectedNotifications", projectId]);
-  };
 
   const renderList = (data: Notification[] | undefined, isLoading: boolean) => {
     if (isLoading) return <Spin />;
@@ -121,36 +95,45 @@ export const PopoverUserNotifications: React.FC<PopoverUserNotificationsProps> =
       <List
         itemLayout="horizontal"
         dataSource={data}
-        renderItem={(item) => (
-          <List.Item>
-            <div>
-              <Flex gap={"8px"} align="center">
-                <p className="item__title">
-                  {item.notification_type_name}
-                  {item.id_erp && `-${item.id_erp}`}
-                </p>
-                {item.is_read === 0 ? (
-                  <div className="item__read">
-                    <Envelope size={11} />
-                  </div>
-                ) : null}
-              </Flex>
-              <p className="item__name">{item.client_name}</p>
-              <p className="item__date">{item.days}</p>
-            </div>
-            <div
-              className="eyeIcon"
-              onClick={() => {
-                if (item.notification_type_name === "Novedad") {
-                  openModal("novelty", { noveltyId: item.incident_id });
-                }
-                handleVisibleChange(false);
-              }}
-            >
-              <Eye size={24} />
-            </div>
-          </List.Item>
-        )}
+        renderItem={(item) => {
+          return (
+            <List.Item>
+              <div>
+                <Flex gap={"8px"} align="center">
+                  <p className="item__title">
+                    {item.notification_type_name}
+                    {item.id_erp && `-${item.id_erp}`}
+                  </p>
+                  {item.is_read === 0 ? (
+                    <div className="item__read">
+                      <Envelope size={11} />
+                    </div>
+                  ) : null}
+                </Flex>
+                <p className="item__name">{item.client_name}</p>
+                <p className="item__date">{item.days}</p>
+              </div>
+              <div
+                className="eyeIcon"
+                onClick={() => {
+                  if (item.notification_type_name === "Novedad") {
+                    openModal("novelty", { noveltyId: item.incident_id });
+                  }
+                  if (item.is_read === 0) {
+                    console.log("item no abierto", item);
+                    markNotificationAsRead(item.id).then(() => {
+                      queryClient.invalidateQueries(["openNotifications", projectId]);
+                      queryClient.invalidateQueries(["rejectedNotifications", projectId]);
+                    });
+                  }
+                  handleVisibleChange(false);
+                }}
+              >
+                <Eye size={24} />
+              </div>
+            </List.Item>
+          );
+        }}
       />
     );
   };
