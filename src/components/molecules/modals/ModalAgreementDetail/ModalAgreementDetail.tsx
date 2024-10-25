@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Modal, Typography, Tabs, Button, Table, Flex } from "antd";
 import { useForm, Controller } from "react-hook-form";
 
@@ -10,13 +10,17 @@ import dayjs from "dayjs";
 import { DotsThree, PaperclipHorizontal } from "phosphor-react";
 import UiTab from "@/components/ui/ui-tab";
 import { FileDownloadModal } from "../FileDownloadModal/FileDownloadModal";
+import { IPaymentDetail } from "@/types/paymentAgreement/paymentAgreement";
+import { getDetailPaymentAgreement } from "@/services/accountingAdjustment/accountingAdjustment";
 
 const { Title, Text } = Typography;
 
 interface Props {
-  isOpen: boolean;
+  isModalPaymentAgreementOpen: {
+    isOpen: boolean;
+    incident_id: number;
+  };
   onClose: () => void;
-  id: number;
 }
 interface InvoiceData {
   key: string;
@@ -38,7 +42,7 @@ interface FormData {
 }
 
 const mockData: FormData = {
-  responsible: "Maria Camila Osorio",
+  responsible: "Maria Camila ahahaha",
   agreementValue: "19500.00",
   creationDate: dayjs("2023-03-24"),
   evidence: [
@@ -57,6 +61,7 @@ const mockData: FormData = {
   invoicesCount: "94",
   dueDate: dayjs("2023-03-24")
 };
+
 const invoicesData: InvoiceData[] = [
   {
     key: "1",
@@ -99,13 +104,23 @@ const invoicesData: InvoiceData[] = [
     fecha: "23/04/2023"
   }
 ];
-export const ModalAgreementDetail: React.FC<Props> = ({ id, isOpen, onClose }) => {
+export const ModalAgreementDetail: React.FC<Props> = ({ isModalPaymentAgreementOpen, onClose }) => {
+  const [paymentAgreementData, setPaymentAgreementData] = useState<IPaymentDetail>();
   const { control, handleSubmit } = useForm<FormData>({
     defaultValues: mockData
   });
   const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
   const [downloadUrl, setDownloadUrl] = useState("");
   const [downloadTitle, setDownloadTitle] = useState("");
+
+  useEffect(() => {
+    const fetchPaymentAgreementData = async () => {
+      const data = await getDetailPaymentAgreement(isModalPaymentAgreementOpen.incident_id);
+      setPaymentAgreementData(data);
+      console.log("Payment Agreement Data", data);
+    };
+    fetchPaymentAgreementData();
+  }, [isModalPaymentAgreementOpen.incident_id]);
 
   const handleEvidenceClick = (url: string, title: string) => {
     setDownloadUrl(url);
@@ -237,11 +252,12 @@ export const ModalAgreementDetail: React.FC<Props> = ({ id, isOpen, onClose }) =
     <>
       <Modal
         width={640}
-        open={isOpen}
+        open={isModalPaymentAgreementOpen.isOpen}
         title={
           <div className="modal-header">
             <Title level={5} className="modal-title">
-              Acuerdo de pago <span className="agreement-id">{id}</span>
+              Acuerdo de pago{" "}
+              <span className="agreement-id">{isModalPaymentAgreementOpen.incident_id}</span>
             </Title>
           </div>
         }

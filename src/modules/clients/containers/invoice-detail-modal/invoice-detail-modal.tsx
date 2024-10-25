@@ -46,7 +46,10 @@ const InvoiceDetailModal: FC<InvoiceDetailModalProps> = ({
   const { mutate } = useSWRConfig();
   const { data: invoiceData, loading } = useInvoiceDetail({ invoiceId, clientId, projectId });
   const [urlStep, setUrlStep] = useState<string | undefined>(undefined);
-  const [isModalAgreenOpen, setIsModalAgreenOpen] = useState(false);
+  const [isModalPaymentAgreementOpen, setIsModalPaymentAgreementOpen] = useState({
+    isOpen: false,
+    incident_id: 0
+  });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [quantity, setQuantity] = useState(0);
 
@@ -331,11 +334,15 @@ const InvoiceDetailModal: FC<InvoiceDetailModalProps> = ({
                                     className={styles.name}
                                   >{`Fecha de pago acordada: ${formatDatePlane(item.event_date?.toString())}`}</div>
                                   <div className={styles.adjustment}>
-                                    ID del acuerdo:
+                                    ID del acuerdooo:
                                     <div
                                       className={styles.idAdjustment}
                                       onClick={() => {
-                                        setIsModalAgreenOpen(true);
+                                        console.log("item", item.incident_id);
+                                        // setIsModalPaymentAgreementOpen({
+                                        //   isOpen: true,
+                                        //   incident_id: item.incident_id
+                                        // });
                                       }}
                                     >
                                       {" "}
@@ -488,9 +495,8 @@ const InvoiceDetailModal: FC<InvoiceDetailModalProps> = ({
         </div>
       </div>
       <ModalAgreementDetail
-        id={invoiceId}
-        isOpen={isModalAgreenOpen}
-        onClose={() => setIsModalAgreenOpen(false)}
+        isModalPaymentAgreementOpen={isModalPaymentAgreementOpen}
+        onClose={() => setIsModalPaymentAgreementOpen({ isOpen: false, incident_id: 0 })}
       />
     </aside>
   );
