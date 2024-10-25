@@ -120,8 +120,9 @@ export const PopoverUserNotifications: React.FC<PopoverUserNotificationsProps> =
                     openModal("novelty", { noveltyId: item.incident_id });
                   }
                   if (item.is_read === 0) {
-                    console.log("item no abierto", item);
                     markNotificationAsRead(item.id).then(() => {
+                      setShouldFetchData(true);
+
                       queryClient.invalidateQueries(["openNotifications", projectId]);
                       queryClient.invalidateQueries(["rejectedNotifications", projectId]);
                     });
