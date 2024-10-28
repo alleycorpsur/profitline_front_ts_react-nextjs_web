@@ -87,7 +87,7 @@ export const editClient = async ({
   formData.append("payment_ids", JSON.stringify(payment_ids));
   formData.append("assign_client_id", client_id);
   formData.append("evidence", evidence);
-  formData.append("previously_assign_client_id", current_client_id);
+  formData.append("previous_assign_client_id", current_client_id);
   try {
     const response: GenericResponse<any> = await axios.put(
       `${config.API_HOST}/bank/updated-client-payments`,
