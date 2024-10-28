@@ -221,7 +221,7 @@ export const getDetailPaymentAgreement = async (incident_id: number) => {
     );
     console.log("Payment Agreement Data in SERVICE", response);
 
-    // return response.data[0];
+    return response[0];
   } catch (error) {
     console.error("Error getting payment agreement detail", error);
     throw error;
