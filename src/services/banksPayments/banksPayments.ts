@@ -35,6 +35,11 @@ interface IAssignClient {
   client_id: string;
   evidence: File;
 }
+
+interface IEditClient extends IAssignClient {
+  current_client_id: string;
+}
+
 export const assignClient = async ({
   id_user,
   payment_ids,
@@ -68,7 +73,13 @@ export const assignClient = async ({
   }
 };
 
-export const editClient = async ({ id_user, payment_ids, client_id, evidence }: IAssignClient) => {
+export const editClient = async ({
+  id_user,
+  payment_ids,
+  client_id,
+  evidence,
+  current_client_id
+}: IEditClient) => {
   const token = await getIdToken();
 
   const formData = new FormData();
@@ -76,6 +87,7 @@ export const editClient = async ({ id_user, payment_ids, client_id, evidence }: 
   formData.append("payment_ids", JSON.stringify(payment_ids));
   formData.append("assign_client_id", client_id);
   formData.append("evidence", evidence);
+  formData.append("previous_assign_client_id", current_client_id);
   try {
     const response: GenericResponse<any> = await axios.put(
       `${config.API_HOST}/bank/updated-client-payments`,
