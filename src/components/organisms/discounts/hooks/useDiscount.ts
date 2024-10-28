@@ -4,9 +4,11 @@ import { useAppStore } from "@/lib/store/store";
 import {
   deactivateDiscount,
   deleteDiscount,
-  getAllDiscounts
+  getAllDiscounts,
+  getAllPackageDiscounts
 } from "@/services/discount/discount.service";
 import { DiscountBasics } from "@/types/discount/DiscountBasics";
+import { DiscountPackage } from "@/types/discount/DiscountPackage";
 import { GenericResponsePage } from "@/types/global/IGlobal";
 import { MessageInstance } from "antd/es/message/interface";
 import { ChangeEvent, useEffect, useState } from "react";
@@ -14,33 +16,36 @@ import useSWR from "swr";
 
 type Props = {
   messageApi: MessageInstance;
+  type: "rules" | "packages";
 };
 
+//type DiscountBasicsState = DiscountBasics & { checked: boolean };
 type DiscountBasicsState = DiscountBasics & { checked: boolean };
-
-export default function useDiscount({ messageApi }: Props) {
+type DiscountPackageState = DiscountPackage & { checked: boolean };
+export default function useDiscount({ messageApi, type }: Props) {
   const [page, setPage] = useState(1);
   const [isOpenModalDelete, setIsOpenModalDelete] = useState(false);
   const [isLoadingDelete, setIsLoadingDelete] = useState(false);
   const [active, setActive] = useState<number | undefined>(undefined);
-  const [data, setData] = useState<DiscountBasicsState[]>([]);
+  const [data, setData] = useState<any[]>([]);
   const { searchQuery, handleChangeSearch } = useSearch();
   const { ID } = useAppStore((project) => project.selectedProject);
-
+  const fetcher = type === "rules" ? getAllDiscounts : getAllPackageDiscounts;
   const {
     data: res,
     isLoading,
     mutate
-  } = useSWR<GenericResponsePage<DiscountBasics[]>>(
+  } = useSWR<GenericResponsePage<DiscountBasics[] | DiscountPackage[]>>(
     {
       projectId: ID,
       params: {
         page,
         searchQuery,
         active
-      }
+      },
+      type
     },
-    ({ projectId, params }) => getAllDiscounts({ projectId, params }),
+    ({ projectId, params }) => fetcher({ projectId, params }),
     {
       revalidateOnMount: true,
       revalidateOnFocus: false,
@@ -56,12 +61,12 @@ export default function useDiscount({ messageApi }: Props) {
       }
     }
   );
-
+  console.log("RES", res);
   useEffect(() => {
     if (res?.data) {
       setData(res.data.map((item) => ({ ...item, checked: false })));
     }
-  }, [res]);
+  }, [res, type]);
 
   const onChangeSearch = (e: ChangeEvent<HTMLInputElement>) => {
     handleChangePage(1);
@@ -122,7 +127,7 @@ export default function useDiscount({ messageApi }: Props) {
           }
           return item;
         })
-      } as GenericResponsePage<DiscountBasics[]>,
+      } as GenericResponsePage<DiscountBasics[] | DiscountPackage[]>,
       { revalidate: false }
     );
     const response = await deactivateDiscount(id, status);

@@ -3,20 +3,24 @@ import styles from "./Discounts.module.scss";
 import { Flex, Table, message } from "antd";
 import UiSearchInput from "@/components/ui/search-input";
 import FilterDiscounts from "@/components/atoms/Filters/FilterDiscounts/FilterDiscounts";
-import useDiscount from "./hooks/useDiscount";
-import { discountsColumns } from "./constants/column";
 import TablePaginator from "@/components/atoms/tablePaginator/TablePaginator";
 import DropdownDiscount from "@/components/molecules/dropdown/discount/DropdownDiscount";
 import { ModalDeleteDiscount } from "@/components/molecules/modals/modalDeleteDiscount/ModalDeleteDiscount";
 import Link from "next/link";
 import ButtonHeader from "@/components/atoms/buttons/buttonHeader/ButtonHeader";
+import { discountPackagesColumns, discountsColumns } from "../constants/column";
+import useDiscount from "../hooks/useDiscount";
+import useSWR from "swr";
+import { GenericResponsePage } from "@/types/global/IGlobal";
+import { DiscountPackage } from "@/types/discount/DiscountPackage";
+import { useAppStore } from "@/lib/store/store";
 
-export default function Discounts() {
+export default function DiscountPackages() {
   const [messageApi, messageContex] = message.useMessage();
   const {
     loading,
-    res,
     data,
+    res,
     handleChangePage,
     handleChangeSearch,
     page,
@@ -24,12 +28,13 @@ export default function Discounts() {
     handleSelectToDelete,
     modalDelete,
     handleDeactivate
-  } = useDiscount({ messageApi, type: "rules" });
+  } = useDiscount({ messageApi, type: "packages" });
+
   return (
     <>
       <Table
         scroll={{ y: "61dvh", x: undefined }}
-        columns={discountsColumns({
+        columns={discountPackagesColumns({
           handleSelect: handleSelectToDelete,
           handleDeactivate: handleDeactivate
         })}

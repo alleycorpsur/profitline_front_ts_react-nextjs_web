@@ -8,9 +8,11 @@ import {
   DiscountGetOne
 } from "@/types/discount/DiscountBasics";
 import { DiscountContractRange } from "@/types/discount/DiscountContractRange";
-import { GenericResponse, GenericResponsePage } from "@/types/global/IGlobal";
+import { GenericResponse, GenericResponsePage, Pagination } from "@/types/global/IGlobal";
 import { API, getIdToken } from "@/utils/api/api";
 import axios, { AxiosResponse } from "axios";
+import { mockDiscountPackages } from "./mocked-data";
+import { DiscountPackage } from "@/types/discount/DiscountPackage";
 
 const defaultRes = {
   data: [],
@@ -36,6 +38,47 @@ export const getAllDiscounts = async ({
     }
   );
   return response.success ? response : { ...defaultRes, ...response };
+};
+
+export const getAllPackageDiscounts = async ({
+  projectId,
+  params
+}: {
+  projectId: number;
+  params?: Record<string, string | number>;
+}): Promise<GenericResponsePage<DiscountPackage[]>> => {
+  // Simulación de datos paginados
+  const totalRows = mockDiscountPackages.length;
+  const rowsperpage = 5; // Número de elementos por página (ajusta según sea necesario)
+  const actualPage = params?.page ? Number(params.page) : 1;
+
+  // Filtrado de los paquetes por projectId
+  const filteredPackages = mockDiscountPackages.filter((pkg) => pkg.project_id === projectId);
+
+  // Simulación de paginación
+  const paginatedData = filteredPackages.slice(
+    (actualPage - 1) * rowsperpage,
+    actualPage * rowsperpage
+  );
+
+  const pagination: Pagination = {
+    actualPage,
+    rowsperpage,
+    totalPages: Math.ceil(filteredPackages.length / rowsperpage),
+    totalRows: filteredPackages.length
+  };
+
+  // Respuesta mockeada simulando el formato esperado del endpoint
+  const response: GenericResponsePage<DiscountPackage[]> = {
+    status: 200,
+    message: "Success",
+    success: true,
+    data: mockDiscountPackages,
+    pagination
+  };
+
+  return response;
+  //return response.success ? response : { ...defaultRes, ...response };
 };
 
 export const deleteDiscount = async (ids: number[]) => {
