@@ -122,7 +122,8 @@ const ModalActionsEditClient = ({ isOpen, onClose, selectedRows }: Props) => {
         id_user: userId,
         payment_ids: selectedRows?.map((row) => row.id),
         client_id: data.change_for.value,
-        evidence: data.evidence as File
+        evidence: data.evidence as File,
+        current_client_id: selectedRows[0].id_client.toString()
       });
 
       showMessage("success", "Cliente editado correctamente");
