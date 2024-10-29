@@ -12,6 +12,14 @@ import {
   ISingleOrder
 } from "@/types/commerce/ICommerce";
 import { MessageType } from "@/context/MessageContext";
+import {
+  InventoriesByWarehouse,
+  WarehouseProductsStock
+} from "@/components/molecules/modals/ChangeWarehouseModal/ChangeWarehouseModal";
+import {
+  inventoriesByWarehouseMock,
+  warehouseProductsStockMock
+} from "@/components/molecules/modals/ChangeWarehouseModal/mocked";
 
 export const getAllOrders = async (projectId: number) => {
   const response: GenericResponse<IOrderData[]> = await API.get(
@@ -221,4 +229,17 @@ export const dowloadOrderCSV = async (
     showMessage("error", "Error al descargar archivo");
     throw error;
   }
+};
+
+export const getInventoriesWarehouse = async (projectId: number) => {
+  const response: GenericResponse<InventoriesByWarehouse[]> = await API.get(
+    `/marketplace/projects/${projectId}/warehouses`
+  );
+  return { data: inventoriesByWarehouseMock };
+};
+export const getWarehouseProducts = async (projectId: number, warehouse: number) => {
+  const response: GenericResponse<WarehouseProductsStock[]> = await API.get(
+    `/marketplace/projects/${projectId}/warehouses/${warehouse}/stock`
+  );
+  return { data: warehouseProductsStockMock };
 };

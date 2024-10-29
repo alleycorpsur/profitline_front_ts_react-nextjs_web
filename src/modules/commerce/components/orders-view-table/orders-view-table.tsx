@@ -1,5 +1,5 @@
-import { Dispatch, Key, SetStateAction } from "react";
-import { Button, Table, TableProps, Typography } from "antd";
+import { Dispatch, Key, SetStateAction, useState } from "react";
+import { Button, Flex, Table, TableProps, Typography } from "antd";
 import { useRouter } from "next/navigation";
 import { Eye } from "phosphor-react";
 
@@ -8,6 +8,8 @@ import { formatDateDMY, formatMoney } from "@/utils/utils";
 
 import { IOrder } from "@/types/commerce/ICommerce";
 import "./orders-view-table.scss";
+import { ChangeWarehouseModal } from "@/components/molecules/modals/ChangeWarehouseModal/ChangeWarehouseModal";
+import { WarningDiamond } from "@phosphor-icons/react";
 
 const { Text } = Typography;
 
@@ -122,6 +124,14 @@ const OrdersViewTable = ({
       showSorterTooltip: false
     },
     {
+      title: "Bodega",
+      key: "warhouse",
+      dataIndex: "warhouse",
+      render: (text) => <Text className="cell">{"Bodega 1"}</Text>,
+      //sorter: (a, b) => a.city.localeCompare(b.city),
+      showSorterTooltip: false
+    },
+    {
       title: "Contacto",
       key: "contacto",
       dataIndex: "contacto",
@@ -146,18 +156,30 @@ const OrdersViewTable = ({
     },
     {
       title: "",
-      key: "buttonSee",
+      key: "buttonOpenModal",
       width: 64,
       dataIndex: "",
       render: (_, row) => (
-        <Button
-          onClick={() => handleSeeDetail(row)}
-          className="buttonSeeProject"
-          icon={<Eye size={"1.3rem"} />}
-        />
+        <Flex gap={8}>
+          <Button
+            onClick={() => {
+              setSelected(row.id);
+              setIsModalOpen(true);
+            }}
+            className="buttonSeeProject"
+            icon={<WarningDiamond size={"1.3rem"} />}
+          />
+          <Button
+            onClick={() => handleSeeDetail(row)}
+            className="buttonSeeProject"
+            icon={<Eye size={"1.3rem"} />}
+          />
+        </Flex>
       )
     }
   ];
+  const [selected, setSelected] = useState<number | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   return (
     <>
@@ -167,6 +189,11 @@ const OrdersViewTable = ({
         dataSource={data.map((data) => ({ ...data, key: data.id }))}
         rowSelection={rowSelection}
         pagination={false}
+      />
+      <ChangeWarehouseModal
+        defaultWarehouse={selected ?? 0}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
       />
     </>
   );
