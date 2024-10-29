@@ -338,14 +338,9 @@ const InvoiceDetailModal: FC<InvoiceDetailModalProps> = ({
                                     <div
                                       className={styles.idAdjustment}
                                       onClick={() => {
-                                        console.log(
-                                          "item single Payment id",
-                                          item.single_payment_agreement_id
-                                        );
-
                                         setIsModalPaymentAgreementOpen({
                                           isOpen: true,
-                                          incident_id: item.single_payment_agreement_id
+                                          incident_id: item.id
                                         });
                                       }}
                                     >
