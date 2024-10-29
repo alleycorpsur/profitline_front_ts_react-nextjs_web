@@ -6,9 +6,10 @@ import { ItemType } from "antd/es/menu/interface";
 
 interface DotsDropdownProps {
   items?: ItemType[];
+  dotsSize?: string;
 }
 
-export const DotsDropdown = ({ items }: DotsDropdownProps) => {
+export const DotsDropdown = ({ items, dotsSize = "1.8rem" }: DotsDropdownProps) => {
   const customDropdown = (menu: ReactNode) => <div className="dropdown">{menu}</div>;
 
   return (
@@ -18,7 +19,7 @@ export const DotsDropdown = ({ items }: DotsDropdownProps) => {
       placement="bottomLeft"
       trigger={["click"]}
     >
-      <Button className="dotsButton" size="large" icon={<DotsThree size={"1.8rem"} />} />
+      <Button className="dotsButton" size="large" icon={<DotsThree size={dotsSize} />} />
     </Dropdown>
   );
 };

@@ -1,18 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { Modal, Typography, Tabs, Button, Table, Flex } from "antd";
+import { Modal, Typography, Button, Table, Flex, MenuProps } from "antd";
 import { useForm, Controller } from "react-hook-form";
+import { PaperclipHorizontal } from "phosphor-react";
+import dayjs from "dayjs";
 
-import "./modalAgreementDetail.scss";
+import { getDetailPaymentAgreement } from "@/services/accountingAdjustment/accountingAdjustment";
+
 import { InputForm } from "@/components/atoms/inputs/InputForm/InputForm";
 import { InputFormMoney } from "@/components/atoms/inputs/InputFormMoney/InputFormMoney";
 import { InputDateForm } from "@/components/atoms/inputs/InputDate/InputDateForm";
-import dayjs from "dayjs";
-import { DotsThree, PaperclipHorizontal } from "phosphor-react";
 import UiTab from "@/components/ui/ui-tab";
 import { FileDownloadModal } from "../FileDownloadModal/FileDownloadModal";
-import { IPaymentDetail } from "@/types/paymentAgreement/paymentAgreement";
-import { getDetailPaymentAgreement } from "@/services/accountingAdjustment/accountingAdjustment";
+import { DotsDropdown } from "@/components/atoms/DotsDropdown/DotsDropdown";
 
+import { IPaymentDetail } from "@/types/paymentAgreement/paymentAgreement";
+
+import "./modalAgreementDetail.scss";
 const { Title, Text } = Typography;
 
 interface Props {
@@ -162,6 +165,21 @@ export const ModalAgreementDetail: React.FC<Props> = ({ isModalPaymentAgreementO
     onClose();
   };
 
+  const handleCancelAgreement = () => {
+    console.log("Cancel agreement");
+  };
+
+  const itemsDropDown: MenuProps["items"] = [
+    {
+      key: "1",
+      label: (
+        <Button className="buttonOutlined" onClick={handleCancelAgreement}>
+          Anular acuerdo
+        </Button>
+      )
+    }
+  ];
+
   const renderSummaryTab = () => (
     <form onSubmit={handleSubmit(onSubmit)} className="agreement-form">
       <div className="form-grid">
@@ -226,6 +244,7 @@ export const ModalAgreementDetail: React.FC<Props> = ({ isModalPaymentAgreementO
       </div>
     </form>
   );
+
   const renderInvoicesTab = () => (
     <Table
       dataSource={invoicesData}
@@ -269,7 +288,7 @@ export const ModalAgreementDetail: React.FC<Props> = ({ isModalPaymentAgreementO
           tabs={items}
           tabBarExtraContent={
             <div className="modal-actions-dots">
-              <DotsThree size={24} weight="bold" />
+              <DotsDropdown items={itemsDropDown} />
             </div>
           }
         />

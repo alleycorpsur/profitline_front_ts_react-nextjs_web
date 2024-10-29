@@ -35,13 +35,7 @@
     }
 
     .modal-actions-dots {
-        background-color: #f0f0f0;
-        height: 32px;
-        width: 32px;
-        border-radius: 4px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        margin-bottom: 4px;
     }
 
     .evidence-section {
@@ -69,17 +63,13 @@
             background-color: #e8e8e8;
         }
 
-
         .evidence-time {
             color: #8c8c8c;
             font-size: 12px;
         }
 
         .evidence-icon {
-
             margin-bottom: auto;
         }
     }
-
-
 }
