@@ -227,6 +227,19 @@ export const getDetailPaymentAgreement = async (incident_id: number) => {
   }
 };
 
+export const cancelPaymentAgreement = async (incident_id: number) => {
+  try {
+    const response: AxiosResponse<any> = await API.delete(
+      `${config.API_HOST}/invoice/paymentAgreement/cancel-payment-agreement/${incident_id}`
+    );
+
+    return response;
+  } catch (error) {
+    console.error("Error canceling payment agreement", error);
+    throw error;
+  }
+};
+
 export const legalizeFinancialDiscount = async (
   discountData: {
     discount_id_legalized: number;

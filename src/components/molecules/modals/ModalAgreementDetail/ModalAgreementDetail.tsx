@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Modal, Typography, Button, Table, Flex, MenuProps } from "antd";
+import { Modal, Button, Table, Flex, MenuProps } from "antd";
 import { useForm, Controller } from "react-hook-form";
 import { Paperclip } from "phosphor-react";
 import dayjs from "dayjs";
 
-import { getDetailPaymentAgreement } from "@/services/accountingAdjustment/accountingAdjustment";
+import {
+  cancelPaymentAgreement,
+  getDetailPaymentAgreement
+} from "@/services/accountingAdjustment/accountingAdjustment";
 
 import { InputForm } from "@/components/atoms/inputs/InputForm/InputForm";
 import { InputFormMoney } from "@/components/atoms/inputs/InputFormMoney/InputFormMoney";
@@ -16,7 +19,7 @@ import { DotsDropdown } from "@/components/atoms/DotsDropdown/DotsDropdown";
 import { IPaymentDetail } from "@/types/paymentAgreement/IPaymentAgreement";
 
 import "./modalAgreementDetail.scss";
-const { Title } = Typography;
+import { useMessageApi } from "@/context/MessageContext";
 
 interface Props {
   isModalPaymentAgreementOpen: {
@@ -42,9 +45,12 @@ export const ModalAgreementDetail: React.FC<Props> = ({ isModalPaymentAgreementO
   const [downloadUrl, setDownloadUrl] = useState("");
   const [downloadTitle, setDownloadTitle] = useState("");
 
+  const { showMessage } = useMessageApi();
+
   const { control, handleSubmit, reset } = useForm<FormData>();
 
   useEffect(() => {
+    if (!isModalPaymentAgreementOpen.incident_id) return;
     const fetchPaymentAgreementData = async () => {
       try {
         const data = await getDetailPaymentAgreement(isModalPaymentAgreementOpen.incident_id);
@@ -98,8 +104,17 @@ export const ModalAgreementDetail: React.FC<Props> = ({ isModalPaymentAgreementO
     onClose();
   };
 
-  const handleCancelAgreement = () => {
-    console.info("Cancel agreement");
+  const handleCancelAgreement = async () => {
+    if (paymentAgreementData?.status_name === "Anulada") {
+      showMessage("error", "El acuerdo ya se encuentra anulado");
+      return;
+    }
+    try {
+      await cancelPaymentAgreement(isModalPaymentAgreementOpen.incident_id);
+      onClose();
+    } catch (error) {
+      showMessage("error", "Error al anular el acuerdo");
+    }
   };
 
   const itemsDropDown: MenuProps["items"] = [

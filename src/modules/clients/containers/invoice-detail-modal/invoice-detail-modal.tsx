@@ -14,7 +14,6 @@ import InvoiceDownloadModal from "../../components/invoice-download-modal";
 import { Button } from "antd";
 import { IInvoice } from "@/types/invoices/IInvoices";
 import { formatDatePlane, formatMoney } from "@/utils/utils";
-import { useSWRConfig } from "swr";
 import StepperContentSkeleton from "./skeleton/skeleton-invoid-detail";
 import { useModalDetail } from "@/context/ModalContext";
 import { ModalAgreementDetail } from "@/components/molecules/modals/ModalAgreementDetail/ModalAgreementDetail";
@@ -43,8 +42,11 @@ const InvoiceDetailModal: FC<InvoiceDetailModalProps> = ({
   selectInvoice,
   handleActionInDetail
 }) => {
-  const { mutate } = useSWRConfig();
-  const { data: invoiceData, loading } = useInvoiceDetail({ invoiceId, clientId, projectId });
+  const {
+    data: invoiceData,
+    loading,
+    mutate
+  } = useInvoiceDetail({ invoiceId, clientId, projectId });
   const [urlStep, setUrlStep] = useState<string | undefined>(undefined);
   const [isModalPaymentAgreementOpen, setIsModalPaymentAgreementOpen] = useState({
     isOpen: false,
@@ -147,7 +149,7 @@ const InvoiceDetailModal: FC<InvoiceDetailModalProps> = ({
               size="large"
               icon={<DotsThree size={"1.5rem"} />}
               onClick={() => {
-                mutate(`/invoice/${invoiceId}/client/${clientId}/project/${projectId}`);
+                mutate();
                 handleActionInDetail?.(selectInvoice!);
               }}
             >
@@ -216,6 +218,12 @@ const InvoiceDetailModal: FC<InvoiceDetailModalProps> = ({
                                         : "Pendiente"}
                                   </span>
                                 )}
+                                {item.event_type_name === "Acuerdo de pago" &&
+                                  item.status_name == "Anulada" && (
+                                    <span className={`${styles.tagLabel} ${styles.tagLabelBlack}`}>
+                                      Anulado
+                                    </span>
+                                  )}
                               </h5>
                               <div className={styles.date}>
                                 {item.event_type_name === "Acuerdo de pago"
@@ -495,7 +503,10 @@ const InvoiceDetailModal: FC<InvoiceDetailModalProps> = ({
       </div>
       <ModalAgreementDetail
         isModalPaymentAgreementOpen={isModalPaymentAgreementOpen}
-        onClose={() => setIsModalPaymentAgreementOpen({ isOpen: false, incident_id: 0 })}
+        onClose={() => {
+          mutate();
+          setIsModalPaymentAgreementOpen({ isOpen: false, incident_id: 0 });
+        }}
       />
     </aside>
   );
