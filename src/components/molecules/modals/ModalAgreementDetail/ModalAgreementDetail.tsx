@@ -8,6 +8,8 @@ import {
   cancelPaymentAgreement,
   getDetailPaymentAgreement
 } from "@/services/accountingAdjustment/accountingAdjustment";
+import { useMessageApi } from "@/context/MessageContext";
+import { formatMoney } from "@/utils/utils";
 
 import { InputForm } from "@/components/atoms/inputs/InputForm/InputForm";
 import { InputFormMoney } from "@/components/atoms/inputs/InputFormMoney/InputFormMoney";
@@ -19,7 +21,6 @@ import { DotsDropdown } from "@/components/atoms/DotsDropdown/DotsDropdown";
 import { IPaymentDetail } from "@/types/paymentAgreement/IPaymentAgreement";
 
 import "./modalAgreementDetail.scss";
-import { useMessageApi } from "@/context/MessageContext";
 
 interface Props {
   isModalPaymentAgreementOpen: {
@@ -90,7 +91,8 @@ export const ModalAgreementDetail: React.FC<Props> = ({ isModalPaymentAgreementO
     {
       title: "$ acordado",
       dataIndex: "amount",
-      key: "amount"
+      key: "amount",
+      render: (text: number) => <span>{formatMoney(text)}</span>
     },
     {
       title: "Fecha",
