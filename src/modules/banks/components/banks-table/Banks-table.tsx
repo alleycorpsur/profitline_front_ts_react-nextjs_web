@@ -166,7 +166,10 @@ export const BanksTable = ({
         ...data,
         key: data.id
       }))}
-      pagination={false}
+      pagination={{
+        pageSize: 15,
+        showSizeChanger: false
+      }}
     />
   );
 };

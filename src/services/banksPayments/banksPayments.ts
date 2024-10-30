@@ -107,3 +107,29 @@ export const editClient = async ({
     throw error;
   }
 };
+
+export const uploadEvidence = async (payment_id: number, user_id: number, evidence: File) => {
+  const token = await getIdToken();
+
+  const formData = new FormData();
+  formData.append("user_id", user_id.toString());
+  formData.append("files", evidence);
+  try {
+    const response: GenericResponse<any> = await axios.post(
+      `${config.API_HOST}/bank/upload-evidence/${payment_id}`,
+      formData,
+      {
+        headers: {
+          Accept: "application/json, text/plain, */*",
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Error al subir la evidencia:", error);
+    throw error;
+  }
+};

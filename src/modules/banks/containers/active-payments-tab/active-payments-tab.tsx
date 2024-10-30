@@ -166,7 +166,11 @@ export const ActivePaymentsTab: FC = () => {
             onClose={onCloseModal}
             selectedRows={selectedRows}
           />
-          <ModalActionsUploadEvidence isOpen={isSelectOpen.selected === 5} onClose={onCloseModal} />
+          <ModalActionsUploadEvidence
+            isOpen={isSelectOpen.selected === 5}
+            onClose={onCloseModal}
+            selectedRows={selectedRows}
+          />
         </Flex>
       )}
     </>
