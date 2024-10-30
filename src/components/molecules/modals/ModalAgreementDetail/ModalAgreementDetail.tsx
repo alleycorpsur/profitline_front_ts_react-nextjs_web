@@ -85,8 +85,9 @@ export const ModalAgreementDetail: React.FC<Props> = ({ isModalPaymentAgreementO
     },
     {
       title: "Pendiente",
-      dataIndex: "pendiente",
-      key: "pendiente"
+      dataIndex: "current_financial_record",
+      key: "current_financial_record",
+      render: (text: number) => <span>{formatMoney(text)}</span>
     },
     {
       title: "$ acordado",
