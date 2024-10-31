@@ -4,7 +4,7 @@ import { Button, DatePicker, Flex, Select, Switch, Typography } from "antd";
 import { InputForm } from "@/components/atoms/inputs/InputForm/InputForm";
 import FeatByOrder from "./feats/featByOrder/FeatByOrder";
 import FeatByCient from "./feats/featByClient/FeatByClient";
-import { getOptionsByType } from "../../../constants/discountTypes";
+import { getOptionsByType } from "../../../../constants/discountTypes";
 import { useEffect, useMemo, useState } from "react";
 import { DiscountSchema } from "../../resolvers/generalResolver";
 import { Pencil } from "phosphor-react";

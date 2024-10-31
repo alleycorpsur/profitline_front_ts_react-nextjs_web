@@ -6,7 +6,7 @@ import DefinitionDiscounts from "./components/definitionsDiscount/DefinitionDisc
 import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
 import useCreateDiscountView from "./hooks/useCreateDiscountView";
 import AnnualDiscountDefinition from "./components/annualDiscountDefinition/AnnualDiscountDefinition";
-import discountCategories from "../constants/discountTypes";
+import discountCategories from "../../constants/discountTypes";
 import Link from "next/link";
 
 const commonDiscount = [discountCategories.byOrder.id, discountCategories.byClient.id];

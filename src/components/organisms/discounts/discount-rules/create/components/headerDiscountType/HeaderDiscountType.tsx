@@ -1,7 +1,7 @@
 "use client";
 import styles from "./HeaderDiscountType.module.scss";
 import { Button, Flex, Typography } from "antd";
-import discountCategories from "../../../constants/discountTypes";
+import discountCategories from "../../../../constants/discountTypes";
 
 const { Title } = Typography;
 

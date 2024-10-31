@@ -7,7 +7,7 @@ import {
   discountTypesByOrder,
   typesWithMinByOrder,
   typesWithOutMinByOrder
-} from "../../constants/discountTypes";
+} from "../../../constants/discountTypes";
 
 const yesterday: any = (date: string) =>
   new Date(new Date(date).setDate(new Date(date).getDate() - 1));

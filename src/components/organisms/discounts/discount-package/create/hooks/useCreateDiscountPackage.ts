@@ -1,11 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useAppStore } from "@/lib/store/store";
 import { useRouter } from "next/navigation";
 import { message } from "antd";
 import { DiscountPackageSchema, generalResolver } from "../resolvers/generaResolver";
-import { DiscountBasics } from "@/types/discount/DiscountBasics";
+import useSWR from "swr";
+import { fetcher } from "@/utils/api/api";
+import { createDiscountPackage, getOneDiscountPackage } from "@/services/discount/discount.service";
+import { Discount } from "@/types/discount/DiscountPackage";
+import { mapGetOneToDiscountPackageSchema } from "../logic/createPackageLogic";
 
 type Props = {
   params?: { id: string };
@@ -13,16 +17,16 @@ type Props = {
 export interface DiscountListData {
   status: number;
   message: string;
-  data: DiscountBasics[];
+  data: Discount[];
 }
 export default function useCreateDiscountPackage({ params }: Props) {
   const discountPackageId = !!Number(params?.id) ? Number(params?.id) : undefined;
   const [messageApi, contextHolder] = message.useMessage();
+  const { ID: projectId } = useAppStore((project) => project.selectedProject);
 
-  // const { ID } = useAppStore((project) => project.selectedProject);
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [isModaltOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
@@ -33,47 +37,85 @@ export default function useCreateDiscountPackage({ params }: Props) {
   const [defaultDiscount, setDefaultDiscount] = useState<DiscountPackageSchema>({
     name: "",
     description: "",
-    start_date: null,
-    end_date: undefined,
+    startDate: null,
+    endDate: undefined,
     is_active: false,
-    discounts: [],
-    additionalDiscounts: []
+    primaryDiscounts: [],
+    secondaryDiscounts: []
   });
+
+  const fetchDiscountPackage: () => Promise<DiscountPackageSchema> = async () => {
+    setLoading(true);
+    try {
+      if (discountPackageId) {
+        const { data } = await getOneDiscountPackage(projectId, discountPackageId);
+        const result = mapGetOneToDiscountPackageSchema(data);
+        setDefaultDiscount(result);
+        setLoading(false);
+        return result;
+      }
+    } catch (e: any) {
+      messageApi.error(e.message);
+      console.error(e.message);
+      router.push("/descuentos");
+    }
+    return defaultDiscount;
+  };
 
   const form = useForm({
     resolver: yupResolver(generalResolver),
-    defaultValues: defaultDiscount,
-    //defaultValues: Number(params?.id) ? fetchDiscount : defaultDiscount,
+    defaultValues: discountPackageId ? fetchDiscountPackage : defaultDiscount,
     disabled: statusForm === "review"
   });
 
   const {
     watch,
-    setValue,
-    getValues,
     trigger,
     control,
-    resetField,
-    formState: { errors }
+    formState: { errors, disabled }
   } = form;
 
   const {
-    fields: discountFields,
+    fields: primaryDiscountsFields,
     append: appendDiscount,
     remove: removeDiscount
   } = useFieldArray<DiscountPackageSchema>({
     control,
-    name: "discounts"
+    name: "primaryDiscounts"
   });
 
   const {
-    fields: additionalDiscountFields,
+    fields: secondaryDiscountsFields,
     append: appendAdditionalDiscount,
     remove: removeAdditionalDiscount
   } = useFieldArray<DiscountPackageSchema>({
     control,
-    name: "additionalDiscounts"
+    name: "secondaryDiscounts"
   });
+
+  const { data: dataDiscountList, isLoading: isLoadingSelect } = useSWR<DiscountListData>(
+    `/discount/discounts-to-apply/project/${projectId}`,
+    fetcher,
+    {}
+  );
+
+  const optionsDiscounts = useMemo(
+    () =>
+      dataDiscountList?.data.map((option) => ({
+        value: option.id,
+        label: option.discount_name ?? ""
+      })),
+    [dataDiscountList]
+  );
+
+  const discountList = useMemo(
+    () =>
+      dataDiscountList?.data.map((discount) => ({
+        ...discount,
+        packageId: discount.id
+      })),
+    [dataDiscountList]
+  );
 
   const handleChangeStatusForm = (status: "create" | "edit" | "review") => {
     setStatusForm(status);
@@ -81,7 +123,6 @@ export default function useCreateDiscountPackage({ params }: Props) {
 
   useEffect(() => {
     if (!Number(params?.id) && typeof params?.id === "string") {
-      // if id is not a number and it is a string then the path is incorrect
       router.push("/descuentos");
     }
   }, [params?.id]);
@@ -95,15 +136,15 @@ export default function useCreateDiscountPackage({ params }: Props) {
   const handlePostDiscount = async (e: DiscountPackageSchema) => {
     setLoading(true);
     try {
-      //const res = await createDiscount({ ...e, project_id: ID }, files);
+      const res = await createDiscountPackage({ ...e, project_id: projectId });
       messageApi.success("Descuento creado exitosamente");
-      router.push(`/descuentos`);
-      //router.push(`/descuentos/${res.data.idDiscount}`);
+      router.push(`/descuentos/paquete/${res.data.id}`);
     } catch (e: any) {
       messageApi.error(e.response.data.message);
       console.error(e);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   // const handleUpdateDiscount = async (e: DiscountPackageSchema) => {
@@ -126,10 +167,6 @@ export default function useCreateDiscountPackage({ params }: Props) {
     // statusForm === "edit" ? handleUpdateDiscount : handlePostDiscount
   );
 
-  // const handleUpdateContract = () => {
-  //   form.setValue("contract_archive", undefined as never);
-  // };
-
   return {
     form,
     handleExecCallback,
@@ -140,19 +177,21 @@ export default function useCreateDiscountPackage({ params }: Props) {
     openModal,
     closeModal,
     errors,
-    isModaltOpen,
+    isModalOpen,
     setIsModalOpen,
-    discountFields,
-    additionalDiscountFields,
+    primaryDiscountsFields,
+    secondaryDiscountsFields,
     control,
     trigger,
     appendAdditionalDiscount,
     appendDiscount,
     removeDiscount,
     removeAdditionalDiscount,
-    watch
-    // appendDiscountRule,
-    // appendAdttionalDiscountRule,
-    // removeDiscount,
+    watch,
+    optionsDiscounts,
+    isLoadingSelect,
+    discountList,
+    discountId: discountPackageId,
+    isFormDisabled: disabled
   };
 }

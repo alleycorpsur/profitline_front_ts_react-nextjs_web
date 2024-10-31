@@ -9,7 +9,7 @@ import {
   UploadDocumentButton
 } from "@/components/atoms/UploadDocumentButton/UploadDocumentButton";
 import AnnualFeatures from "./annualFeatures/AnnualFeatures";
-import { getOptionsByType } from "../../../constants/discountTypes";
+import { getOptionsByType } from "../../../../constants/discountTypes";
 import { DiscountSchema } from "../../resolvers/generalResolver";
 import { useAppStore } from "@/lib/store/store";
 import { Pencil } from "phosphor-react";

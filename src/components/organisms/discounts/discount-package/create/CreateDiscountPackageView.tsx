@@ -4,13 +4,14 @@ import Link from "next/link";
 import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
 import useCreateDiscountPackage from "./hooks/useCreateDiscountPackage";
 import styles from "./CreateDiscountPackageView.module.scss";
-import { Pencil, Plus } from "phosphor-react";
+import { Plus } from "phosphor-react";
 import { Controller } from "react-hook-form";
 import { InputForm } from "@/components/atoms/inputs/InputForm/InputForm";
 import { discountsFormColumns } from "../../constants/column";
 import { DividerCustom } from "@/components/atoms/DividerCustom/DividerCustom";
 import AddDiscountModal from "@/components/molecules/modals/AddDiscountModal/AddDiscountModal";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { Discount } from "@/types/discount/DiscountPackage";
 
 type Props = {
   params?: { id: string };
@@ -18,37 +19,72 @@ type Props = {
 export type TypeDiscount = "principal" | "additional";
 const { Title, Text } = Typography;
 
-export function CreatePDiscountPackageView({ params }: Props) {
+export function CreateDiscountPackageView({ params }: Readonly<Props>) {
   const {
-    form,
     handleExecCallback,
     loading,
     statusForm,
-    handleChangeStatusForm,
     contextHolder,
     setIsModalOpen,
-    isModaltOpen,
+    isModalOpen,
     errors,
     control,
-    discountFields,
-    additionalDiscountFields,
+    primaryDiscountsFields,
+    secondaryDiscountsFields,
     trigger,
     watch,
     appendDiscount,
     appendAdditionalDiscount,
     removeDiscount,
-    removeAdditionalDiscount
+    removeAdditionalDiscount,
+    isLoadingSelect,
+    optionsDiscounts,
+    discountList,
+    //discountId,
+    isFormDisabled
   } = useCreateDiscountPackage({ params });
 
-  const discountId = null;
-
   const [typeDiscount, setTypeDiscount] = useState<TypeDiscount | null>(null);
+
+  const handleConfirmModal = (id: number) => {
+    const completeOptionSelected = discountList?.find((d) => d.id === id);
+    if (completeOptionSelected) {
+      if (typeDiscount === "principal") {
+        appendDiscount(completeOptionSelected);
+      } else appendAdditionalDiscount(completeOptionSelected);
+    }
+  };
+
+  function filterAvailableDiscountOptions(
+    optionsDiscounts: { value: number; label: string }[] | undefined,
+    discounts: Discount[] = [],
+    additionalDiscounts: Discount[] = []
+  ): { value: number; label: string }[] | undefined {
+    if (!optionsDiscounts) return undefined;
+
+    const usedDiscountIds = new Set([
+      ...discounts.map((discount) => discount.packageId),
+      ...additionalDiscounts.map((discount) => discount.packageId)
+    ]);
+
+    return optionsDiscounts.filter((option) => !usedDiscountIds.has(option.value));
+  }
+  const filteredOptions = useMemo(
+    () =>
+      filterAvailableDiscountOptions(
+        optionsDiscounts,
+        primaryDiscountsFields,
+        secondaryDiscountsFields
+      ),
+    [optionsDiscounts, primaryDiscountsFields, secondaryDiscountsFields]
+  );
+
   return (
     <>
       {contextHolder}
       <Flex className={styles.mainCreateDiscount}>
         <Flex className={styles.HeaderContainer} vertical gap={20}>
-          <Flex gap={20} justify="space-between">
+          {/* <Flex gap={20} justify="space-between">
             {statusForm !== "create" && (
               <Button
                 className={styles.buttonEdit}
@@ -63,7 +99,7 @@ export function CreatePDiscountPackageView({ params }: Props) {
                 <Pencil size={"1.2rem"} />
               </Button>
             )}
-          </Flex>
+          </Flex> */}
           <Title level={4}>Descripción</Title>
           <Flex gap={20}>
             <InputForm
@@ -101,7 +137,7 @@ export function CreatePDiscountPackageView({ params }: Props) {
           <Flex gap={20}>
             <Flex vertical>
               <Controller
-                name="start_date"
+                name="startDate"
                 control={control}
                 render={({ field: { value, ...field } }) => {
                   return (
@@ -115,8 +151,8 @@ export function CreatePDiscountPackageView({ params }: Props) {
                         value={value}
                         {...field}
                       />
-                      <Text type="danger" style={{ textWrap: "wrap" }} hidden={!errors.start_date}>
-                        {errors?.start_date?.message}
+                      <Text type="danger" style={{ textWrap: "wrap" }} hidden={!errors.startDate}>
+                        {errors?.startDate?.message}
                       </Text>
                     </>
                   );
@@ -125,7 +161,7 @@ export function CreatePDiscountPackageView({ params }: Props) {
             </Flex>
             <Flex vertical>
               <Controller
-                name="end_date"
+                name="endDate"
                 control={control}
                 render={({ field: { onChange, ...field } }) => {
                   return (
@@ -138,12 +174,12 @@ export function CreatePDiscountPackageView({ params }: Props) {
                         type="secondary"
                         onChange={(e) => {
                           onChange(e);
-                          trigger("end_date");
+                          trigger("endDate");
                         }}
                         {...field}
                       ></DatePicker>
-                      <Text type="danger" hidden={!errors.end_date}>
-                        {errors?.end_date?.message}
+                      <Text type="danger" hidden={!errors.endDate}>
+                        {errors?.endDate?.message}
                       </Text>
                     </>
                   );
@@ -155,43 +191,54 @@ export function CreatePDiscountPackageView({ params }: Props) {
           <Flex gap={20} vertical>
             <Flex vertical gap={24}>
               <Title level={4}>Descuento</Title>
-              <Table
-                dataSource={discountFields}
-                columns={discountsFormColumns({ remove: removeDiscount })}
-                pagination={false}
-              />
-              <Flex justify="flex-end">
-                <PrincipalButton
-                  onClick={() => {
-                    setTypeDiscount("principal");
-                    setIsModalOpen(true);
-                  }}
-                  icon={<Plus />}
-                  iconPosition="end"
-                >
-                  Agregar regla de descuento
-                </PrincipalButton>
-              </Flex>
+              <>
+                <Table
+                  dataSource={primaryDiscountsFields}
+                  columns={discountsFormColumns({ remove: removeDiscount, isFormDisabled })}
+                  pagination={false}
+                />
+                <Text type="danger" hidden={!errors.primaryDiscounts}>
+                  {errors?.primaryDiscounts?.message}
+                </Text>
+              </>
+              {!isFormDisabled && (
+                <Flex justify="flex-end">
+                  <PrincipalButton
+                    onClick={() => {
+                      setTypeDiscount("principal");
+                      setIsModalOpen(true);
+                    }}
+                    icon={<Plus />}
+                    iconPosition="end"
+                    disabled={isFormDisabled}
+                  >
+                    Agregar regla de descuento
+                  </PrincipalButton>
+                </Flex>
+              )}
             </Flex>
             <Flex vertical gap={24}>
               <Title level={4}>Descuento adicional</Title>
               <Table
-                dataSource={additionalDiscountFields}
-                columns={discountsFormColumns({ remove: removeAdditionalDiscount })}
+                dataSource={secondaryDiscountsFields}
+                columns={discountsFormColumns({ remove: removeAdditionalDiscount, isFormDisabled })}
                 pagination={false}
               />
-              <Flex justify="flex-end">
-                <PrincipalButton
-                  onClick={() => {
-                    setTypeDiscount("additional");
-                    setIsModalOpen(true);
-                  }}
-                  icon={<Plus />}
-                  iconPosition="end"
-                >
-                  Agregar regla de descuento
-                </PrincipalButton>
-              </Flex>
+              {!isFormDisabled && (
+                <Flex justify="flex-end">
+                  <PrincipalButton
+                    onClick={() => {
+                      setTypeDiscount("additional");
+                      setIsModalOpen(true);
+                    }}
+                    icon={<Plus />}
+                    iconPosition="end"
+                    disabled={isFormDisabled}
+                  >
+                    Agregar regla de descuento
+                  </PrincipalButton>
+                </Flex>
+              )}
             </Flex>
           </Flex>
         </Flex>
@@ -210,19 +257,21 @@ export function CreatePDiscountPackageView({ params }: Props) {
               onClick={handleExecCallback}
               loading={loading}
             >
-              {discountId ? "Guardar Descuento" : "Crear Descuento"}
+              Crear paquete de descuentos
+              {/* {discountId ? "Guardar cambios" : "Crear paquete de descuentos"} */}
             </PrincipalButton>
           )}
         </Flex>
       </Flex>
       <AddDiscountModal
-        isModalOpen={isModaltOpen}
+        isModalOpen={isModalOpen}
         onClose={() => {
           setIsModalOpen(false);
           setTypeDiscount(null);
         }}
-        typeDiscount={typeDiscount}
-        onConfirm={typeDiscount === "principal" ? appendDiscount : appendAdditionalDiscount}
+        onConfirm={(id: number) => handleConfirmModal(id)}
+        options={filteredOptions ?? []}
+        isLoading={isLoadingSelect}
       />
     </>
   );

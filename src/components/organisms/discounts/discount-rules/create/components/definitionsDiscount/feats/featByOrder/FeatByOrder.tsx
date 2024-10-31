@@ -1,19 +1,15 @@
 import { Col, Flex, Radio, Row, Typography } from "antd";
 import styles from "./FeatByOrder.module.scss";
-import { rangesDummy } from "./dataDummy";
-import { useEffect, useMemo } from "react";
 import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
 import { Plus } from "phosphor-react";
 import RangesRow from "../../rangesRow/RangesRow";
 import { InputForm } from "@/components/atoms/inputs/InputForm/InputForm";
-import { Controller, UseFormReturn, useFieldArray } from "react-hook-form";
+import { UseFormReturn, useFieldArray } from "react-hook-form";
 import ProductList from "../../productList/ProductList";
 import { DiscountSchema } from "../../../../resolvers/generalResolver";
-import {
-  discountTypesByOrder,
-  typesWithMinByOrder
-} from "@/components/organisms/discounts/constants/discountTypes";
+import { typesWithMinByOrder } from "@/components/organisms/discounts/constants/discountTypes";
 import useDiscountFeats from "../hooks/useDiscountFeats";
+import { useMemo } from "react";
 
 const { Title, Text } = Typography;
 

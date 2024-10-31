@@ -3,12 +3,6 @@ import React, { FC, useState } from "react";
 import { Modal, Select, Typography } from "antd";
 import { X } from "phosphor-react";
 import FooterButtons from "@/components/atoms/FooterButtons/FooterButtons";
-import useSWR from "swr";
-import { DiscountListData } from "@/components/organisms/discounts/discount-package/create/hooks/useCreateDiscountPackage";
-import { fetcher } from "@/utils/api/api";
-import { useAppStore } from "@/lib/store/store";
-import { DiscountBasics } from "@/types/discount/DiscountBasics";
-import { TypeDiscount } from "@/components/organisms/discounts/discount-package/create/CreateDiscountPackageView";
 const { Title } = Typography;
 
 export interface Option {
@@ -19,30 +13,18 @@ export interface Option {
 interface AddDiscountModalProps {
   isModalOpen: boolean;
   onClose: () => void;
-  typeDiscount: TypeDiscount | null;
-  onConfirm: (discount: DiscountBasics) => void;
+  onConfirm: (discountId: number) => void;
+  options: Option[];
+  isLoading: boolean;
 }
 const AddDiscountModal: FC<AddDiscountModalProps> = ({
   isModalOpen,
-  typeDiscount,
   onClose,
-  onConfirm
+  onConfirm,
+  options,
+  isLoading
 }) => {
-  const { ID: projectId } = useAppStore((project) => project.selectedProject);
-
-  const { data, isLoading } = useSWR<DiscountListData>(
-    `/discount/project/${projectId}`,
-    fetcher,
-    {}
-  );
-
-  const options = data?.data.map((option) => {
-    return {
-      value: option.id,
-      label: option.description
-    };
-  });
-  const [selectedDiscount, setSelectedDiscount] = useState<Option | null>(null);
+  const [selectedDiscountId, setSelectedDiscountId] = useState<number | null>(null);
   return (
     <Modal
       centered
@@ -58,15 +40,14 @@ const AddDiscountModal: FC<AddDiscountModalProps> = ({
       }}
       footer={
         <FooterButtons
-          titleConfirm="Agregar requerimiento"
-          isConfirmDisabled={!selectedDiscount}
+          titleConfirm="Agregar descuento"
+          isConfirmDisabled={!selectedDiscountId}
           onClose={onClose}
           handleOk={() => {
-            if (selectedDiscount) {
-              const findDiscount = data?.data.find((d) => d.id === selectedDiscount.value);
-              findDiscount && onConfirm(findDiscount);
+            if (selectedDiscountId) {
+              onConfirm(selectedDiscountId);
               onClose();
-              setSelectedDiscount(null);
+              setSelectedDiscountId(null);
             }
           }}
         />
@@ -77,11 +58,14 @@ const AddDiscountModal: FC<AddDiscountModalProps> = ({
         placeholder="Seleccione el descuento"
         style={{ width: "100%", height: "45px" }}
         options={options}
-        onSelect={(value, option) => {
-          option && setSelectedDiscount(option);
+        onSelect={(value) => {
+          setSelectedDiscountId(value);
         }}
-        value={selectedDiscount}
+        value={selectedDiscountId}
         loading={isLoading}
+        filterOption={(input, option) =>
+          option?.label ? option.label.toLowerCase().includes(input.toLowerCase()) : false
+        }
       />
     </Modal>
   );

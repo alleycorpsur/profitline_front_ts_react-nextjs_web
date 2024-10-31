@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import discountCategories from "../../constants/discountTypes";
+import discountCategories from "../../../constants/discountTypes";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { DiscountSchema, generalResolver } from "../resolvers/generalResolver";
@@ -102,7 +102,7 @@ export default function useCreateDiscountView({ params }: Props) {
     try {
       const res = await createDiscount({ ...e, project_id: ID }, files);
       messageApi.success("Descuento creado exitosamente");
-      router.push(`/descuentos/${res.data.idDiscount}`);
+      router.push(`/descuentos/regla/${res.data.idDiscount}`);
     } catch (e: any) {
       messageApi.error(e.response.data.message);
       console.error(e);
