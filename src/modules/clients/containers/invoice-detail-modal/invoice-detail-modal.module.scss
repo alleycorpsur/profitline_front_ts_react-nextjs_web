@@ -224,7 +224,6 @@
                             padding-bottom: 20px;
                             padding-left: 5px;
 
-
                             &:last-child {
                                 min-height: auto;
                                 padding-bottom: 0;
@@ -248,7 +247,6 @@
                                     display: none;
                                 }
                             }
-
 
                             .stepCircle {
                                 top: 0px;
@@ -496,6 +494,12 @@
     }
 
     .tagLabelRose {
-        background-color: #E53261 ;
+        background-color: #e53261;
+    }
+
+    .tagLabelBlack {
+        background-color: $black;
+        color: $white;
+        font-weight: 400;
     }
 }

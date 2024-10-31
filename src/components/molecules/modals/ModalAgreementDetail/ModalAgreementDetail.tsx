@@ -1,151 +1,135 @@
-import React, { useState } from "react";
-import { Modal, Typography, Tabs, Button, Table, Flex } from "antd";
+import React, { useEffect, useState } from "react";
+import { Modal, Button, Table, Flex, MenuProps } from "antd";
 import { useForm, Controller } from "react-hook-form";
+import { Paperclip } from "phosphor-react";
+import dayjs from "dayjs";
 
-import "./modalAgreementDetail.scss";
+import {
+  cancelPaymentAgreement,
+  getDetailPaymentAgreement
+} from "@/services/accountingAdjustment/accountingAdjustment";
+import { useMessageApi } from "@/context/MessageContext";
+import { formatMoney } from "@/utils/utils";
+
 import { InputForm } from "@/components/atoms/inputs/InputForm/InputForm";
 import { InputFormMoney } from "@/components/atoms/inputs/InputFormMoney/InputFormMoney";
 import { InputDateForm } from "@/components/atoms/inputs/InputDate/InputDateForm";
-import dayjs from "dayjs";
-import { DotsThree, PaperclipHorizontal } from "phosphor-react";
 import UiTab from "@/components/ui/ui-tab";
 import { FileDownloadModal } from "../FileDownloadModal/FileDownloadModal";
+import { DotsDropdown } from "@/components/atoms/DotsDropdown/DotsDropdown";
 
-const { Title, Text } = Typography;
+import { IPaymentDetail } from "@/types/paymentAgreement/IPaymentAgreement";
+
+import "./modalAgreementDetail.scss";
 
 interface Props {
-  isOpen: boolean;
+  isModalPaymentAgreementOpen: {
+    isOpen: boolean;
+    incident_id: number;
+  };
   onClose: () => void;
-  id: number;
-}
-interface InvoiceData {
-  key: string;
-  idFactura: string;
-  emision: string;
-  pendiente: string;
-  acordado: string;
-  fecha: string;
 }
 
 interface FormData {
   responsible: string;
   agreementValue: string;
   creationDate: dayjs.Dayjs;
-  evidence: { name: string; url: string; time: string }[];
+  evidence: string[];
   agreementStatus: string;
   invoicesCount: string;
   dueDate: dayjs.Dayjs;
 }
 
-const mockData: FormData = {
-  responsible: "Maria Camila Osorio",
-  agreementValue: "19500.00",
-  creationDate: dayjs("2023-03-24"),
-  evidence: [
-    {
-      name: "Ajuste-Contable-2024",
-      url: "https://example.com/ajuste-contable-2024.pdf",
-      time: "08:34PM"
-    },
-    {
-      name: "Ajuste-Contable-2024",
-      url: "https://example.com/ajuste-contable-2024-2.pdf",
-      time: "08:34PM"
-    }
-  ],
-  agreementStatus: "Maria Camila Osorio",
-  invoicesCount: "94",
-  dueDate: dayjs("2023-03-24")
-};
-const invoicesData: InvoiceData[] = [
-  {
-    key: "1",
-    idFactura: "1234556",
-    emision: "23/04/2023",
-    pendiente: "$28,000,000",
-    acordado: "$25,000,000",
-    fecha: "23/04/2023"
-  },
-  {
-    key: "2",
-    idFactura: "1234556",
-    emision: "23/04/2023",
-    pendiente: "$28,000,000",
-    acordado: "$22,000,000",
-    fecha: "23/04/2023"
-  },
-  {
-    key: "3",
-    idFactura: "1234556",
-    emision: "23/04/2023",
-    pendiente: "$19,000,000",
-    acordado: "$19,000,000",
-    fecha: "23/04/2023"
-  },
-  {
-    key: "4",
-    idFactura: "1234556",
-    emision: "23/04/2023",
-    pendiente: "$28,000,000",
-    acordado: "$28,000,000",
-    fecha: "23/04/2023"
-  },
-  {
-    key: "5",
-    idFactura: "1234556",
-    emision: "23/04/2023",
-    pendiente: "$28,000,000",
-    acordado: "$28,000,000",
-    fecha: "23/04/2023"
-  }
-];
-export const ModalAgreementDetail: React.FC<Props> = ({ id, isOpen, onClose }) => {
-  const { control, handleSubmit } = useForm<FormData>({
-    defaultValues: mockData
-  });
+export const ModalAgreementDetail: React.FC<Props> = ({ isModalPaymentAgreementOpen, onClose }) => {
+  const [paymentAgreementData, setPaymentAgreementData] = useState<IPaymentDetail>();
   const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
   const [downloadUrl, setDownloadUrl] = useState("");
   const [downloadTitle, setDownloadTitle] = useState("");
 
-  const handleEvidenceClick = (url: string, title: string) => {
+  const { showMessage } = useMessageApi();
+
+  const { control, handleSubmit, reset } = useForm<FormData>();
+
+  useEffect(() => {
+    if (!isModalPaymentAgreementOpen.incident_id) return;
+    const fetchPaymentAgreementData = async () => {
+      try {
+        const data = await getDetailPaymentAgreement(isModalPaymentAgreementOpen.incident_id);
+        setPaymentAgreementData(data);
+        reset(dataToFormData(data));
+      } catch (error) {
+        console.error("Error getting payment agreement detail", error);
+      }
+    };
+    fetchPaymentAgreementData();
+  }, [isModalPaymentAgreementOpen.incident_id]);
+
+  const handleEvidenceClick = (url: string) => {
     setDownloadUrl(url);
-    setDownloadTitle(title);
+    const title = url.split("/").pop();
+    setDownloadTitle(title || url);
     setIsDownloadModalOpen(true);
   };
 
   const columns = [
     {
       title: "ID Factura",
-      dataIndex: "idFactura",
-      key: "idFactura",
+      dataIndex: "invoice_id",
+      key: "invoice_id",
       render: (text: string) => <a>{text}</a>
     },
     {
       title: "Emisión",
-      dataIndex: "emision",
-      key: "emision"
+      dataIndex: "CREATE_AT",
+      key: "CREATE_AT"
     },
     {
       title: "Pendiente",
-      dataIndex: "pendiente",
-      key: "pendiente"
+      dataIndex: "current_financial_record",
+      key: "current_financial_record",
+      render: (text: number) => <span>{formatMoney(text)}</span>
     },
     {
       title: "$ acordado",
-      dataIndex: "acordado",
-      key: "acordado"
+      dataIndex: "amount",
+      key: "amount",
+      render: (text: number) => <span>{formatMoney(text)}</span>
     },
     {
       title: "Fecha",
-      dataIndex: "fecha",
-      key: "fecha"
+      dataIndex: "payment_date",
+      key: "payment_date"
     }
   ];
   const onSubmit = (data: FormData) => {
-    console.log("Form submitted with data:", data);
+    console.info("Form submitted with data:", data);
     // Here you would typically send the data to an API
     onClose();
   };
+
+  const handleCancelAgreement = async () => {
+    if (paymentAgreementData?.status_name === "Anulada") {
+      showMessage("error", "El acuerdo ya se encuentra anulado");
+      return;
+    }
+    try {
+      await cancelPaymentAgreement(isModalPaymentAgreementOpen.incident_id);
+      onClose();
+    } catch (error) {
+      showMessage("error", "Error al anular el acuerdo");
+    }
+  };
+
+  const itemsDropDown: MenuProps["items"] = [
+    {
+      key: "1",
+      label: (
+        <Button className="buttonOutlined" onClick={handleCancelAgreement}>
+          Anular acuerdo
+        </Button>
+      )
+    }
+  ];
 
   const renderSummaryTab = () => (
     <form onSubmit={handleSubmit(onSubmit)} className="agreement-form">
@@ -161,8 +145,8 @@ export const ModalAgreementDetail: React.FC<Props> = ({ id, isOpen, onClose }) =
           titleInput="Valor del acuerdo"
           nameInput="agreementValue"
           control={control}
-          readOnly
           error={undefined}
+          readOnly
         />
         <InputForm
           titleInput="No. de facturas"
@@ -185,35 +169,37 @@ export const ModalAgreementDetail: React.FC<Props> = ({ id, isOpen, onClose }) =
           error={undefined}
         />
       </div>
-      <div className="evidence-section">
-        <Text strong>Evidencia</Text>
+      <div className="evidenceSection">
+        <p className="evidenceSection__title">Evidencia</p>
         <Controller
           name="evidence"
           control={control}
           render={({ field }) => (
             <div className="evidence-list">
-              {field.value.map((item, index) => (
-                <div
-                  key={index}
-                  className="evidence-item"
-                  onClick={() => handleEvidenceClick(item.url, item.name)}
-                >
-                  <PaperclipHorizontal size={20} fill="#000000" className="evidence-icon" />
-                  <Flex vertical gap={"4px"}>
-                    <Text>{item.name}</Text>
-                    <Text className="evidence-time">{item.time}</Text>
-                  </Flex>
-                </div>
-              ))}
+              {field?.value?.map((item, index) => {
+                return (
+                  <div
+                    key={index}
+                    className="evidence-item"
+                    onClick={() => handleEvidenceClick(item)}
+                  >
+                    <Paperclip size={36} className="evidence-icon" />
+                    <Flex vertical gap={"4px"}>
+                      <p>{item.split("/").pop()}</p>
+                    </Flex>
+                  </div>
+                );
+              })}
             </div>
           )}
         />
       </div>
     </form>
   );
+
   const renderInvoicesTab = () => (
     <Table
-      dataSource={invoicesData}
+      dataSource={paymentAgreementData?.agreement_invoices}
       columns={columns}
       pagination={false}
       className="invoices-table"
@@ -237,12 +223,13 @@ export const ModalAgreementDetail: React.FC<Props> = ({ id, isOpen, onClose }) =
     <>
       <Modal
         width={640}
-        open={isOpen}
+        open={isModalPaymentAgreementOpen.isOpen}
         title={
           <div className="modal-header">
-            <Title level={5} className="modal-title">
-              Acuerdo de pago <span className="agreement-id">{id}</span>
-            </Title>
+            <div className="agreement-detail-modal__modal-title">
+              Acuerdo de pago{" "}
+              <span className="agreement-id">{isModalPaymentAgreementOpen.incident_id}</span>
+            </div>
           </div>
         }
         footer={null}
@@ -253,7 +240,7 @@ export const ModalAgreementDetail: React.FC<Props> = ({ id, isOpen, onClose }) =
           tabs={items}
           tabBarExtraContent={
             <div className="modal-actions-dots">
-              <DotsThree size={24} weight="bold" />
+              <DotsDropdown items={itemsDropDown} />
             </div>
           }
         />
@@ -266,4 +253,16 @@ export const ModalAgreementDetail: React.FC<Props> = ({ id, isOpen, onClose }) =
       />
     </>
   );
+};
+
+const dataToFormData = (data: IPaymentDetail): FormData => {
+  return {
+    responsible: data.user_name,
+    agreementValue: data.amount.toString(),
+    creationDate: dayjs(data.created_at),
+    evidence: data.files,
+    agreementStatus: data.status_name,
+    invoicesCount: data.count_invoices.toString(),
+    dueDate: dayjs(data.payment_date)
+  };
 };

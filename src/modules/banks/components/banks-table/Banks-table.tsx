@@ -85,31 +85,43 @@ export const BanksTable = ({
       title: "ID",
       dataIndex: "id",
       key: "id",
-      render: (text) => <Text className="idText">{text}</Text>
+      render: (text) => <Text className="idText">{text}</Text>,
+      sorter: (a, b) => a.id - b.id,
+      showSorterTooltip: false
     },
     {
       title: "Cliente",
       dataIndex: "CLIENT_NAME",
       key: "CLIENT_NAME",
-      render: (text) => <Text>{text}</Text>
+      render: (text) => <Text>{text}</Text>,
+      sorter: (a, b) => a.CLIENT_NAME.localeCompare(b.CLIENT_NAME),
+      showSorterTooltip: false
     },
     {
       title: "Fecha",
       dataIndex: "created_at",
       key: "created_at",
-      render: (text) => <Text>{formatDateDMY(text)}</Text>
+      render: (text) => <Text>{formatDateDMY(text)}</Text>,
+      sorter: (a, b) => Date.parse(a.created_at) - Date.parse(b.created_at),
+      showSorterTooltip: false,
+      width: 110
     },
     {
       title: "Monto",
       key: "current_value",
       dataIndex: "current_value",
-      render: (text) => <Text>{formatMoney(text)}</Text>
+      render: (text) => <Text>{formatMoney(text)}</Text>,
+      sorter: (a, b) => (a.current_value ?? 0) - (b.current_value ?? 0),
+      showSorterTooltip: false,
+      width: 130
     },
     {
       title: "Descripción",
       key: "description",
       dataIndex: "description",
-      render: (text) => <Text>{text}</Text>
+      render: (text) => <Text>{text}</Text>,
+      sorter: (a, b) => a.description.localeCompare(b.description),
+      showSorterTooltip: false
     },
     {
       title: "Cuenta",
@@ -154,7 +166,10 @@ export const BanksTable = ({
         ...data,
         key: data.id
       }))}
-      pagination={false}
+      pagination={{
+        pageSize: 15,
+        showSizeChanger: false
+      }}
     />
   );
 };
