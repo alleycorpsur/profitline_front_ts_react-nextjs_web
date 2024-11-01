@@ -5,9 +5,10 @@ import { ArrowLineDown, CaretDoubleRight, DotsThree, Receipt } from "phosphor-re
 import { formatMoney } from "@/utils/utils";
 import { getPaymentDetail } from "@/services/banksPayments/banksPayments";
 
-import { ISingleBank } from "@/types/banks/IBanks";
+import { IPaymentDetail } from "@/types/banks/IBanks";
 
 import styles from "./ModalDetailPayment.module.scss";
+import ModalDetailPaymentEvents from "./components/ModalDetailPaymentEvents/ModalDetailPaymentEvents";
 
 interface ModalDetailPaymentProps {
   isOpen: boolean;
@@ -81,13 +82,8 @@ const mockPaymentData = {
   current_amount: 30000000
 };
 
-const ModalDetailPayment: FC<ModalDetailPaymentProps> = ({
-  isOpen,
-  onClose,
-
-  paymentId
-}) => {
-  const [paymentData, setPaymentData] = useState<ISingleBank>();
+const ModalDetailPayment: FC<ModalDetailPaymentProps> = ({ isOpen, onClose, paymentId }) => {
+  const [paymentData, setPaymentData] = useState<IPaymentDetail>();
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
@@ -96,6 +92,7 @@ const ModalDetailPayment: FC<ModalDetailPaymentProps> = ({
       // Fetch payment data
       try {
         const res = await getPaymentDetail(paymentId);
+        console.log("response Payment detail ", res);
         setPaymentData(res[0]);
       } catch (error) {
         console.error("Error al obtener el detalle del pago:", error);
@@ -151,62 +148,7 @@ const ModalDetailPayment: FC<ModalDetailPaymentProps> = ({
               </Flex>
             </div>
 
-            <div className={styles.body}>
-              <div className={styles.headerBody}>
-                <div className={styles.title}>Trazabilidad</div>
-                <div className={`${styles.status} ${styles[mockPaymentData.status.toLowerCase()]}`}>
-                  {mockPaymentData.status}
-                </div>
-              </div>
-              <div className={styles.content}>
-                <div className={styles.progress}></div>
-                <div className={styles.description}>
-                  <div className={styles.stepperContainer}>
-                    <div className={styles.stepperContent}>
-                      {mockPaymentData.traceability.map((item, index, arr) => (
-                        <div key={item.id} className={styles.mainStep}>
-                          <div
-                            className={`${styles.stepLine} ${index === arr.length - 1 ? styles.inactive : styles.active}`}
-                          />
-                          <div className={`${styles.stepCircle} ${styles.active}`} />
-                          <div className={styles.stepLabel}>
-                            <div className={styles.cardInvoiceFiling}>
-                              <h5 className={styles.title}>{item.event_name}</h5>
-                              <div className={styles.date}>{formatDatePlane(item.event_date)}</div>
-                              {item.username && (
-                                <div className={styles.name}>{`Responsable: ${item.username}`}</div>
-                              )}
-                              {item.event_name === "Aplicación" && (
-                                <div>
-                                  {item.cp_id && (
-                                    <Flex gap="4px" className={styles.name}>
-                                      Aplicación {item.ammount} a la sucursal{" "}
-                                      <div className={styles.idAdjustment}>{item.cp_id}</div>
-                                    </Flex>
-                                  )}
-                                  <Flex wrap gap="2px" className={styles.name}>
-                                    Aplicado a las facturas:
-                                    {item.invoices?.map((invoice, index) => (
-                                      <div key={invoice} className={styles.text_blue}>
-                                        {invoice}
-                                        {index < item.invoices.length - 1 ? "," : ""}
-                                      </div>
-                                    ))}
-                                  </Flex>
-                                  <div className={styles.icons}>
-                                    <ArrowLineDown size={14} />
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <ModalDetailPaymentEvents paymentEvents={paymentData?.events} />
           </>
         )}
       </div>

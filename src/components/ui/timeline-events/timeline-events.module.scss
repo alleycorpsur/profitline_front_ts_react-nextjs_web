@@ -1,0 +1,192 @@
+@import "@/styles/variables.scss";
+
+.content {
+    width: 100%;
+    display: flex;
+    padding-top: 5px;
+    margin-top: 10px;
+    overflow-y: scroll;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+
+    .progress {
+        width: 40px;
+        display: flex;
+        flex-direction: column;
+
+        .iconContainer {
+            display: flex;
+            justify-content: flex-start;
+
+            .iconProgress {
+                width: 24px;
+                height: 24px;
+                padding: 6px;
+                display: flex;
+                cursor: pointer;
+                border-radius: 4px;
+                background: #f7f7f7;
+                justify-content: center;
+            }
+        }
+    }
+
+    .stepperContainer {
+        display: flex;
+        justify-content: flex-start;
+        width: 100%;
+
+        .stepperContent {
+            .mainStep {
+                min-height: 120px;
+                display: flex;
+                column-gap: 10px;
+                position: relative;
+                padding-bottom: 20px;
+                padding-left: 5px;
+
+                &:last-child {
+                    min-height: auto;
+                    padding-bottom: 0;
+                }
+
+                .stepLine {
+                    width: 1px;
+                    position: absolute;
+                    top: 10px;
+                    bottom: 0;
+                    left: -1px;
+
+                    background-color: #dddddd;
+
+                    &.active {
+                        background-color: transparent;
+                        border-left: 1px dashed #cbe71e;
+                    }
+
+                    &.inactive {
+                        display: none;
+                    }
+                }
+
+                .stepCircle {
+                    top: 0px;
+                    left: -5px;
+                    width: 10px;
+                    height: 10px;
+                    border-radius: 50%;
+                    position: absolute;
+                    background-color: #dddddd;
+
+                    &.active {
+                        background-color: #cbe71e;
+                    }
+                }
+
+                .stepLabel {
+                    display: flex;
+                    margin-top: -5px;
+
+                    .quantity {
+                        gap: 6px;
+                        height: 32px;
+                        display: flex;
+                        padding-left: 8px;
+
+                        .button {
+                            display: flex;
+                            cursor: pointer;
+                            padding: 10px 6px;
+                            border-radius: 4px;
+                            background: #f7f7f7;
+                            justify-content: center;
+                        }
+
+                        .number {
+                            display: flex;
+                            height: 32px;
+                            width: 40px;
+                            font-weight: 400;
+                            color: #141414;
+                            padding: 6px 8px;
+                            text-align: center;
+                            border-radius: 4px;
+                            align-items: center;
+                            line-height: normal;
+                            background: #f7f7f7;
+                            justify-content: center;
+                        }
+                    }
+
+                    .cardInvoiceFiling {
+                        display: flex;
+                        flex-direction: column;
+
+                        .icons {
+                            display: flex;
+                            padding: 6px;
+                            cursor: pointer;
+                            margin-top: -46px;
+                            border-radius: 4px;
+                            position: absolute;
+                            margin-left: -44px;
+                            background: #f7f7f7;
+                        }
+
+                        .adjustment {
+                            gap: 4px;
+                            display: flex;
+                            font-size: 12px;
+                            font-weight: 400;
+                            color: #a5a5a5;
+                            padding-left: 8px;
+                            line-height: normal;
+
+                            .idAdjustment {
+                                color: #0085ff;
+                                cursor: pointer;
+                            }
+                        }
+
+                        .title {
+                            display: flex;
+                            font-size: 1rem;
+                            font-weight: 300;
+                            padding-left: 8px;
+                            color: #141414;
+                            line-height: normal;
+                        }
+
+                        .date {
+                            font-size: 12px;
+                            font-weight: 600;
+                            color: #a5a5a5;
+                            padding-left: 8px;
+                            line-height: normal;
+                        }
+
+                        .dateAndYears {
+                            font-size: 12px;
+                            font-weight: 600;
+                            color: #a5a5a5;
+                            padding-left: 8px;
+                            line-height: normal;
+                        }
+
+                        .name {
+                            font-size: 12px;
+                            font-weight: 400;
+                            color: #a5a5a5;
+                            padding-left: 8px;
+                            line-height: normal;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
