@@ -1,12 +1,12 @@
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Cascader } from "antd";
 import { useAppStore } from "@/lib/store/store";
 
-import "../filterCascader.scss";
+import { getClientGroups } from "@/services/groupClients/groupClients";
 import { getHoldingsByProjectId, IHoldingResponse } from "@/services/holding/holding";
 import { IClientsGroupsFull } from "@/types/clientsGroups/IClientsGroups";
-import { getClientGroups } from "@/services/groupClients/groupClients";
 
+import "../filterCascader.scss";
 interface Option {
   value: string;
   label: string;
@@ -31,7 +31,7 @@ export const FilterPortfolio = ({ setSelectedFilters }: Props) => {
   const [optionsList, setOptionsList] = useState<Option[]>(options);
   const [selectOptions, setSelectOptions] = useState<string[][]>([]);
 
-  const onBlur = () => {
+  useEffect(() => {
     if (selectOptions.length === 0) {
       return setSelectedFilters({
         holding: [],
@@ -50,7 +50,7 @@ export const FilterPortfolio = ({ setSelectedFilters }: Props) => {
       holding: holdingFilters,
       clientGroup: clientGroupFilters
     });
-  };
+  }, [selectOptions]);
 
   const onChange = (value: string[][]) => {
     setSelectOptions(value);
@@ -108,7 +108,6 @@ export const FilterPortfolio = ({ setSelectedFilters }: Props) => {
       loadData={loadData}
       value={selectOptions}
       onChange={onChange}
-      onBlur={onBlur}
     />
   );
 };

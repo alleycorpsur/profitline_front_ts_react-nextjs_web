@@ -7,7 +7,6 @@ import { getChannelByProjectId } from "@/services/businessRules/BR";
 import { ILine, ISubLine } from "@/types/lines/line";
 import { IZone } from "@/types/zones/IZones";
 
-
 import "../filterCascader.scss";
 import { channel } from "@/types/bre/IBRE";
 
@@ -16,6 +15,7 @@ interface FilterOption {
   label: string;
   isLeaf?: boolean;
   children?: FilterOption[];
+  line_id?: string | number;
 }
 
 export interface SelectedFiltersWallet {
@@ -35,6 +35,7 @@ export const WalletTabFilter: React.FC<Props> = ({ setSelectedFilters }) => {
   const { ID } = useAppStore((state) => state.selectedProject);
   const [cascaderOptions, setCascaderOptions] = useState<FilterOption[]>([]);
   const [selectedOptions, setSelectedOptions] = useState<(string | number)[][]>([]);
+  const [originalSublines, setOriginalSublines] = useState<FilterOption[]>([]); // Store original sublines data
 
   useEffect(() => {
     const fetchData = async () => {
@@ -63,8 +64,11 @@ export const WalletTabFilter: React.FC<Props> = ({ setSelectedFilters }) => {
 
         const sublines = sublinesData.map((subline: ISubLine) => ({
           value: subline.id,
-          label: subline.subline_description
+          label: subline.subline_description,
+          line_id: subline.line_id
         }));
+
+        setOriginalSublines(sublines); // Store the original sublines list
 
         setCascaderOptions([
           {
@@ -112,6 +116,34 @@ export const WalletTabFilter: React.FC<Props> = ({ setSelectedFilters }) => {
 
     fetchData();
   }, [ID]);
+
+  const updateCascaderOptions = (filteredSublines: FilterOption[]) => {
+    setCascaderOptions((prevOptions) =>
+      prevOptions.map((option) =>
+        option.value === "sublines" ? { ...option, children: filteredSublines } : option
+      )
+    );
+  };
+
+  useEffect(() => {
+    // Find all selected line IDs from selectedOptions
+    const selectedLinesIds = selectedOptions
+      .filter((option) => option[0] === "lines") // Get all the selected lines
+      .map((option) => option.slice(1)) // Extract the actual IDs
+      .flat(); // Flatten the array to handle multiple selected lines
+
+    if (selectedLinesIds.length > 0) {
+      // Filter sublines that belong to any of the selected line IDs
+      const filteredSublines = originalSublines.filter(
+        (subline) => subline.line_id && selectedLinesIds.includes(subline.line_id)
+      );
+
+      updateCascaderOptions(filteredSublines);
+    } else {
+      // Reset to show all sublines if no lines are selected
+      updateCascaderOptions(originalSublines);
+    }
+  }, [selectedOptions, originalSublines]);
 
   const handleCascaderChange = (value: (string | number)[][]) => {
     setSelectedOptions(value);

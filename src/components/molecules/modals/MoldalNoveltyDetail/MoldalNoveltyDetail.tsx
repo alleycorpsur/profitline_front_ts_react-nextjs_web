@@ -25,7 +25,6 @@ const MoldalNoveltyDetail: FC<MoldalNoveltyDetailProps> = ({ onClose, noveltyId 
 
   const [messageShow, contextHolder] = message.useMessage();
   useEffect(() => {
-    
     if (data && data.length > 0) {
       setIncidentData(data[0]);
     }
@@ -81,7 +80,7 @@ const MoldalNoveltyDetail: FC<MoldalNoveltyDetailProps> = ({ onClose, noveltyId 
 
         <div className="header">
           <Title level={4}>{incidentData.incident_name}</Title>
-          {incidentData.is_rejected !== 1 && incidentData.is_rejected !== 0 && (
+          {incidentData.status_name === "pendiente" && (
             <div className="header-buttons">
               <Button onClick={() => handleOpenResolveModal(false)}>
                 <X />
@@ -101,12 +100,7 @@ const MoldalNoveltyDetail: FC<MoldalNoveltyDetailProps> = ({ onClose, noveltyId 
         cliente={incidentData.client}
         aprobadores={[{ nombre: incidentData.approvers_users, estado: "pendiente" }]}
       />
-      <InfoInvoice
-        FacturaID={incidentData.id_erp || ""}
-        invoice_amount_difference={incidentData.invoice_amount_difference || 0}
-        invoice_cashport_value={incidentData.invoice_cashport_value}
-        invoice_client_value={incidentData.invoice_client_value}
-      />
+      <InfoInvoice incidentData={incidentData} />
       <EvidenceSection
         evidenceComments={incidentData.evidence_comments}
         evidenceFiles={incidentData.evidence_files}

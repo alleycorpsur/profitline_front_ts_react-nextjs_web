@@ -11,12 +11,13 @@ interface UseInvoiceDetailProps {
 }
 
 export const useInvoiceDetail = (props: UseInvoiceDetailProps) => {
-  const { data, isLoading } = useSWR<InvoiceDetail>(
+  const { data, isLoading, mutate } = useSWR<InvoiceDetail>(
     `/invoice/${props.invoiceId}/client/${props.clientId}/project/${props.projectId}`,
     fetcher
   );
   return {
     data: data?.data,
-    loading: isLoading
+    loading: isLoading,
+    mutate
   };
 };

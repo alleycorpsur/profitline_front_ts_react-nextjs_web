@@ -1,9 +1,10 @@
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Button, Flex, Table, TableProps, Typography } from "antd";
 import { Eye, Receipt } from "phosphor-react";
 
+import { formatDateDMY, formatMoney } from "@/utils/utils";
 import { ISingleBank } from "@/types/banks/IBanks";
-import { formatMoney } from "@/utils/utils";
+
 import "./banks-table.scss";
 
 const { Text } = Typography;
@@ -11,17 +12,24 @@ const { Text } = Typography;
 interface PropsBanksTable {
   clientsByStatus: any[];
   setSelectedRows: Dispatch<SetStateAction<ISingleBank[] | undefined>>;
-  handleOpenPaymentDetail?: (payment: any) => void;
+  // eslint-disable-next-line no-unused-vars
+  handleOpenPaymentDetail?: (payment: ISingleBank) => void;
   bankStatusId: number;
+  clearSelected: boolean;
 }
 
 export const BanksTable = ({
   clientsByStatus,
   setSelectedRows,
   handleOpenPaymentDetail,
-  bankStatusId
+  bankStatusId,
+  clearSelected
 }: PropsBanksTable) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+
+  useEffect(() => {
+    setSelectedRowKeys([]);
+  }, [clearSelected]);
 
   const onSelectChange = (newSelectedRowKeys: React.Key[], newSelectedRows: ISingleBank[]) => {
     setSelectedRowKeys(newSelectedRowKeys);
@@ -39,7 +47,7 @@ export const BanksTable = ({
           const unCheckedRows = prevSelectedRows?.filter(
             (prevSelectedRow) =>
               !newSelectedRowKeys.includes(prevSelectedRow.id) &&
-              prevSelectedRow.status_id === bankStatusId
+              prevSelectedRow.id_status === bankStatusId
           );
           if (unCheckedRows.length > 0) {
             // remove form the prevState the ones present in the unCheckedRows
@@ -60,7 +68,7 @@ export const BanksTable = ({
       setSelectedRows((prevSelectedRows) => {
         if (prevSelectedRows) {
           return prevSelectedRows.filter(
-            (prevSelectedRow) => prevSelectedRow.status_id !== bankStatusId
+            (prevSelectedRow) => prevSelectedRow.id_status !== bankStatusId
           );
         }
       });
@@ -77,40 +85,52 @@ export const BanksTable = ({
       title: "ID",
       dataIndex: "id",
       key: "id",
-      render: (text) => <Text className="idText">{text}</Text>
+      render: (text) => <Text className="idText">{text}</Text>,
+      sorter: (a, b) => a.id - b.id,
+      showSorterTooltip: false
     },
     {
       title: "Cliente",
-      dataIndex: "client_name",
-      key: "client_name",
-      render: (text) => <Text>{text}</Text>
+      dataIndex: "CLIENT_NAME",
+      key: "CLIENT_NAME",
+      render: (text) => <Text>{text}</Text>,
+      sorter: (a, b) => a.CLIENT_NAME.localeCompare(b.CLIENT_NAME),
+      showSorterTooltip: false
     },
     {
       title: "Fecha",
-      dataIndex: "date",
-      key: "date",
-      render: (text) => <Text>{text}</Text>
+      dataIndex: "created_at",
+      key: "created_at",
+      render: (text) => <Text>{formatDateDMY(text)}</Text>,
+      sorter: (a, b) => Date.parse(a.created_at) - Date.parse(b.created_at),
+      showSorterTooltip: false,
+      width: 110
     },
     {
       title: "Monto",
-      key: "amount",
-      dataIndex: "amount",
-      render: (text) => <Text>{formatMoney(text)}</Text>
+      key: "current_value",
+      dataIndex: "current_value",
+      render: (text) => <Text>{formatMoney(text)}</Text>,
+      sorter: (a, b) => (a.current_value ?? 0) - (b.current_value ?? 0),
+      showSorterTooltip: false,
+      width: 130
     },
     {
       title: "Descripción",
       key: "description",
       dataIndex: "description",
-      render: (text) => <Text>{text}</Text>
+      render: (text) => <Text>{text}</Text>,
+      sorter: (a, b) => a.description.localeCompare(b.description),
+      showSorterTooltip: false
     },
     {
       title: "Cuenta",
-      key: "account_number",
-      dataIndex: "account_number",
+      key: "bank_description",
+      dataIndex: "bank_description",
       render: (text) => (
         <>
-          <Text>{text}</Text>
-          <p className="accountBankText">Bancolombia</p>
+          <Text>123456</Text>
+          <p className="accountBankText">{text}</p>
         </>
       )
     },
@@ -119,7 +139,7 @@ export const BanksTable = ({
       key: "seeProject",
       width: "40px",
       dataIndex: "",
-      render: (_, recoder) => (
+      render: (_, record) => (
         <Flex gap={"0.5rem"}>
           <Button className="buttonSeeEvidence" icon={<Receipt size={"1.3rem"} />} />
           <Button
@@ -127,7 +147,7 @@ export const BanksTable = ({
             icon={
               <Eye
                 size={"1.3rem"}
-                onClick={() => handleOpenPaymentDetail && handleOpenPaymentDetail(recoder.id)}
+                onClick={() => handleOpenPaymentDetail && handleOpenPaymentDetail(record)}
               />
             }
           />
@@ -146,7 +166,10 @@ export const BanksTable = ({
         ...data,
         key: data.id
       }))}
-      pagination={false}
+      pagination={{
+        pageSize: 15,
+        showSizeChanger: false
+      }}
     />
   );
 };

@@ -40,11 +40,13 @@
         border: 1px solid $background;
 
         &:hover {
-            border: none
+            border: none;
+            background-color: $background !important;
         }
 
         &:focus {
-            border: none
+            border: none;
+            background-color: $background !important;
         }
 
         &::placeholder {

@@ -1,4 +1,4 @@
-import { Flex, Input, InputNumber, Typography } from "antd";
+import { Flex, Input, Typography } from "antd";
 import { Control, Controller, FieldError, RegisterOptions } from "react-hook-form";
 import "./inputFormMoney.scss";
 
@@ -35,7 +35,8 @@ export const InputFormMoney = ({
 }: Props) => {
   const formatNumber = (value: string): string => {
     if (!value) return "";
-    const numStr = value.replace(/\D/g, "");
+    else if (typeof value !== "string") value = String(value);
+    const numStr = String(value).replace(/\D/g, "");
     return numStr.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   };
 

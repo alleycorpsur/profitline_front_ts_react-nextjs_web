@@ -41,7 +41,7 @@ export const useInvoices = ({
       ? `&radication_type=${radicationType}`
       : "";
   const linesQuery = lines && lines.length > 0 ? `&line=${lines.join(",")}` : "";
-  const sublinesQuery = sublines && sublines.length > 0 ? `&line=${sublines.join(",")}` : "";
+  const sublinesQuery = sublines && sublines.length > 0 ? `&subline=${sublines.join(",")}` : "";
   const zonesQuery = zones && zones.length > 0 ? `&zone=${zones.join(",")}` : "";
   const channelsQuery = channels && channels.length > 0 ? `&channel=${channels.join(",")}` : "";
   const searchQueryParam = searchQuery ? `&id=${searchQuery.toLowerCase().trim()}` : "";

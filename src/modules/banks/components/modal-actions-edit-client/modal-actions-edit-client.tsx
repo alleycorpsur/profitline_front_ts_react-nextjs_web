@@ -3,14 +3,19 @@ import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Flex, Modal, Typography } from "antd";
 
+import { useAppStore } from "@/lib/store/store";
 import { useMessageApi } from "@/context/MessageContext";
+import { editClient, getClientsByProject } from "@/services/banksPayments/banksPayments";
+
 import SecondaryButton from "@/components/atoms/buttons/secondaryButton/SecondaryButton";
 import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
 import { DocumentButton } from "@/components/atoms/DocumentButton/DocumentButton";
 import GeneralSelect from "@/components/ui/general-select";
+import { InputForm } from "@/components/atoms/inputs/InputForm/InputForm";
+
+import { ISingleBank } from "@/types/banks/IBanks";
 
 import "./modal-actions-edit-client.scss";
-import { InputForm } from "@/components/atoms/inputs/InputForm/InputForm";
 const { Title } = Typography;
 
 interface infoObject {
@@ -23,14 +28,47 @@ interface ISelect {
   label: string;
 }
 
+interface IFormEditClient {
+  client: string;
+  change_for: ISelect;
+  evidence: File | undefined;
+}
+
 interface Props {
   isOpen: boolean;
   onClose: () => void;
+  selectedRows: ISingleBank[] | undefined;
 }
 
-const ModalActionsEditClient = ({ isOpen, onClose }: Props) => {
+const ModalActionsEditClient = ({ isOpen, onClose, selectedRows }: Props) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [clients, setClients] = useState<ISelect[]>([]);
+  const { ID } = useAppStore((state) => state.selectedProject);
+  const userId = useAppStore((state) => state.userId);
+
   const { showMessage } = useMessageApi();
+
+  useEffect(() => {
+    const fetchClients = async () => {
+      try {
+        const response = await getClientsByProject(ID);
+
+        const testClients = response.map((client) => {
+          const key = Object.keys(client)[0];
+          const value = client[key];
+          return {
+            value: value.toString(),
+            label: key
+          };
+        });
+
+        setClients(testClients);
+      } catch (error) {
+        console.error("Error al cargar los clientes del input");
+      }
+    };
+    fetchClients();
+  }, [ID]);
 
   const {
     control,
@@ -40,13 +78,9 @@ const ModalActionsEditClient = ({ isOpen, onClose }: Props) => {
     trigger,
     reset,
     formState: { errors, isValid }
-  } = useForm<{
-    client: string;
-    change_for: ISelect[];
-    evidence: File | undefined;
-  }>({
+  } = useForm<IFormEditClient>({
     defaultValues: {
-      client: "Coopidrogas"
+      client: selectedRows && selectedRows?.length > 0 ? selectedRows[0].CLIENT_NAME : undefined
     }
   });
 
@@ -79,10 +113,18 @@ const ModalActionsEditClient = ({ isOpen, onClose }: Props) => {
     trigger("evidence");
   };
 
-  const onSubmit = async (data: { evidence: File | undefined }) => {
+  const onSubmit = async (data: IFormEditClient) => {
     setIsSubmitting(true);
+    if (!selectedRows) return;
+
     try {
-      console.info("Edicion realizada: ", data);
+      await editClient({
+        id_user: userId,
+        payment_ids: selectedRows?.map((row) => row.id),
+        client_id: data.change_for.value,
+        evidence: data.evidence as File,
+        current_client_id: selectedRows[0].id_client.toString()
+      });
 
       showMessage("success", "Cliente editado correctamente");
 
@@ -117,6 +159,9 @@ const ModalActionsEditClient = ({ isOpen, onClose }: Props) => {
           control={control}
           nameInput="client"
           error={errors.client}
+          defaultValue={
+            selectedRows && selectedRows.length > 0 ? selectedRows[0].CLIENT_NAME : undefined
+          }
           readOnly
         />
 
@@ -170,26 +215,3 @@ const ModalActionsEditClient = ({ isOpen, onClose }: Props) => {
 };
 
 export default ModalActionsEditClient;
-
-const clients = [
-  {
-    value: "1",
-    label: "Cliente 1"
-  },
-  {
-    value: "2",
-    label: "Cliente 2"
-  },
-  {
-    value: "3",
-    label: "Cliente 3"
-  },
-  {
-    value: "4",
-    label: "Cliente 4"
-  },
-  {
-    value: "5",
-    label: "Cliente 5"
-  }
-];
