@@ -205,9 +205,9 @@ const InvoiceDetailModal: FC<InvoiceDetailModalProps> = ({
                                   <span
                                     className={`${styles.tagLabel} ${
                                       item.is_rejected === 1
-                                        ? styles.tagLabelRose
+                                        ? styles.tagLabelGreen
                                         : item.is_rejected === 0
-                                          ? styles.tagLabelGreen
+                                          ? styles.tagLabelRose
                                           : styles.tagLabelRed
                                     }`}
                                   >
