@@ -212,9 +212,9 @@ const InvoiceDetailModal: FC<InvoiceDetailModalProps> = ({
                                     }`}
                                   >
                                     {item.is_rejected === 1
-                                      ? "Rechazada"
+                                      ? "Aprobada"
                                       : item.is_rejected === 0
-                                        ? "Aprobada"
+                                        ? "Rechazada"
                                         : "Pendiente"}
                                   </span>
                                 )}
