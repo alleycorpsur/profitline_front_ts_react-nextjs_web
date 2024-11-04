@@ -34,7 +34,6 @@ export const ConfirmedOrderView: FC = () => {
   const handleGoBack = () => {
     router.push("/comercio/");
   };
-
   return (
     <>
       {loading ? (

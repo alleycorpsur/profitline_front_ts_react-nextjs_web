@@ -5,7 +5,6 @@ import { Button, Flex, MenuProps } from "antd";
 import { useAppStore } from "@/lib/store/store";
 import { deleteOrders, getAllOrders } from "@/services/commerce/commerce";
 import { useMessageApi } from "@/context/MessageContext";
-
 import UiSearchInput from "@/components/ui/search-input";
 import FilterDiscounts from "@/components/atoms/Filters/FilterDiscounts/FilterDiscounts";
 import { DotsDropdown } from "@/components/atoms/DotsDropdown/DotsDropdown";
@@ -19,6 +18,8 @@ import { OrdersGenerateActionModal } from "../../components/orders-generate-acti
 import { IOrder } from "@/types/commerce/ICommerce";
 
 import styles from "./orders-view.module.scss";
+import { useDebounce } from "@/hooks/useSearch";
+
 interface IOrdersByCategory {
   status: string;
   color: string;
@@ -29,6 +30,9 @@ interface IOrdersByCategory {
 export const OrdersView: FC = () => {
   const { ID: projectId } = useAppStore((state) => state.selectedProject);
   const [ordersByCategory, setOrdersByCategory] = useState<IOrdersByCategory[]>();
+  const [filteredOrdersByCategory, setFilteredOrdersByCategory] = useState<IOrdersByCategory[]>();
+  const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
   const [isOpenModalRemove, setIsOpenModalRemove] = useState<boolean>(false);
   const [isGenerateActionModalOpen, setIsGenerateActionModalOpen] = useState<boolean>(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
@@ -41,6 +45,7 @@ export const OrdersView: FC = () => {
     const response = await getAllOrders(projectId);
     if (response.status === 200) {
       setOrdersByCategory(response.data);
+      setFilteredOrdersByCategory(response.data);
     }
   };
 
@@ -48,6 +53,35 @@ export const OrdersView: FC = () => {
     if (!projectId) return;
     fetchOrders();
   }, [projectId, fetchMutate]);
+
+  useEffect(() => {
+    if (!ordersByCategory) return;
+
+    if (!debouncedSearchTerm) {
+      setFilteredOrdersByCategory(ordersByCategory);
+      return;
+    }
+
+    const searchTermLower = debouncedSearchTerm.toLowerCase();
+    const filtered = ordersByCategory.map((category) => ({
+      ...category,
+      orders: category.orders.filter((order) => {
+        // Add more fields to search through as needed
+        return (
+          order.id?.toString().toLowerCase().includes(searchTermLower) ||
+          order.client_name?.toLowerCase().includes(searchTermLower)
+        );
+      }),
+      count: category.orders.filter((order) => {
+        return (
+          order.id?.toString().toLowerCase().includes(searchTermLower) ||
+          order.client_name?.toLowerCase().includes(searchTermLower)
+        );
+      }).length
+    }));
+
+    setFilteredOrdersByCategory(filtered);
+  }, [debouncedSearchTerm, ordersByCategory]);
 
   const handleDeleteOrders = async () => {
     const selectedOrdersIds = selectedRows?.map((order) => order.id);
@@ -90,11 +124,7 @@ export const OrdersView: FC = () => {
         <Flex className={styles.header}>
           <UiSearchInput
             placeholder="Buscar"
-            onChange={(event) => {
-              setTimeout(() => {
-                console.info(event.target.value);
-              }, 1000);
-            }}
+            onChange={(event) => setSearchTerm(event.target.value)}
           />
           <FilterDiscounts />
           <DotsDropdown items={items} />
@@ -103,12 +133,12 @@ export const OrdersView: FC = () => {
           </Link>
         </Flex>
         <Collapse
-          items={ordersByCategory?.map((order) => ({
+          items={filteredOrdersByCategory?.map((order) => ({
             key: order.status,
             label: (
               <LabelCollapse
                 status={order.status}
-                quantity={order.orders.length}
+                quantity={order.count}
                 color={order.color}
                 removeIcons
               />

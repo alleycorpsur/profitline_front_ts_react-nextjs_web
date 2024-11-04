@@ -2,7 +2,7 @@
     gap: 16px;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr;
-    grid-template-rows: 104px 294px 294px;
+    grid-template-rows: 104px 294px 310px;
     grid-template-areas:
         "a a a b"
         "a a a b"
@@ -63,8 +63,8 @@
         gap: 16px;
         grid-area: c;
         display: grid;
-        grid-template-columns: calc(65% - 8px) calc(35% - 8px);
-        grid-template-rows: 294px;
+        grid-template-columns: calc(60% - 8px) calc(40% - 8px);
+        grid-template-rows: auto;
     }
 
     @media (max-width: 1200px) {

@@ -1,18 +1,22 @@
 import React, { useState } from "react";
-import { Button, Flex, Modal } from "antd";
-import { CaretLeft, Plus } from "@phosphor-icons/react";
-import { DocumentButton } from "@/components/atoms/DocumentButton/DocumentButton";
-import "./registerNews.scss";
-import { IInvoice } from "@/types/invoices/IInvoices";
-import { MessageInstance } from "antd/es/message/interface";
-import { InputSelect } from "@/components/atoms/inputs/InputSelect/InputSelect";
 import { useForm, Controller } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
+import { Button, Flex, Modal } from "antd";
+import { MessageInstance } from "antd/es/message/interface";
+import { CaretLeft, Plus } from "@phosphor-icons/react";
 import * as yup from "yup";
-import { useInvoiceIncidentMotives } from "@/hooks/useInvoiceIncidentMotives";
+import { yupResolver } from "@hookform/resolvers/yup";
+
+import { useAppStore } from "@/lib/store/store";
 import { reportInvoiceIncident } from "@/services/accountingAdjustment/accountingAdjustment";
+
+import { DocumentButton } from "@/components/atoms/DocumentButton/DocumentButton";
+import { InputSelect } from "@/components/atoms/inputs/InputSelect/InputSelect";
+import { useInvoiceIncidentMotives } from "@/hooks/useInvoiceIncidentMotives";
 import { InputFormMoney } from "@/components/atoms/inputs/InputFormMoney/InputFormMoney";
 
+import { IInvoice } from "@/types/invoices/IInvoices";
+
+import "./registerNews.scss";
 interface RegisterNewsProps {
   isOpen: boolean;
   onClose: () => void;
@@ -54,6 +58,7 @@ const RegisterNews = ({
 }: RegisterNewsProps) => {
   const { data: motives, isLoading, isError } = useInvoiceIncidentMotives();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { ID: projectId } = useAppStore((state) => state.selectedProject);
 
   const {
     control,
@@ -136,6 +141,7 @@ const RegisterNews = ({
         motives?.find((motive) => motive.name === data.motive)?.id.toString() || "",
         data.evidence,
         clientId?.toString() || "",
+        projectId.toString(),
         data.amount ? data.amount : undefined
       );
       messageShow.success("Evidencia adjuntada con éxito");

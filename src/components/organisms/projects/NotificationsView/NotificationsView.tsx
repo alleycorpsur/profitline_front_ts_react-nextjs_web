@@ -9,11 +9,10 @@ import { Check, Eye, X } from "phosphor-react";
 import { useModalDetail } from "@/context/ModalContext";
 import { useNotificationOpen } from "@/hooks/useNotificationOpen";
 import { useRejectedNotifications } from "@/hooks/useNotificationReject";
-import { mutate } from "swr";
 import { useAppStore } from "@/lib/store/store";
 
 const ListPanel = [
-  { key: "opens", value: "Abiertas" },
+  { key: "opened", value: "Abiertas" },
   { key: "closed", value: "Cerradas" }
 ];
 
@@ -79,11 +78,11 @@ export const NotificationsView = () => {
     }
   }, [modalType]);
 
-  const renderNotifications = (type: "opens" | "closed") => {
+  const renderNotifications = (type: "opened" | "closed") => {
     const currentNotifications =
-      type === "opens" ? filteredOpenNotifications : filteredClosedNotifications;
-    const isLoading = type === "opens" ? isLoadingOpen : isLoadingClosed;
-    const isError = type === "opens" ? isErrorOpen : isErrorClosed;
+      type === "opened" ? filteredOpenNotifications : filteredClosedNotifications;
+    const isLoading = type === "opened" ? isLoadingOpen : isLoadingClosed;
+    const isError = type === "opened" ? isErrorOpen : isErrorClosed;
 
     if (isLoading) return <Spin size="large" />;
     if (isError) return <div>Error al cargar las notificaciones</div>;
@@ -94,7 +93,9 @@ export const NotificationsView = () => {
           <div className="list-item">
             <div>
               <Flex gap="1rem">
-                <p className="item__title">{item.notification_type_name}</p>
+                <p className="item__title">
+                  {item.notification_type_name} - {item.incident_id}
+                </p>
                 <p className="item__name">{item.client_name}</p>
                 <p className="item__date">{item.days}</p>
               </Flex>
@@ -139,7 +140,7 @@ export const NotificationsView = () => {
         style={{ width: "100%", height: "100%" }}
         items={ListPanel.map((item, i) => {
           return {
-            label: `${item.value}`,
+            label: `${item.value} (${item.key === "opened" ? filteredOpenNotifications.length : filteredClosedNotifications.length})`,
             key: String(i),
             children: (
               <Flex vertical>
@@ -154,7 +155,7 @@ export const NotificationsView = () => {
                   />
                   <FiltersNotifications />
                 </Flex>
-                {renderNotifications(item.key as "opens" | "closed")}
+                {renderNotifications(item.key as "opened" | "closed")}
               </Flex>
             )
           };

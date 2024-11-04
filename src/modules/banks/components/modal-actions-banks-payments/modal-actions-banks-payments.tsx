@@ -1,5 +1,4 @@
 "use client";
-import { Dispatch, SetStateAction } from "react";
 import { Flex, Modal } from "antd";
 import { PencilLine, User, CheckCircle, CirclesFour, FileArrowUp } from "@phosphor-icons/react";
 
@@ -10,7 +9,8 @@ import "./modal-actions-banks-payments.scss";
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  setSelectOpen: Dispatch<SetStateAction<{ selected: number }>>;
+  // eslint-disable-next-line no-unused-vars
+  setSelectOpen: (args: { selected: number }) => void;
 }
 
 const ModalActionsBanksPayments = ({ isOpen, onClose, setSelectOpen }: Props) => {
