@@ -1,52 +1,50 @@
-import { FC, useEffect, useState } from "react";
-import { Button, Flex, Spin, Steps } from "antd";
-import { ArrowLineDown, CaretDoubleRight, DotsThree, Receipt } from "phosphor-react";
+import { FC } from "react";
+import { ArrowLineDown } from "phosphor-react";
+
+import TimelineEvents from "@/components/ui/timeline-events";
 
 import { IEvent } from "@/types/banks/IBanks";
 
-import "./modalDetailPaymentEvents.scss";
-import TimelineEvents from "@/components/ui/timeline-events";
-
-const { Step } = Steps;
+import styles from "./modalDetailPaymentEvents.module.scss";
 
 interface ModalDetailPaymentProps {
   paymentEvents: IEvent[] | undefined;
 }
 
 const ModalDetailPaymentEvents: FC<ModalDetailPaymentProps> = ({ paymentEvents }) => {
-  const icon = (
-    <div
-      style={{
-        width: "16px",
-        height: "16px",
-        borderRadius: "50%",
-        backgroundColor: "yellow"
-      }}
-    />
-  );
-
   const items = paymentEvents?.map((event, index) => {
+    console.log("event ", index, event);
     const leftIcon =
-      event.payments_events_types_name === "Identificación" || " Aplicación" ? <h2>A</h2> : null;
+      event.payments_events_types_name === "Identificacion" ||
+      event.payments_events_types_name === "Aplicación" ? (
+        <ArrowLineDown size={14} />
+      ) : null;
 
     const content = (
-      <div>
-        <p>{event.comments}</p>
-        <p>{event.USER_NAME}</p>
+      <div className={styles.modalDetailPaymentEvents__eventContent}>
+        {event.USER_NAME && <p className={styles.regularEntry}>Responsable: {event.USER_NAME}</p>}
+
+        <p className={styles.regularEntry}>Cliente: XXXX</p>
+
+        <p className={styles.regularEntry}>Cliente previo: XXXX</p>
+        <p className={styles.regularEntry}>Nuevo cliente: XXXX</p>
+
+        {event.comments && <p className={styles.regularEntry}>Comentarios: {event.comments}</p>}
       </div>
     );
 
     return {
       id: event.id,
       title: event.payments_events_types_name,
+      date: event.event_date,
       content,
       leftIcon
     };
   });
 
   return (
-    <div className="modalDetailPaymentEvents">
-      <h3>Trazabilidad</h3>
+    <div className={styles.modalDetailPaymentEvents}>
+      <h3 className={styles.modalDetailPaymentEvents__title}>Trazabilidad</h3>
       <TimelineEvents events={items} />
     </div>
   );

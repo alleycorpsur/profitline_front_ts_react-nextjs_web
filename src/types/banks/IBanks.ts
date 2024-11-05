@@ -31,7 +31,6 @@ export interface ISingleBank {
   color: string;
   client_status_id: number;
   evidence_url: string | null;
-  id_payment: number;
   key: number;
   rule_id: number | null;
   sequence: number;

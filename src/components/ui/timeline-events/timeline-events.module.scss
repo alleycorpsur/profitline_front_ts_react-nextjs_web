@@ -8,13 +8,14 @@
     overflow-y: scroll;
     scrollbar-width: none;
     -ms-overflow-style: none;
+    max-height: 42vh;
 
     &::-webkit-scrollbar {
         display: none;
     }
 
     .progress {
-        width: 40px;
+        width: 46px;
         display: flex;
         flex-direction: column;
 
@@ -54,6 +55,20 @@
                     padding-bottom: 0;
                 }
 
+                .leftIcon {
+                    position: absolute;
+                    left: -42px;
+                    top: -6px;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border-radius: 4px;
+                    background: $background;
+                    padding: 6px;
+                    height: fit-content;
+                }
+
                 .stepLine {
                     width: 1px;
                     position: absolute;
@@ -89,104 +104,36 @@
 
                 .stepLabel {
                     display: flex;
-                    margin-top: -5px;
-
-                    .quantity {
-                        gap: 6px;
-                        height: 32px;
-                        display: flex;
-                        padding-left: 8px;
-
-                        .button {
-                            display: flex;
-                            cursor: pointer;
-                            padding: 10px 6px;
-                            border-radius: 4px;
-                            background: #f7f7f7;
-                            justify-content: center;
-                        }
-
-                        .number {
-                            display: flex;
-                            height: 32px;
-                            width: 40px;
-                            font-weight: 400;
-                            color: #141414;
-                            padding: 6px 8px;
-                            text-align: center;
-                            border-radius: 4px;
-                            align-items: center;
-                            line-height: normal;
-                            background: #f7f7f7;
-                            justify-content: center;
-                        }
-                    }
+                    margin-top: -7px;
 
                     .cardInvoiceFiling {
                         display: flex;
                         flex-direction: column;
-
-                        .icons {
-                            display: flex;
-                            padding: 6px;
-                            cursor: pointer;
-                            margin-top: -46px;
-                            border-radius: 4px;
-                            position: absolute;
-                            margin-left: -44px;
-                            background: #f7f7f7;
-                        }
-
-                        .adjustment {
-                            gap: 4px;
-                            display: flex;
-                            font-size: 12px;
-                            font-weight: 400;
-                            color: #a5a5a5;
-                            padding-left: 8px;
-                            line-height: normal;
-
-                            .idAdjustment {
-                                color: #0085ff;
-                                cursor: pointer;
-                            }
-                        }
+                        padding-left: 8px;
 
                         .title {
                             display: flex;
                             font-size: 1rem;
                             font-weight: 300;
-                            padding-left: 8px;
                             color: #141414;
                             line-height: normal;
                         }
 
                         .date {
-                            font-size: 12px;
+                            font-size: 0.75rem;
                             font-weight: 600;
                             color: #a5a5a5;
-                            padding-left: 8px;
-                            line-height: normal;
-                        }
-
-                        .dateAndYears {
-                            font-size: 12px;
-                            font-weight: 600;
-                            color: #a5a5a5;
-                            padding-left: 8px;
-                            line-height: normal;
-                        }
-
-                        .name {
-                            font-size: 12px;
-                            font-weight: 400;
-                            color: #a5a5a5;
-                            padding-left: 8px;
                             line-height: normal;
                         }
                     }
                 }
             }
         }
+    }
+}
+
+@media (min-height: 800px) {
+    .content {
+        max-height: 46vh;
     }
 }

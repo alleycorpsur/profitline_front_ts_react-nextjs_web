@@ -88,7 +88,14 @@ export const BanksTable = ({
       title: "ID",
       dataIndex: "id",
       key: "id",
-      render: (text) => <Text className="idText">{text}</Text>,
+      render: (text, record) => (
+        <Text
+          className="idText"
+          onClick={() => handleOpenPaymentDetail && handleOpenPaymentDetail(record)}
+        >
+          {text}
+        </Text>
+      ),
       sorter: (a, b) => a.id - b.id,
       showSorterTooltip: false,
       width: 100
@@ -123,7 +130,7 @@ export const BanksTable = ({
       title: "Descripción",
       key: "description",
       dataIndex: "description",
-      render: (text) => <Text>{text}</Text>,
+      render: (text) => <p className="description">{text}</p>,
       sorter: (a, b) => a.description.localeCompare(b.description),
       showSorterTooltip: false
     },

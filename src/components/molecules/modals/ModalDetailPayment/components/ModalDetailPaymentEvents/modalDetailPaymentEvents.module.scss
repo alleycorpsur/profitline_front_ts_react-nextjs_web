@@ -1,0 +1,21 @@
+@import "@styles/variables.scss";
+
+.modalDetailPaymentEvents {
+    height: auto;
+    border-top: 1px solid #ddd;
+
+    &__title {
+        font-size: 1rem;
+        font-weight: 600;
+        margin: 1rem 0;
+    }
+
+    &__eventContent {
+        .regularEntry {
+            font-size: 0.75rem;
+            font-weight: 300;
+            color: $light-gray;
+            line-height: normal;
+        }
+    }
+}

@@ -46,7 +46,7 @@ export const ActivePaymentsTab: FC = () => {
 
   const handleOpenPaymentDetail = (payment: ISingleBank) => {
     openModal("payment", {
-      paymentId: payment.id_payment,
+      paymentId: payment.id,
       projectId: ID
     });
   };
