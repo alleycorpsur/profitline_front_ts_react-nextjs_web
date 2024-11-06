@@ -32,7 +32,8 @@ interface ISelect {
 
 interface Props {
   isOpen: boolean;
-  onClose: () => void;
+  // eslint-disable-next-line no-unused-vars
+  onClose: (cancelClicked?: Boolean) => void;
   selectedRows: ISingleBank[] | undefined;
 }
 
@@ -45,15 +46,20 @@ export interface PaymentForm {
 const ModalActionsSplitPayment = ({ isOpen, onClose, selectedRows }: Props) => {
   const { ID } = useAppStore((state) => state.selectedProject);
   const userId = useAppStore((state) => state.userId);
-  const [availableMoney, setAvailableMoney] = useState(12000000);
+  const [availableMoney, setAvailableMoney] = useState<number>();
   const [clients, setClients] = useState<ISelect[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { showMessage } = useMessageApi();
 
-  const paymentInfo = {
-    available: 12000000,
-    total: 15000000
-  };
+  useEffect(() => {
+    //useEffect to set and clean the availableMoney state
+    if (selectedRows && typeof selectedRows[0]?.current_value === "number") {
+      setAvailableMoney(selectedRows[0]?.current_value);
+    }
+    if (!isOpen) {
+      setAvailableMoney(0);
+    }
+  }, [isOpen]);
 
   const {
     control,
@@ -103,15 +109,17 @@ const ModalActionsSplitPayment = ({ isOpen, onClose, selectedRows }: Props) => {
   }, [ID]);
 
   const handleValueChange = (index: number, value: string) => {
-    const numericValue = parseInt(value.replace(/\./g, ""), 10) || 0;
+    const numericValue = parseInt(value) || 0;
     const currentPayments = watch("payments");
     const totalUsed = currentPayments.reduce(
       (sum, payment, idx) => sum + (idx !== index ? payment.value || 0 : 0),
       0
     );
 
+    const totalMoney = (selectedRows && selectedRows[0]?.current_value) || 0;
+
     // Calculate the remaining available money
-    const remainingMoney = paymentInfo.available - totalUsed;
+    const remainingMoney = totalMoney - totalUsed;
 
     if (numericValue > remainingMoney) {
       setValue(`payments.${index}.value`, remainingMoney);
@@ -147,8 +155,6 @@ const ModalActionsSplitPayment = ({ isOpen, onClose, selectedRows }: Props) => {
   const onSubmit = async (data: { payments: PaymentForm[] }) => {
     setIsSubmitting(true);
     try {
-      console.info("Pagos fraccionados: ", data);
-
       const dataArray = data.payments.map((payment, index) => ({
         id_client: Number(payment.client?.value),
         ammount: payment.value,
@@ -163,7 +169,7 @@ const ModalActionsSplitPayment = ({ isOpen, onClose, selectedRows }: Props) => {
         );
       });
 
-      const res = await splitPayment({
+      await splitPayment({
         payment_id: (selectedRows && selectedRows[0]?.id) || 0,
         userId,
         data: dataArray,
@@ -189,9 +195,7 @@ const ModalActionsSplitPayment = ({ isOpen, onClose, selectedRows }: Props) => {
       closable={false}
       destroyOnClose
     >
-      <Title level={4} onClick={onClose}>
-        Fraccionar pago
-      </Title>
+      <Title level={4}>Fraccionar pago</Title>
 
       <Flex justify="space-between">
         <Title style={{ fontWeight: 500 }} level={5}>
@@ -201,7 +205,9 @@ const ModalActionsSplitPayment = ({ isOpen, onClose, selectedRows }: Props) => {
           <strong className="modalActionsSplitPayment__availAmount">
             {formatMoney(availableMoney)}
           </strong>
-          <p className="modalActionsSplitPayment__totalAmount">{formatMoney(paymentInfo.total)}</p>
+          <p className="modalActionsSplitPayment__totalAmount">
+            {formatMoney(selectedRows && selectedRows[0]?.current_value)}
+          </p>
         </Flex>
       </Flex>
 
@@ -276,14 +282,18 @@ const ModalActionsSplitPayment = ({ isOpen, onClose, selectedRows }: Props) => {
       <button
         className="modalActionsSplitPayment__addPayment"
         onClick={() => append({ client: null, value: 0, evidence: undefined })}
-        disabled={availableMoney <= 0} // Disable the button if there's no more money left
+        disabled={
+          availableMoney === null ||
+          availableMoney === undefined ||
+          !!(availableMoney && availableMoney <= 0)
+        } // Disable the button if there's no more money left
       >
         <Plus />
         Agregar pago
       </button>
 
       <div className="modalActionsSplitPayment__footer">
-        <SecondaryButton onClick={onClose} bordered={false}>
+        <SecondaryButton onClick={() => onClose(true)} bordered={false}>
           Cancelar
         </SecondaryButton>
 

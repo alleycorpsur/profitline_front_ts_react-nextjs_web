@@ -384,12 +384,18 @@ export const createAndDownloadTxt = (rawData: string) => {
 };
 
 export function renameFile(file: File, newName: string): File {
-  // Extract the file extension from the original file name
+  if (!file || !file.name) {
+    console.warn("Invalid file provided to renameFile");
+    return file; // Return the original file if invalid input
+  }
+
   const extension = file.name.split(".").pop();
 
   // Create a new name by appending the extension to the new name
   const newFileName = `${newName}.${extension}`;
 
+  const blob = file.slice(0, file.size, file.type);
+
   // Return a new File instance with the new name
-  return new File([file], newFileName, { type: file.type });
+  return new File([blob], newFileName, { type: file.type });
 }
