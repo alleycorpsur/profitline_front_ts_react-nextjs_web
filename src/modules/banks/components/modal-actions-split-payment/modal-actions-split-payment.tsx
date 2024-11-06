@@ -167,7 +167,7 @@ const ModalActionsSplitPayment = ({ isOpen, onClose, selectedRows }: Props) => {
         payment_id: (selectedRows && selectedRows[0]?.id) || 0,
         userId,
         data: dataArray,
-        files: renamedFiles.filter((file) => file !== undefined)
+        files: renamedFiles.filter((file) => file !== undefined) as File[]
       });
 
       showMessage("success", "Pago fraccionado correctamente");
