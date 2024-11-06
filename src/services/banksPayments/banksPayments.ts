@@ -133,3 +133,49 @@ export const uploadEvidence = async (payment_id: number, user_id: number, eviden
     throw error;
   }
 };
+
+interface IDataSplitPayment {
+  id_client: number;
+  ammount: number;
+  key_file: string;
+}
+
+interface ISpliPayment {
+  payment_id: number;
+  userId: number;
+  data: IDataSplitPayment[];
+  files: File[];
+}
+
+export const splitPayment = async ({ payment_id, userId, data, files }: ISpliPayment) => {
+  const token = await getIdToken();
+
+  const formData = new FormData();
+  formData.append("payment_id", payment_id.toString());
+  formData.append("data", JSON.stringify(data));
+  formData.append("user_id", userId.toString());
+
+  // for each file in files append with key files
+  files.forEach((file) => {
+    formData.append("files", file);
+  });
+
+  try {
+    const response: GenericResponse<any> = await axios.post(
+      `${config.API_HOST}/bank/split-payment`,
+      formData,
+      {
+        headers: {
+          Accept: "application/json, text/plain, */*",
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Error al dividir el pago:", error);
+    throw error;
+  }
+};
