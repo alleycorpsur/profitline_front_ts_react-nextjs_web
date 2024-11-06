@@ -46,12 +46,20 @@ export interface PaymentForm {
 const ModalActionsSplitPayment = ({ isOpen, onClose, selectedRows }: Props) => {
   const { ID } = useAppStore((state) => state.selectedProject);
   const userId = useAppStore((state) => state.userId);
-  const [availableMoney, setAvailableMoney] = useState(
-    (selectedRows && selectedRows[0]?.current_value) || 0
-  );
+  const [availableMoney, setAvailableMoney] = useState<number>();
   const [clients, setClients] = useState<ISelect[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { showMessage } = useMessageApi();
+
+  useEffect(() => {
+    //useEffect to set and clean the availableMoney state
+    if (selectedRows && typeof selectedRows[0]?.current_value === "number") {
+      setAvailableMoney(selectedRows[0]?.current_value);
+    }
+    if (!isOpen) {
+      setAvailableMoney(0);
+    }
+  }, [isOpen]);
 
   const {
     control,
@@ -147,8 +155,6 @@ const ModalActionsSplitPayment = ({ isOpen, onClose, selectedRows }: Props) => {
   const onSubmit = async (data: { payments: PaymentForm[] }) => {
     setIsSubmitting(true);
     try {
-      console.info("Pagos fraccionados: ", data);
-
       const dataArray = data.payments.map((payment, index) => ({
         id_client: Number(payment.client?.value),
         ammount: payment.value,
@@ -276,7 +282,11 @@ const ModalActionsSplitPayment = ({ isOpen, onClose, selectedRows }: Props) => {
       <button
         className="modalActionsSplitPayment__addPayment"
         onClick={() => append({ client: null, value: 0, evidence: undefined })}
-        disabled={availableMoney <= 0} // Disable the button if there's no more money left
+        disabled={
+          availableMoney === null ||
+          availableMoney === undefined ||
+          !!(availableMoney && availableMoney <= 0)
+        } // Disable the button if there's no more money left
       >
         <Plus />
         Agregar pago
