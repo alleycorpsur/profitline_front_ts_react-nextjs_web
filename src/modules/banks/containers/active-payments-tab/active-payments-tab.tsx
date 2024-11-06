@@ -51,12 +51,14 @@ export const ActivePaymentsTab: FC = () => {
     });
   };
 
-  const onCloseModal = () => {
+  const onCloseModal = (cancelClicked?: Boolean) => {
     setisGenerateActionOpen(!isGenerateActionOpen);
     setIsSelectOpen({ selected: 0 });
+
+    if (cancelClicked) return;
+
     setClearSelected(!clearSelected);
     setSelectedRows([]);
-
     mutate();
   };
 

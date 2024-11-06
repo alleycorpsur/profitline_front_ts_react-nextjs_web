@@ -32,7 +32,8 @@ interface ISelect {
 
 interface Props {
   isOpen: boolean;
-  onClose: () => void;
+  // eslint-disable-next-line no-unused-vars
+  onClose: (cancelClicked?: Boolean) => void;
   selectedRows: ISingleBank[] | undefined;
 }
 
@@ -188,9 +189,7 @@ const ModalActionsSplitPayment = ({ isOpen, onClose, selectedRows }: Props) => {
       closable={false}
       destroyOnClose
     >
-      <Title level={4} onClick={onClose}>
-        Fraccionar pago
-      </Title>
+      <Title level={4}>Fraccionar pago</Title>
 
       <Flex justify="space-between">
         <Title style={{ fontWeight: 500 }} level={5}>
@@ -284,7 +283,7 @@ const ModalActionsSplitPayment = ({ isOpen, onClose, selectedRows }: Props) => {
       </button>
 
       <div className="modalActionsSplitPayment__footer">
-        <SecondaryButton onClick={onClose} bordered={false}>
+        <SecondaryButton onClick={() => onClose(true)} bordered={false}>
           Cancelar
         </SecondaryButton>
 
