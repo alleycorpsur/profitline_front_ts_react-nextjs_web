@@ -45,15 +45,12 @@ export interface PaymentForm {
 const ModalActionsSplitPayment = ({ isOpen, onClose, selectedRows }: Props) => {
   const { ID } = useAppStore((state) => state.selectedProject);
   const userId = useAppStore((state) => state.userId);
-  const [availableMoney, setAvailableMoney] = useState(12000000);
+  const [availableMoney, setAvailableMoney] = useState(
+    (selectedRows && selectedRows[0]?.current_value) || 0
+  );
   const [clients, setClients] = useState<ISelect[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { showMessage } = useMessageApi();
-
-  const paymentInfo = {
-    available: 12000000,
-    total: 15000000
-  };
 
   const {
     control,
@@ -103,15 +100,17 @@ const ModalActionsSplitPayment = ({ isOpen, onClose, selectedRows }: Props) => {
   }, [ID]);
 
   const handleValueChange = (index: number, value: string) => {
-    const numericValue = parseInt(value.replace(/\./g, ""), 10) || 0;
+    const numericValue = parseInt(value) || 0;
     const currentPayments = watch("payments");
     const totalUsed = currentPayments.reduce(
       (sum, payment, idx) => sum + (idx !== index ? payment.value || 0 : 0),
       0
     );
 
+    const totalMoney = (selectedRows && selectedRows[0]?.current_value) || 0;
+
     // Calculate the remaining available money
-    const remainingMoney = paymentInfo.available - totalUsed;
+    const remainingMoney = totalMoney - totalUsed;
 
     if (numericValue > remainingMoney) {
       setValue(`payments.${index}.value`, remainingMoney);
@@ -163,7 +162,7 @@ const ModalActionsSplitPayment = ({ isOpen, onClose, selectedRows }: Props) => {
         );
       });
 
-      const res = await splitPayment({
+      await splitPayment({
         payment_id: (selectedRows && selectedRows[0]?.id) || 0,
         userId,
         data: dataArray,
@@ -201,7 +200,9 @@ const ModalActionsSplitPayment = ({ isOpen, onClose, selectedRows }: Props) => {
           <strong className="modalActionsSplitPayment__availAmount">
             {formatMoney(availableMoney)}
           </strong>
-          <p className="modalActionsSplitPayment__totalAmount">{formatMoney(paymentInfo.total)}</p>
+          <p className="modalActionsSplitPayment__totalAmount">
+            {formatMoney(selectedRows && selectedRows[0]?.current_value)}
+          </p>
         </Flex>
       </Flex>
 
