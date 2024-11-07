@@ -49,15 +49,30 @@ export const StateConcilationTable = ({ invoices, clientId, setInvoices }: Props
   }, [invoices]);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(event.target.value);
+    const value = event.target.value;
+
+    const cleanedIds = value
+      .split(/[\n\r\s,]+/)
+      .filter((id) => id.trim() !== "")
+      .map((id) => id.trim());
+    const formattedValue = cleanedIds.join(",");
+    setSearchTerm(formattedValue);
   };
 
   const filteredInvoices = (invoiceCategory: InvoicesConcilation) => {
+    if (!searchTerm) return invoiceCategory;
+
+    const searchIds = searchTerm.split(",").filter(Boolean);
+
     return {
       ...invoiceCategory,
-      invoices: invoiceCategory?.invoices.filter((invoice) =>
-        invoice?.id.toString().includes(searchTerm)
-      )
+      invoices: invoiceCategory?.invoices.filter((invoice) => {
+        return searchIds.some(
+          (searchId) =>
+            invoice?.id_erp?.toString().includes(searchId) ||
+            invoice?.id?.toString().includes(searchId)
+        );
+      })
     };
   };
 
