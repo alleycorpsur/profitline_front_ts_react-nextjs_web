@@ -2,11 +2,11 @@ import { GenericResponse } from "@/types/global/IGlobal";
 import axios from "axios";
 import config from "@/config";
 import { API, getIdToken } from "@/utils/api/api";
-import { IClientsByProject, ISingleBank } from "@/types/banks/IBanks";
+import { IClientsByProject, IPaymentDetail } from "@/types/banks/IBanks";
 
 export const getPaymentDetail = async (payment_id: number) => {
   try {
-    const response: GenericResponse<ISingleBank[]> = await API.get(
+    const response: GenericResponse<IPaymentDetail[]> = await API.get(
       `/bank/get-payment-detail?payment_id=${payment_id}`
     );
 

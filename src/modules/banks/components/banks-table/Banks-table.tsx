@@ -9,8 +9,11 @@ import "./banks-table.scss";
 
 const { Text } = Typography;
 
+interface clientByStatus extends ISingleBank {
+  client_status_id: number;
+}
 interface PropsBanksTable {
-  clientsByStatus: any[];
+  clientsByStatus: clientByStatus[];
   setSelectedRows: Dispatch<SetStateAction<ISingleBank[] | undefined>>;
   // eslint-disable-next-line no-unused-vars
   handleOpenPaymentDetail?: (payment: ISingleBank) => void;
@@ -85,9 +88,17 @@ export const BanksTable = ({
       title: "ID",
       dataIndex: "id",
       key: "id",
-      render: (text) => <Text className="idText">{text}</Text>,
+      render: (text, record) => (
+        <Text
+          className="idText"
+          onClick={() => handleOpenPaymentDetail && handleOpenPaymentDetail(record)}
+        >
+          {text}
+        </Text>
+      ),
       sorter: (a, b) => a.id - b.id,
-      showSorterTooltip: false
+      showSorterTooltip: false,
+      width: 100
     },
     {
       title: "Cliente",
@@ -119,7 +130,7 @@ export const BanksTable = ({
       title: "Descripción",
       key: "description",
       dataIndex: "description",
-      render: (text) => <Text>{text}</Text>,
+      render: (text) => <p className="description">{text}</p>,
       sorter: (a, b) => a.description.localeCompare(b.description),
       showSorterTooltip: false
     },

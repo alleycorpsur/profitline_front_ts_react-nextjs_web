@@ -35,6 +35,16 @@
         cursor: pointer;
     }
 
+    .description {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: normal;
+    }
+
     .accountBankText {
         font-size: 0.625rem;
         color: $darker-gray;
