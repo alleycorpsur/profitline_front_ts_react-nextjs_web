@@ -4,7 +4,7 @@ import {
   ICommerceAdresses,
   IConfirmOrderData,
   ICreateOrderData,
-  IDiscount,
+  IDiscountPackageAvailable,
   IEcommerceClient,
   IOrderConfirmedResponse,
   IOrderData,
@@ -51,16 +51,16 @@ export const getAdresses = async (clientId: number) => {
 export const getDiscounts = async (
   projectId: number,
   clientId: number
-): Promise<GenericResponse<IDiscount[]>> => {
+): Promise<GenericResponse<IDiscountPackageAvailable[]>> => {
   try {
-    const response: GenericResponse<IDiscount[]> = await API.get(
-      `/marketplace/projects/${projectId}/clients/${clientId}/discounts`
+    const response: GenericResponse<IDiscountPackageAvailable[]> = await API.get(
+      `/marketplace/projects/${projectId}/clients/${clientId}/discounts-packages`
     );
 
     return response;
   } catch (error) {
     console.error(error);
-    return error as GenericResponse<IDiscount[]>;
+    return error as GenericResponse<IDiscountPackageAvailable[]>;
   }
 };
 
@@ -71,7 +71,7 @@ export const confirmOrder = async (
 ) => {
   try {
     const response: GenericResponse<IOrderConfirmedResponse> = await API.post(
-      `/marketplace/projects/${projectId}/clients/${clientId}/order-confirmation`,
+      `/marketplace/projects/${projectId}/clients/${clientId}/order-confirmation-package`,
       data
     );
     return response;
