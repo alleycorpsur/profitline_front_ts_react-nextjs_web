@@ -40,6 +40,7 @@ export const StateConcilationTable = ({ invoices, clientId, setInvoices }: Props
   const { ID } = useAppStore((state) => state.selectedProject);
   const { data: motives, isLoading } = useInvoiceIncidentMotives();
 
+  // Función auxiliar para obtener todas las facturas
   useEffect(() => {
     if (invoices) {
       const keys = Object.keys(invoices);
@@ -74,6 +75,7 @@ export const StateConcilationTable = ({ invoices, clientId, setInvoices }: Props
       setInvoices(updatedInvoices);
     }
   };
+
   const handleRowSelection = (
     newSelectedRowKeys: React.Key[],
     newSelectedRows: IInvoiceConcilation[],
@@ -164,7 +166,6 @@ export const StateConcilationTable = ({ invoices, clientId, setInvoices }: Props
 
     setIsValid(allInvoicesHaveMotive);
   }, [invoices]);
-
 
   return (
     <div className="concilation_table">
