@@ -21,15 +21,12 @@ const ModalDetailPayment: FC<ModalDetailPaymentProps> = ({ isOpen, onClose, paym
   const [paymentData, setPaymentData] = useState<IPaymentDetail>();
   const [loading, setLoading] = useState<boolean>(false);
 
-  console.log("paymentId detailPayment ", paymentId);
-
   useEffect(() => {
     const fetchPaymentData = async () => {
       setLoading(true);
       // Fetch payment data
       try {
         const res = await getPaymentDetail(paymentId);
-        console.log("response Payment detail ", res);
         setPaymentData(res[0]);
       } catch (error) {
         console.error("Error al obtener el detalle del pago:", error);

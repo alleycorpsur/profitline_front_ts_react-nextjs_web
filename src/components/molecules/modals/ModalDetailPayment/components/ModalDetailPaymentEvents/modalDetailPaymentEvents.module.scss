@@ -16,6 +16,16 @@
             font-weight: 300;
             color: $light-gray;
             line-height: normal;
+            white-space: nowrap; // Prevent text from wrapping
+            overflow: hidden;
+        }
+
+        .linkEntry {
+            font-size: 0.75rem;
+            font-weight: 300;
+            color: $link;
+            text-decoration: underline;
+            flex-wrap: wrap;
         }
     }
 }

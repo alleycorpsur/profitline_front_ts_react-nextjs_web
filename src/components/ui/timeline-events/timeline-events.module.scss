@@ -18,113 +18,99 @@
         width: 46px;
         display: flex;
         flex-direction: column;
-
-        .iconContainer {
-            display: flex;
-            justify-content: flex-start;
-
-            .iconProgress {
-                width: 24px;
-                height: 24px;
-                padding: 6px;
-                display: flex;
-                cursor: pointer;
-                border-radius: 4px;
-                background: #f7f7f7;
-                justify-content: center;
-            }
-        }
     }
 
     .stepperContainer {
         display: flex;
-        justify-content: flex-start;
+        flex-direction: column;
         width: 100%;
+        max-width: 530px;
 
-        .stepperContent {
-            .mainStep {
-                min-height: 120px;
+        .mainStep {
+            display: flex;
+            column-gap: 10px;
+            position: relative;
+            padding-bottom: 20px;
+            padding-left: 5px;
+            width: 100%;
+
+            &:last-child {
+                min-height: auto;
+                padding-bottom: 0;
+            }
+
+            .leftIcon {
+                position: absolute;
+                left: -42px;
+                top: -6px;
+                cursor: pointer;
                 display: flex;
-                column-gap: 10px;
-                position: relative;
-                padding-bottom: 20px;
-                padding-left: 5px;
+                align-items: center;
+                justify-content: center;
+                border-radius: 4px;
+                background: $background;
+                padding: 6px;
+                height: fit-content;
+            }
 
-                &:last-child {
-                    min-height: auto;
-                    padding-bottom: 0;
+            .stepLine {
+                width: 1px;
+                position: absolute;
+                top: 10px;
+                bottom: 0;
+                left: -1px;
+
+                background-color: #dddddd;
+
+                &.active {
+                    background-color: transparent;
+                    border-left: 1px dashed #cbe71e;
                 }
 
-                .leftIcon {
-                    position: absolute;
-                    left: -42px;
-                    top: -6px;
-                    cursor: pointer;
+                &.inactive {
+                    display: none;
+                }
+            }
+
+            .stepCircle {
+                top: 0px;
+                left: -5px;
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+                position: absolute;
+                background-color: #dddddd;
+
+                &.active {
+                    background-color: #cbe71e;
+                }
+            }
+
+            .stepLabel {
+                display: flex;
+                margin-top: -7px;
+                width: 100%;
+
+                .cardInvoiceFiling {
                     display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    border-radius: 4px;
-                    background: $background;
-                    padding: 6px;
-                    height: fit-content;
-                }
+                    flex-direction: column;
+                    padding-left: 8px;
+                    min-height: 90px;
+                    width: 100%;
 
-                .stepLine {
-                    width: 1px;
-                    position: absolute;
-                    top: 10px;
-                    bottom: 0;
-                    left: -1px;
-
-                    background-color: #dddddd;
-
-                    &.active {
-                        background-color: transparent;
-                        border-left: 1px dashed #cbe71e;
-                    }
-
-                    &.inactive {
-                        display: none;
-                    }
-                }
-
-                .stepCircle {
-                    top: 0px;
-                    left: -5px;
-                    width: 10px;
-                    height: 10px;
-                    border-radius: 50%;
-                    position: absolute;
-                    background-color: #dddddd;
-
-                    &.active {
-                        background-color: #cbe71e;
-                    }
-                }
-
-                .stepLabel {
-                    display: flex;
-                    margin-top: -7px;
-
-                    .cardInvoiceFiling {
+                    .title {
                         display: flex;
-                        flex-direction: column;
-                        padding-left: 8px;
+                        font-size: 1rem;
+                        font-weight: 300;
+                        color: #141414;
+                        line-height: normal;
+                    }
 
-                        .title {
-                            display: flex;
-                            font-size: 1rem;
-                            font-weight: 300;
-                            color: #141414;
-                            line-height: normal;
-                        }
-
-                        .date {
-                            font-size: 0.75rem;
-                            font-weight: 600;
-                            color: #a5a5a5;
-                            line-height: normal;
-                        }
+                    .date {
+                        font-size: 0.75rem;
+                        font-weight: 600;
+                        color: #a5a5a5;
+                        line-height: normal;
                     }
                 }
             }

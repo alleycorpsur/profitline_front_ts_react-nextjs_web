@@ -54,6 +54,10 @@ export interface IEvent {
   id_aplication_payment: number | null;
   payments_events_types: number;
   payments_events_types_name: string;
+  client_name: string;
+  id_client: number;
+  ids_split_payment: number[] | null;
+  previous_name_client: string;
 }
 
 export interface IClientsByProject {
