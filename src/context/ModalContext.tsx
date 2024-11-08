@@ -15,6 +15,7 @@ interface InvoiceModalProps {
   clientId: number;
   showId: string;
   hiddenActions?: boolean;
+  // eslint-disable-next-line no-unused-vars
   handleActionInDetail?: (invoice: IInvoice) => void;
   selectInvoice?: IInvoice;
   projectId?: number;
@@ -44,6 +45,7 @@ type ModalProps =
   | ModalDetailPaymentProps;
 
 interface ModalContextType {
+  // eslint-disable-next-line no-unused-vars
   openModal: (type: ModalType, props: ModalProps) => void;
   closeModal: () => void;
   modalType: ModalType;
