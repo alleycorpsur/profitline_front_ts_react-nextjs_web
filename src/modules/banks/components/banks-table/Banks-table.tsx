@@ -155,12 +155,8 @@ export const BanksTable = ({
           <Button className="buttonSeeEvidence" icon={<Receipt size={"1.3rem"} />} />
           <Button
             className="buttonSeeClient"
-            icon={
-              <Eye
-                size={"1.3rem"}
-                onClick={() => handleOpenPaymentDetail && handleOpenPaymentDetail(record)}
-              />
-            }
+            onClick={() => handleOpenPaymentDetail && handleOpenPaymentDetail(record)}
+            icon={<Eye size={"1.3rem"} />}
           />
         </Flex>
       )
