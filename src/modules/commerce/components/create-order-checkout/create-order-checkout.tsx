@@ -17,7 +17,11 @@ import {
   getDiscounts
 } from "@/services/commerce/commerce";
 import { useAppStore } from "@/lib/store/store";
-import { ICommerceAdresses, IDiscount, IShippingInformation } from "@/types/commerce/ICommerce";
+import {
+  ICommerceAdresses,
+  IDiscountPackageAvailable,
+  IShippingInformation
+} from "@/types/commerce/ICommerce";
 import { useMessageApi } from "@/context/MessageContext";
 import { GenericResponse } from "@/types/global/IGlobal";
 
@@ -40,7 +44,7 @@ const CreateOrderCheckout: FC = ({}) => {
   const { draftInfo } = useAppStore((state) => state);
   const [loading, setLoading] = useState(false);
   const [addresses, setAddresses] = useState<ICommerceAdresses[]>([]);
-  const [discounts, setDiscounts] = useState<IDiscount[]>([]);
+  const [discounts, setDiscounts] = useState<IDiscountPackageAvailable[]>([]);
   const router = useRouter();
   const { showMessage } = useMessageApi();
 
@@ -253,7 +257,7 @@ const CreateOrderCheckout: FC = ({}) => {
             {discounts.map((discount) => (
               <Radio className={styles.radioGroup__item} key={discount.id} value={discount.id}>
                 <div className={styles.radioGroup__item__label}>
-                  <p>{discount.discount_name}</p>
+                  <p>{discount.name}</p>
                 </div>
               </Radio>
             ))}

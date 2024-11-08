@@ -1,7 +1,8 @@
-import Discounts from "@/components/organisms/discounts/Discounts";
+"use client";
+import DiscountPage from "@/components/organisms/discounts/DiscountPage";
 
 function Page() {
-  return <Discounts />;
+  return <DiscountPage />;
 }
 
 export default Page;

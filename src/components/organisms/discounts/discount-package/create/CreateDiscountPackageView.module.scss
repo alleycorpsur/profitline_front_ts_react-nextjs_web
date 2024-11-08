@@ -1,0 +1,170 @@
+@import "@/styles/variables.scss";
+
+.mainCreateDiscount {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: $background;
+
+    .buttonGoBack {
+        display: flex;
+        align-items: center;
+        color: $secondary-gray;
+    }
+
+    .divider {
+        color: $secondary-gray;
+        font-size: 1.8rem;
+        margin: 0 0.5rem;
+    }
+
+    .icon {
+        color: $secondary-gray;
+    }
+
+    .rutesText {
+        color: $secondary-gray;
+        font-weight: 600;
+        cursor: pointer;
+    }
+    .HeaderContainer {
+        width: 100%;
+        margin: 0 0 32px 0;
+        background-color: $white;
+        padding: 2rem;
+        padding-left: 2.5rem;
+        border-radius: 1rem;
+        border: 1px solid $dark-gray;
+    
+        .buttonContainer {
+            display: flex;
+            flex-wrap: nowrap; // Asegura que los botones estén en una sola línea
+            .buttonIcon {
+                background-color: transparent;
+                box-shadow: none;
+                display: flex;
+                align-items: center;
+                border: 1px solid $dark-gray;
+                padding: 3rem 5rem;
+                flex-direction: column;
+                min-width: 100px; // Tamaño mínimo
+                max-width: 100%;  // Tamaño máximo para ser responsivo
+                @media (max-width: 768px) {
+                    width: 230px;
+                }
+                @media (min-width: 768px) {
+                    width: 350px;
+                }
+                > span {
+                    font-size: 1rem;
+                    font-weight: 500;
+                }
+    
+                &:hover {
+                    background-color: $secondary !important;
+                    color: $white !important;
+                    border: 1px solid $gray !important;
+                }
+    
+                &.active {
+                    background-color: $secondary;
+                    span {
+                        font-weight: 800;
+                    }
+                }
+            }
+        }
+    }
+    
+
+    .containerCreateProject {
+        width: 100%;
+        padding: 2rem;
+        .titleName {
+            margin: auto;
+            font-weight: 600;
+            width: 398px;
+            height: 32px;
+            color: var(--Black, #141414);
+            line-height: 124%;
+            font-style: normal;
+            font-size: 24px;
+        }
+
+        .subtitleNit {
+            font-weight: 600;
+            margin: 1rem 0;
+        }
+
+        .imageProject {
+            margin: rem 0;
+        }
+    }
+
+    .infoHeaderProject {
+        gap: 2rem;
+        margin-bottom: 1.5rem;
+        justify-content: space-between;
+    }
+
+    .tabsContainer {
+        width: 100%;
+        height: 88%;
+        padding-left: 1.5rem;
+        border-radius: 0.5rem;
+        background-color: $white;
+        .ant-tabs-content,
+        .ant-tabs-tabpane {
+            height: 100%;
+        }
+    }
+}
+
+.message_section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: absolute;
+}
+
+.button {
+    span {
+        color: $black;
+        display: inline-flex;
+        align-items: center;
+        font-weight: 600;
+    }
+    &:hover {
+        span {
+            color: white;
+            transition-duration: 250ms;
+        }
+    }
+}
+
+
+
+.buttonEdit {
+    background-color: #f7f7f7;
+    border: 1px solid transparent;
+    display: flex;
+    gap: 0.625rem;
+    padding: 0.75rem;
+    width: -moz-fit-content;
+    width: fit-content;
+    height: -moz-fit-content;
+    height: fit-content;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    line-height: normal;
+    align-items: center;
+    justify-content: center;
+    color: #141414;
+    border: 1px solid #ddd;
+    > span {
+        color: $black;
+        font-weight: bold;
+    }
+}

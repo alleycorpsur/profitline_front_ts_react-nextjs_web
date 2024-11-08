@@ -6,7 +6,7 @@ import InputRadioRightSide from "@/components/ui/input-radio-right-side";
 
 import styles from "./create-order-discounts-modal.module.scss";
 import { getDiscounts } from "@/services/commerce/commerce";
-import { IDiscount } from "@/types/commerce/ICommerce";
+import { IDiscountPackageAvailable } from "@/types/commerce/ICommerce";
 import { OrderViewContext } from "../../containers/create-order/create-order";
 import { useAppStore } from "@/lib/store/store";
 export interface CreateOrderDiscountsModalProps {
@@ -18,7 +18,7 @@ const CreateOrderDiscountsModal: FC<CreateOrderDiscountsModalProps> = ({
 }) => {
   const { ID: projectId } = useAppStore((state) => state.selectedProject);
   const [radioValue, setRadioValue] = useState(0);
-  const [discounts, setDiscounts] = useState<IDiscount[]>([]);
+  const [discounts, setDiscounts] = useState<IDiscountPackageAvailable[]>([]);
   const { client, discountId, setDiscountId } = useContext(OrderViewContext);
   const [loading, setLoading] = useState(false);
 
@@ -73,7 +73,7 @@ const CreateOrderDiscountsModal: FC<CreateOrderDiscountsModalProps> = ({
           {discounts.map((discount) => (
             <InputRadioRightSide key={discount.id} value={discount.id} customStyles={styleRadio}>
               <div className={styles.radioGroup__label}>
-                <p>{discount.discount_name}</p>
+                <p>{discount.name}</p>
               </div>
             </InputRadioRightSide>
           ))}
