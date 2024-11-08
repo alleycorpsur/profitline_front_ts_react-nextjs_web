@@ -162,12 +162,13 @@ export interface ISingleOrder {
 interface IDetailOrder {
   products: ICategories[];
   subtotal: number;
-  discounts: number;
-  discount_id: number;
+  discounts: OrderDiscount;
+  discount_package_id: number;
   taxes: number;
   total_pronto_pago: number;
   total: number;
-  discount_name: string;
+  insufficientStockProducts: any[];
+  discount_name?: string;
 }
 
 export interface ICategories {
