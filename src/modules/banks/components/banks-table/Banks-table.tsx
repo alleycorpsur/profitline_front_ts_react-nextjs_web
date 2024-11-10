@@ -14,6 +14,7 @@ interface clientByStatus extends ISingleBank {
 }
 interface PropsBanksTable {
   clientsByStatus: clientByStatus[];
+  selectedRows: ISingleBank[] | undefined;
   setSelectedRows: Dispatch<SetStateAction<ISingleBank[] | undefined>>;
   // eslint-disable-next-line no-unused-vars
   handleOpenPaymentDetail?: (payment: ISingleBank) => void;
@@ -23,6 +24,7 @@ interface PropsBanksTable {
 
 export const BanksTable = ({
   clientsByStatus,
+  selectedRows,
   setSelectedRows,
   handleOpenPaymentDetail,
   bankStatusId,
@@ -33,6 +35,10 @@ export const BanksTable = ({
   useEffect(() => {
     setSelectedRowKeys([]);
   }, [clearSelected]);
+
+  useEffect(() => {
+    setSelectedRowKeys(selectedRows?.map((row) => row.id) ?? []);
+  }, [selectedRows]);
 
   const onSelectChange = (newSelectedRowKeys: React.Key[], newSelectedRows: ISingleBank[]) => {
     setSelectedRowKeys(newSelectedRowKeys);

@@ -137,6 +137,7 @@ export const ActivePaymentsTab: FC = () => {
                     };
                   })}
                   handleOpenPaymentDetail={handleOpenPaymentDetail}
+                  selectedRows={selectedRows}
                   setSelectedRows={setSelectedRows}
                   bankStatusId={status.payments_status_id}
                   clearSelected={clearSelected}
