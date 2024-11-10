@@ -57,10 +57,15 @@ const ModalDetailPaymentEvents: FC<ModalDetailPaymentProps> = ({ paymentEvents }
 
         {event.payments_events_types_name === "Aplicacion de pagos" && (
           <>
+            {event.id_payment_parent && (
+              <p className={styles.regularEntry}>
+                Id de la aplicación: ${event.id_aplication_payment}
+              </p>
+            )}
+
             <p className={styles.regularEntry}>
-              Id de la aplicación: {event.id_aplication_payment}
+              Valor aplicado: {formatMoney(event.ammount_applied)}
             </p>
-            <p className={styles.regularEntry}>Valor aplicado: {formatMoney(2000000)}X</p>
             <Flex gap={"0.2rem"} wrap="wrap">
               <p className={styles.regularEntry}>Id de las facturas:</p>
 

@@ -44,10 +44,17 @@ export const ActivePaymentsTab: FC = () => {
     setShowBankRules(true);
   };
 
+  const handleActionInDetail = (selectedPayment: ISingleBank) => {
+    setisGenerateActionOpen(!isGenerateActionOpen);
+    setSelectedRows([selectedPayment]);
+    mutate();
+  };
+
   const handleOpenPaymentDetail = (payment: ISingleBank) => {
     openModal("payment", {
-      paymentId: payment.id,
-      projectId: ID
+      selectedPayment: payment,
+      projectId: ID,
+      handleActionInDetail: handleActionInDetail
     });
   };
 

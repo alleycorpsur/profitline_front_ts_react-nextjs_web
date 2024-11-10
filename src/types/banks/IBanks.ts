@@ -58,6 +58,8 @@ export interface IEvent {
   id_client: number;
   ids_split_payment: number[] | null;
   previous_name_client: string;
+  ammount_applied: number;
+  id_payment_parent: number;
 }
 
 export interface IClientsByProject {

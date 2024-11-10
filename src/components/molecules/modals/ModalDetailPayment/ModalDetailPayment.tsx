@@ -7,17 +7,24 @@ import { getPaymentDetail } from "@/services/banksPayments/banksPayments";
 
 import ModalDetailPaymentEvents from "./components/ModalDetailPaymentEvents/ModalDetailPaymentEvents";
 
-import { IPaymentDetail } from "@/types/banks/IBanks";
+import { IPaymentDetail, ISingleBank } from "@/types/banks/IBanks";
 
 import styles from "./ModalDetailPayment.module.scss";
 
 interface ModalDetailPaymentProps {
   isOpen: boolean;
   onClose: () => void;
-  paymentId: number;
+  selectedPayment: ISingleBank;
+  // eslint-disable-next-line no-unused-vars
+  handleActionInDetail?: (selectedPayment: ISingleBank) => void;
 }
 
-const ModalDetailPayment: FC<ModalDetailPaymentProps> = ({ isOpen, onClose, paymentId }) => {
+const ModalDetailPayment: FC<ModalDetailPaymentProps> = ({
+  isOpen,
+  onClose,
+  selectedPayment,
+  handleActionInDetail
+}) => {
   const [paymentData, setPaymentData] = useState<IPaymentDetail>();
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -26,7 +33,7 @@ const ModalDetailPayment: FC<ModalDetailPaymentProps> = ({ isOpen, onClose, paym
       setLoading(true);
       // Fetch payment data
       try {
-        const res = await getPaymentDetail(paymentId);
+        const res = await getPaymentDetail(selectedPayment.id);
         setPaymentData(res[0]);
       } catch (error) {
         console.error("Error al obtener el detalle del pago:", error);
@@ -34,7 +41,7 @@ const ModalDetailPayment: FC<ModalDetailPaymentProps> = ({ isOpen, onClose, paym
       setLoading(false);
     };
     fetchPaymentData();
-  }, [paymentId]);
+  }, [selectedPayment]);
 
   return (
     <aside className={`${styles.wrapper} ${isOpen ? styles.show : styles.hide}`}>
@@ -61,6 +68,7 @@ const ModalDetailPayment: FC<ModalDetailPaymentProps> = ({ isOpen, onClose, paym
                   className={styles.button__actions}
                   size="large"
                   icon={<DotsThree size="1.5rem" />}
+                  onClick={() => handleActionInDetail && handleActionInDetail(selectedPayment)}
                 >
                   Generar acción
                 </Button>
