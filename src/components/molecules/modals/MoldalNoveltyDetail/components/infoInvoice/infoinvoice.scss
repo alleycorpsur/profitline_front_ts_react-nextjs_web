@@ -5,33 +5,34 @@
     align-items: start;
     border-top: 1px solid #e8e8e8;
     padding: 16px;
-  
+
     .invoice-id {
-      color: #1890ff;
-      font-weight: bold;
+        color: #1890ff;
+        font-weight: bold;
+        cursor: pointer;
     }
-  
+
     .values-container {
-      display: grid;
-      grid-template-columns: 1fr 2fr;
-      gap: 4px;
-  
-      .value-row {
-        display: contents;
-  
-        span:first-child {
-          color: #8c8c8c;
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 4px;
+
+        .value-row {
+            display: contents;
+
+            span:first-child {
+                color: #8c8c8c;
+            }
+
+            span:last-child {
+                text-align: left;
+            }
         }
-  
-        span:last-child {
-          text-align:  left;
+
+        .difference {
+            span:last-child {
+                color: #ff4d4f;
+            }
         }
-      }
-  
-      .difference {
-        span:last-child {
-          color: #ff4d4f;
-        }
-      }
     }
-  }
+}

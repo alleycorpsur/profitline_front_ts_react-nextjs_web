@@ -36,7 +36,8 @@ interface IFormEditClient {
 
 interface Props {
   isOpen: boolean;
-  onClose: () => void;
+  // eslint-disable-next-line no-unused-vars
+  onClose: (cancelClicked?: Boolean) => void;
   selectedRows: ISingleBank[] | undefined;
 }
 
@@ -145,9 +146,7 @@ const ModalActionsEditClient = ({ isOpen, onClose, selectedRows }: Props) => {
       closable={false}
       destroyOnClose
     >
-      <Title level={4} onClick={onClose}>
-        Editar cliente
-      </Title>
+      <Title level={4}>Editar cliente</Title>
 
       <p className="modalActionsEditClient__subTitle">
         Ingresa el nombre del cliente para realizar el cambio
@@ -200,7 +199,7 @@ const ModalActionsEditClient = ({ isOpen, onClose, selectedRows }: Props) => {
       </div>
 
       <div className="modalActionsEditClient__footer">
-        <SecondaryButton onClick={onClose}>Cancelar</SecondaryButton>
+        <SecondaryButton onClick={() => onClose(true)}>Cancelar</SecondaryButton>
 
         <PrincipalButton
           onClick={handleSubmit(onSubmit)}

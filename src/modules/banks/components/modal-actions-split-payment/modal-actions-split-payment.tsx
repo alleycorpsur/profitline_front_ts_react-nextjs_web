@@ -4,7 +4,9 @@ import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { Flex, Modal, Typography } from "antd";
 import { Plus } from "phosphor-react";
 
-import { formatMoney } from "@/utils/utils";
+import { formatMoney, renameFile } from "@/utils/utils";
+import { useAppStore } from "@/lib/store/store";
+import { getClientsByProject, splitPayment } from "@/services/banksPayments/banksPayments";
 
 import { useMessageApi } from "@/context/MessageContext";
 import SecondaryButton from "@/components/atoms/buttons/secondaryButton/SecondaryButton";
@@ -30,25 +32,34 @@ interface ISelect {
 
 interface Props {
   isOpen: boolean;
-  onClose: () => void;
+  // eslint-disable-next-line no-unused-vars
+  onClose: (cancelClicked?: Boolean) => void;
   selectedRows: ISingleBank[] | undefined;
 }
 
-interface PaymentForm {
+export interface PaymentForm {
   client: ISelect | null;
   value: number;
   evidence: File | undefined;
 }
 
 const ModalActionsSplitPayment = ({ isOpen, onClose, selectedRows }: Props) => {
-  const [availableMoney, setAvailableMoney] = useState(12000000);
+  const { ID } = useAppStore((state) => state.selectedProject);
+  const userId = useAppStore((state) => state.userId);
+  const [availableMoney, setAvailableMoney] = useState<number>();
+  const [clients, setClients] = useState<ISelect[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { showMessage } = useMessageApi();
 
-  const paymentInfo = {
-    available: 12000000,
-    total: 15000000
-  };
+  useEffect(() => {
+    //useEffect to set and clean the availableMoney state
+    if (selectedRows && typeof selectedRows[0]?.current_value === "number") {
+      setAvailableMoney(selectedRows[0]?.current_value);
+    }
+    if (!isOpen) {
+      setAvailableMoney(0);
+    }
+  }, [isOpen]);
 
   const {
     control,
@@ -75,16 +86,40 @@ const ModalActionsSplitPayment = ({ isOpen, onClose, selectedRows }: Props) => {
     }
   }, [isOpen, append, reset]);
 
+  useEffect(() => {
+    const fetchClients = async () => {
+      try {
+        const response = await getClientsByProject(ID);
+
+        const testClients = response.map((client) => {
+          const key = Object.keys(client)[0];
+          const value = client[key];
+          return {
+            value: value.toString(),
+            label: key
+          };
+        });
+
+        setClients(testClients);
+      } catch (error) {
+        console.error("Error al cargar los clientes del input");
+      }
+    };
+    fetchClients();
+  }, [ID]);
+
   const handleValueChange = (index: number, value: string) => {
-    const numericValue = parseInt(value.replace(/\./g, ""), 10) || 0;
+    const numericValue = parseInt(value) || 0;
     const currentPayments = watch("payments");
     const totalUsed = currentPayments.reduce(
       (sum, payment, idx) => sum + (idx !== index ? payment.value || 0 : 0),
       0
     );
 
+    const totalMoney = (selectedRows && selectedRows[0]?.current_value) || 0;
+
     // Calculate the remaining available money
-    const remainingMoney = paymentInfo.available - totalUsed;
+    const remainingMoney = totalMoney - totalUsed;
 
     if (numericValue > remainingMoney) {
       setValue(`payments.${index}.value`, remainingMoney);
@@ -120,9 +155,28 @@ const ModalActionsSplitPayment = ({ isOpen, onClose, selectedRows }: Props) => {
   const onSubmit = async (data: { payments: PaymentForm[] }) => {
     setIsSubmitting(true);
     try {
-      console.info("Pagos fraccionados: ", data);
+      const dataArray = data.payments.map((payment, index) => ({
+        id_client: Number(payment.client?.value),
+        ammount: payment.value,
+        key_file: `${payment.evidence?.name.split(".")[0]}_${selectedRows ? selectedRows[0]?.id : ""}_${index + 1}`
+      }));
 
-      showMessage("success", "Cliente editado correctamente");
+      const renamedFiles = data.payments.map((payment, index) => {
+        if (!payment.evidence) return;
+        return renameFile(
+          payment.evidence,
+          `${payment.evidence?.name.split(".")[0]}_${selectedRows ? selectedRows[0]?.id : ""}_${index + 1}`
+        );
+      });
+
+      await splitPayment({
+        payment_id: (selectedRows && selectedRows[0]?.id) || 0,
+        userId,
+        data: dataArray,
+        files: renamedFiles.filter((file) => file !== undefined) as File[]
+      });
+
+      showMessage("success", "Pago fraccionado correctamente");
 
       onClose();
     } catch (error) {
@@ -141,9 +195,7 @@ const ModalActionsSplitPayment = ({ isOpen, onClose, selectedRows }: Props) => {
       closable={false}
       destroyOnClose
     >
-      <Title level={4} onClick={onClose}>
-        Fraccionar pago
-      </Title>
+      <Title level={4}>Fraccionar pago</Title>
 
       <Flex justify="space-between">
         <Title style={{ fontWeight: 500 }} level={5}>
@@ -153,7 +205,9 @@ const ModalActionsSplitPayment = ({ isOpen, onClose, selectedRows }: Props) => {
           <strong className="modalActionsSplitPayment__availAmount">
             {formatMoney(availableMoney)}
           </strong>
-          <p className="modalActionsSplitPayment__totalAmount">{formatMoney(paymentInfo.total)}</p>
+          <p className="modalActionsSplitPayment__totalAmount">
+            {formatMoney(selectedRows && selectedRows[0]?.current_value)}
+          </p>
         </Flex>
       </Flex>
 
@@ -161,7 +215,7 @@ const ModalActionsSplitPayment = ({ isOpen, onClose, selectedRows }: Props) => {
         {fields.map((field, index) => (
           <Flex style={{ paddingBottom: "10px" }} key={field.id} vertical gap={"1rem"}>
             <Title style={{ fontWeight: 500 }} level={5}>
-              Pago {selectedRows && selectedRows[0].id} - {index + 1}
+              Pago {selectedRows && selectedRows[0]?.id} - {index + 1}
             </Title>
             <Flex gap={"1rem"}>
               <Controller
@@ -228,14 +282,18 @@ const ModalActionsSplitPayment = ({ isOpen, onClose, selectedRows }: Props) => {
       <button
         className="modalActionsSplitPayment__addPayment"
         onClick={() => append({ client: null, value: 0, evidence: undefined })}
-        disabled={availableMoney <= 0} // Disable the button if there's no more money left
+        disabled={
+          availableMoney === null ||
+          availableMoney === undefined ||
+          !!(availableMoney && availableMoney <= 0)
+        } // Disable the button if there's no more money left
       >
         <Plus />
         Agregar pago
       </button>
 
       <div className="modalActionsSplitPayment__footer">
-        <SecondaryButton onClick={onClose} bordered={false}>
+        <SecondaryButton onClick={() => onClose(true)} bordered={false}>
           Cancelar
         </SecondaryButton>
 
@@ -252,26 +310,3 @@ const ModalActionsSplitPayment = ({ isOpen, onClose, selectedRows }: Props) => {
 };
 
 export default ModalActionsSplitPayment;
-
-const clients = [
-  {
-    value: "1",
-    label: "Cliente 1"
-  },
-  {
-    value: "2",
-    label: "Cliente 2"
-  },
-  {
-    value: "3",
-    label: "Cliente 3"
-  },
-  {
-    value: "4",
-    label: "Cliente 4"
-  },
-  {
-    value: "5",
-    label: "Cliente 5"
-  }
-];

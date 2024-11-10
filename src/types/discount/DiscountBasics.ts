@@ -4,7 +4,7 @@ export interface DiscountBasics {
   discount_type_id: number;
   discount_type: string;
   discount_definition: string;
-  client_name?: string;
+  client_name: string;
   discount_name: string;
   description: string;
   start_date: string;
