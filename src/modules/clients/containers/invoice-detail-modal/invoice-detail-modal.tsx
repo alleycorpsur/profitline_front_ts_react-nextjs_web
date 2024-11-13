@@ -95,7 +95,7 @@ const InvoiceDetailModal: FC<InvoiceDetailModalProps> = ({
       case "Radicar factura":
         return "Radicación";
       case "Registrar novedad":
-        return "Novedad";
+        return "Nueva novedad";
       case "Emision de factura":
         return "Emisión de factura";
       default:
@@ -205,16 +205,33 @@ const InvoiceDetailModal: FC<InvoiceDetailModalProps> = ({
                                   <span
                                     className={`${styles.tagLabel} ${
                                       item.is_rejected === 1
-                                        ? styles.tagLabelGreen
+                                        ? styles.tagLabelBlack
                                         : item.is_rejected === 0
-                                          ? styles.tagLabelRose
+                                          ? styles.tagLabelGray
                                           : styles.tagLabelRed
                                     }`}
                                   >
                                     {item.is_rejected === 1
-                                      ? "Aprobada"
+                                      ? "Cerrada"
                                       : item.is_rejected === 0
-                                        ? "Rechazada"
+                                        ? "Abierta"
+                                        : "Pendiente"}
+                                  </span>
+                                )}
+                                {item.event_type_name === "Cierre de novedad" && (
+                                  <span
+                                    className={`${styles.tagLabel} ${
+                                      item.is_rejected === 1
+                                        ? styles.tagLabelRose
+                                        : item.is_rejected === 0
+                                          ? styles.tagLabelGreen
+                                          : styles.tagLabelRed
+                                    }`}
+                                  >
+                                    {item.is_rejected === 1
+                                      ? "Rechazada"
+                                      : item.is_rejected === 0
+                                        ? "Aprobada"
                                         : "Pendiente"}
                                   </span>
                                 )}
@@ -421,6 +438,33 @@ const InvoiceDetailModal: FC<InvoiceDetailModalProps> = ({
                                   <div
                                     className={styles.name}
                                   >{`Tipo novedad: ${item.type_incident}`}</div>
+                                  <div className={styles.name}>{`Acción: ${item.user_name}`}</div>
+                                  <div className={styles.adjustment}>
+                                    ID novedad:
+                                    <div
+                                      className={styles.idAdjustment}
+                                      onClick={() =>
+                                        item.id && handelOpenNoveltyDetail(item.incident_id)
+                                      }
+                                    >
+                                      {item.sequence || item.id}
+                                    </div>
+                                  </div>
+                                </div>
+                              ) : (
+                                ""
+                              )}
+
+                              {item.event_type_name === "Cierre de novedad" ? (
+                                <div>
+                                  <div
+                                    className={styles.icons}
+                                    onClick={() => {
+                                      handleDocumentClick(item.files[0] || "");
+                                    }}
+                                  >
+                                    <ArrowLineDown size={14} onClick={() => {}} />
+                                  </div>
                                   <div className={styles.name}>{`Acción: ${item.user_name}`}</div>
                                   <div className={styles.adjustment}>
                                     ID novedad:
