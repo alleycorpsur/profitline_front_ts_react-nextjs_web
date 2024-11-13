@@ -7,7 +7,7 @@ import { getPaymentDetail } from "@/services/banksPayments/banksPayments";
 
 import ModalDetailPaymentEvents from "./components/ModalDetailPaymentEvents/ModalDetailPaymentEvents";
 
-import { IPaymentDetail } from "@/types/banks/IBanks";
+import { IPaymentDetail, ISingleBank } from "@/types/banks/IBanks";
 
 import styles from "./ModalDetailPayment.module.scss";
 
@@ -15,9 +15,19 @@ interface ModalDetailPaymentProps {
   isOpen: boolean;
   onClose: () => void;
   paymentId: number;
+  // eslint-disable-next-line no-unused-vars
+  handleActionInDetail?: (selectedPayment: ISingleBank) => void;
+  // eslint-disable-next-line no-unused-vars
+  handleOpenPaymentDetail?: (paymentId: number) => void;
 }
 
-const ModalDetailPayment: FC<ModalDetailPaymentProps> = ({ isOpen, onClose, paymentId }) => {
+const ModalDetailPayment: FC<ModalDetailPaymentProps> = ({
+  isOpen,
+  onClose,
+  paymentId,
+  handleActionInDetail,
+  handleOpenPaymentDetail
+}) => {
   const [paymentData, setPaymentData] = useState<IPaymentDetail>();
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -61,6 +71,9 @@ const ModalDetailPayment: FC<ModalDetailPaymentProps> = ({ isOpen, onClose, paym
                   className={styles.button__actions}
                   size="large"
                   icon={<DotsThree size="1.5rem" />}
+                  onClick={() =>
+                    handleActionInDetail && handleActionInDetail(paymentData as ISingleBank)
+                  }
                 >
                   Generar acción
                 </Button>
@@ -76,7 +89,10 @@ const ModalDetailPayment: FC<ModalDetailPaymentProps> = ({ isOpen, onClose, paym
               </Flex>
             </div>
 
-            <ModalDetailPaymentEvents paymentEvents={paymentData?.events} />
+            <ModalDetailPaymentEvents
+              paymentEvents={paymentData?.events}
+              handleOpenPaymentDetail={handleOpenPaymentDetail}
+            />
           </>
         )}
       </div>
@@ -89,12 +105,12 @@ const ModalDetailPayment: FC<ModalDetailPaymentProps> = ({ isOpen, onClose, paym
           </div>
           <div className={styles.initialValue}>
             <p className={styles.value}>Monto aplicado</p>
-            <p className={styles.result}>{formatMoney(0)}X</p>
+            <p className={styles.result}>{formatMoney(paymentData?.ammount_applied)}</p>
           </div>
           <hr />
           <div className={styles.total}>
             <p className={styles.value}>Disponible</p>
-            <p className={styles.result}>{formatMoney(paymentData?.initial_value)}</p>
+            <p className={styles.result}>{formatMoney(paymentData?.current_value)}</p>
           </div>
         </div>
       </div>

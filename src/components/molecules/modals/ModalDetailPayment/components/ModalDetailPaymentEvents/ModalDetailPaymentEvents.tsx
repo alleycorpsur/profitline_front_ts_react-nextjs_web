@@ -10,11 +10,17 @@ import InvoiceDownloadModal from "@/modules/clients/components/invoice-download-
 import { IEvent } from "@/types/banks/IBanks";
 
 import styles from "./modalDetailPaymentEvents.module.scss";
+
 interface ModalDetailPaymentProps {
   paymentEvents: IEvent[] | undefined;
+  // eslint-disable-next-line no-unused-vars
+  handleOpenPaymentDetail?: (paymentId: number) => void;
 }
 
-const ModalDetailPaymentEvents: FC<ModalDetailPaymentProps> = ({ paymentEvents }) => {
+const ModalDetailPaymentEvents: FC<ModalDetailPaymentProps> = ({
+  paymentEvents,
+  handleOpenPaymentDetail
+}) => {
   const [isModalFileDetailOpen, setIsModalFileDetailOpen] = useState<boolean>(false);
   const [urlStep, setUrlStep] = useState<string>("");
 
@@ -42,6 +48,20 @@ const ModalDetailPaymentEvents: FC<ModalDetailPaymentProps> = ({ paymentEvents }
       <div className={styles.modalDetailPaymentEvents__eventContent}>
         {event.USER_NAME && <p className={styles.regularEntry}>Responsable: {event.USER_NAME}</p>}
 
+        {event.id_payment_parent && (
+          <Flex gap={"0.2rem"} wrap="wrap">
+            <p className={styles.regularEntry}>Id del pago padre:</p>
+            <p
+              className={styles.linkEntry}
+              onClick={() => {
+                handleOpenPaymentDetail && handleOpenPaymentDetail(event.id_payment_parent);
+              }}
+            >
+              {event.id_payment_parent}
+            </p>
+          </Flex>
+        )}
+
         {event.client_name &&
           (event.payments_events_types_name === "Identificacion" ||
             event.payments_events_types_name === "identificación automática") && (
@@ -57,15 +77,24 @@ const ModalDetailPaymentEvents: FC<ModalDetailPaymentProps> = ({ paymentEvents }
 
         {event.payments_events_types_name === "Aplicacion de pagos" && (
           <>
+            {event.id_payment_parent && (
+              <p className={styles.regularEntry}>
+                Id de la aplicación: ${event.id_aplication_payment}
+              </p>
+            )}
+
             <p className={styles.regularEntry}>
-              Id de la aplicación: {event.id_aplication_payment}
+              Valor aplicado: {formatMoney(event.ammount_applied)}
             </p>
-            <p className={styles.regularEntry}>Valor aplicado: {formatMoney(2000000)}X</p>
             <Flex gap={"0.2rem"} wrap="wrap">
               <p className={styles.regularEntry}>Id de las facturas:</p>
 
               {event.ids_split_payment?.map((id, index) => (
-                <p key={id} className={styles.linkEntry}>
+                <p
+                  key={id}
+                  className={styles.linkEntry}
+                  onClick={() => handleOpenPaymentDetail && handleOpenPaymentDetail(id)}
+                >
                   {id}
                   {event.ids_split_payment && index === event.ids_split_payment.length - 1
                     ? ""

@@ -1,12 +1,14 @@
 "use Client";
 import React, { createContext, useContext, useState, ReactNode } from "react";
 
-import { IInvoice } from "@/types/invoices/IInvoices";
-import { FinancialDiscount } from "@/types/financialDiscounts/IFinancialDiscounts";
 import InvoiceDetailModal from "@/modules/clients/containers/invoice-detail-modal";
 import ModalDetailAdjustment from "@/components/molecules/modals/ModalDetailAdjustment/ModalDetailAdjustment";
 import MoldalNoveltyDetail from "@/components/molecules/modals/MoldalNoveltyDetail/MoldalNoveltyDetail";
 import ModalDetailPayment from "@/components/molecules/modals/ModalDetailPayment/ModalDetailPayment";
+
+import { IInvoice } from "@/types/invoices/IInvoices";
+import { FinancialDiscount } from "@/types/financialDiscounts/IFinancialDiscounts";
+import { ISingleBank } from "@/types/banks/IBanks";
 
 type ModalType = "invoice" | "novelty" | "adjustment" | "payment" | null;
 
@@ -35,7 +37,10 @@ interface AdjustmentModalProps {
 
 interface ModalDetailPaymentProps {
   paymentId: number;
-  projectId: number;
+  // eslint-disable-next-line no-unused-vars
+  handleActionInDetail?: (selectedPayment: ISingleBank) => void;
+  // eslint-disable-next-line no-unused-vars
+  handleOpenPaymentDetail?: (paymentId: number) => void;
 }
 
 type ModalProps =

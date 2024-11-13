@@ -34,6 +34,8 @@ export interface ISingleBank {
   key: number;
   rule_id: number | null;
   sequence: number;
+  ammount_applied: number;
+  USER_NAME: string | null;
 }
 
 export interface IPaymentDetail extends ISingleBank {
@@ -58,6 +60,8 @@ export interface IEvent {
   id_client: number;
   ids_split_payment: number[] | null;
   previous_name_client: string;
+  ammount_applied: number;
+  id_payment_parent: number;
 }
 
 export interface IClientsByProject {

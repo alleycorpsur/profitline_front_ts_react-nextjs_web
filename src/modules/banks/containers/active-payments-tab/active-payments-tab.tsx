@@ -44,10 +44,17 @@ export const ActivePaymentsTab: FC = () => {
     setShowBankRules(true);
   };
 
-  const handleOpenPaymentDetail = (payment: ISingleBank) => {
+  const handleActionInDetail = (selectedPayment: ISingleBank) => {
+    setisGenerateActionOpen(!isGenerateActionOpen);
+    setSelectedRows([selectedPayment]);
+    mutate();
+  };
+
+  const handleOpenPaymentDetail = (paymentId: number) => {
     openModal("payment", {
-      paymentId: payment.id,
-      projectId: ID
+      paymentId: paymentId,
+      handleActionInDetail: handleActionInDetail,
+      handleOpenPaymentDetail
     });
   };
 
@@ -130,6 +137,7 @@ export const ActivePaymentsTab: FC = () => {
                     };
                   })}
                   handleOpenPaymentDetail={handleOpenPaymentDetail}
+                  selectedRows={selectedRows}
                   setSelectedRows={setSelectedRows}
                   bankStatusId={status.payments_status_id}
                   clearSelected={clearSelected}
