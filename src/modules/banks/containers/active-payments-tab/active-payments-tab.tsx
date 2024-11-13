@@ -50,11 +50,11 @@ export const ActivePaymentsTab: FC = () => {
     mutate();
   };
 
-  const handleOpenPaymentDetail = (payment: ISingleBank) => {
+  const handleOpenPaymentDetail = (paymentId: number) => {
     openModal("payment", {
-      selectedPayment: payment,
-      projectId: ID,
-      handleActionInDetail: handleActionInDetail
+      paymentId: paymentId,
+      handleActionInDetail: handleActionInDetail,
+      handleOpenPaymentDetail
     });
   };
 

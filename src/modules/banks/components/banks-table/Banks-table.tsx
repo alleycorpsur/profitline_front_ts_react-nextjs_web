@@ -17,7 +17,7 @@ interface PropsBanksTable {
   selectedRows: ISingleBank[] | undefined;
   setSelectedRows: Dispatch<SetStateAction<ISingleBank[] | undefined>>;
   // eslint-disable-next-line no-unused-vars
-  handleOpenPaymentDetail?: (payment: ISingleBank) => void;
+  handleOpenPaymentDetail?: (paymentId: number) => void;
   bankStatusId: number;
   clearSelected: boolean;
 }
@@ -94,12 +94,12 @@ export const BanksTable = ({
       title: "ID",
       dataIndex: "id",
       key: "id",
-      render: (text, record) => (
+      render: (id) => (
         <Text
           className="idText"
-          onClick={() => handleOpenPaymentDetail && handleOpenPaymentDetail(record)}
+          onClick={() => handleOpenPaymentDetail && handleOpenPaymentDetail(id)}
         >
-          {text}
+          {id}
         </Text>
       ),
       sorter: (a, b) => a.id - b.id,
@@ -161,7 +161,7 @@ export const BanksTable = ({
           <Button className="buttonSeeEvidence" icon={<Receipt size={"1.3rem"} />} />
           <Button
             className="buttonSeeClient"
-            onClick={() => handleOpenPaymentDetail && handleOpenPaymentDetail(record)}
+            onClick={() => handleOpenPaymentDetail && handleOpenPaymentDetail(record.id)}
             icon={<Eye size={"1.3rem"} />}
           />
         </Flex>

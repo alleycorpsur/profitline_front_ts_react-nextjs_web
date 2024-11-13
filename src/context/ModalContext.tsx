@@ -36,9 +36,11 @@ interface AdjustmentModalProps {
 }
 
 interface ModalDetailPaymentProps {
-  selectedPayment: ISingleBank;
+  paymentId: number;
   // eslint-disable-next-line no-unused-vars
   handleActionInDetail?: (selectedPayment: ISingleBank) => void;
+  // eslint-disable-next-line no-unused-vars
+  handleOpenPaymentDetail?: (paymentId: number) => void;
 }
 
 type ModalProps =

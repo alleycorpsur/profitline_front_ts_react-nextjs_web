@@ -14,16 +14,19 @@ import styles from "./ModalDetailPayment.module.scss";
 interface ModalDetailPaymentProps {
   isOpen: boolean;
   onClose: () => void;
-  selectedPayment: ISingleBank;
+  paymentId: number;
   // eslint-disable-next-line no-unused-vars
   handleActionInDetail?: (selectedPayment: ISingleBank) => void;
+  // eslint-disable-next-line no-unused-vars
+  handleOpenPaymentDetail?: (paymentId: number) => void;
 }
 
 const ModalDetailPayment: FC<ModalDetailPaymentProps> = ({
   isOpen,
   onClose,
-  selectedPayment,
-  handleActionInDetail
+  paymentId,
+  handleActionInDetail,
+  handleOpenPaymentDetail
 }) => {
   const [paymentData, setPaymentData] = useState<IPaymentDetail>();
   const [loading, setLoading] = useState<boolean>(false);
@@ -33,7 +36,7 @@ const ModalDetailPayment: FC<ModalDetailPaymentProps> = ({
       setLoading(true);
       // Fetch payment data
       try {
-        const res = await getPaymentDetail(selectedPayment.id);
+        const res = await getPaymentDetail(paymentId);
         setPaymentData(res[0]);
       } catch (error) {
         console.error("Error al obtener el detalle del pago:", error);
@@ -41,7 +44,7 @@ const ModalDetailPayment: FC<ModalDetailPaymentProps> = ({
       setLoading(false);
     };
     fetchPaymentData();
-  }, [selectedPayment]);
+  }, [paymentId]);
 
   return (
     <aside className={`${styles.wrapper} ${isOpen ? styles.show : styles.hide}`}>
@@ -68,7 +71,9 @@ const ModalDetailPayment: FC<ModalDetailPaymentProps> = ({
                   className={styles.button__actions}
                   size="large"
                   icon={<DotsThree size="1.5rem" />}
-                  onClick={() => handleActionInDetail && handleActionInDetail(selectedPayment)}
+                  onClick={() =>
+                    handleActionInDetail && handleActionInDetail(paymentData as ISingleBank)
+                  }
                 >
                   Generar acción
                 </Button>
@@ -84,7 +89,10 @@ const ModalDetailPayment: FC<ModalDetailPaymentProps> = ({
               </Flex>
             </div>
 
-            <ModalDetailPaymentEvents paymentEvents={paymentData?.events} />
+            <ModalDetailPaymentEvents
+              paymentEvents={paymentData?.events}
+              handleOpenPaymentDetail={handleOpenPaymentDetail}
+            />
           </>
         )}
       </div>
@@ -97,12 +105,12 @@ const ModalDetailPayment: FC<ModalDetailPaymentProps> = ({
           </div>
           <div className={styles.initialValue}>
             <p className={styles.value}>Monto aplicado</p>
-            <p className={styles.result}>{formatMoney(0)}X</p>
+            <p className={styles.result}>{formatMoney(paymentData?.ammount_applied)}</p>
           </div>
           <hr />
           <div className={styles.total}>
             <p className={styles.value}>Disponible</p>
-            <p className={styles.result}>{formatMoney(paymentData?.initial_value)}</p>
+            <p className={styles.result}>{formatMoney(paymentData?.current_value)}</p>
           </div>
         </div>
       </div>

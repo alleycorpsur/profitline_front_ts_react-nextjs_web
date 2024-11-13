@@ -34,6 +34,8 @@ export interface ISingleBank {
   key: number;
   rule_id: number | null;
   sequence: number;
+  ammount_applied: number;
+  USER_NAME: string | null;
 }
 
 export interface IPaymentDetail extends ISingleBank {
