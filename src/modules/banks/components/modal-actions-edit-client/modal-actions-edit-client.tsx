@@ -206,7 +206,7 @@ const ModalActionsEditClient = ({ isOpen, onClose, selectedRows }: Props) => {
           disabled={!isValid || !evidence}
           loading={isSubmitting}
         >
-          Asignar cliente
+          Editar cliente
         </PrincipalButton>
       </div>
     </Modal>

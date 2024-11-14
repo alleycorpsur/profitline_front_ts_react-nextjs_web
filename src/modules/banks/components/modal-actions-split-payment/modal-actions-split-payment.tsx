@@ -302,7 +302,7 @@ const ModalActionsSplitPayment = ({ isOpen, onClose, selectedRows }: Props) => {
           disabled={!isValid || isSubmitting}
           loading={isSubmitting}
         >
-          Asignar cliente
+          Fraccionar pago
         </PrincipalButton>
       </div>
     </Modal>
