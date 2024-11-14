@@ -1,18 +1,21 @@
 import { useEffect, useState } from "react";
 import { Button, Flex } from "antd";
 import { DotsThree, MagnifyingGlassPlus } from "phosphor-react";
+
+import { useSelectedPayments } from "@/context/SelectedPaymentsContext";
 import LabelCollapse from "@/components/ui/label-collapse";
 import UiSearchInput from "@/components/ui/search-input";
 import Collapse from "@/components/ui/collapse";
 import { DotsDropdown } from "@/components/atoms/DotsDropdown/DotsDropdown";
 import UiFilterDropdown from "@/components/ui/ui-filter-dropdown";
 import PaymentsTable from "@/modules/clients/components/payments-table";
+import { ModalActionPayment } from "@/components/molecules/modals/ModalActionPayment/ModalActionPayment";
+import ModalIdentifyPayment from "../../components/payments-tab/modal-identify-payment";
 
 import "./payments-tab.scss";
-import { ModalActionPayment } from "@/components/molecules/modals/ModalActionPayment/ModalActionPayment";
-import { useSelectedPayments } from "@/context/SelectedPaymentsContext";
 
 interface PaymentProd {
+  // eslint-disable-next-line no-unused-vars
   onChangeTab: (activeKey: string) => void;
 }
 
@@ -87,6 +90,7 @@ const PaymentsTab: React.FC<PaymentProd> = ({ onChangeTab }) => {
         onClose={() => setIsModalActionPaymentOpen(false)}
         onChangeTab={onChangetabWithCloseModal}
       />
+      <ModalIdentifyPayment isOpen={true} onClose={() => {}} />
     </>
   );
 };
