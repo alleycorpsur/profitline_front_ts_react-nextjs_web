@@ -1,5 +1,5 @@
 "use client";
-import { Dispatch, Key, SetStateAction } from "react";
+import { Dispatch, Key, SetStateAction, useState } from "react";
 import { Flex, Modal, Typography } from "antd";
 import { DownloadSimple, NewspaperClipping } from "@phosphor-icons/react";
 
@@ -12,7 +12,7 @@ import { ButtonGenerateAction } from "@/components/atoms/ButtonGenerateAction/Bu
 import { IOrder } from "@/types/commerce/ICommerce";
 
 import "./orders-generate-action-modal.scss";
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 interface Props {
   isOpen: boolean;
@@ -34,6 +34,9 @@ export const OrdersGenerateActionModal = ({
   const { ID: projectId } = useAppStore((state) => state.selectedProject);
   const { showMessage } = useMessageApi();
 
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
   const handleChangeOrderState = async () => {
     try {
       await changeOrderState(ordersId, showMessage);
@@ -48,8 +51,18 @@ export const OrdersGenerateActionModal = ({
 
   const handleDownloadCSV = async () => {
     try {
-      const res = await dowloadOrderCSV(ordersId, projectId, showMessage);
-      createAndDownloadTxt(res);
+      const res = await dowloadOrderCSV(ordersId, projectId);
+      console.log("RESSSS", res);
+      createAndDownloadTxt(res?.data);
+      if (res.message == "Descarga exitosa") {
+        showMessage("success", res?.message);
+      } else {
+        setErrorMessage(res?.message);
+        setIsErrorModalOpen(true);
+      }
+      setFetchMutate((prev) => !prev);
+      setSelectedRows([]);
+      setSelectedRowKeys([]);
       onClose();
     } catch (error) {
       console.error(error);
@@ -57,34 +70,49 @@ export const OrdersGenerateActionModal = ({
   };
 
   return (
-    <Modal
-      className="ordersGenerateActionModal"
-      width={"45%"}
-      open={isOpen}
-      centered
-      title={
-        <Title className="ordersGenerateActionModal__title" level={4}>
-          Generar acción
-        </Title>
-      }
-      footer={null}
-      onCancel={onClose}
-    >
-      <p className="ordersGenerateActionModal__description">
-        Selecciona la acción que vas a realizar
-      </p>
-      <Flex vertical gap="0.75rem">
-        <ButtonGenerateAction
-          onClick={handleChangeOrderState}
-          icon={<NewspaperClipping size={16} />}
-          title="Enviar pedido a facturado"
-        />
-        <ButtonGenerateAction
-          onClick={handleDownloadCSV}
-          icon={<DownloadSimple size={16} />}
-          title="Descargar CSV"
-        />
-      </Flex>
-    </Modal>
+    <>
+      <Modal
+        className="ordersGenerateActionModal"
+        width={"45%"}
+        open={isOpen}
+        centered
+        title={
+          <Title className="ordersGenerateActionModal__title" level={4}>
+            Generar acción
+          </Title>
+        }
+        footer={null}
+        onCancel={onClose}
+      >
+        <p className="ordersGenerateActionModal__description">
+          Selecciona la acción que vas a realizar
+        </p>
+        <Flex vertical gap="0.75rem">
+          <ButtonGenerateAction
+            onClick={handleChangeOrderState}
+            icon={<NewspaperClipping size={16} />}
+            title="Enviar pedido a facturado"
+          />
+          <ButtonGenerateAction
+            onClick={handleDownloadCSV}
+            icon={<DownloadSimple size={16} />}
+            title="Descargar CSV"
+          />
+        </Flex>
+      </Modal>
+
+      <Modal
+        open={isErrorModalOpen}
+        onCancel={() => setIsErrorModalOpen(false)}
+        footer={null}
+        centered
+        title={<Title level={4}>Descarga de plano de facturación</Title>}
+      >
+        <Flex vertical gap={12}>
+          <Text>Ordenes sin stock</Text>
+          <Text strong>{errorMessage}</Text>
+        </Flex>
+      </Modal>
+    </>
   );
 };

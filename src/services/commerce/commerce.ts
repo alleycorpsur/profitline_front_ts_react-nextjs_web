@@ -197,12 +197,7 @@ export const changeOrderState = async (
   }
 };
 
-export const dowloadOrderCSV = async (
-  ordersIds: number[],
-  projectId: number,
-  // eslint-disable-next-line no-unused-vars
-  showMessage: (type: MessageType, content: string) => void
-) => {
+export const dowloadOrderCSV = async (ordersIds: number[], projectId: number) => {
   const ordersIdsObject = {
     order_ids: ordersIds
   };
@@ -210,15 +205,13 @@ export const dowloadOrderCSV = async (
   formData.append("request", JSON.stringify(ordersIdsObject));
 
   try {
-    const response: string = await API.post(
+    const response = await API.post(
       `/marketplace/projects/${projectId}/downloadtxtorders`,
       formData
     );
-
-    showMessage("success", "Descarga exitosa");
-    return response;
+    console.log("RESPONSE ,", response);
+    return { message: "502, 503", data: response };
   } catch (error) {
-    showMessage("error", "Error al descargar archivo");
-    throw error;
+    return error;
   }
 };
