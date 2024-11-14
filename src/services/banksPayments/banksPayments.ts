@@ -116,7 +116,7 @@ export const uploadEvidence = async (payment_id: number, user_id: number, eviden
   formData.append("files", evidence);
   try {
     const response: GenericResponse<any> = await axios.post(
-      `${config.API_HOST}/bank/upload-evidence/:${payment_id}`,
+      `${config.API_HOST}/bank/upload-evidence/${payment_id}`,
       formData,
       {
         headers: {
