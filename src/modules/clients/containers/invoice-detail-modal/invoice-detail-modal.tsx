@@ -204,18 +204,14 @@ const InvoiceDetailModal: FC<InvoiceDetailModalProps> = ({
                                 {item.event_type_name === "Registrar novedad" && (
                                   <span
                                     className={`${styles.tagLabel} ${
-                                      item.is_rejected === 1
+                                      item.is_rejected || item.is_rejected === 0
                                         ? styles.tagLabelBlack
-                                        : item.is_rejected === 0
-                                          ? styles.tagLabelGray
-                                          : styles.tagLabelRed
+                                        : styles.tagLabelGray
                                     }`}
                                   >
-                                    {item.is_rejected === 1
+                                    {item.is_rejected || item.is_rejected === 0
                                       ? "Cerrada"
-                                      : item.is_rejected === 0
-                                        ? "Abierta"
-                                        : "Pendiente"}
+                                      : "Abierta"}
                                   </span>
                                 )}
                                 {item.event_type_name === "Cierre de novedad" && (
@@ -406,14 +402,17 @@ const InvoiceDetailModal: FC<InvoiceDetailModalProps> = ({
                               )}
                               {item.event_type_name === "Cambiar estado" ? (
                                 <div>
-                                  <div
-                                    className={styles.icons}
-                                    onClick={() => {
-                                      handleDocumentClick(item.files[0] || "");
-                                    }}
-                                  >
-                                    <ArrowLineDown size={14} onClick={() => {}} />
-                                  </div>
+                                  {item.files[0] && (
+                                    <div
+                                      className={styles.icons}
+                                      onClick={() => {
+                                        handleDocumentClick(item.files[0] || "");
+                                      }}
+                                    >
+                                      <ArrowLineDown size={14} onClick={() => {}} />
+                                    </div>
+                                  )}
+
                                   <div className={styles.name}>{`Acción: ${item.user_name}`}</div>
                                   <div
                                     className={styles.name}
