@@ -146,7 +146,6 @@ const ModalDetailAdjustment: FC<ModalDetailAdjustmentProps> = ({
                   <div className={styles.stepperContainer}>
                     <div className={styles.stepperContent}>
                       {(adjusmentData?.details ?? []).map((item, index, arr) => {
-                        console.log("item", index, item);
                         return (
                           <div key={item.id} className={styles.mainStep}>
                             <div
