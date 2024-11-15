@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Dispatch, SetStateAction } from "react";
 import { Modal } from "antd";
 import { ButtonGenerateAction } from "@/components/atoms/ButtonGenerateAction/ButtonGenerateAction";
 import { MagnifyingGlassPlus, HandTap, PushPin } from "@phosphor-icons/react";
@@ -7,13 +7,22 @@ import "./modalActionPayment.scss";
 type ModalActionPaymentProps = {
   isOpen: boolean;
   onClose: () => void;
+  // eslint-disable-next-line no-unused-vars
   onChangeTab: (activeKey: string) => void;
+  setIsSelectedActionModalOpen: Dispatch<
+    SetStateAction<{
+      selected: number;
+    }>
+  >;
+  setIsModalActionPaymentOpen: Dispatch<SetStateAction<boolean>>;
 };
 
 export const ModalActionPayment: React.FC<ModalActionPaymentProps> = ({
   isOpen,
   onClose,
-  onChangeTab
+  onChangeTab,
+  setIsSelectedActionModalOpen,
+  setIsModalActionPaymentOpen
 }) => {
   return (
     <Modal
@@ -30,7 +39,10 @@ export const ModalActionPayment: React.FC<ModalActionPaymentProps> = ({
           icon={<MagnifyingGlassPlus size={20} />}
           title="Identificar pago"
           onClick={() => {
-            console.log("Identificar pago clicked");
+            setIsModalActionPaymentOpen((prev) => !prev);
+            setIsSelectedActionModalOpen({
+              selected: 1
+            });
           }}
         />
         <ButtonGenerateAction

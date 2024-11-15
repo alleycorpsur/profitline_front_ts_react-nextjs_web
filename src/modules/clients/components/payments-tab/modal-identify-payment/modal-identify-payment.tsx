@@ -17,7 +17,8 @@ import "./modal-identify-payment.scss";
 
 interface ModalIdentifyPaymentProps {
   isOpen: boolean;
-  onClose: () => void;
+  // eslint-disable-next-line no-unused-vars
+  onClose: (cancelClicked?: boolean) => void;
 }
 
 interface infoObject {
@@ -98,7 +99,7 @@ const ModalIdentifyPayment: FC<ModalIdentifyPaymentProps> = ({ isOpen, onClose }
       closable={false}
       destroyOnClose
     >
-      <button className="identifyPaymentModal__goBackBtn" onClick={onClose}>
+      <button className="identifyPaymentModal__goBackBtn" onClick={() => onClose(true)}>
         <CaretLeft size="1.25rem" />
         Identificar pago
       </button>
@@ -202,7 +203,7 @@ const ModalIdentifyPayment: FC<ModalIdentifyPaymentProps> = ({ isOpen, onClose }
       </div>
 
       <div className="identifyPaymentModal__footer">
-        <SecondaryButton onClick={onClose}>Cancelar</SecondaryButton>
+        <SecondaryButton onClick={() => onClose(true)}>Cancelar</SecondaryButton>
 
         <PrincipalButton onClick={handleSubmit(onSubmit)} disabled={!isValid || isSubmitting}>
           {isSubmitting ? "...enviando" : "Enviar acta"}

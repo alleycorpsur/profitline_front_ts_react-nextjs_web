@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button, Flex } from "antd";
 import { DotsThree, MagnifyingGlassPlus } from "phosphor-react";
 
@@ -6,7 +6,6 @@ import { useSelectedPayments } from "@/context/SelectedPaymentsContext";
 import LabelCollapse from "@/components/ui/label-collapse";
 import UiSearchInput from "@/components/ui/search-input";
 import Collapse from "@/components/ui/collapse";
-import { DotsDropdown } from "@/components/atoms/DotsDropdown/DotsDropdown";
 import UiFilterDropdown from "@/components/ui/ui-filter-dropdown";
 import PaymentsTable from "@/modules/clients/components/payments-table";
 import { ModalActionPayment } from "@/components/molecules/modals/ModalActionPayment/ModalActionPayment";
@@ -25,16 +24,22 @@ const PaymentsTab: React.FC<PaymentProd> = ({ onChangeTab }) => {
     isOpen: boolean;
     paymentId: number;
   }>({} as { isOpen: boolean; paymentId: number });
+  const [isSelectedActionModalOpen, setIsSelectedActionModalOpen] = useState({
+    selected: 0
+  });
   const [search, setSearch] = useState("");
   const [isModalActionPaymentOpen, setIsModalActionPaymentOpen] = useState(false);
-
-  useEffect(() => {
-    console.log("selectedPayments", selectedPayments);
-  }, [selectedPayments]);
 
   const onChangetabWithCloseModal = (activeKey: string) => {
     setIsModalActionPaymentOpen(false);
     onChangeTab(activeKey);
+  };
+
+  const handleCloseActionModal = (cancelClicked?: Boolean) => {
+    setIsSelectedActionModalOpen({ selected: 0 });
+
+    if (cancelClicked) return;
+    setIsModalActionPaymentOpen((prev) => !prev);
   };
 
   return (
@@ -61,7 +66,6 @@ const PaymentsTab: React.FC<PaymentProd> = ({ onChangeTab }) => {
             >
               Generar acción
             </Button>
-            <DotsDropdown />
           </Flex>
 
           <Button type="primary" className="identifiyPayment">
@@ -89,8 +93,13 @@ const PaymentsTab: React.FC<PaymentProd> = ({ onChangeTab }) => {
         isOpen={isModalActionPaymentOpen}
         onClose={() => setIsModalActionPaymentOpen(false)}
         onChangeTab={onChangetabWithCloseModal}
+        setIsSelectedActionModalOpen={setIsSelectedActionModalOpen}
+        setIsModalActionPaymentOpen={setIsModalActionPaymentOpen}
       />
-      <ModalIdentifyPayment isOpen={true} onClose={() => {}} />
+      <ModalIdentifyPayment
+        isOpen={isSelectedActionModalOpen.selected === 1}
+        onClose={handleCloseActionModal}
+      />
     </>
   );
 };
