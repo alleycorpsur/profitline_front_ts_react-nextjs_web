@@ -1,6 +1,6 @@
 import { FC, useState } from "react";
 import { ArrowLineDown, CaretDoubleRight, DotsThree } from "phosphor-react";
-import { Button, Flex } from "antd";
+import { Button, Flex, Spin } from "antd";
 
 import { formatDatePlane, formatMoney } from "@/utils/utils";
 import { useModalDetail } from "@/context/ModalContext";
@@ -96,7 +96,9 @@ const ModalDetailAdjustment: FC<ModalDetailAdjustmentProps> = ({
   return (
     <aside className={`${styles.wrapper} ${isOpen ? styles.show : styles.hide}`}>
       {isLoading ? (
-        <p>cargando</p>
+        <Flex justify="center" align="center" style={{ height: "100%" }}>
+          <Spin />
+        </Flex>
       ) : (
         <>
           <FileDownloadModal
@@ -144,7 +146,6 @@ const ModalDetailAdjustment: FC<ModalDetailAdjustmentProps> = ({
                   <div className={styles.stepperContainer}>
                     <div className={styles.stepperContent}>
                       {(adjusmentData?.details ?? []).map((item, index, arr) => {
-                        console.log("item", index, item);
                         return (
                           <div key={item.id} className={styles.mainStep}>
                             <div
