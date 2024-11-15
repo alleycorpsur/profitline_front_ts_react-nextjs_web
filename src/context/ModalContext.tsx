@@ -41,6 +41,7 @@ interface ModalDetailPaymentProps {
   handleActionInDetail?: (selectedPayment: ISingleBank) => void;
   // eslint-disable-next-line no-unused-vars
   handleOpenPaymentDetail?: (paymentId: number) => void;
+  mutatedPaymentDetail?: boolean;
 }
 
 type ModalProps =
