@@ -19,6 +19,7 @@ interface ModalDetailPaymentProps {
   handleActionInDetail?: (selectedPayment: ISingleBank) => void;
   // eslint-disable-next-line no-unused-vars
   handleOpenPaymentDetail?: (paymentId: number) => void;
+  mutatedPaymentDetail?: boolean;
 }
 
 const ModalDetailPayment: FC<ModalDetailPaymentProps> = ({
@@ -26,7 +27,8 @@ const ModalDetailPayment: FC<ModalDetailPaymentProps> = ({
   onClose,
   paymentId,
   handleActionInDetail,
-  handleOpenPaymentDetail
+  handleOpenPaymentDetail,
+  mutatedPaymentDetail
 }) => {
   const [paymentData, setPaymentData] = useState<IPaymentDetail>();
   const [loading, setLoading] = useState<boolean>(false);
@@ -44,7 +46,7 @@ const ModalDetailPayment: FC<ModalDetailPaymentProps> = ({
       setLoading(false);
     };
     fetchPaymentData();
-  }, [paymentId]);
+  }, [paymentId, mutatedPaymentDetail]);
 
   return (
     <aside className={`${styles.wrapper} ${isOpen ? styles.show : styles.hide}`}>

@@ -33,6 +33,8 @@ export const ActivePaymentsTab: FC = () => {
   const [isSelectOpen, setIsSelectOpen] = useState({
     selected: 0
   });
+  const [mutatedPaymentDetail, mutatePaymentDetail] = useState<boolean>(false);
+
   const { ID } = useAppStore((state) => state.selectedProject);
 
   const { showMessage } = useMessageApi();
@@ -44,7 +46,7 @@ export const ActivePaymentsTab: FC = () => {
     setShowBankRules(true);
   };
 
-  const handleActionInDetail = (selectedPayment: ISingleBank) => {
+  const handleActionInDetail = (selectedPayment: ISingleBank): void => {
     setisGenerateActionOpen(!isGenerateActionOpen);
     setSelectedRows([selectedPayment]);
     mutate();
@@ -54,7 +56,8 @@ export const ActivePaymentsTab: FC = () => {
     openModal("payment", {
       paymentId: paymentId,
       handleActionInDetail: handleActionInDetail,
-      handleOpenPaymentDetail
+      handleOpenPaymentDetail,
+      mutatedPaymentDetail
     });
   };
 
@@ -67,6 +70,15 @@ export const ActivePaymentsTab: FC = () => {
     setClearSelected(!clearSelected);
     setSelectedRows([]);
     mutate();
+
+    // These lines below mutate the payment detail data after the modal is closed
+    mutatePaymentDetail((prev) => !prev);
+    openModal("payment", {
+      paymentId: selectedRows?.[0]?.id || 0,
+      handleActionInDetail: handleActionInDetail,
+      handleOpenPaymentDetail,
+      mutatedPaymentDetail: !mutatedPaymentDetail
+    });
   };
 
   const items: MenuProps["items"] = [
