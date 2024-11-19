@@ -1,15 +1,18 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import "./notificationsView.scss";
 import { Flex, Tabs, Spin } from "antd";
-import UiSearchInput from "@/components/ui/search-input/search-input";
-import FiltersNotifications from "@/components/atoms/Filters/FiltersNotifications/FiltersNotifications";
-
 import { Check, Eye, X } from "phosphor-react";
+
+import { useAppStore } from "@/lib/store/store";
 import { useModalDetail } from "@/context/ModalContext";
 import { useNotificationOpen } from "@/hooks/useNotificationOpen";
 import { useRejectedNotifications } from "@/hooks/useNotificationReject";
-import { useAppStore } from "@/lib/store/store";
+import UiSearchInput from "@/components/ui/search-input/search-input";
+import FiltersNotifications, {
+  ISelectFilterNotifications
+} from "@/components/atoms/Filters/FiltersNotifications/FiltersNotifications";
+
+import "./notificationsView.scss";
 
 const ListPanel = [
   { key: "opened", value: "Abiertas" },
@@ -29,6 +32,12 @@ interface Notification {
 export const NotificationsView = () => {
   const { openModal, modalType } = useModalDetail();
   const { ID: projectId } = useAppStore((state) => state.selectedProject);
+  const [filters, setFilters] = useState<ISelectFilterNotifications>({
+    lines: [],
+    sublines: [],
+    notificationTypes: []
+  });
+
   const {
     data: openNotifications,
     isLoading: isLoadingOpen,
@@ -153,7 +162,7 @@ export const NotificationsView = () => {
                       }, 300);
                     }}
                   />
-                  <FiltersNotifications />
+                  <FiltersNotifications setSelectedFilters={setFilters} />
                 </Flex>
                 {renderNotifications(item.key as "opened" | "closed")}
               </Flex>
