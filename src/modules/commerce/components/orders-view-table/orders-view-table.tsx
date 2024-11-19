@@ -19,6 +19,7 @@ interface PropsOrdersViewTable {
   setSelectedRowKeys: Dispatch<SetStateAction<Key[]>>;
   selectedRowKeys: Key[];
   orderStatus: string;
+  setFetchMutate: Dispatch<SetStateAction<boolean>>;
 }
 
 const OrdersViewTable = ({
@@ -26,10 +27,16 @@ const OrdersViewTable = ({
   setSelectedRows,
   setSelectedRowKeys,
   selectedRowKeys,
-  orderStatus
+  orderStatus,
+  setFetchMutate
 }: PropsOrdersViewTable) => {
   const router = useRouter();
   const setDraftInfo = useAppStore((state) => state.setDraftInfo);
+
+  const [selectedOrder, setSelectedOrder] = useState<number | null>(null);
+  const [currentWarehouseId, setCurrentWarehouseId] = useState<number | null>(null);
+
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   const handleSeeDetail = (order: IOrder) => {
     const { id: orderId, order_status } = order;
@@ -125,10 +132,10 @@ const OrdersViewTable = ({
     },
     {
       title: "Bodega",
-      key: "warhouse",
-      dataIndex: "warhouse",
-      render: (text) => <Text className="cell">{"Bodega 1"}</Text>,
-      //sorter: (a, b) => a.city.localeCompare(b.city),
+      key: "warehousename",
+      dataIndex: "warehousename",
+      render: (warehousename) => <Text className="cell">{warehousename}</Text>,
+      sorter: (a, b) => a.warehousename.localeCompare(b.warehousename),
       showSorterTooltip: false
     },
     {
@@ -163,7 +170,8 @@ const OrdersViewTable = ({
         <Flex gap={8}>
           <Button
             onClick={() => {
-              setSelected(row.id);
+              setSelectedOrder(row.id);
+              setCurrentWarehouseId(row.warehouseid);
               setIsModalOpen(true);
             }}
             className="buttonSeeProject"
@@ -178,8 +186,6 @@ const OrdersViewTable = ({
       )
     }
   ];
-  const [selected, setSelected] = useState<number | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   return (
     <>
@@ -191,9 +197,11 @@ const OrdersViewTable = ({
         pagination={false}
       />
       <ChangeWarehouseModal
-        defaultWarehouse={selected ?? 0}
+        selectedOrder={selectedOrder ?? 0}
+        currentWarehouseId={currentWarehouseId ?? 0}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        setFetchMutate={setFetchMutate}
       />
     </>
   );

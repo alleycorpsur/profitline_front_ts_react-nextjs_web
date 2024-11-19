@@ -150,6 +150,7 @@ export const OrdersView: FC = () => {
                 selectedRowKeys={selectedRowKeys}
                 setSelectedRowKeys={setSelectedRowKeys}
                 orderStatus={order.status}
+                setFetchMutate={setFetchMutate}
               />
             )
           }))}

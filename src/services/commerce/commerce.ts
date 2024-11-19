@@ -16,10 +16,6 @@ import {
   InventoriesByWarehouse,
   WarehouseProductsStock
 } from "@/components/molecules/modals/ChangeWarehouseModal/ChangeWarehouseModal";
-import {
-  inventoriesByWarehouseMock,
-  warehouseProductsStockMock
-} from "@/components/molecules/modals/ChangeWarehouseModal/mocked";
 
 export const getAllOrders = async (projectId: number) => {
   const response: GenericResponse<IOrderData[]> = await API.get(
@@ -231,15 +227,64 @@ export const dowloadOrderCSV = async (
   }
 };
 
-export const getInventoriesWarehouse = async (projectId: number) => {
-  const response: GenericResponse<InventoriesByWarehouse[]> = await API.get(
-    `/marketplace/projects/${projectId}/warehouses`
-  );
-  return { data: inventoriesByWarehouseMock };
+export const getInventoriesWarehouse = async (projectId: number, orderIds: number[]) => {
+  try {
+    const form = {
+      projectId,
+      orderIds
+    };
+    const response: GenericResponse<InventoriesByWarehouse[]> = await API.post(
+      `/warehouse/calculate-warehouses-availables`,
+      form
+    );
+
+    if (response.success) {
+      return response.data;
+    }
+
+    throw new Error(response.message || "Error al obtener las bodegas");
+  } catch (error) {
+    throw new Error(
+      error instanceof Error ? error.message : "Error desconocido al al obtener las bodegas"
+    );
+  }
 };
-export const getWarehouseProducts = async (projectId: number, warehouse: number) => {
-  const response: GenericResponse<WarehouseProductsStock[]> = await API.get(
-    `/marketplace/projects/${projectId}/warehouses/${warehouse}/stock`
-  );
-  return { data: warehouseProductsStockMock };
+export const getWarehouseProducts = async (
+  projectId: number,
+  warehouseId: number,
+  orderId: number
+) => {
+  try {
+    const form = {
+      projectId,
+      warehouseId,
+      orderIds: [orderId]
+    };
+    const response: GenericResponse<WarehouseProductsStock[]> = await API.post(
+      `/warehouse/get-warehouse-details-by-order`,
+      form
+    );
+
+    if (response.success) {
+      return response.data;
+    }
+
+    throw new Error(response.message || `Error al obtener stock de la bodega ${warehouseId}`);
+  } catch (error) {
+    throw new Error(
+      error instanceof Error
+        ? error.message
+        : `Error desconocido al obtener stock de la bodega ${warehouseId}`
+    );
+  }
+};
+export const updateWarehouse = async (orderIds: number[], warehouseId: number) => {
+  const payload = { orderIds, warehouseId };
+  const response: GenericResponse<any> = await API.put("/marketplace/orders/warehouse", payload);
+
+  if (response.success) {
+    return response.success;
+  } else {
+    throw new Error(response.message || `Error al actualizar bodega`);
+  }
 };

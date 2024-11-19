@@ -1,108 +1,112 @@
-import React, { useContext, useEffect, useState } from "react";
-import { Modal, Typography, Button, Table, Flex, Radio, Spin } from "antd";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Modal, Typography, Button, Table, Flex, Radio, message } from "antd";
 import { CaretLeft, Eye } from "phosphor-react";
 import { ColumnsType } from "antd/es/table";
-import styles from "./ChangeWarehouse.module.scss";
 import { useAppStore } from "@/lib/store/store";
-import { getInventoriesWarehouse, getWarehouseProducts } from "@/services/commerce/commerce";
-import { inventoriesByWarehouseMock, warehouseProductsStockMock } from "./mocked";
+import {
+  getInventoriesWarehouse,
+  getWarehouseProducts,
+  updateWarehouse
+} from "@/services/commerce/commerce";
 import FooterButtons from "@/components/atoms/FooterButtons/FooterButtons";
 const { Title, Text } = Typography;
 
 interface Props {
   isOpen: boolean;
-  defaultWarehouse: number;
-  //onConfirm: () => void;
+  selectedOrder: number;
+  currentWarehouseId: number;
   onClose: () => void;
+  setFetchMutate: Dispatch<SetStateAction<boolean>>;
 }
 export interface InventoriesByWarehouse {
   id: number;
-  warehouseName: string;
-  stockAvailable: boolean;
+  warehouse: string;
+  availability: boolean;
+  availability_msg: string;
 }
 
 export interface WarehouseProductsStock {
-  id: number;
-  productName: string;
-  orderQuantity: number;
-  stock: number;
+  sku: string;
+  quantity: number;
+  requested: number;
+  inWarehouse: number;
 }
 
 export const ChangeWarehouseModal: React.FC<Props> = ({
-  defaultWarehouse,
+  selectedOrder,
+  currentWarehouseId,
   isOpen,
-  onClose
-  // onConfirm
+  onClose,
+  setFetchMutate
 }) => {
   const [view, setView] = useState<"change-warehouse" | "warehouse-detail">("change-warehouse");
-  const [warehouseSelected, setWarehouseSelected] = useState<number | null>(defaultWarehouse);
+  const [warehouseSelected, setWarehouseSelected] = useState<number | null>(currentWarehouseId);
   const [viewWarehouseDetails, setViewWarehouseDetails] = useState<InventoriesByWarehouse | null>(
     null
   );
   const { ID: projectId } = useAppStore((state) => state.selectedProject);
-
   const [loading, setLoading] = useState(false);
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [inventoriesByWarehouse, setInventoriesByWarehouse] = useState<InventoriesByWarehouse[]>(
     []
   );
   const [warehouseProductsStock, setWarehouseProductsStock] = useState<WarehouseProductsStock[]>(
     []
   );
+  useEffect(() => {
+    if (isOpen) {
+      setWarehouseSelected(currentWarehouseId);
+    }
+  }, [currentWarehouseId, isOpen]);
 
   useEffect(() => {
-    const fetchDiscounts = async () => {
+    const fetchWarehouses = async () => {
       setLoading(true);
-      //const response = await getInventoriesWarehouse(projectId);
-      // if (response.data) {
-      setTimeout(() => {
-        setInventoriesByWarehouse(inventoriesByWarehouseMock);
-      }, 3000);
-      // }
+      const response = await getInventoriesWarehouse(projectId, [selectedOrder ?? 0]);
+      setInventoriesByWarehouse(response);
       setLoading(false);
     };
-    fetchDiscounts();
-  }, []);
-  console.log("inventoriesByWarehouse", inventoriesByWarehouse);
+    isOpen && fetchWarehouses();
+  }, [selectedOrder]);
 
   useEffect(() => {
     const fetchWarehouseStock = async () => {
       setLoading(true);
-      // if (viewWarehouseDetails?.id) {
-      //   const response = await getWarehouseProducts(projectId, viewWarehouseDetails?.id);
-      //   // if (response.data) {
-      //   setWarehouseProductsStock(warehouseProductsStockMock);
-      //   // }
-      // }
-      setTimeout(() => {
-        setWarehouseProductsStock(warehouseProductsStockMock);
-      }, 3000);
+      if (viewWarehouseDetails?.id) {
+        const response = await getWarehouseProducts(
+          projectId,
+          viewWarehouseDetails?.id,
+          selectedOrder
+        );
+        setWarehouseProductsStock(response);
+      }
       setLoading(false);
     };
-    fetchWarehouseStock();
+    isOpen && fetchWarehouseStock();
   }, [viewWarehouseDetails?.id]);
 
   const columns: ColumnsType<InventoriesByWarehouse> = [
     {
       title: "Bodega",
-      dataIndex: "warehouseName",
-      key: "warehouseName",
-      render: (warehouseName, record) => (
+      dataIndex: "warehouse",
+      key: "warehouse",
+      render: (warehouse, record) => (
         <Flex gap={12}>
           <Radio
             checked={warehouseSelected === record.id}
             onChange={() => setWarehouseSelected(record.id)}
           />
-          <Text>{warehouseName}</Text>
+          <Text>{warehouse}</Text>
         </Flex>
       )
     },
     {
       title: "Inventario",
-      dataIndex: "stockAvailable",
-      key: "stockAvailable",
-      render: (stockAvailable: number) => (
-        <Text {...(stockAvailable && { type: "success" })}>
-          {!!stockAvailable ? "Stock disponible" : "No hay stock"}
+      dataIndex: "availability",
+      key: "availability",
+      render: (availability: boolean) => (
+        <Text {...(availability && { type: "success" })}>
+          {availability ? "Stock disponible" : "No hay stock"}
         </Text>
       )
     },
@@ -130,43 +134,64 @@ export const ChangeWarehouseModal: React.FC<Props> = ({
   const columnsDetails: ColumnsType<WarehouseProductsStock> = [
     {
       title: "Producto",
-      dataIndex: "productName",
-      key: "productName"
+      dataIndex: "sku",
+      key: "sku"
     },
     {
       title: "Pedido",
-      dataIndex: "orderQuantity",
-      key: "orderQuantity"
+      dataIndex: "requested",
+      key: "requested"
     },
     {
       title: "Stock",
-      dataIndex: "stock",
-      key: "stock",
-      render: (stock: number, record: WarehouseProductsStock) => (
-        <Text {...(stock < record.orderQuantity && { type: "danger" })}>{stock}</Text>
+      dataIndex: "inWarehouse",
+      key: "inWarehouse",
+      render: (inWarehouse: number, record: WarehouseProductsStock) => (
+        <Text {...(inWarehouse < record.requested && { type: "danger" })}>{inWarehouse}</Text>
       )
     }
   ];
-  const onSubmit = () => {
-    console.log("Form submitted with data:", warehouseSelected);
-    // Here you would typically send the data to an API
-    onClose();
-  };
 
-  const renderView = () => {
-    switch (view) {
-      case "change-warehouse":
-        return <Table dataSource={inventoriesByWarehouse} columns={columns} pagination={false} />;
-      case "warehouse-detail":
-        return (
-          <Table dataSource={warehouseProductsStock} columns={columnsDetails} pagination={false} />
-        );
-      default:
-        return <Table dataSource={inventoriesByWarehouse} columns={columns} pagination={false} />;
+  const onSubmit = async () => {
+    setLoadingSubmit(true);
+    try {
+      const orderIds = [selectedOrder];
+      await updateWarehouse(orderIds, warehouseSelected as number);
+      message.success("Bodega actualizada", 2, onClose);
+      setFetchMutate((prev) => !prev);
+    } catch (error) {
+      message.error(
+        error instanceof Error ? error.message : "Error al actualizar la bodega",
+        3,
+        onClose
+      );
+    } finally {
+      setLoadingSubmit(false);
     }
   };
 
-  if (loading) return <Spin />;
+  const renderView = () => {
+    const viewMap = {
+      "change-warehouse": (
+        <Table
+          dataSource={inventoriesByWarehouse}
+          columns={columns}
+          pagination={false}
+          rowKey={"id"}
+        />
+      ),
+      "warehouse-detail": (
+        <Table
+          dataSource={warehouseProductsStock}
+          columns={columnsDetails}
+          pagination={false}
+          rowKey={"sku"}
+        />
+      )
+    };
+
+    return viewMap[view] || viewMap["change-warehouse"];
+  };
 
   return (
     <Modal
@@ -175,7 +200,6 @@ export const ChangeWarehouseModal: React.FC<Props> = ({
       title={
         <Flex gap={8} align="center" style={{ alignItems: "center" }}>
           <Button
-            //className={styles.goBackButton}
             type="text"
             onClick={() => {
               if (view === "change-warehouse") {
@@ -190,7 +214,7 @@ export const ChangeWarehouseModal: React.FC<Props> = ({
           <Title level={4} style={{ marginBottom: 0 }}>
             {view === "change-warehouse"
               ? "Cambiar bodega"
-              : `Bodega ${viewWarehouseDetails?.warehouseName}`}
+              : `Bodega ${viewWarehouseDetails?.warehouse}`}
           </Title>
         </Flex>
       }
@@ -198,15 +222,17 @@ export const ChangeWarehouseModal: React.FC<Props> = ({
         view === "change-warehouse" && (
           <FooterButtons
             titleConfirm="Guardar bodega"
-            isConfirmDisabled={false}
             onClose={onClose}
             handleOk={onSubmit}
+            isConfirmDisabled={!warehouseSelected}
+            isConfirmLoading={loadingSubmit}
           />
         )
       }
       onCancel={onClose}
       className="agreement-detail-modal"
       closeIcon={null}
+      loading={loading}
     >
       {renderView()}
     </Modal>
