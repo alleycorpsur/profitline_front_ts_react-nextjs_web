@@ -43,7 +43,7 @@ export const NotificationsView = () => {
     isLoading: isLoadingOpen,
     isError: isErrorOpen,
     mutate: mutateOpen
-  } = useNotificationOpen(projectId);
+  } = useNotificationOpen({ projectId, filters });
   const {
     data: closedNotifications,
     isLoading: isLoadingClosed,
