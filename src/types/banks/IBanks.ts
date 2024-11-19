@@ -28,6 +28,40 @@ export interface ISingleBank {
   id_bank: number;
   account_description: string;
   bank_description: string;
+  color: string;
+  client_status_id: number;
+  evidence_url: string | null;
+  key: number;
+  rule_id: number | null;
+  sequence: number;
+  ammount_applied: number;
+  USER_NAME: string | null;
+}
+
+export interface IPaymentDetail extends ISingleBank {
+  events: IEvent[];
+}
+
+export interface IEvent {
+  id: number;
+  files: any | null;
+  user_id: number | null;
+  comments: string;
+  USER_NAME: string | null;
+  created_at: string;
+  event_date: string;
+  id_payment: number;
+  id_payment_rule: number | null;
+  previous_id_client: number | null;
+  id_aplication_payment: number | null;
+  payments_events_types: number;
+  payments_events_types_name: string;
+  client_name: string;
+  id_client: number;
+  ids_split_payment: number[] | null;
+  previous_name_client: string;
+  ammount_applied: number;
+  id_payment_parent: number;
 }
 
 export interface IClientsByProject {

@@ -33,6 +33,8 @@ export const ActivePaymentsTab: FC = () => {
   const [isSelectOpen, setIsSelectOpen] = useState({
     selected: 0
   });
+  const [mutatedPaymentDetail, mutatePaymentDetail] = useState<boolean>(false);
+
   const { ID } = useAppStore((state) => state.selectedProject);
 
   const { showMessage } = useMessageApi();
@@ -44,20 +46,39 @@ export const ActivePaymentsTab: FC = () => {
     setShowBankRules(true);
   };
 
-  const handleOpenPaymentDetail = (payment: ISingleBank) => {
+  const handleActionInDetail = (selectedPayment: ISingleBank): void => {
+    setisGenerateActionOpen(!isGenerateActionOpen);
+    setSelectedRows([selectedPayment]);
+    mutate();
+  };
+
+  const handleOpenPaymentDetail = (paymentId: number) => {
     openModal("payment", {
-      paymentId: payment.id,
-      projectId: ID
+      paymentId: paymentId,
+      handleActionInDetail: handleActionInDetail,
+      handleOpenPaymentDetail,
+      mutatedPaymentDetail
     });
   };
 
-  const onCloseModal = () => {
+  const onCloseModal = (cancelClicked?: Boolean) => {
     setisGenerateActionOpen(!isGenerateActionOpen);
     setIsSelectOpen({ selected: 0 });
+
+    if (cancelClicked) return;
+
     setClearSelected(!clearSelected);
     setSelectedRows([]);
-
     mutate();
+
+    // These lines below mutate the payment detail data after the modal is closed
+    mutatePaymentDetail((prev) => !prev);
+    openModal("payment", {
+      paymentId: selectedRows?.[0]?.id || 0,
+      handleActionInDetail: handleActionInDetail,
+      handleOpenPaymentDetail,
+      mutatedPaymentDetail: !mutatedPaymentDetail
+    });
   };
 
   const items: MenuProps["items"] = [
@@ -128,6 +149,7 @@ export const ActivePaymentsTab: FC = () => {
                     };
                   })}
                   handleOpenPaymentDetail={handleOpenPaymentDetail}
+                  selectedRows={selectedRows}
                   setSelectedRows={setSelectedRows}
                   bankStatusId={status.payments_status_id}
                   clearSelected={clearSelected}
@@ -166,7 +188,11 @@ export const ActivePaymentsTab: FC = () => {
             onClose={onCloseModal}
             selectedRows={selectedRows}
           />
-          <ModalActionsUploadEvidence isOpen={isSelectOpen.selected === 5} onClose={onCloseModal} />
+          <ModalActionsUploadEvidence
+            isOpen={isSelectOpen.selected === 5}
+            onClose={onCloseModal}
+            selectedRows={selectedRows}
+          />
         </Flex>
       )}
     </>

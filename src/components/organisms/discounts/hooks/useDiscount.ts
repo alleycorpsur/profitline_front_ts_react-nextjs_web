@@ -2,11 +2,13 @@
 import useSearch from "@/hooks/useSearch";
 import { useAppStore } from "@/lib/store/store";
 import {
-  deactivateDiscount,
+  changeStatus,
   deleteDiscount,
+  getAllDiscountPackages,
   getAllDiscounts
 } from "@/services/discount/discount.service";
 import { DiscountBasics } from "@/types/discount/DiscountBasics";
+import { DiscountPackage } from "@/types/discount/DiscountPackage";
 import { GenericResponsePage } from "@/types/global/IGlobal";
 import { MessageInstance } from "antd/es/message/interface";
 import { ChangeEvent, useEffect, useState } from "react";
@@ -14,33 +16,37 @@ import useSWR from "swr";
 
 type Props = {
   messageApi: MessageInstance;
+  tabActive: string;
 };
 
+//type DiscountBasicsState = DiscountBasics & { checked: boolean };
 type DiscountBasicsState = DiscountBasics & { checked: boolean };
+type DiscountPackageState = DiscountPackage & { checked: boolean };
 
-export default function useDiscount({ messageApi }: Props) {
+export default function useDiscount({ messageApi, tabActive }: Props) {
   const [page, setPage] = useState(1);
   const [isOpenModalDelete, setIsOpenModalDelete] = useState(false);
   const [isLoadingDelete, setIsLoadingDelete] = useState(false);
   const [active, setActive] = useState<number | undefined>(undefined);
-  const [data, setData] = useState<DiscountBasicsState[]>([]);
+  const [data, setData] = useState<any[]>([]);
   const { searchQuery, handleChangeSearch } = useSearch();
   const { ID } = useAppStore((project) => project.selectedProject);
-
+  const fetcher = tabActive === "1" ? getAllDiscountPackages : getAllDiscounts;
   const {
     data: res,
     isLoading,
     mutate
-  } = useSWR<GenericResponsePage<DiscountBasics[]>>(
+  } = useSWR<GenericResponsePage<DiscountBasics[] | DiscountPackage[]>>(
     {
       projectId: ID,
       params: {
         page,
         searchQuery,
         active
-      }
+      },
+      tabActive
     },
-    ({ projectId, params }) => getAllDiscounts({ projectId, params }),
+    ({ projectId, params }) => fetcher({ projectId, params }),
     {
       revalidateOnMount: true,
       revalidateOnFocus: false,
@@ -61,7 +67,7 @@ export default function useDiscount({ messageApi }: Props) {
     if (res?.data) {
       setData(res.data.map((item) => ({ ...item, checked: false })));
     }
-  }, [res]);
+  }, [res, tabActive]);
 
   const onChangeSearch = (e: ChangeEvent<HTMLInputElement>) => {
     handleChangePage(1);
@@ -109,7 +115,7 @@ export default function useDiscount({ messageApi }: Props) {
     setIsOpenModalDelete(true);
   };
 
-  const handleDeactivate = async (id: number, status: boolean) => {
+  const handleChangeStatus = async (id: number, newStatus: boolean) => {
     mutate(
       {
         ...res,
@@ -117,17 +123,17 @@ export default function useDiscount({ messageApi }: Props) {
           if (item.id === id) {
             return {
               ...item,
-              status
+              status: newStatus
             };
           }
           return item;
         })
-      } as GenericResponsePage<DiscountBasics[]>,
+      } as GenericResponsePage<DiscountBasics[] | DiscountPackage[]>,
       { revalidate: false }
     );
-    const response = await deactivateDiscount(id, status);
+    const response = await changeStatus(id, newStatus);
     if (response.success) {
-      messageApi.success(`Descuento ${status ? "desactivado" : "activado"} con éxito`);
+      messageApi.success(`Descuento ${newStatus ? "activado" : "desactivado"} con éxito`);
     } else {
       mutate();
       messageApi.error(response.message);
@@ -144,7 +150,7 @@ export default function useDiscount({ messageApi }: Props) {
     handleChangeActive,
     handleSelectToDelete,
     handleDeleteDiscount,
-    handleDeactivate,
+    handleChangeStatus,
     modalDelete: {
       removeDiscountAction: handleDeleteDiscount,
       isLoading: isLoadingDelete,

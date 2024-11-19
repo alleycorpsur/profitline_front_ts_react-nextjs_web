@@ -2,11 +2,11 @@ import { GenericResponse } from "@/types/global/IGlobal";
 import axios from "axios";
 import config from "@/config";
 import { API, getIdToken } from "@/utils/api/api";
-import { IClientsByProject, ISingleBank } from "@/types/banks/IBanks";
+import { IClientsByProject, IPaymentDetail } from "@/types/banks/IBanks";
 
 export const getPaymentDetail = async (payment_id: number) => {
   try {
-    const response: GenericResponse<ISingleBank[]> = await API.get(
+    const response: GenericResponse<IPaymentDetail[]> = await API.get(
       `/bank/get-payment-detail?payment_id=${payment_id}`
     );
 
@@ -35,6 +35,11 @@ interface IAssignClient {
   client_id: string;
   evidence: File;
 }
+
+interface IEditClient extends IAssignClient {
+  current_client_id: string;
+}
+
 export const assignClient = async ({
   id_user,
   payment_ids,
@@ -68,7 +73,13 @@ export const assignClient = async ({
   }
 };
 
-export const editClient = async ({ id_user, payment_ids, client_id, evidence }: IAssignClient) => {
+export const editClient = async ({
+  id_user,
+  payment_ids,
+  client_id,
+  evidence,
+  current_client_id
+}: IEditClient) => {
   const token = await getIdToken();
 
   const formData = new FormData();
@@ -76,6 +87,7 @@ export const editClient = async ({ id_user, payment_ids, client_id, evidence }: 
   formData.append("payment_ids", JSON.stringify(payment_ids));
   formData.append("assign_client_id", client_id);
   formData.append("evidence", evidence);
+  formData.append("previous_assign_client_id", current_client_id);
   try {
     const response: GenericResponse<any> = await axios.put(
       `${config.API_HOST}/bank/updated-client-payments`,
@@ -92,6 +104,78 @@ export const editClient = async ({ id_user, payment_ids, client_id, evidence }: 
     return response.data;
   } catch (error) {
     console.error("Error al editar el cliente:", error);
+    throw error;
+  }
+};
+
+export const uploadEvidence = async (payment_id: number, user_id: number, evidence: File) => {
+  const token = await getIdToken();
+
+  const formData = new FormData();
+  formData.append("user_id", user_id.toString());
+  formData.append("files", evidence);
+  try {
+    const response: GenericResponse<any> = await axios.post(
+      `${config.API_HOST}/bank/upload-evidence/${payment_id}`,
+      formData,
+      {
+        headers: {
+          Accept: "application/json, text/plain, */*",
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Error al subir la evidencia:", error);
+    throw error;
+  }
+};
+
+interface IDataSplitPayment {
+  id_client: number;
+  ammount: number;
+  key_file: string;
+}
+
+interface ISpliPayment {
+  payment_id: number;
+  userId: number;
+  data: IDataSplitPayment[];
+  files: File[];
+}
+
+export const splitPayment = async ({ payment_id, userId, data, files }: ISpliPayment) => {
+  const token = await getIdToken();
+
+  const formData = new FormData();
+  formData.append("payment_id", payment_id.toString());
+  formData.append("data", JSON.stringify(data));
+  formData.append("user_id", userId.toString());
+
+  // for each file in files append with key files
+  files.forEach((file) => {
+    formData.append("files", file);
+  });
+
+  try {
+    const response: GenericResponse<any> = await axios.post(
+      `${config.API_HOST}/bank/split-payment`,
+      formData,
+      {
+        headers: {
+          Accept: "application/json, text/plain, */*",
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Error al dividir el pago:", error);
     throw error;
   }
 };

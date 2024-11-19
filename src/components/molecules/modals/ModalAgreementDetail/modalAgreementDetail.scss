@@ -1,6 +1,17 @@
+@import "@styles/variables.scss";
+
 .agreement-detail-modal {
     .ant-modal-content {
         padding: 24px;
+    }
+
+    &__modal-title {
+        font-size: 1.25rem;
+        color: $black;
+
+        span {
+            font-weight: 300;
+        }
     }
 
     .agreement-form {
@@ -17,13 +28,6 @@
         width: 100%;
     }
 
-    .evidence-section {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        width: 100%;
-    }
-
     .evidence-value {
         background-color: #f0f0f0;
         padding: 8px;
@@ -35,51 +39,59 @@
     }
 
     .modal-actions-dots {
-        background-color: #f0f0f0;
-        height: 32px;
-        width: 32px;
-        border-radius: 4px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        margin-bottom: 4px;
     }
 
-    .evidence-section {
-        margin-top: 24px;
+    .evidenceSection {
+        display: flex;
+        flex-direction: column;
+
+        &__title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: $gray;
+            margin-bottom: 6px;
+        }
     }
 
     .evidence-list {
-        display: flex;
-        gap: 8px;
-        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: auto;
+        gap: 1rem;
     }
 
     .evidence-item {
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 8px 12px;
+        padding: 12px 16px;
         gap: 8px;
         border-radius: 4px;
         cursor: pointer;
         transition: background-color 0.3s;
-        background-color: #f0f0f0;
+        background-color: $background;
+        max-height: 305px;
+
+        p {
+            font-size: 1rem;
+            font-weight: 400;
+            // max lines 2
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
 
         &:hover {
             background-color: #e8e8e8;
         }
 
-
         .evidence-time {
             color: #8c8c8c;
             font-size: 12px;
         }
-
-        .evidence-icon {
-
-            margin-bottom: auto;
-        }
     }
-
-
 }

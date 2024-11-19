@@ -2,6 +2,7 @@ import { IFormDigitalRecordModal } from "@/components/molecules/modals/DigitalRe
 import config from "@/config";
 import { DiscountRequestBody } from "@/types/accountingAdjustment/IAccountingAdjustment";
 import { GenericResponse } from "@/types/global/IGlobal";
+import { IPaymentDetail } from "@/types/paymentAgreement/IPaymentAgreement";
 import { API, getIdToken } from "@/utils/api/api";
 import axios, { AxiosResponse } from "axios";
 
@@ -211,6 +212,32 @@ export const createPaymentAgreement = async (
   );
 
   return response.data;
+};
+
+export const getDetailPaymentAgreement = async (incident_id: number) => {
+  try {
+    const response: IPaymentDetail[] = await API.get(
+      `${config.API_HOST}/invoice/paymentAgreement/get-detail/${incident_id}`
+    );
+
+    return response[0];
+  } catch (error) {
+    console.error("Error getting payment agreement detail", error);
+    throw error;
+  }
+};
+
+export const cancelPaymentAgreement = async (incident_id: number) => {
+  try {
+    const response: AxiosResponse<any> = await API.delete(
+      `${config.API_HOST}/invoice/paymentAgreement/cancel-payment-agreement/${incident_id}`
+    );
+
+    return response;
+  } catch (error) {
+    console.error("Error canceling payment agreement", error);
+    throw error;
+  }
 };
 
 export const legalizeFinancialDiscount = async (

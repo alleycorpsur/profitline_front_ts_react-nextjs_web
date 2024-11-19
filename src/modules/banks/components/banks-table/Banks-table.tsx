@@ -9,17 +9,22 @@ import "./banks-table.scss";
 
 const { Text } = Typography;
 
+interface clientByStatus extends ISingleBank {
+  client_status_id: number;
+}
 interface PropsBanksTable {
-  clientsByStatus: any[];
+  clientsByStatus: clientByStatus[];
+  selectedRows: ISingleBank[] | undefined;
   setSelectedRows: Dispatch<SetStateAction<ISingleBank[] | undefined>>;
   // eslint-disable-next-line no-unused-vars
-  handleOpenPaymentDetail?: (payment: ISingleBank) => void;
+  handleOpenPaymentDetail?: (paymentId: number) => void;
   bankStatusId: number;
   clearSelected: boolean;
 }
 
 export const BanksTable = ({
   clientsByStatus,
+  selectedRows,
   setSelectedRows,
   handleOpenPaymentDetail,
   bankStatusId,
@@ -30,6 +35,10 @@ export const BanksTable = ({
   useEffect(() => {
     setSelectedRowKeys([]);
   }, [clearSelected]);
+
+  useEffect(() => {
+    setSelectedRowKeys(selectedRows?.map((row) => row.id) ?? []);
+  }, [selectedRows]);
 
   const onSelectChange = (newSelectedRowKeys: React.Key[], newSelectedRows: ISingleBank[]) => {
     setSelectedRowKeys(newSelectedRowKeys);
@@ -85,31 +94,51 @@ export const BanksTable = ({
       title: "ID",
       dataIndex: "id",
       key: "id",
-      render: (text) => <Text className="idText">{text}</Text>
+      render: (id) => (
+        <Text
+          className="idText"
+          onClick={() => handleOpenPaymentDetail && handleOpenPaymentDetail(id)}
+        >
+          {id}
+        </Text>
+      ),
+      sorter: (a, b) => a.id - b.id,
+      showSorterTooltip: false,
+      width: 100
     },
     {
       title: "Cliente",
       dataIndex: "CLIENT_NAME",
       key: "CLIENT_NAME",
-      render: (text) => <Text>{text}</Text>
+      render: (text) => <Text>{text}</Text>,
+      sorter: (a, b) => a.CLIENT_NAME.localeCompare(b.CLIENT_NAME),
+      showSorterTooltip: false
     },
     {
       title: "Fecha",
       dataIndex: "created_at",
       key: "created_at",
-      render: (text) => <Text>{formatDateDMY(text)}</Text>
+      render: (text) => <Text>{formatDateDMY(text)}</Text>,
+      sorter: (a, b) => Date.parse(a.created_at) - Date.parse(b.created_at),
+      showSorterTooltip: false,
+      width: 110
     },
     {
       title: "Monto",
       key: "current_value",
       dataIndex: "current_value",
-      render: (text) => <Text>{formatMoney(text)}</Text>
+      render: (text) => <Text>{formatMoney(text)}</Text>,
+      sorter: (a, b) => (a.current_value ?? 0) - (b.current_value ?? 0),
+      showSorterTooltip: false,
+      width: 130
     },
     {
       title: "Descripción",
       key: "description",
       dataIndex: "description",
-      render: (text) => <Text>{text}</Text>
+      render: (text) => <p className="description">{text}</p>,
+      sorter: (a, b) => a.description.localeCompare(b.description),
+      showSorterTooltip: false
     },
     {
       title: "Cuenta",
@@ -132,12 +161,8 @@ export const BanksTable = ({
           <Button className="buttonSeeEvidence" icon={<Receipt size={"1.3rem"} />} />
           <Button
             className="buttonSeeClient"
-            icon={
-              <Eye
-                size={"1.3rem"}
-                onClick={() => handleOpenPaymentDetail && handleOpenPaymentDetail(record)}
-              />
-            }
+            onClick={() => handleOpenPaymentDetail && handleOpenPaymentDetail(record.id)}
+            icon={<Eye size={"1.3rem"} />}
           />
         </Flex>
       )
@@ -154,7 +179,10 @@ export const BanksTable = ({
         ...data,
         key: data.id
       }))}
-      pagination={false}
+      pagination={{
+        pageSize: 15,
+        showSizeChanger: false
+      }}
     />
   );
 };

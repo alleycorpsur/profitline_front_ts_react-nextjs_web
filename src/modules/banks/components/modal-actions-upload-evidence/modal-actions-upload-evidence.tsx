@@ -1,12 +1,17 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Modal, Typography } from "antd";
+import { useForm } from "react-hook-form";
+
+import { uploadEvidence } from "@/services/banksPayments/banksPayments";
+import { useAppStore } from "@/lib/store/store";
 
 import SecondaryButton from "@/components/atoms/buttons/secondaryButton/SecondaryButton";
 import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
 import { DocumentButton } from "@/components/atoms/DocumentButton/DocumentButton";
-import { useForm } from "react-hook-form";
 import { useMessageApi } from "@/context/MessageContext";
+
+import { ISingleBank } from "@/types/banks/IBanks";
 
 import "./modal-actions-upload-evidence.scss";
 const { Title } = Typography;
@@ -18,11 +23,14 @@ interface infoObject {
 
 interface Props {
   isOpen: boolean;
-  onClose: () => void;
+  // eslint-disable-next-line no-unused-vars
+  onClose: (cancelClicked?: boolean) => void;
+  selectedRows: ISingleBank[] | undefined;
 }
 
-const ModalActionsUploadEvidence = ({ isOpen, onClose }: Props) => {
+const ModalActionsUploadEvidence = ({ isOpen, onClose, selectedRows }: Props) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const userId = useAppStore((state) => state.userId);
   const { showMessage } = useMessageApi();
 
   const { handleSubmit, setValue, watch, trigger, reset } = useForm<{
@@ -58,9 +66,12 @@ const ModalActionsUploadEvidence = ({ isOpen, onClose }: Props) => {
   };
 
   const onSubmit = async (data: { evidence: File }) => {
+    if (!selectedRows) {
+      return;
+    }
     setIsSubmitting(true);
     try {
-      console.info("archivo enviado: ", data);
+      await uploadEvidence(selectedRows[0].id, userId, data.evidence);
 
       showMessage("success", "Tirilla enviada correctamente");
 
@@ -81,9 +92,7 @@ const ModalActionsUploadEvidence = ({ isOpen, onClose }: Props) => {
       closable={false}
       destroyOnClose
     >
-      <Title level={4} onClick={onClose}>
-        Cargar tirilla
-      </Title>
+      <Title level={4}>Cargar tirilla</Title>
 
       <p className="modalActionsUploadEvidence__subTitle">Cargar el archivo correspondiente</p>
 
@@ -100,7 +109,7 @@ const ModalActionsUploadEvidence = ({ isOpen, onClose }: Props) => {
       </div>
 
       <div className="modalActionsUploadEvidence__footer">
-        <SecondaryButton onClick={onClose}>Cancelar</SecondaryButton>
+        <SecondaryButton onClick={() => onClose(true)}>Cancelar</SecondaryButton>
 
         <PrincipalButton
           onClick={handleSubmit(onSubmit)}

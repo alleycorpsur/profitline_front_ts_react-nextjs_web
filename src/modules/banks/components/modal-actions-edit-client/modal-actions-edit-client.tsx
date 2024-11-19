@@ -36,7 +36,8 @@ interface IFormEditClient {
 
 interface Props {
   isOpen: boolean;
-  onClose: () => void;
+  // eslint-disable-next-line no-unused-vars
+  onClose: (cancelClicked?: Boolean) => void;
   selectedRows: ISingleBank[] | undefined;
 }
 
@@ -122,7 +123,8 @@ const ModalActionsEditClient = ({ isOpen, onClose, selectedRows }: Props) => {
         id_user: userId,
         payment_ids: selectedRows?.map((row) => row.id),
         client_id: data.change_for.value,
-        evidence: data.evidence as File
+        evidence: data.evidence as File,
+        current_client_id: selectedRows[0].id_client.toString()
       });
 
       showMessage("success", "Cliente editado correctamente");
@@ -144,9 +146,7 @@ const ModalActionsEditClient = ({ isOpen, onClose, selectedRows }: Props) => {
       closable={false}
       destroyOnClose
     >
-      <Title level={4} onClick={onClose}>
-        Editar cliente
-      </Title>
+      <Title level={4}>Editar cliente</Title>
 
       <p className="modalActionsEditClient__subTitle">
         Ingresa el nombre del cliente para realizar el cambio
@@ -199,14 +199,14 @@ const ModalActionsEditClient = ({ isOpen, onClose, selectedRows }: Props) => {
       </div>
 
       <div className="modalActionsEditClient__footer">
-        <SecondaryButton onClick={onClose}>Cancelar</SecondaryButton>
+        <SecondaryButton onClick={() => onClose(true)}>Cancelar</SecondaryButton>
 
         <PrincipalButton
           onClick={handleSubmit(onSubmit)}
           disabled={!isValid || !evidence}
           loading={isSubmitting}
         >
-          Asignar cliente
+          Editar cliente
         </PrincipalButton>
       </div>
     </Modal>
