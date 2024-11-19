@@ -481,6 +481,10 @@ const InvoiceDetailModal: FC<InvoiceDetailModalProps> = ({
                                 ""
                               )}
 
+                              {item.event_type_name === "Factura conciliada" ? (
+                                <div className={styles.name}>{`Acción: ${item.user_name}`}</div>
+                              ) : null}
+
                               {item.comments && (
                                 <div className={styles.commentsContainer}>
                                   <div className={styles.name}>Comentario: {item.comments}</div>
