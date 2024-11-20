@@ -9,7 +9,7 @@ import Collapse from "@/components/ui/collapse";
 import UiFilterDropdown from "@/components/ui/ui-filter-dropdown";
 import PaymentsTable from "@/modules/clients/components/payments-table";
 import { ModalActionPayment } from "@/components/molecules/modals/ModalActionPayment/ModalActionPayment";
-import ModalIdentifyPayment from "../../components/payments-tab/modal-identify-payment";
+import ModalIdentifyPayment from "../../components/payments-tab/modal-identify-payment-action";
 
 import "./payments-tab.scss";
 
