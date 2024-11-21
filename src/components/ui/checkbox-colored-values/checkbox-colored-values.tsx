@@ -13,7 +13,7 @@ interface CheckboxColoredValuesProps extends React.ComponentProps<typeof Checkbo
 }
 
 const CheckboxColoredValues: FC<CheckboxColoredValuesProps> = ({
-  color = "#1890ff", // Default Ant Design primary color
+  color = "#1890ff",
   onChangeCheckbox,
   checked,
   content,

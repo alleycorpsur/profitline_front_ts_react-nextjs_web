@@ -141,6 +141,17 @@ const ModalIdentifyPayment: FC<ModalIdentifyPaymentProps> = ({ isOpen, onClose }
               placeholder="Seleccionar fecha"
               control={control}
               error={errors.date}
+              validationRules={{
+                required: "Fecha es obligatoria",
+                validate: {
+                  notFutureDate: (value) => {
+                    const selectedDate = new Date(value);
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0); // Set time to midnight to compare only dates
+                    return selectedDate <= today || "La fecha no puede ser futura";
+                  }
+                }
+              }}
             />
 
             <InputFormMoney
