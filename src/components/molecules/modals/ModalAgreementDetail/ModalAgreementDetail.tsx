@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Modal, Button, Table, Flex, MenuProps } from "antd";
+import { Modal, Button, Table, MenuProps } from "antd";
 import { useForm, Controller } from "react-hook-form";
 import { Paperclip } from "phosphor-react";
 import dayjs from "dayjs";
@@ -65,10 +65,15 @@ export const ModalAgreementDetail: React.FC<Props> = ({ isModalPaymentAgreementO
   }, [isModalPaymentAgreementOpen.incident_id]);
 
   const handleEvidenceClick = (url: string) => {
-    setDownloadUrl(url);
-    const title = url.split("/").pop();
-    setDownloadTitle(title || url);
-    setIsDownloadModalOpen(true);
+    const fileExtension = url?.split(".").pop()?.toLowerCase() ?? "";
+    if (["png", "jpg", "jpeg"].includes(fileExtension)) {
+      setDownloadUrl(url);
+      const title = url.split("/").pop();
+      setDownloadTitle(title || url);
+      setIsDownloadModalOpen(true);
+    } else {
+      window.open(url, "_blank");
+    }
   };
 
   const columns = [
@@ -183,10 +188,9 @@ export const ModalAgreementDetail: React.FC<Props> = ({ isModalPaymentAgreementO
                     className="evidence-item"
                     onClick={() => handleEvidenceClick(item)}
                   >
-                    <Paperclip size={36} className="evidence-icon" />
-                    <Flex vertical gap={"4px"}>
-                      <p>{item.split("/").pop()}</p>
-                    </Flex>
+                    <Paperclip size={26} className="evidence-icon" />
+
+                    <p>{item.split("/").pop()}</p>
                   </div>
                 );
               })}
