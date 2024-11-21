@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
-import { Button, Flex } from "antd";
+import { Button, Flex, Spin } from "antd";
 import { DotsThree, MagnifyingGlassPlus } from "phosphor-react";
+
+import { useSelectedPayments } from "@/context/SelectedPaymentsContext";
+import { useClientsPayments } from "@/hooks/useClientsPayments";
+
 import LabelCollapse from "@/components/ui/label-collapse";
 import UiSearchInput from "@/components/ui/search-input";
 import Collapse from "@/components/ui/collapse";
@@ -8,11 +12,14 @@ import { DotsDropdown } from "@/components/atoms/DotsDropdown/DotsDropdown";
 import UiFilterDropdown from "@/components/ui/ui-filter-dropdown";
 import PaymentsTable from "@/modules/clients/components/payments-table";
 
-import "./payments-tab.scss";
 import { ModalActionPayment } from "@/components/molecules/modals/ModalActionPayment/ModalActionPayment";
-import { useSelectedPayments } from "@/context/SelectedPaymentsContext";
+
+import "./payments-tab.scss";
+import { useParams } from "next/navigation";
+import { extractSingleParam } from "@/utils/utils";
 
 interface PaymentProd {
+  // eslint-disable-next-line no-unused-vars
   onChangeTab: (activeKey: string) => void;
 }
 
@@ -24,6 +31,16 @@ const PaymentsTab: React.FC<PaymentProd> = ({ onChangeTab }) => {
   }>({} as { isOpen: boolean; paymentId: number });
   const [search, setSearch] = useState("");
   const [isModalActionPaymentOpen, setIsModalActionPaymentOpen] = useState(false);
+  const params = useParams();
+
+  const clientIdParam = extractSingleParam(params.clientId);
+  const projectIdParam = extractSingleParam(params.projectId);
+
+  const clientId = clientIdParam ? parseInt(clientIdParam) : 0;
+  const projectId = projectIdParam ? parseInt(projectIdParam) : 0;
+
+  const { data, isLoading, error } = useClientsPayments({ projectId, clientId });
+  console.log("data", data);
 
   useEffect(() => {
     console.log("selectedPayments", selectedPayments);
@@ -67,20 +84,26 @@ const PaymentsTab: React.FC<PaymentProd> = ({ onChangeTab }) => {
           </Button>
         </Flex>
 
-        <Collapse
-          items={mockData?.map((PaymentStatus) => ({
-            key: PaymentStatus.status_id,
-            label: <LabelCollapse status={PaymentStatus.status_name} color={PaymentStatus.color} />,
-            children: (
-              <PaymentsTable
-                setShowPaymentDetail={setShowPaymentDetail}
-                paymentStatusId={PaymentStatus.status_id}
-                paymentsByStatus={PaymentStatus.payments}
-                setSelectedRows={setSelectedPayments}
-              />
-            )
-          }))}
-        />
+        {isLoading ? (
+          <Spin />
+        ) : (
+          <Collapse
+            items={data?.map((PaymentStatus) => ({
+              key: PaymentStatus.payments_status_id,
+              label: (
+                <LabelCollapse status={PaymentStatus.payments_status} color={PaymentStatus.color} />
+              ),
+              children: (
+                <PaymentsTable
+                  setShowPaymentDetail={setShowPaymentDetail}
+                  paymentStatusId={PaymentStatus.payments_status_id}
+                  paymentsByStatus={PaymentStatus.payments}
+                  setSelectedRows={setSelectedPayments}
+                />
+              )
+            }))}
+          />
+        )}
       </div>
       <ModalActionPayment
         isOpen={isModalActionPaymentOpen}
@@ -92,74 +115,3 @@ const PaymentsTab: React.FC<PaymentProd> = ({ onChangeTab }) => {
 };
 
 export default PaymentsTab;
-
-const mockData = [
-  {
-    status_id: 1,
-    status_name: "Pagos disponibles",
-    color: "#2fb300",
-    payments: [
-      {
-        id: 1,
-        entered: "2021-10-10",
-        identified: "2021-10-10",
-        reference: 1234563423,
-        amount: 20000000,
-        available: 10000000,
-        payment_status_id: 1
-      },
-      {
-        id: 2,
-        entered: "2021-10-10",
-        identified: "2021-10-10",
-        reference: 1234565235,
-        amount: 20000000,
-        available: 10000000,
-        payment_status_id: 1
-      },
-      {
-        id: 3,
-        entered: "2021-10-10",
-        identified: "2021-10-10",
-        reference: 123456456,
-        amount: 20000000,
-        available: 10000000,
-        payment_status_id: 1
-      },
-      {
-        id: 4,
-        entered: "2021-10-10",
-        identified: "2021-10-10",
-        reference: 123456859,
-        amount: 20000000,
-        available: 10000000,
-        payment_status_id: 1
-      }
-    ]
-  },
-  {
-    status_id: 2,
-    status_name: "Pagos radicados",
-    color: "#FFD700",
-    payments: [
-      {
-        id: 5,
-        entered: "2021-10-10",
-        identified: "2021-10-10",
-        reference: 1234561143,
-        amount: 20000000,
-        available: 10000000,
-        payment_status_id: 2
-      },
-      {
-        id: 6,
-        entered: "2021-10-10",
-        identified: "2021-10-10",
-        reference: 1234566737,
-        amount: 20000000,
-        available: 10000000,
-        payment_status_id: 2
-      }
-    ]
-  }
-];
