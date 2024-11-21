@@ -5,18 +5,19 @@ import { DotsThree, MagnifyingGlassPlus } from "phosphor-react";
 import { useSelectedPayments } from "@/context/SelectedPaymentsContext";
 import { useClientsPayments } from "@/hooks/useClientsPayments";
 
+import { useModalDetail } from "@/context/ModalContext";
 import LabelCollapse from "@/components/ui/label-collapse";
 import UiSearchInput from "@/components/ui/search-input";
 import Collapse from "@/components/ui/collapse";
 import { DotsDropdown } from "@/components/atoms/DotsDropdown/DotsDropdown";
 import UiFilterDropdown from "@/components/ui/ui-filter-dropdown";
 import PaymentsTable from "@/modules/clients/components/payments-table";
-
 import { ModalActionPayment } from "@/components/molecules/modals/ModalActionPayment/ModalActionPayment";
 
+import { IClientPayment } from "@/types/clientPayments/IClientPayments";
+import { ISingleBank } from "@/types/banks/IBanks";
+
 import "./payments-tab.scss";
-import { useParams } from "next/navigation";
-import { extractSingleParam } from "@/utils/utils";
 
 interface PaymentProd {
   // eslint-disable-next-line no-unused-vars
@@ -25,26 +26,33 @@ interface PaymentProd {
 
 const PaymentsTab: React.FC<PaymentProd> = ({ onChangeTab }) => {
   const { selectedPayments, setSelectedPayments } = useSelectedPayments();
-  const [showPaymentDetail, setShowPaymentDetail] = useState<{
-    isOpen: boolean;
-    paymentId: number;
-  }>({} as { isOpen: boolean; paymentId: number });
   const [search, setSearch] = useState("");
   const [isModalActionPaymentOpen, setIsModalActionPaymentOpen] = useState(false);
-  const params = useParams();
+  const [mutatedPaymentDetail, mutatePaymentDetail] = useState<boolean>(false);
 
-  const clientIdParam = extractSingleParam(params.clientId);
-  const projectIdParam = extractSingleParam(params.projectId);
+  const { openModal } = useModalDetail();
 
-  const clientId = clientIdParam ? parseInt(clientIdParam) : 0;
-  const projectId = projectIdParam ? parseInt(projectIdParam) : 0;
-
-  const { data, isLoading, error } = useClientsPayments({ projectId, clientId });
+  const { data, isLoading, mutate } = useClientsPayments();
   console.log("data", data);
 
   useEffect(() => {
     console.log("selectedPayments", selectedPayments);
   }, [selectedPayments]);
+
+  const handleActionInDetail = (selectedPayment: IClientPayment | ISingleBank): void => {
+    setIsModalActionPaymentOpen((prev) => !prev);
+    setSelectedPayments([selectedPayment as IClientPayment]);
+    mutate();
+  };
+
+  const handleOpenPaymentDetail = (paymentId: number) => {
+    openModal("payment", {
+      paymentId: paymentId,
+      handleActionInDetail: handleActionInDetail,
+      handleOpenPaymentDetail,
+      mutatedPaymentDetail
+    });
+  };
 
   const onChangetabWithCloseModal = (activeKey: string) => {
     setIsModalActionPaymentOpen(false);
@@ -95,10 +103,9 @@ const PaymentsTab: React.FC<PaymentProd> = ({ onChangeTab }) => {
               ),
               children: (
                 <PaymentsTable
-                  setShowPaymentDetail={setShowPaymentDetail}
                   paymentStatusId={PaymentStatus.payments_status_id}
                   paymentsByStatus={PaymentStatus.payments}
-                  setSelectedRows={setSelectedPayments}
+                  handleOpenPaymentDetail={handleOpenPaymentDetail}
                 />
               )
             }))}

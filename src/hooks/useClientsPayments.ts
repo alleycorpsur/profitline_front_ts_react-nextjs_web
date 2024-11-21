@@ -1,14 +1,21 @@
 import useSWR from "swr";
+import { useParams } from "next/navigation";
+
 import { fetcher } from "@/utils/api/api";
-import { GenericResponse } from "@/types/global/IGlobal";
+import { extractSingleParam } from "@/utils/utils";
+
 import { IClientPaymentStatus } from "@/types/clientPayments/IClientPayments";
+import { GenericResponse } from "@/types/global/IGlobal";
 
-interface Props {
-  projectId: number;
-  clientId: number;
-}
+export const useClientsPayments = () => {
+  const params = useParams();
 
-export const useClientsPayments = ({ projectId, clientId }: Props) => {
+  const clientIdParam = extractSingleParam(params.clientId);
+  const projectIdParam = extractSingleParam(params.projectId);
+
+  const clientId = clientIdParam ? parseInt(clientIdParam) : 0;
+  const projectId = projectIdParam ? parseInt(projectIdParam) : 0;
+
   const pathKey = `/bank/get-payments/project/${projectId}/client/${clientId}`;
 
   const { data, error, isLoading, mutate } = useSWR<GenericResponse<IClientPaymentStatus[]>>(

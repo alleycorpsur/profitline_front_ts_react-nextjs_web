@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Table, TableProps, Typography } from "antd";
 import { Eye } from "phosphor-react";
 
@@ -13,28 +13,18 @@ const { Text } = Typography;
 
 interface PropsInvoicesTable {
   paymentsByStatus: IClientPayment[];
-  setSelectedRows: Dispatch<SetStateAction<IClientPayment[]>>;
-  setShowPaymentDetail: Dispatch<
-    SetStateAction<{
-      isOpen: boolean;
-      paymentId: number;
-    }>
-  >;
   paymentStatusId: number;
+  // eslint-disable-next-line no-unused-vars
+  handleOpenPaymentDetail: (paymentId: number) => void;
 }
 
 const PaymentsTable = ({
   paymentsByStatus: data,
-  setSelectedRows,
-  setShowPaymentDetail,
-  paymentStatusId
+  paymentStatusId,
+  handleOpenPaymentDetail
 }: PropsInvoicesTable) => {
   const { selectedPayments, setSelectedPayments } = useSelectedPayments();
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
-
-  const openPaymentDetail = (paymentId: number) => {
-    setShowPaymentDetail({ isOpen: true, paymentId });
-  };
 
   useEffect(() => {
     // Update selectedRowKeys based on global selectedPayments
@@ -75,7 +65,7 @@ const PaymentsTable = ({
       dataIndex: "id",
       key: "id",
       render: (paymentId) => (
-        <p onClick={() => openPaymentDetail(paymentId)} className="paymentsTable__id">
+        <p onClick={() => handleOpenPaymentDetail(paymentId)} className="paymentsTable__id">
           {paymentId}
         </p>
       ),
@@ -126,7 +116,7 @@ const PaymentsTable = ({
     {
       title: "",
       render: (_, record) => (
-        <Button onClick={() => openPaymentDetail(record.id)} icon={<Eye size={"1.2rem"} />} />
+        <Button onClick={() => handleOpenPaymentDetail(record.id)} icon={<Eye size={"1.2rem"} />} />
       ),
       width: 60,
       onCell: () => ({
