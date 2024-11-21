@@ -15,6 +15,7 @@ import { DocumentButton } from "@/components/atoms/DocumentButton/DocumentButton
 
 import "./modal-identify-payment-action.scss";
 import ModalNotIdentifiedPayment from "../modal-not-identified-payment";
+import ModalIdentifiedPayments from "../modal-identified-payments";
 
 interface ModalIdentifyPaymentProps {
   isOpen: boolean;
@@ -63,8 +64,8 @@ const ModalIdentifyPayment: FC<ModalIdentifyPaymentProps> = ({ isOpen, onClose }
   const onSubmit = async (data: IFormIdentifyPaymentModal) => {
     setIsSubmitting(true);
     try {
-      console.log("data enviada:", data);
-      setViewInfo({ current: "not_identified", paymentInfo: data });
+      console.info("data enviada:", data);
+      setViewInfo({ current: "identified", paymentInfo: data });
       // Open identified payments modal or not Identify modal
 
       // onClose();
@@ -216,7 +217,7 @@ const ModalIdentifyPayment: FC<ModalIdentifyPaymentProps> = ({ isOpen, onClose }
             <SecondaryButton onClick={() => onClose(true)}>Cancelar</SecondaryButton>
 
             <PrincipalButton onClick={handleSubmit(onSubmit)} disabled={!isValid || isSubmitting}>
-              {isSubmitting ? "...enviando" : "Enviar acta"}
+              {isSubmitting ? "...enviando" : "Buscar"}
             </PrincipalButton>
           </div>
         </>
@@ -225,6 +226,8 @@ const ModalIdentifyPayment: FC<ModalIdentifyPaymentProps> = ({ isOpen, onClose }
       {viewInfo.current === "not_identified" && (
         <ModalNotIdentifiedPayment setViewInfo={setViewInfo} />
       )}
+
+      {viewInfo.current === "identified" && <ModalIdentifiedPayments setViewInfo={setViewInfo} />}
     </Modal>
   );
 };
