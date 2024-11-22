@@ -3,6 +3,7 @@ import { Button, Flex, Table, TableProps, Typography } from "antd";
 import { Eye, Receipt } from "phosphor-react";
 
 import { formatDateDMY, formatMoney } from "@/utils/utils";
+import InvoiceDownloadModal from "@/modules/clients/components/invoice-download-modal";
 import { ISingleBank } from "@/types/banks/IBanks";
 
 import "./banks-table.scss";
@@ -31,6 +32,8 @@ export const BanksTable = ({
   clearSelected
 }: PropsBanksTable) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+  const [isModalFileDetailOpen, setIsModalFileDetailOpen] = useState<boolean>(false);
+  const [fileURL, setFileURL] = useState<string>("");
 
   useEffect(() => {
     setSelectedRowKeys([]);
@@ -39,6 +42,16 @@ export const BanksTable = ({
   useEffect(() => {
     setSelectedRowKeys(selectedRows?.map((row) => row.id) ?? []);
   }, [selectedRows]);
+
+  const handleDocumentClick = (documentUrl: string) => {
+    const fileExtension = documentUrl?.split(".").pop()?.toLowerCase() ?? "";
+    if (["png", "jpg", "jpeg"].includes(fileExtension)) {
+      setFileURL(documentUrl);
+      if (isModalFileDetailOpen === false) setIsModalFileDetailOpen(true);
+    } else {
+      window.open(documentUrl, "_blank");
+    }
+  };
 
   const onSelectChange = (newSelectedRowKeys: React.Key[], newSelectedRows: ISingleBank[]) => {
     setSelectedRowKeys(newSelectedRowKeys);
@@ -144,12 +157,13 @@ export const BanksTable = ({
       title: "Cuenta",
       key: "bank_description",
       dataIndex: "bank_description",
-      render: (text) => (
+      render: (text, record) => (
         <>
-          <Text>123456</Text>
+          <Text>{record.account_number}</Text>
           <p className="accountBankText">{text}</p>
         </>
-      )
+      ),
+      width: 110
     },
     {
       title: "",
@@ -157,8 +171,15 @@ export const BanksTable = ({
       width: "40px",
       dataIndex: "",
       render: (_, record) => (
-        <Flex gap={"0.5rem"}>
-          <Button className="buttonSeeEvidence" icon={<Receipt size={"1.3rem"} />} />
+        <Flex gap={"0.5rem"} justify="end">
+          {record.evidence_url && (
+            <Button
+              onClick={() => record.evidence_url && handleDocumentClick(record.evidence_url)}
+              className="buttonSeeEvidence"
+              icon={<Receipt size={"1.3rem"} />}
+            />
+          )}
+
           <Button
             className="buttonSeeClient"
             onClick={() => handleOpenPaymentDetail && handleOpenPaymentDetail(record.id)}
@@ -170,20 +191,28 @@ export const BanksTable = ({
   ];
 
   return (
-    <Table
-      className="banksTable"
-      loading={false}
-      columns={columns}
-      rowSelection={rowSelection}
-      dataSource={clientsByStatus.map((data) => ({
-        ...data,
-        key: data.id
-      }))}
-      pagination={{
-        pageSize: 15,
-        showSizeChanger: false
-      }}
-    />
+    <>
+      <Table
+        className="banksTable"
+        loading={false}
+        columns={columns}
+        rowSelection={rowSelection}
+        dataSource={clientsByStatus.map((data) => ({
+          ...data,
+          key: data.id
+        }))}
+        pagination={{
+          pageSize: 15,
+          showSizeChanger: false
+        }}
+      />
+      <InvoiceDownloadModal
+        isModalOpen={isModalFileDetailOpen}
+        handleCloseModal={setIsModalFileDetailOpen}
+        title="Imagen"
+        url={fileURL}
+      />
+    </>
   );
 };
 

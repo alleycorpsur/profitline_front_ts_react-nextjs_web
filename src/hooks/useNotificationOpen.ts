@@ -1,19 +1,10 @@
 import useSWR from "swr";
 import { fetcher } from "@/utils/api/api";
-import { GenericResponse } from "@/types/global/IGlobal";
+
 import { ISelectFilterNotifications } from "@/components/atoms/Filters/FiltersNotifications/FiltersNotifications";
 
-interface Notification {
-  create_at: string;
-  notification_type_name: string;
-  client_name: string;
-  incident_id: number | null;
-  is_client_change: number;
-  client_update_changes: Record<string, any>;
-  days: string;
-  id: number;
-  is_read: number;
-}
+import { GenericResponse } from "@/types/global/IGlobal";
+import { INotification } from "@/types/notifications/INotifications";
 
 interface IUseNotificationOpen {
   projectId: number;
@@ -28,7 +19,7 @@ export const useNotificationOpen = ({ projectId, filters }: IUseNotificationOpen
 
   const queryString = queries.length > 0 ? `?${queries.join("&")}` : "";
 
-  const { data, error, isLoading, mutate } = useSWR<GenericResponse<Notification[]>>(
+  const { data, error, isLoading, mutate } = useSWR<GenericResponse<INotification[]>>(
     `/notification/project/${projectId}/user${queryString}`,
     fetcher
   );
