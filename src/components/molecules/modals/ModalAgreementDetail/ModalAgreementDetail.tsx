@@ -263,10 +263,10 @@ const dataToFormData = (data: IPaymentDetail): FormData => {
   return {
     responsible: data.user_name,
     agreementValue: data.amount.toString(),
-    creationDate: dayjs(data.created_at),
+    creationDate: dayjs(data.created_at).utc(),
     evidence: data.files,
     agreementStatus: data.status_name,
     invoicesCount: data.count_invoices.toString(),
-    dueDate: dayjs(data.payment_date)
+    dueDate: dayjs(data.payment_date).utc()
   };
 };
