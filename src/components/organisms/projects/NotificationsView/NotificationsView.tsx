@@ -12,22 +12,14 @@ import FiltersNotifications, {
   ISelectFilterNotifications
 } from "@/components/atoms/Filters/FiltersNotifications/FiltersNotifications";
 
+import { INotification } from "@/types/notifications/INotifications";
+
 import "./notificationsView.scss";
 
 const ListPanel = [
   { key: "opened", value: "Abiertas" },
   { key: "closed", value: "Cerradas" }
 ];
-
-interface Notification {
-  create_at: string;
-  notification_type_name: string;
-  client_name: string;
-  incident_id: number | null;
-  is_client_change: number;
-  client_update_changes: Record<string, any>;
-  days: string;
-}
 
 export const NotificationsView = () => {
   const { openModal, modalType } = useModalDetail();
@@ -50,8 +42,8 @@ export const NotificationsView = () => {
     isError: isErrorClosed,
     mutate: mutateClosed
   } = useRejectedNotifications(projectId);
-  const [filteredOpenNotifications, setFilteredOpenNotifications] = useState<Notification[]>([]);
-  const [filteredClosedNotifications, setFilteredClosedNotifications] = useState<Notification[]>(
+  const [filteredOpenNotifications, setFilteredOpenNotifications] = useState<INotification[]>([]);
+  const [filteredClosedNotifications, setFilteredClosedNotifications] = useState<INotification[]>(
     []
   );
 
@@ -103,7 +95,7 @@ export const NotificationsView = () => {
             <div>
               <Flex gap="1rem">
                 <p className="item__title">
-                  {item.notification_type_name} - {item.incident_id}
+                  {item.notification_type_name} - {item.id_erp}
                 </p>
                 <p className="item__name">{item.client_name}</p>
                 <p className="item__date">{item.days}</p>
