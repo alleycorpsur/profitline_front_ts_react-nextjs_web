@@ -100,9 +100,7 @@ export const NotificationsView = () => {
                 <p className="item__name">{item.client_name}</p>
                 <p className="item__date">{item.days}</p>
               </Flex>
-              <p className="item__description">
-                {item.is_client_change === 1 ? "Cambios en el cliente" : "Novedad"}
-              </p>
+              <p className="item__description">{item.incident_motive}</p>
             </div>
             <Flex gap="1rem">
               {/* {type === "closed" && (
