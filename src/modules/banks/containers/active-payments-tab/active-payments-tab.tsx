@@ -62,10 +62,9 @@ export const ActivePaymentsTab: FC = () => {
   };
 
   const onCloseModal = (cancelClicked?: Boolean) => {
-    setisGenerateActionOpen(!isGenerateActionOpen);
     setIsSelectOpen({ selected: 0 });
 
-    if (cancelClicked) return;
+    if (cancelClicked) return setisGenerateActionOpen(!isGenerateActionOpen);
 
     setClearSelected(!clearSelected);
     setSelectedRows([]);
