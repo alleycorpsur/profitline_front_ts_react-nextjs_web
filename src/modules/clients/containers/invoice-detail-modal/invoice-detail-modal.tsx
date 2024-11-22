@@ -446,7 +446,7 @@ const InvoiceDetailModal: FC<InvoiceDetailModalProps> = ({
                                         item.id && handelOpenNoveltyDetail(item.incident_id)
                                       }
                                     >
-                                      {item.sequence || item.id}
+                                      {item.sequence}
                                     </div>
                                   </div>
                                 </div>
@@ -473,7 +473,7 @@ const InvoiceDetailModal: FC<InvoiceDetailModalProps> = ({
                                         item.id && handelOpenNoveltyDetail(item.incident_id)
                                       }
                                     >
-                                      {item.sequence || item.id}
+                                      {item.sequence}
                                     </div>
                                   </div>
                                 </div>
