@@ -5,9 +5,15 @@ interface DividerProps {
   type?: number;
   color?: string;
   className?: string;
+  customStyles?: React.CSSProperties;
 }
 
-export const DividerVerticalModal: React.FC<DividerProps> = ({ type, color, className }) => {
+export const DividerVerticalModal: React.FC<DividerProps> = ({
+  type,
+  color,
+  className,
+  customStyles
+}) => {
   let backgroundColor;
 
   switch (type) {
@@ -25,7 +31,12 @@ export const DividerVerticalModal: React.FC<DividerProps> = ({ type, color, clas
       break;
   }
 
-  const finalClassName = `divides ${className || ""}`; 
+  const finalClassName = `divides ${className || ""}`;
 
-  return <div className={finalClassName} style={{ backgroundColor: color || backgroundColor }} />;
+  return (
+    <div
+      className={finalClassName}
+      style={{ backgroundColor: color || backgroundColor, ...customStyles }}
+    />
+  );
 };

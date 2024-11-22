@@ -1,20 +1,18 @@
 import { Dispatch, FC, SetStateAction, useState } from "react";
-
+import { Radio } from "antd";
 import { CaretLeft } from "phosphor-react";
 
 import { useMessageApi } from "@/context/MessageContext";
+import { formatMoney } from "@/utils/utils";
 
 import SecondaryButton from "@/components/atoms/buttons/secondaryButton/SecondaryButton";
 import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
 import { IFormIdentifyPaymentModal } from "../modal-identify-payment-action/modal-identify-payment-action";
-import CheckboxColoredValues from "@/components/ui/checkbox-colored-values/checkbox-colored-values";
+import { DividerVerticalModal } from "@/components/atoms/DividerVertical/DividerVerticalModal";
 
 import styles from "./modal-identified-payments.module.scss";
-import { formatMoney } from "@/utils/utils";
-import { Controller, useForm } from "react-hook-form";
 
 interface ModalIdentifiedPaymentProps {
-  // eslint-disable-next-line no-unused-vars
   setViewInfo: Dispatch<
     SetStateAction<{
       current: "form" | "identified" | "not_identified";
@@ -25,28 +23,16 @@ interface ModalIdentifiedPaymentProps {
 
 const ModalIdentifiedPayment: FC<ModalIdentifiedPaymentProps> = ({ setViewInfo }) => {
   const { showMessage } = useMessageApi();
-  const { control, handleSubmit, watch } = useForm<{ payments: Record<string, boolean> }>({
-    defaultValues: {
-      payments: mockPayments.reduce(
-        (acc, payment) => {
-          acc[payment.id] = false; // Initialize all payments as unchecked
-          return acc;
-        },
-        {} as Record<number, boolean>
-      )
-    }
-  });
-
-  const selectedPayments = watch("payments");
+  const [selectedPaymentId, setSelectedPaymentId] = useState<number | null>(null);
 
   const handleIdentifyPayments = () => {
     try {
-      const identifiedPayments = mockPayments.filter((payment) => selectedPayments[payment.id]);
-      console.info("Pagos identificados:", identifiedPayments);
+      const identifiedPayment = mockPayments.find((payment) => payment.id === selectedPaymentId);
+      console.info("Pago identificado:", identifiedPayment);
 
-      showMessage("success", "Pagos identificados enviados correctamente!");
+      showMessage("success", "Pago identificado enviado correctamente!");
     } catch (error) {
-      showMessage("error", "Ocurrió un error al identificar los pagos");
+      showMessage("error", "Ocurrió un error al identificar el pago");
     }
   };
 
@@ -60,40 +46,37 @@ const ModalIdentifiedPayment: FC<ModalIdentifiedPaymentProps> = ({ setViewInfo }
         <CaretLeft size={"1.25rem"} />
         <h4>Pagos identificados</h4>
       </button>
-      <p className={styles.content__description}>Selecciona el pago o pagos que quieres aplicar</p>
+      <p className={styles.content__description}>Selecciona el pago que quieres aplicar</p>
 
-      <div className={styles.content__payments}>
+      <Radio.Group
+        className={styles.content__payments}
+        onChange={(e) => setSelectedPaymentId(e.target.value)}
+        value={selectedPaymentId}
+      >
         {mockPayments.map((payment) => (
-          <Controller
-            key={payment.id}
-            name={`payments.${payment.id}`}
-            control={control}
-            render={({ field: { value, onChange } }) => (
-              <CheckboxColoredValues
-                onChangeCheckbox={(e) => onChange(e.target.checked)} // Sync with react-hook-form
-                checked={value} // Controlled state
-                content={
-                  <div className={styles.paymentContent}>
-                    <div className={styles.paymentContent__left}>
-                      <h3 className={styles.paymentContent__name}>Pago {payment.id}</h3>
-                      <p className={styles.paymentContent__date}>Fecha: {payment.date}</p>
-                      <p className={styles.paymentContent__client}>{payment.client}</p>
-                    </div>
-                    <h2 className={styles.paymentContent__amount}>{formatMoney(payment.amount)}</h2>
-                  </div>
-                }
-              />
-            )}
-          />
+          <Radio key={payment.id} value={payment.id} className={styles.paymentRadio}>
+            <div className={styles.paymentContent}>
+              <div className={styles.paymentContent__colorLabelContainer}>
+                <DividerVerticalModal customStyles={{ width: "6px", margin: "8px 8px 8px 0px" }} />
+              </div>
+              <div className={styles.paymentContent__content}>
+                <div className={styles.paymentContent__content__left}>
+                  <h3 className={styles.paymentContent__content__name}>Pago {payment.id}</h3>
+                  <p className={styles.paymentContent__content__date}>{payment.date}</p>
+                  <p className={styles.paymentContent__content__client}>{payment.client}</p>
+                </div>
+                <h2 className={styles.paymentContent__content__amount}>
+                  {formatMoney(payment.amount)}
+                </h2>
+              </div>
+            </div>
+          </Radio>
         ))}
-      </div>
+      </Radio.Group>
 
       <div className={styles.footer}>
         <SecondaryButton onClick={handleCancel}>Cancelar</SecondaryButton>
-        <PrincipalButton
-          onClick={handleSubmit(handleIdentifyPayments)}
-          disabled={!Object.values(selectedPayments).some((isSelected) => isSelected)}
-        >
+        <PrincipalButton onClick={handleIdentifyPayments} disabled={selectedPaymentId === null}>
           Identificar
         </PrincipalButton>
       </div>
