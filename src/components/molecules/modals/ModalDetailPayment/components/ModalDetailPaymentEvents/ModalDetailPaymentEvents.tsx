@@ -35,14 +35,15 @@ const ModalDetailPaymentEvents: FC<ModalDetailPaymentProps> = ({
   };
 
   const items = paymentEvents?.map((event) => {
-    const leftIcon = event.files ? (
-      <ArrowLineDown
-        size={14}
-        onClick={() => {
-          handleDocumentClick(event?.files[0] || "");
-        }}
-      />
-    ) : null;
+    const leftIcon =
+      event.files && Array.isArray(event.files) ? (
+        <ArrowLineDown
+          size={14}
+          onClick={() => {
+            handleDocumentClick(event?.files[0] || "");
+          }}
+        />
+      ) : null;
 
     const content = (
       <div className={styles.modalDetailPaymentEvents__eventContent}>
@@ -63,8 +64,8 @@ const ModalDetailPaymentEvents: FC<ModalDetailPaymentProps> = ({
         )}
 
         {event.client_name &&
-          (event.payments_events_types_name === "Identificacion" ||
-            event.payments_events_types_name === "identificación automática") && (
+          (event.payments_events_types_name === "Identificación" ||
+            event.payments_events_types_name === "Identificación automática") && (
             <p className={styles.regularEntry}>Cliente: {event.client_name}</p>
           )}
 
@@ -77,11 +78,12 @@ const ModalDetailPaymentEvents: FC<ModalDetailPaymentProps> = ({
 
         {event.payments_events_types_name === "Aplicacion de pagos" && (
           <>
-            {event.id_payment_parent && (
-              <p className={styles.regularEntry}>
-                Id de la aplicación: ${event.id_aplication_payment}
+            <Flex gap={"0.2rem"} wrap="wrap">
+              <p className={styles.regularEntry}>Id de la aplicación:</p>
+              <p className={styles.linkEntry} style={{ cursor: "default" }}>
+                {event.id}
               </p>
-            )}
+            </Flex>
 
             <p className={styles.regularEntry}>
               Valor aplicado: {formatMoney(event.ammount_applied)}
@@ -125,7 +127,7 @@ const ModalDetailPaymentEvents: FC<ModalDetailPaymentProps> = ({
       <InvoiceDownloadModal
         isModalOpen={isModalFileDetailOpen}
         handleCloseModal={setIsModalFileDetailOpen}
-        title="Imagen"
+        title={urlStep.substring(0, urlStep.lastIndexOf("."))}
         url={urlStep}
       />
     </div>

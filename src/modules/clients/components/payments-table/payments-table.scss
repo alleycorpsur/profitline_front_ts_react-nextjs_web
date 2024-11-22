@@ -13,6 +13,12 @@
         }
     }
 
+    .ant-table-thead {
+        .ant-table-cell {
+            font-size: 1rem;
+        }
+    }
+
     .ant-table-column-title {
         font-size: 1rem;
         margin: 0.5rem 0;
@@ -29,5 +35,18 @@
 
     .cell {
         display: inline-block;
+        text-wrap: nowrap;
+
+        &__description {
+            max-width: 400px;
+        }
+    }
+
+    .logoButton {
+        background-color: $background;
+        border: none;
+        &:hover {
+            border: 1px solid $black;
+        }
     }
 }

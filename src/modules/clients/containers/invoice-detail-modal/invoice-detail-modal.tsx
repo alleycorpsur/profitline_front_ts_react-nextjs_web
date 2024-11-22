@@ -204,18 +204,14 @@ const InvoiceDetailModal: FC<InvoiceDetailModalProps> = ({
                                 {item.event_type_name === "Registrar novedad" && (
                                   <span
                                     className={`${styles.tagLabel} ${
-                                      item.is_rejected === 1
+                                      item.is_rejected || item.is_rejected === 0
                                         ? styles.tagLabelBlack
-                                        : item.is_rejected === 0
-                                          ? styles.tagLabelGray
-                                          : styles.tagLabelRed
+                                        : styles.tagLabelGray
                                     }`}
                                   >
-                                    {item.is_rejected === 1
+                                    {item.is_rejected || item.is_rejected === 0
                                       ? "Cerrada"
-                                      : item.is_rejected === 0
-                                        ? "Abierta"
-                                        : "Pendiente"}
+                                      : "Abierta"}
                                   </span>
                                 )}
                                 {item.event_type_name === "Cierre de novedad" && (
@@ -236,7 +232,7 @@ const InvoiceDetailModal: FC<InvoiceDetailModalProps> = ({
                                   </span>
                                 )}
                                 {item.event_type_name === "Acuerdo de pago" &&
-                                  item.status_name == "Anulada" && (
+                                  item.status_name_payment_agreement == "Anulada" && (
                                     <span className={`${styles.tagLabel} ${styles.tagLabelBlack}`}>
                                       Anulado
                                     </span>
@@ -359,7 +355,7 @@ const InvoiceDetailModal: FC<InvoiceDetailModalProps> = ({
                                     className={styles.name}
                                   >{`Fecha de pago acordada: ${formatDatePlane(item.event_date?.toString())}`}</div>
                                   <div className={styles.adjustment}>
-                                    ID del acuerdooo:
+                                    ID del acuerdo:
                                     <div
                                       className={styles.idAdjustment}
                                       onClick={() => {
@@ -406,14 +402,17 @@ const InvoiceDetailModal: FC<InvoiceDetailModalProps> = ({
                               )}
                               {item.event_type_name === "Cambiar estado" ? (
                                 <div>
-                                  <div
-                                    className={styles.icons}
-                                    onClick={() => {
-                                      handleDocumentClick(item.files[0] || "");
-                                    }}
-                                  >
-                                    <ArrowLineDown size={14} onClick={() => {}} />
-                                  </div>
+                                  {item.files[0] && (
+                                    <div
+                                      className={styles.icons}
+                                      onClick={() => {
+                                        handleDocumentClick(item.files[0] || "");
+                                      }}
+                                    >
+                                      <ArrowLineDown size={14} onClick={() => {}} />
+                                    </div>
+                                  )}
+
                                   <div className={styles.name}>{`Acción: ${item.user_name}`}</div>
                                   <div
                                     className={styles.name}
@@ -447,7 +446,7 @@ const InvoiceDetailModal: FC<InvoiceDetailModalProps> = ({
                                         item.id && handelOpenNoveltyDetail(item.incident_id)
                                       }
                                     >
-                                      {item.sequence || item.id}
+                                      {item.sequence}
                                     </div>
                                   </div>
                                 </div>
@@ -474,13 +473,17 @@ const InvoiceDetailModal: FC<InvoiceDetailModalProps> = ({
                                         item.id && handelOpenNoveltyDetail(item.incident_id)
                                       }
                                     >
-                                      {item.sequence || item.id}
+                                      {item.sequence}
                                     </div>
                                   </div>
                                 </div>
                               ) : (
                                 ""
                               )}
+
+                              {item.event_type_name === "Factura conciliada" ? (
+                                <div className={styles.name}>{`Acción: ${item.user_name}`}</div>
+                              ) : null}
 
                               {item.comments && (
                                 <div className={styles.commentsContainer}>
