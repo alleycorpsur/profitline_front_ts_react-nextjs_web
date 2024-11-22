@@ -38,7 +38,6 @@ const PaymentsTab: React.FC<PaymentProd> = ({ onChangeTab }) => {
   const { openModal } = useModalDetail();
 
   const { data, isLoading, mutate } = useClientsPayments();
-  console.log("data", data);
 
   const handleActionInDetail = (selectedPayment: IClientPayment | ISingleBank): void => {
     setIsModalActionPaymentOpen((prev) => !prev);

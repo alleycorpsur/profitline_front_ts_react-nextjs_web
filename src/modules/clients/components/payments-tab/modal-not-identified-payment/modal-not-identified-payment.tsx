@@ -72,7 +72,7 @@ const ModalNotIdentifiedPayment: FC<ModalNotIdentifiedPaymentProps> = ({ setView
     setIsSubmitting(true);
 
     try {
-      console.log("Form data:", data);
+      console.info("Form data:", data);
     } catch (error) {
       showMessage("error", "Error al enviar notificación");
     }
