@@ -9,6 +9,7 @@ import ModalDetailPayment from "@/components/molecules/modals/ModalDetailPayment
 import { IInvoice } from "@/types/invoices/IInvoices";
 import { FinancialDiscount } from "@/types/financialDiscounts/IFinancialDiscounts";
 import { ISingleBank } from "@/types/banks/IBanks";
+import { IClientPayment } from "@/types/clientPayments/IClientPayments";
 
 type ModalType = "invoice" | "novelty" | "adjustment" | "payment" | null;
 
@@ -38,7 +39,7 @@ interface AdjustmentModalProps {
 interface ModalDetailPaymentProps {
   paymentId: number;
   // eslint-disable-next-line no-unused-vars
-  handleActionInDetail?: (selectedPayment: ISingleBank) => void;
+  handleActionInDetail?: (selectedPayment: ISingleBank | IClientPayment) => void;
   // eslint-disable-next-line no-unused-vars
   handleOpenPaymentDetail?: (paymentId: number) => void;
   mutatedPaymentDetail?: boolean;

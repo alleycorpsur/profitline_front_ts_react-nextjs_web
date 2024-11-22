@@ -22,6 +22,7 @@ import ModalActionsAssignClient from "../../components/modal-actions-assign-clie
 import ModalActionsSplitPayment from "../../components/modal-actions-split-payment";
 
 import { ISingleBank } from "@/types/banks/IBanks";
+import { IClientPayment } from "@/types/clientPayments/IClientPayments";
 
 import styles from "./active-payments-tab.module.scss";
 
@@ -69,9 +70,9 @@ export const ActivePaymentsTab: FC = () => {
     setShowBankRules(true);
   };
 
-  const handleActionInDetail = (selectedPayment: ISingleBank): void => {
+  const handleActionInDetail = (selectedPayment: ISingleBank | IClientPayment): void => {
     setisGenerateActionOpen(!isGenerateActionOpen);
-    setSelectedRows([selectedPayment]);
+    setSelectedRows([selectedPayment as ISingleBank]);
     mutate();
   };
 
