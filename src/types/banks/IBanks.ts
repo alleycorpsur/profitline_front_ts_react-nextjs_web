@@ -36,6 +36,8 @@ export interface ISingleBank {
   sequence: number;
   ammount_applied: number;
   USER_NAME: string | null;
+  evidence: string | null;
+  account_number: string;
 }
 
 export interface IPaymentDetail extends ISingleBank {

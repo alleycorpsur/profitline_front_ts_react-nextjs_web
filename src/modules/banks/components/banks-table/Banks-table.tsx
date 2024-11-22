@@ -144,12 +144,13 @@ export const BanksTable = ({
       title: "Cuenta",
       key: "bank_description",
       dataIndex: "bank_description",
-      render: (text) => (
+      render: (text, record) => (
         <>
-          <Text>123456</Text>
+          <Text>{record.account_number}</Text>
           <p className="accountBankText">{text}</p>
         </>
-      )
+      ),
+      width: 110
     },
     {
       title: "",

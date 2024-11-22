@@ -86,7 +86,7 @@ const ModalDetailPayment: FC<ModalDetailPaymentProps> = ({
               <p>{paymentData?.account_description}</p>
               <p>{paymentData?.CLIENT_NAME}</p>
               <Flex gap={"8px"}>
-                <p className={styles.id}>723846523X</p>
+                <p className={styles.id}>{paymentData?.account_number}</p>
                 <p className={styles.bank}>{paymentData?.bank_description}</p>
               </Flex>
             </div>
