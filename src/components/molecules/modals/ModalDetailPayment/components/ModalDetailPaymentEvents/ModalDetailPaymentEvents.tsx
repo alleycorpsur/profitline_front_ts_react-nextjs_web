@@ -64,8 +64,8 @@ const ModalDetailPaymentEvents: FC<ModalDetailPaymentProps> = ({
         )}
 
         {event.client_name &&
-          (event.payments_events_types_name === "Identificacion" ||
-            event.payments_events_types_name === "identificación automática") && (
+          (event.payments_events_types_name === "Identificación" ||
+            event.payments_events_types_name === "Identificación automática") && (
             <p className={styles.regularEntry}>Cliente: {event.client_name}</p>
           )}
 
@@ -127,7 +127,7 @@ const ModalDetailPaymentEvents: FC<ModalDetailPaymentProps> = ({
       <InvoiceDownloadModal
         isModalOpen={isModalFileDetailOpen}
         handleCloseModal={setIsModalFileDetailOpen}
-        title="Imagen"
+        title={urlStep.substring(0, urlStep.lastIndexOf("."))}
         url={urlStep}
       />
     </div>
