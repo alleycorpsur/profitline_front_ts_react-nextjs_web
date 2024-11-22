@@ -36,14 +36,12 @@ export const NotificationsView = () => {
     isError: isErrorOpen,
     mutate: mutateOpen
   } = useNotificationOpen({ projectId, filters });
-  // console.log("abiertas", openNotifications);
   const {
     data: closedNotifications,
     isLoading: isLoadingClosed,
     isError: isErrorClosed,
     mutate: mutateClosed
   } = useRejectedNotifications(projectId);
-  console.log("cerradas", closedNotifications);
   const [filteredOpenNotifications, setFilteredOpenNotifications] = useState<INotification[]>([]);
   const [filteredClosedNotifications, setFilteredClosedNotifications] = useState<INotification[]>(
     []

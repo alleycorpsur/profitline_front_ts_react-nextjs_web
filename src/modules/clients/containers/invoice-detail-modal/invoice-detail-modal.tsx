@@ -232,7 +232,7 @@ const InvoiceDetailModal: FC<InvoiceDetailModalProps> = ({
                                   </span>
                                 )}
                                 {item.event_type_name === "Acuerdo de pago" &&
-                                  item.status_name == "Anulada" && (
+                                  item.status_name_payment_agreement == "Anulada" && (
                                     <span className={`${styles.tagLabel} ${styles.tagLabelBlack}`}>
                                       Anulado
                                     </span>
