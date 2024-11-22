@@ -41,4 +41,12 @@
             max-width: 400px;
         }
     }
+
+    .logoButton {
+        background-color: $background;
+        border: none;
+        &:hover {
+            border: 1px solid $black;
+        }
+    }
 }

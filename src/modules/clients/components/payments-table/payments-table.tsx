@@ -116,7 +116,11 @@ const PaymentsTable = ({
     {
       title: "",
       render: (_, record) => (
-        <Button onClick={() => handleOpenPaymentDetail(record.id)} icon={<Eye size={"1.2rem"} />} />
+        <Button
+          className="logoButton"
+          onClick={() => handleOpenPaymentDetail(record.id)}
+          icon={<Eye size={"1.2rem"} />}
+        />
       ),
       width: 60,
       onCell: () => ({
