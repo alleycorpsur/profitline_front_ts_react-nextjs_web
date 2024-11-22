@@ -1,4 +1,4 @@
-import { Button, Flex, MenuProps, message, Spin } from "antd";
+import { Button, Flex, MenuProps, Spin } from "antd";
 import { useState } from "react";
 import { Bank, CaretLeft } from "phosphor-react";
 
@@ -14,6 +14,7 @@ import { BankRuleModal } from "../../components/bank-rule-modal/Bank-rule-modal"
 
 import styles from "./banks-rules.module.scss";
 import { deleteManyBankRules } from "@/services/banksRules/banksRules";
+import { useMessageApi } from "@/context/MessageContext";
 
 interface PropsBanksRules {
   onClickBack: () => void;
@@ -26,6 +27,8 @@ export const BanksRules = ({ onClickBack }: PropsBanksRules) => {
     isOpen: false,
     ruleId: 0
   });
+
+  const { showMessage } = useMessageApi();
 
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -51,11 +54,11 @@ export const BanksRules = ({ onClickBack }: PropsBanksRules) => {
     setIsDeleting(true);
     try {
       await deleteManyBankRules(selectedRowKeys);
-      message.success(`${selectedRowKeys.length} regla(s) eliminada(s) exitosamente`);
+      showMessage("success", `${selectedRowKeys.length} regla(s) eliminada(s) exitosamente`);
       setSelectedRowKeys([]);
       mutate();
     } catch (error) {
-      message.error("Error al eliminar las reglas");
+      showMessage("error", "Error al eliminar las reglas");
     } finally {
       setIsDeleting(false);
     }
