@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button, Flex, Spin } from "antd";
 import { DotsThree, MagnifyingGlassPlus } from "phosphor-react";
 
@@ -9,13 +9,15 @@ import { useModalDetail } from "@/context/ModalContext";
 import LabelCollapse from "@/components/ui/label-collapse";
 import UiSearchInput from "@/components/ui/search-input";
 import Collapse from "@/components/ui/collapse";
-import { DotsDropdown } from "@/components/atoms/DotsDropdown/DotsDropdown";
 import UiFilterDropdown from "@/components/ui/ui-filter-dropdown";
 import PaymentsTable from "@/modules/clients/components/payments-table";
 import { ModalActionPayment } from "@/components/molecules/modals/ModalActionPayment/ModalActionPayment";
 
 import { IClientPayment } from "@/types/clientPayments/IClientPayments";
 import { ISingleBank } from "@/types/banks/IBanks";
+
+import "./payments-tab.scss";
+import ModalIdentifyPayment from "../../components/payments-tab/modal-identify-payment-action";
 
 import "./payments-tab.scss";
 
@@ -26,6 +28,9 @@ interface PaymentProd {
 
 const PaymentsTab: React.FC<PaymentProd> = ({ onChangeTab }) => {
   const { selectedPayments, setSelectedPayments } = useSelectedPayments();
+  const [isSelectedActionModalOpen, setIsSelectedActionModalOpen] = useState({
+    selected: 0
+  });
   const [search, setSearch] = useState("");
   const [isModalActionPaymentOpen, setIsModalActionPaymentOpen] = useState(false);
   const [mutatedPaymentDetail, mutatePaymentDetail] = useState<boolean>(false);
@@ -33,11 +38,6 @@ const PaymentsTab: React.FC<PaymentProd> = ({ onChangeTab }) => {
   const { openModal } = useModalDetail();
 
   const { data, isLoading, mutate } = useClientsPayments();
-  console.log("data", data);
-
-  useEffect(() => {
-    console.log("selectedPayments", selectedPayments);
-  }, [selectedPayments]);
 
   const handleActionInDetail = (selectedPayment: IClientPayment | ISingleBank): void => {
     setIsModalActionPaymentOpen((prev) => !prev);
@@ -57,6 +57,13 @@ const PaymentsTab: React.FC<PaymentProd> = ({ onChangeTab }) => {
   const onChangetabWithCloseModal = (activeKey: string) => {
     setIsModalActionPaymentOpen(false);
     onChangeTab(activeKey);
+  };
+
+  const handleCloseActionModal = (cancelClicked?: Boolean) => {
+    setIsSelectedActionModalOpen({ selected: 0 });
+
+    if (cancelClicked) return;
+    setIsModalActionPaymentOpen((prev) => !prev);
   };
 
   return (
@@ -83,7 +90,6 @@ const PaymentsTab: React.FC<PaymentProd> = ({ onChangeTab }) => {
             >
               Generar acción
             </Button>
-            <DotsDropdown />
           </Flex>
 
           <Button type="primary" className="identifiyPayment">
@@ -118,6 +124,12 @@ const PaymentsTab: React.FC<PaymentProd> = ({ onChangeTab }) => {
         isOpen={isModalActionPaymentOpen}
         onClose={() => setIsModalActionPaymentOpen(false)}
         onChangeTab={onChangetabWithCloseModal}
+        setIsSelectedActionModalOpen={setIsSelectedActionModalOpen}
+        setIsModalActionPaymentOpen={setIsModalActionPaymentOpen}
+      />
+      <ModalIdentifyPayment
+        isOpen={isSelectedActionModalOpen.selected === 1}
+        onClose={handleCloseActionModal}
       />
     </>
   );
