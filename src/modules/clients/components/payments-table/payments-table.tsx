@@ -75,6 +75,15 @@ const PaymentsTable = ({
     },
     {
       title: "Ingreso",
+      dataIndex: "payment_date",
+      key: "payment_date",
+      render: (text) => <Text className="cell">{formatDate(text)}</Text>,
+      sorter: (a, b) => Date.parse(a.payment_date) - Date.parse(b.payment_date),
+      showSorterTooltip: false,
+      width: 120
+    },
+    {
+      title: "Identificación",
       dataIndex: "created_at",
       key: "created_at",
       render: (text) => <Text className="cell">{formatDate(text)}</Text>,
@@ -82,19 +91,10 @@ const PaymentsTable = ({
       showSorterTooltip: false
     },
     {
-      title: "Identificación",
-      key: "identified",
-      dataIndex: "identified",
-      // render: (text) => <Text className="cell">{formatDate(text)}</Text>,
-      // sorter: (a, b) => Date.parse(a.identified) - Date.parse(b.identified),
-      showSorterTooltip: false
-    },
-    {
       title: "Referencia",
-      key: "reference",
-      dataIndex: "reference",
-      render: (text) => <Text className="cell">{text}</Text>,
-      // sorter: (a, b) => a.reference - b.reference,
+      key: "description",
+      dataIndex: "description",
+      render: (text) => <p className="cell__description">{text}</p>,
       showSorterTooltip: false
     },
     {

@@ -93,7 +93,9 @@ const PaymentsTab: React.FC<PaymentProd> = ({ onChangeTab }) => {
         </Flex>
 
         {isLoading ? (
-          <Spin />
+          <Flex justify="center" align="center" style={{ margin: "2rem 0" }}>
+            <Spin />
+          </Flex>
         ) : (
           <Collapse
             items={data?.map((PaymentStatus) => ({
