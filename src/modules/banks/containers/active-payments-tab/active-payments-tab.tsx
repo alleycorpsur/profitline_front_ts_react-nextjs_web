@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC, useState, useEffect } from "react";
 import { Button, Flex, MenuProps, Spin } from "antd";
 import { Bank } from "phosphor-react";
 
@@ -30,18 +30,41 @@ export const ActivePaymentsTab: FC = () => {
   const [showBankRules, setShowBankRules] = useState<boolean>(false);
   const [isGenerateActionOpen, setisGenerateActionOpen] = useState(false);
   const [clearSelected, setClearSelected] = useState(false);
-  const [isSelectOpen, setIsSelectOpen] = useState({
-    selected: 0
-  });
+  const [isSelectOpen, setIsSelectOpen] = useState({ selected: 0 });
   const [mutatedPaymentDetail, mutatePaymentDetail] = useState<boolean>(false);
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [paymentMaps, setPaymentMaps] = useState<Map<number, Map<string, ISingleBank>>>(new Map());
 
   const { ID } = useAppStore((state) => state.selectedProject);
-
   const { showMessage } = useMessageApi();
-
   const { openModal } = useModalDetail();
-
   const { data, isLoading, mutate } = useBankPayments({ projectId: ID });
+
+  useEffect(() => {
+    if (data) {
+      const maps = new Map();
+      data.forEach((status) => {
+        const paymentMap = new Map();
+        status.payments.forEach((payment) => {
+          paymentMap.set(payment.id.toString(), payment);
+        });
+        maps.set(status.payments_status_id, paymentMap);
+      });
+      setPaymentMaps(maps);
+    }
+  }, [data]);
+
+  const searchPayments = (statusId: number, query: string): ISingleBank[] => {
+    if (!query) return data?.find((s) => s.payments_status_id === statusId)?.payments || [];
+
+    const paymentMap = paymentMaps.get(statusId);
+    if (!paymentMap) return [];
+
+    return Array.from(paymentMap.entries())
+      .filter(([id]) => id.includes(query))
+      .map(([, payment]) => payment);
+  };
+ 
   const handleOpenBankRules = () => {
     setShowBankRules(true);
   };
@@ -54,8 +77,8 @@ export const ActivePaymentsTab: FC = () => {
 
   const handleOpenPaymentDetail = (paymentId: number) => {
     openModal("payment", {
-      paymentId: paymentId,
-      handleActionInDetail: handleActionInDetail,
+      paymentId,
+      handleActionInDetail,
       handleOpenPaymentDetail,
       mutatedPaymentDetail
     });
@@ -70,15 +93,19 @@ export const ActivePaymentsTab: FC = () => {
     setSelectedRows([]);
     mutate();
 
-    // These lines below mutate the payment detail data after the modal is closed
     mutatePaymentDetail((prev) => !prev);
     openModal("payment", {
       paymentId: selectedRows?.[0]?.id || 0,
-      handleActionInDetail: handleActionInDetail,
+      handleActionInDetail,
       handleOpenPaymentDetail,
       mutatedPaymentDetail: !mutatedPaymentDetail
     });
   };
+
+  const filteredData = data?.map((status) => ({
+    ...status,
+    payments: searchPayments(status.payments_status_id, searchQuery)
+  }));
 
   const items: MenuProps["items"] = [
     {
@@ -91,7 +118,6 @@ export const ActivePaymentsTab: FC = () => {
               showMessage("error", "Seleccione al menos un pago");
               return;
             }
-
             setisGenerateActionOpen(true);
           }}
         >
@@ -113,12 +139,8 @@ export const ActivePaymentsTab: FC = () => {
         <Flex className={styles.activePaymentsTab} vertical>
           <div className={styles.header}>
             <UiSearchInput
-              placeholder="Buscar"
-              onChange={(event) => {
-                setTimeout(() => {
-                  console.info(event.target.value);
-                }, 1000);
-              }}
+              placeholder="Buscar por ID"
+              onChange={(event) => setSearchQuery(event.target.value)}
             />
             <FilterDiscounts />
             <DotsDropdown items={items} />
@@ -129,24 +151,22 @@ export const ActivePaymentsTab: FC = () => {
           </div>
 
           <Collapse
-            items={data?.map((status) => ({
+            items={filteredData?.map((status) => ({
               key: status.payments_status_id,
               label: (
                 <LabelCollapse
                   status={status.payments_status}
                   color={status.color}
-                  quantity={status.payments_count}
+                  quantity={status.payments.length}
                   total={status.total_account || 0}
                 />
               ),
               children: (
                 <BanksTable
-                  clientsByStatus={status.payments.map((client) => {
-                    return {
-                      ...client,
-                      client_status_id: status.payments_status_id
-                    };
-                  })}
+                  clientsByStatus={status.payments.map((client) => ({
+                    ...client,
+                    client_status_id: status.payments_status_id
+                  }))}
                   handleOpenPaymentDetail={handleOpenPaymentDetail}
                   selectedRows={selectedRows}
                   setSelectedRows={setSelectedRows}
@@ -156,11 +176,10 @@ export const ActivePaymentsTab: FC = () => {
               )
             }))}
           />
+
           <ModalActionsBanksPayments
             isOpen={isGenerateActionOpen}
-            onClose={() => {
-              setisGenerateActionOpen(false);
-            }}
+            onClose={() => setisGenerateActionOpen(false)}
             setSelectOpen={(e) => {
               const { selected } = e;
               if (selected !== 2 && selectedRows && selectedRows.length > 1) {
