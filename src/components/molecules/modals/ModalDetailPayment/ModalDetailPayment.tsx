@@ -6,6 +6,7 @@ import { formatMoney } from "@/utils/utils";
 import { getPaymentDetail } from "@/services/banksPayments/banksPayments";
 
 import ModalDetailPaymentEvents from "./components/ModalDetailPaymentEvents/ModalDetailPaymentEvents";
+import InvoiceDownloadModal from "@/modules/clients/components/invoice-download-modal";
 
 import { IPaymentDetail, ISingleBank } from "@/types/banks/IBanks";
 
@@ -32,6 +33,8 @@ const ModalDetailPayment: FC<ModalDetailPaymentProps> = ({
 }) => {
   const [paymentData, setPaymentData] = useState<IPaymentDetail>();
   const [loading, setLoading] = useState<boolean>(false);
+  const [isModalFileDetailOpen, setIsModalFileDetailOpen] = useState<boolean>(false);
+  const [fileURL, setFileURL] = useState<string>("");
 
   useEffect(() => {
     const fetchPaymentData = async () => {
@@ -47,6 +50,16 @@ const ModalDetailPayment: FC<ModalDetailPaymentProps> = ({
     };
     fetchPaymentData();
   }, [paymentId, mutatedPaymentDetail]);
+
+  const handleDocumentClick = (documentUrl: string) => {
+    const fileExtension = documentUrl?.split(".").pop()?.toLowerCase() ?? "";
+    if (["png", "jpg", "jpeg"].includes(fileExtension)) {
+      setFileURL(documentUrl);
+      if (isModalFileDetailOpen === false) setIsModalFileDetailOpen(true);
+    } else {
+      window.open(documentUrl, "_blank");
+    }
+  };
 
   return (
     <aside className={`${styles.wrapper} ${isOpen ? styles.show : styles.hide}`}>
@@ -65,10 +78,19 @@ const ModalDetailPayment: FC<ModalDetailPaymentProps> = ({
             <div className={styles.header}>
               <h4 className={styles.numberInvoice}>ID pago {paymentData?.id}</h4>
               <Flex gap="1rem">
-                <Flex align="flex-start" className={styles.viewInvoice}>
-                  <Receipt size={20} />
-                  Ver tirilla
-                </Flex>
+                {paymentData?.evidence_url && (
+                  <Flex
+                    onClick={() =>
+                      paymentData.evidence_url && handleDocumentClick(paymentData.evidence_url)
+                    }
+                    align="flex-start"
+                    className={styles.viewInvoice}
+                  >
+                    <Receipt size={20} />
+                    Ver tirilla
+                  </Flex>
+                )}
+
                 <Button
                   className={styles.button__actions}
                   size="large"
@@ -86,7 +108,7 @@ const ModalDetailPayment: FC<ModalDetailPaymentProps> = ({
               <p>{paymentData?.account_description}</p>
               <p>{paymentData?.CLIENT_NAME}</p>
               <Flex gap={"8px"}>
-                <p className={styles.id}>723846523X</p>
+                <p className={styles.id}>{paymentData?.account_number}</p>
                 <p className={styles.bank}>{paymentData?.bank_description}</p>
               </Flex>
             </div>
@@ -116,6 +138,12 @@ const ModalDetailPayment: FC<ModalDetailPaymentProps> = ({
           </div>
         </div>
       </div>
+      <InvoiceDownloadModal
+        isModalOpen={isModalFileDetailOpen}
+        handleCloseModal={setIsModalFileDetailOpen}
+        title="Imagen"
+        url={fileURL}
+      />
     </aside>
   );
 };

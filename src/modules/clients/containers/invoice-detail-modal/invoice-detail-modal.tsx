@@ -232,7 +232,7 @@ const InvoiceDetailModal: FC<InvoiceDetailModalProps> = ({
                                   </span>
                                 )}
                                 {item.event_type_name === "Acuerdo de pago" &&
-                                  item.status_name == "Anulada" && (
+                                  item.status_name_payment_agreement == "Anulada" && (
                                     <span className={`${styles.tagLabel} ${styles.tagLabelBlack}`}>
                                       Anulado
                                     </span>
@@ -355,7 +355,7 @@ const InvoiceDetailModal: FC<InvoiceDetailModalProps> = ({
                                     className={styles.name}
                                   >{`Fecha de pago acordada: ${formatDatePlane(item.event_date?.toString())}`}</div>
                                   <div className={styles.adjustment}>
-                                    ID del acuerdooo:
+                                    ID del acuerdo:
                                     <div
                                       className={styles.idAdjustment}
                                       onClick={() => {
@@ -446,7 +446,7 @@ const InvoiceDetailModal: FC<InvoiceDetailModalProps> = ({
                                         item.id && handelOpenNoveltyDetail(item.incident_id)
                                       }
                                     >
-                                      {item.sequence || item.id}
+                                      {item.sequence}
                                     </div>
                                   </div>
                                 </div>
@@ -473,13 +473,17 @@ const InvoiceDetailModal: FC<InvoiceDetailModalProps> = ({
                                         item.id && handelOpenNoveltyDetail(item.incident_id)
                                       }
                                     >
-                                      {item.sequence || item.id}
+                                      {item.sequence}
                                     </div>
                                   </div>
                                 </div>
                               ) : (
                                 ""
                               )}
+
+                              {item.event_type_name === "Factura conciliada" ? (
+                                <div className={styles.name}>{`Acción: ${item.user_name}`}</div>
+                              ) : null}
 
                               {item.comments && (
                                 <div className={styles.commentsContainer}>

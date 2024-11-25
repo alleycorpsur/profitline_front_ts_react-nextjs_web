@@ -1,6 +1,7 @@
 import axios, { AxiosResponse } from "axios";
 import config from "@/config";
 import { getIdToken } from "@/utils/api/api";
+import { GenericResponse } from "@/types/global/IGlobal";
 
 interface MarkNotificationReadResponse {
   message: string;
@@ -30,6 +31,29 @@ export const markNotificationAsRead = async (
       return error.response as AxiosResponse<MarkNotificationReadResponse>;
     }
     // For other types of errors, throw them
+    throw error;
+  }
+};
+
+export interface INotificationType {
+  ID: number;
+  NAME: string;
+  IS_DELETED: number;
+}
+
+export const getNotificationTypes = async () => {
+  const token = await getIdToken();
+  try {
+    const url = `${config.API_HOST}/notification/notification_type`;
+
+    const response: AxiosResponse<GenericResponse<INotificationType[]>> = await axios.get(url, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    return response.data.data as INotificationType[];
+  } catch (error) {
+    console.error("Error fetching notification types", error);
     throw error;
   }
 };

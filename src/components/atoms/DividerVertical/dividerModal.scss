@@ -3,4 +3,5 @@
     height: calc(100% - 16px);
     width: 4px;
     margin: 8px 14px 8px 14px;
+    align-self: stretch; /* Ensures it stretches to match sibling height in flexbox */
 }
