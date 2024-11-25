@@ -494,8 +494,8 @@ export const ClientProjectForm = ({
               </div>
               {/* -----------------------------------Experiencia----------------------------------- */}
               <Title level={4}>Documentos</Title>
-              <Flex vertical align="flex-start">
-                <div className="clientDocuments">
+              <Flex className="clientDocuments">
+                <div className="clientDocuments__docs">
                   {clientDocuments?.map((document, index) => (
                     <div key={`${index}${document.name}`} style={{ marginBottom: "1rem" }}>
                       <DocumentButtonAction
