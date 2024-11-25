@@ -1,0 +1,147 @@
+@import "@/styles/variables";
+
+.content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+
+    &__header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-family: inherit;
+        border: none;
+        padding: 0;
+        box-shadow: none;
+        width: fit-content;
+        background-color: transparent;
+
+        &:hover {
+            opacity: 0.6;
+            cursor: pointer;
+        }
+
+        h4 {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+    }
+
+    &__description {
+        font-size: 1rem;
+        font-weight: 300;
+    }
+
+    &__payments {
+        display: flex !important;
+        width: 100%;
+        flex-direction: column;
+        gap: 0.75rem;
+        max-height: 300px;
+        overflow-y: scroll;
+        scrollbar-width: none;
+    }
+}
+
+.footer {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+
+    .cancelButton {
+        width: 100%;
+        height: fit-content;
+        box-shadow: none;
+        background-color: $white;
+        color: black;
+        font-weight: 600;
+        border: 1px solid black;
+        padding: 12px 24px;
+
+        &:hover {
+            opacity: 0.8;
+        }
+    }
+
+    .acceptButton {
+        width: 100%;
+        height: fit-content;
+        box-shadow: none;
+        background-color: $secondary;
+        color: black;
+        font-weight: 600;
+        padding: 12px 24px;
+
+        &:hover {
+            background-color: $secondary !important;
+            color: $white !important;
+            border: 1px solid transparent !important;
+        }
+
+        &:disabled {
+            background-color: $dark-gray;
+
+            cursor: not-allowed;
+
+            &:hover {
+                background-color: $dark-gray !important;
+                color: black !important;
+            }
+        }
+    }
+}
+
+.paymentContent {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+
+    &__colorLabelContainer {
+        height: 80px;
+    }
+    &__content {
+        display: flex;
+        width: 100%;
+        justify-content: space-between;
+        align-items: center;
+
+        &__left {
+            display: flex;
+            flex-direction: column;
+        }
+
+        &__name {
+            font-weight: 600;
+        }
+
+        &__date,
+        &__client {
+            font-weight: 300;
+            font-size: 0.875rem;
+        }
+
+        &__amount {
+            font-weight: 500;
+            font-size: 1.25rem;
+            justify-self: flex-end;
+            align-self: flex-start;
+        }
+    }
+}
+
+.paymentRadio {
+    background-color: $background;
+    border-radius: 8px;
+    padding: 0.5rem 0.75rem !important;
+    display: flex;
+    justify-content: stretch;
+    align-items: center !important;
+
+    span:last-child {
+        width: 100%;
+    }
+    span:not(:last-child) {
+        width: 17px; // Radio stays in place and doesn't deform
+    }
+}

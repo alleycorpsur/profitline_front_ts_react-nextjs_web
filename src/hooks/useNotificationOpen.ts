@@ -1,33 +1,32 @@
 import useSWR from "swr";
 import { fetcher } from "@/utils/api/api";
 
-interface Notification {
-  create_at: string;
-  notification_type_name: string;
-  client_name: string;
-  incident_id: number | null;
-  is_client_change: number;
-  client_update_changes: Record<string, any>;
-  days: string;
-  id: number;
-  is_read : number;
-}
+import { ISelectFilterNotifications } from "@/components/atoms/Filters/FiltersNotifications/FiltersNotifications";
 
-interface GetNotificationsResponse {
-  message: string;
-  status: number;
-  data: Notification[];
-}
+import { GenericResponse } from "@/types/global/IGlobal";
+import { INotification } from "@/types/notifications/INotifications";
 
-export const useNotificationOpen = (projectId: number) => {
-  const { data, error, mutate } = useSWR<GetNotificationsResponse>(
-    `/notification/project/${projectId}/user`,
+interface IUseNotificationOpen {
+  projectId: number;
+  filters: ISelectFilterNotifications;
+}
+export const useNotificationOpen = ({ projectId, filters }: IUseNotificationOpen) => {
+  const queries = [];
+  if (filters.lines.length > 0) queries.push(`line=${filters.lines.join(",")}`);
+  if (filters.sublines.length > 0) queries.push(`subline=${filters.sublines.join(",")}`);
+  if (filters.notificationTypes.length > 0)
+    queries.push(`notification_type=${filters.notificationTypes.join(",")}`);
+
+  const queryString = queries.length > 0 ? `?${queries.join("&")}` : "";
+
+  const { data, error, isLoading, mutate } = useSWR<GenericResponse<INotification[]>>(
+    `/notification/project/${projectId}/user${queryString}`,
     fetcher
   );
 
   return {
     data: data?.data,
-    isLoading: !error && !data,
+    isLoading,
     isError: !!error,
     mutate
   };
