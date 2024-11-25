@@ -1,5 +1,5 @@
-import { Dispatch, Key, SetStateAction } from "react";
-import { Button, Table, TableProps, Typography } from "antd";
+import { Dispatch, Key, SetStateAction, useState } from "react";
+import { Button, Flex, Table, TableProps, Typography } from "antd";
 import { useRouter } from "next/navigation";
 import { Eye } from "phosphor-react";
 
@@ -8,6 +8,8 @@ import { formatDateDMY, formatMoney } from "@/utils/utils";
 
 import { IOrder } from "@/types/commerce/ICommerce";
 import "./orders-view-table.scss";
+import { ChangeWarehouseModal } from "@/components/molecules/modals/ChangeWarehouseModal/ChangeWarehouseModal";
+import { WarningDiamond } from "@phosphor-icons/react";
 
 const { Text } = Typography;
 
@@ -17,6 +19,7 @@ interface PropsOrdersViewTable {
   setSelectedRowKeys: Dispatch<SetStateAction<Key[]>>;
   selectedRowKeys: Key[];
   orderStatus: string;
+  setFetchMutate: Dispatch<SetStateAction<boolean>>;
 }
 
 const OrdersViewTable = ({
@@ -24,10 +27,16 @@ const OrdersViewTable = ({
   setSelectedRows,
   setSelectedRowKeys,
   selectedRowKeys,
-  orderStatus
+  orderStatus,
+  setFetchMutate
 }: PropsOrdersViewTable) => {
   const router = useRouter();
   const setDraftInfo = useAppStore((state) => state.setDraftInfo);
+
+  const [selectedOrder, setSelectedOrder] = useState<number | null>(null);
+  const [currentWarehouseId, setCurrentWarehouseId] = useState<number | null>(null);
+
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   const handleSeeDetail = (order: IOrder) => {
     const { id: orderId, order_status } = order;
@@ -122,6 +131,14 @@ const OrdersViewTable = ({
       showSorterTooltip: false
     },
     {
+      title: "Bodega",
+      key: "warehousename",
+      dataIndex: "warehousename",
+      render: (warehousename) => <Text className="cell">{warehousename}</Text>,
+      sorter: (a, b) => a.warehousename.localeCompare(b.warehousename),
+      showSorterTooltip: false
+    },
+    {
       title: "Contacto",
       key: "contacto",
       dataIndex: "contacto",
@@ -146,15 +163,26 @@ const OrdersViewTable = ({
     },
     {
       title: "",
-      key: "buttonSee",
+      key: "buttonOpenModal",
       width: 64,
       dataIndex: "",
       render: (_, row) => (
-        <Button
-          onClick={() => handleSeeDetail(row)}
-          className="buttonSeeProject"
-          icon={<Eye size={"1.3rem"} />}
-        />
+        <Flex gap={8}>
+          <Button
+            onClick={() => {
+              setSelectedOrder(row.id);
+              setCurrentWarehouseId(row.warehouseid);
+              setIsModalOpen(true);
+            }}
+            className="buttonSeeProject"
+            icon={<WarningDiamond size={"1.3rem"} />}
+          />
+          <Button
+            onClick={() => handleSeeDetail(row)}
+            className="buttonSeeProject"
+            icon={<Eye size={"1.3rem"} />}
+          />
+        </Flex>
       )
     }
   ];
@@ -167,6 +195,13 @@ const OrdersViewTable = ({
         dataSource={data.map((data) => ({ ...data, key: data.id }))}
         rowSelection={rowSelection}
         pagination={false}
+      />
+      <ChangeWarehouseModal
+        selectedOrder={selectedOrder ?? 0}
+        currentWarehouseId={currentWarehouseId ?? 0}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        setFetchMutate={setFetchMutate}
       />
     </>
   );
