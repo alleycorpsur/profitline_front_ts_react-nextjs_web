@@ -52,10 +52,12 @@ export const OrdersGenerateActionModal = ({
   const handleDownloadCSV = async () => {
     try {
       const res = await dowloadOrderCSV(ordersId, projectId);
-      console.log("RESSSS", res);
-      createAndDownloadTxt(res?.data);
-      if (res.message == "Descarga exitosa") {
-        showMessage("success", res?.message);
+      if (!res) {
+        return showMessage("error", "Error al descargar CSV");
+      }
+      createAndDownloadTxt(res.data);
+      if (res.message == "Order Ids correctos") {
+        showMessage("success", "Descarga exitosa");
       } else {
         setErrorMessage(res?.message);
         setIsErrorModalOpen(true);
@@ -109,7 +111,6 @@ export const OrdersGenerateActionModal = ({
         title={<Title level={4}>Descarga de plano de facturación</Title>}
       >
         <Flex vertical gap={12}>
-          <Text>Ordenes sin stock</Text>
           <Text strong>{errorMessage}</Text>
         </Flex>
       </Modal>

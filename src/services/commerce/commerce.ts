@@ -200,8 +200,15 @@ export const changeOrderState = async (
     throw error;
   }
 };
+interface DownloadResponse {
+  message: string;
+  data: string; // El contenido del CSV en formato string
+}
 
-export const dowloadOrderCSV = async (ordersIds: number[], projectId: number) => {
+export const dowloadOrderCSV = async (
+  ordersIds: number[],
+  projectId: number
+): Promise<DownloadResponse | null> => {
   const ordersIdsObject = {
     order_ids: ordersIds
   };
@@ -209,14 +216,16 @@ export const dowloadOrderCSV = async (ordersIds: number[], projectId: number) =>
   formData.append("request", JSON.stringify(ordersIdsObject));
 
   try {
-    const response = await API.post(
+    const response: GenericResponse<string> = await API.post(
       `/marketplace/projects/${projectId}/downloadtxtorders`,
       formData
     );
-    console.log("RESPONSE ,", response);
-    return { message: "502, 503", data: response };
+    if (response.success) {
+      return { message: response.message, data: response.data };
+    }
+    return null;
   } catch (error) {
-    return error;
+    return null;
   }
 };
 
