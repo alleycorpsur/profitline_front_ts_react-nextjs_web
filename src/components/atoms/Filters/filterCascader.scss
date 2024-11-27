@@ -7,7 +7,7 @@
         font-size: 16px;
         font-weight: 600;
 
-        .ant-select-selection-overflow { 
+        .ant-select-selection-overflow {
             flex-wrap: nowrap !important;
         }
 
@@ -30,4 +30,9 @@
         background-color: #f0f0f0;
         color: #a5a5a5;
     }
+}
+
+.ant-cascader-menu {
+    height: fit-content !important;
+    max-height: 180px !important;
 }

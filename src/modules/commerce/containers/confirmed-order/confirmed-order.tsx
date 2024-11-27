@@ -100,11 +100,13 @@ export const ConfirmedOrderView: FC = () => {
                   />
                 </div>
 
-                {order?.detail.discount_id ? (
+                {order?.detail.discount_package_id ? (
                   <div className={styles.discountsContainer}>
                     <h2 className={styles.discountsContainer__title}>Descuento aplicado</h2>
                     <div className={styles.discountsContainer__discounts}>
-                      <p key={order?.detail?.discount_id}>{order?.detail?.discount_name}</p>
+                      <p key={order?.detail?.discount_package_id}>
+                        {order?.detail?.discount_name ?? ""}
+                      </p>
                     </div>
                   </div>
                 ) : null}
@@ -123,7 +125,7 @@ export const ConfirmedOrderView: FC = () => {
                 </Flex>
                 <Flex justify="space-between">
                   <p>Descuentos</p>
-                  <p>-{formatMoney(order?.detail?.discounts)}</p>
+                  <p>-{formatMoney(order?.detail?.discounts?.totalDiscount)}</p>
                 </Flex>
                 <Flex justify="space-between">
                   <strong>Total</strong>

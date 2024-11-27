@@ -34,7 +34,8 @@ interface IFormAssignClient {
 
 interface Props {
   isOpen: boolean;
-  onClose: () => void;
+  // eslint-disable-next-line no-unused-vars
+  onClose: (cancelClicked?: boolean) => void;
   selectedRows: ISingleBank[] | undefined;
 }
 
@@ -136,9 +137,7 @@ const ModalActionsAssignClient = ({ isOpen, onClose, selectedRows }: Props) => {
       closable={false}
       destroyOnClose
     >
-      <Title level={4} onClick={onClose}>
-        Asignar cliente
-      </Title>
+      <Title level={4}>Asignar cliente</Title>
 
       <p className="modalActionsAssignClient__subTitle">
         Selecciona el cliente para asignar al pago
@@ -178,7 +177,7 @@ const ModalActionsAssignClient = ({ isOpen, onClose, selectedRows }: Props) => {
       </div>
 
       <div className="modalActionsAssignClient__footer">
-        <SecondaryButton onClick={onClose}>Cancelar</SecondaryButton>
+        <SecondaryButton onClick={() => onClose(true)}>Cancelar</SecondaryButton>
 
         <PrincipalButton
           onClick={handleSubmit(onSubmit)}

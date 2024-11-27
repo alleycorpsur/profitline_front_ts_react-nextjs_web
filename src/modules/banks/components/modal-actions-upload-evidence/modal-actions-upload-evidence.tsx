@@ -23,7 +23,8 @@ interface infoObject {
 
 interface Props {
   isOpen: boolean;
-  onClose: () => void;
+  // eslint-disable-next-line no-unused-vars
+  onClose: (cancelClicked?: boolean) => void;
   selectedRows: ISingleBank[] | undefined;
 }
 
@@ -91,9 +92,7 @@ const ModalActionsUploadEvidence = ({ isOpen, onClose, selectedRows }: Props) =>
       closable={false}
       destroyOnClose
     >
-      <Title level={4} onClick={onClose}>
-        Cargar tirilla
-      </Title>
+      <Title level={4}>Cargar tirilla</Title>
 
       <p className="modalActionsUploadEvidence__subTitle">Cargar el archivo correspondiente</p>
 
@@ -110,7 +109,7 @@ const ModalActionsUploadEvidence = ({ isOpen, onClose, selectedRows }: Props) =>
       </div>
 
       <div className="modalActionsUploadEvidence__footer">
-        <SecondaryButton onClick={onClose}>Cancelar</SecondaryButton>
+        <SecondaryButton onClick={() => onClose(true)}>Cancelar</SecondaryButton>
 
         <PrincipalButton
           onClick={handleSubmit(onSubmit)}

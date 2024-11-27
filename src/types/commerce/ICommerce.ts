@@ -46,7 +46,7 @@ export interface IFetchedCategories {
 }
 
 export interface IConfirmOrderData {
-  discount_id: number | undefined;
+  discount_package_id: number | undefined;
   order_summary: {
     product_sku: string;
     quantity: number;
@@ -65,13 +65,54 @@ export interface IProductInDetail {
   discount: number;
   discount_percentage: number;
 }
+export interface DiscountApplied {
+  id: number;
+  discount: number;
+  description: string;
+  discount_name: string;
+}
+
+export interface PrimaryDiscount {
+  product_id: number;
+  product_sku: string;
+  description: string;
+  price: number;
+  unit_discount: number;
+  discount_applied: DiscountApplied;
+}
+
+export interface Discount {
+  subtotalDiscount: number;
+  primary: PrimaryDiscount;
+}
+export interface DiscountItem {
+  product_sku: string;
+  quantity: number;
+  price: number;
+  taxes: number;
+  image: string;
+  category_id: number;
+  line_id: number;
+  product_id: number;
+  description: string;
+  discount: Discount;
+}
+export interface DiscountOrder {
+  discountId: number;
+  discount: number;
+}
+export interface OrderDiscount {
+  totalDiscount: number;
+  discountOrder: DiscountOrder[];
+  discountItems: DiscountItem[];
+}
 
 export interface IOrderConfirmedResponse {
-  discount_id: number;
+  discount_package_id: number;
   products?: IProductInDetail[];
   subtotal: number;
   taxes: number;
-  discounts: number;
+  discounts: OrderDiscount;
   total: number;
   total_pronto_pago: number;
   insufficientStockProducts: string[];
@@ -121,12 +162,13 @@ export interface ISingleOrder {
 interface IDetailOrder {
   products: ICategories[];
   subtotal: number;
-  discounts: number;
-  discount_id: number;
+  discounts: OrderDiscount;
+  discount_package_id: number;
   taxes: number;
   total_pronto_pago: number;
   total: number;
-  discount_name: string;
+  insufficientStockProducts: any[];
+  discount_name?: string;
 }
 
 export interface ICategories {
@@ -152,6 +194,8 @@ export interface IOrder {
   total: number;
   total_pronto_pago: number;
   client_name: string;
+  warehousename: string;
+  warehouseid: number;
 }
 
 export interface IDiscount {
@@ -160,4 +204,10 @@ export interface IDiscount {
   description: string;
   id_client: number;
   discount_type_id: number;
+}
+
+export interface IDiscountPackageAvailable {
+  id: number;
+  name: string;
+  description: string;
 }

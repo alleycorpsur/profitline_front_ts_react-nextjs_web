@@ -4,6 +4,7 @@ import "./concilationTable.scss";
 import { formatDate, formatDateBars, formatMoney } from "@/utils/utils";
 import { IInvoiceConcilation } from "@/types/concilation/concilation";
 import { useInvoiceIncidentMotives } from "@/hooks/useInvoiceIncidentMotives";
+import { useEffect, useState } from "react";
 
 const { Text } = Typography;
 
@@ -24,24 +25,52 @@ export const ConcilationTable = ({
   onRowSelection,
   selectedRowKeys
 }: PropsInvoicesTable) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
+
   const openInvoiceDetail = (invoiceId: number, id_erp?: string) => {
     setIderp(id_erp || "");
     setShowInvoiceDetailModal({ isOpen: true, invoiceId });
   };
 
+  // Preparar los datos con las keys
+  const dataWithKeys = data.map((item) => ({ ...item, key: item.id }));
+
   const rowSelection = {
     selectedRowKeys,
-    onChange: (newSelectedRowKeys: React.Key[], newSelectedRows: IInvoiceConcilation[]) => {
-      onRowSelection(newSelectedRowKeys, newSelectedRows);
-    }
+    onSelect: (record: IInvoiceConcilation, selected: boolean) => {
+      if (selected) {
+        const newKeys = [...selectedRowKeys, record.id];
+        onRowSelection(
+          newKeys,
+          data.filter((item) => newKeys.includes(item.id))
+        );
+      } else {
+        const newKeys = selectedRowKeys.filter((key) => key !== record.id);
+        onRowSelection(
+          newKeys,
+          data.filter((item) => newKeys.includes(item.id))
+        );
+      }
+    },
+    onSelectAll: (selected: boolean) => {
+      if (selected) {
+        const allKeys = dataWithKeys.map((item) => item.key);
+
+        onRowSelection(allKeys, dataWithKeys);
+      } else {
+        onRowSelection([], []);
+      }
+    },
+    preserveSelectedRowKeys: true
   };
 
   const { data: motives, isLoading } = useInvoiceIncidentMotives();
   const columns: TableProps<IInvoiceConcilation>["columns"] = [
     {
       title: "Factura",
-      dataIndex: "id",
-      key: "id",
+      dataIndex: "id_erp",
+      key: "id_erp",
       render: (invoiceId, record) => (
         <Text
           onClick={() => openInvoiceDetail(invoiceId, record.id_erp)}
@@ -58,7 +87,9 @@ export const ConcilationTable = ({
       dataIndex: "create_at",
       key: "create_at",
       render: (text, record) => (
-        <Text className="cell -alignRight">{formatDate(record?.financialRecordDate?.toString())}</Text>
+        <Text className="cell -alignRight">
+          {formatDate(record?.financialRecordDate?.toString())}
+        </Text>
       ),
       sorter: (a, b) => {
         const dateA = new Date(a.financialRecordDate);
@@ -73,7 +104,6 @@ export const ConcilationTable = ({
       title: "Pronto pago",
       key: "earlypay_date",
       dataIndex: "earlypay_date",
-
       showSorterTooltip: false,
       align: "right",
       width: 150
@@ -162,14 +192,22 @@ export const ConcilationTable = ({
   ];
 
   return (
-    <>
-      <Table
-        className="concilationTable"
-        columns={columns}
-        pagination={false}
-        rowSelection={rowSelection}
-        dataSource={data.map((data) => ({ ...data, key: data.id }))}
-      />
-    </>
+    <Table
+      className="concilationTable"
+      columns={columns}
+      pagination={
+        data.length > pageSize
+          ? {
+              current: currentPage,
+              onChange: (page) => setCurrentPage(page),
+              pageSize: pageSize,
+              showSizeChanger: false,
+              total: data.length
+            }
+          : false
+      }
+      rowSelection={rowSelection}
+      dataSource={dataWithKeys}
+    />
   );
 };

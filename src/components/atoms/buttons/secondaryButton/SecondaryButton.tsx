@@ -24,9 +24,12 @@ export default function SecondaryButton({
   const { token } = useToken();
   const green = token.green;
   const white = token.colorTextSecondary;
-
   const className =
-    bordered && !fullWidth ? styles.button__bordered : fullWidth ? styles.fullWidth : styles.button;
+    bordered && !fullWidth
+      ? styles.button__bordered
+      : fullWidth
+        ? styles.button__fullWidth
+        : styles.button;
 
   return (
     <ConfigProvider
