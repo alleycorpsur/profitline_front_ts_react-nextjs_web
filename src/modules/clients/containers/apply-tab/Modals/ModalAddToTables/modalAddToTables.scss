@@ -25,15 +25,17 @@
 
     .select-all {
         margin-bottom: 12px;
-        margin-left: 14px;
+        margin-left: 12px;
     }
 
     .invoices-list {
         display: flex;
-        max-height: 40vh;
+        max-height: 30vh;
         overflow-y: auto;
         flex-direction: column;
         gap: 8px;
+        overflow-y: scroll;
+        scrollbar-width: none;
     }
 
     .modal-footer {

@@ -1,28 +1,21 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { Modal, Checkbox, Spin, message, Flex } from "antd";
+import { Modal, Checkbox, Spin, message, Flex, Pagination } from "antd";
 import { CopySimple } from "phosphor-react";
-import { CheckboxChangeEvent } from "antd/es/checkbox";
 
 import { useInvoices } from "@/hooks/useInvoices";
-import ItemsActionsModalInvoice from "@/components/atoms/ItemsModalInvoice/ItemsActionsModalInvoice";
-import UiSearchInputLong from "@/components/ui/search-input-long";
-
-import { IClientPayment } from "@/types/clientPayments/IClientPayments";
-
-import "./modalAddToTables.scss";
-import { IModalAddToTableOpen } from "../../apply-tab";
-import { IInvoice } from "@/types/invoices/IInvoices";
 import { useClientsPayments } from "@/hooks/useClientsPayments";
+import { formatDate, formatMoney } from "@/utils/utils";
+
+import UiSearchInputLong from "@/components/ui/search-input-long";
+import { IModalAddToTableOpen } from "../../apply-tab";
 import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
 import SecondaryButton from "@/components/atoms/buttons/secondaryButton/SecondaryButton";
+import CheckboxColoredValues from "@/components/ui/checkbox-colored-values/checkbox-colored-values";
 
-interface Invoice {
-  id: number;
-  current_value: number;
-  selected: boolean;
-  date: string;
-}
+import { IClientPayment } from "@/types/clientPayments/IClientPayments";
+import { IInvoice } from "@/types/invoices/IInvoices";
 
+import "./modalAddToTables.scss";
 interface ModalAddToTablesProps {
   onCancel: () => void;
   onAdd: () => void;
@@ -34,15 +27,13 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
   onAdd,
   isModalAddToTableOpen
 }) => {
-  const [rows, setRows] = useState<IInvoice[] | IClientPayment[]>([]);
-  const [invoices, setInvoices] = useState<Invoice[]>([
-    { id: 12345, current_value: 12000000, selected: false, date: "19/04/2024" },
-    { id: 2357462, current_value: 20000000, selected: false, date: "19/04/2024" }
-  ]);
+  const [rows, setRows] = useState<(IInvoice | IClientPayment)[]>([]);
+  const [selectedRows, setSelectedRows] = useState<(IInvoice | IClientPayment)[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 8;
 
   const { data: invoicesByState } = useInvoices({});
   const allInvoices = invoicesByState?.map((data) => data.invoices).flat();
-  console.log("allInvoices", allInvoices);
 
   const { data: paymentsByState } = useClientsPayments();
   const allPayments = paymentsByState?.map((data) => data.payments).flat();
@@ -53,72 +44,51 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
     } else if (isModalAddToTableOpen.adding === "payments" && allPayments) {
       setRows(allPayments);
     }
+
+    return () => {
+      setSelectedRows([]);
+      setRows([]);
+    };
   }, [isModalAddToTableOpen.adding]);
 
   const [notFoundInvoices, setNotFoundInvoices] = useState<number[]>([]);
   const [adjustments, setAdjustments] = useState(15000000);
 
-  const handleSelectAll = (e: CheckboxChangeEvent) => {
-    const newInvoices = invoices.map((invoice) => ({ ...invoice, selected: e.target.checked }));
-    setInvoices(newInvoices);
-    notFoundInvoices.length && setNotFoundInvoices([]);
-  };
-
-  const handleInvoiceSelect = (id: number) => {
-    const newInvoices = invoices.map((invoice) =>
-      invoice.id === id ? { ...invoice, selected: !invoice.selected } : invoice
-    );
-    setInvoices(newInvoices);
-  };
-
-  const handlePasteInvoices = async () => {
-    console.log("Pasting invoices");
-
-    try {
-      console.log("Reading text from clipboard");
-      const text = await navigator.clipboard.readText();
-
-      const pastedIds = text
-        .split("\n")
-        .map((row) => row.trim())
-        .filter((row) => row !== "" && !isNaN(+row))
-        .map(Number);
-
-      console.log({ pastedIds });
-
-      const foundIds = new Set(invoices.map((invoice) => invoice.id));
-      const newNotFound: number[] = [];
-
-      const updatedInvoices = invoices.map((invoice) => {
-        if (pastedIds.includes(invoice.id)) {
-          return { ...invoice, selected: true };
-        }
-        return invoice;
-      });
-
-      pastedIds.forEach((id) => {
-        if (!foundIds.has(id)) {
-          newNotFound.push(id);
-        }
-      });
-
-      setInvoices(updatedInvoices);
-      setNotFoundInvoices(newNotFound);
-
-      console.log("Updated invoices:", updatedInvoices);
-      console.log("Not found invoices:", newNotFound);
-    } catch (err) {
-      console.error("Error pasting invoices:", err);
-      message.error("Error al pegar facturas. Por favor, inténtelo de nuevo.");
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedRows(rows);
+    } else {
+      setSelectedRows([]);
     }
   };
 
+  const handleSelectOne = (checked: boolean, row: IClientPayment | IInvoice) => {
+    setSelectedRows((prevSelectedRows) =>
+      checked
+        ? [...(prevSelectedRows as (IInvoice | IClientPayment)[]), row]
+        : (prevSelectedRows as (IInvoice | IClientPayment)[]).filter(
+            (selected) => selected.id !== row.id
+          )
+    );
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const paginatedRows = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    return rows.slice(startIndex, endIndex);
+  }, [rows, currentPage]);
+
+  const handlePasteInvoices = async () => {};
+
   const summary = useMemo(() => {
-    const selectedInvoices = invoices.filter((invoice) => invoice.selected);
-    const total = selectedInvoices.reduce((sum, invoice) => sum + invoice.current_value, 0);
+    const total = selectedRows.reduce((sum, row) => sum + row.current_value, 0);
     const pending = total - adjustments;
-    return { total, adjustments, pending, count: selectedInvoices.length };
-  }, [invoices, adjustments]);
+    return { total, adjustments, pending, count: selectedRows.length };
+  }, [selectedRows, adjustments]);
 
   const isLoading = false;
 
@@ -188,18 +158,39 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
       )}
 
       <div className="select-all">
-        <Checkbox onChange={handleSelectAll}>Seleccionar todo</Checkbox>
+        <Checkbox onChange={(e) => handleSelectAll(e.target.checked)}>Seleccionar todo</Checkbox>
       </div>
       <div className="invoices-list">
-        {invoices.map((invoice, index) => (
-          <ItemsActionsModalInvoice
-            key={invoice.id}
-            onHeaderClick={() => handleInvoiceSelect(invoice.id)}
-            type={index === 0 ? 1 : 0}
-            item={invoice}
+        {paginatedRows.map((row) => (
+          <CheckboxColoredValues
+            customStyles={{ height: "76px" }}
+            customStyleDivider={{ width: "6px", height: "44px", alignSelf: "center" }}
+            key={row.id}
+            onChangeCheckbox={(e) => {
+              handleSelectOne(e.target.checked, row);
+            }}
+            checked={selectedRows.some((selected) => selected.id === row.id)}
+            content={
+              <Flex style={{ width: "100%" }} justify="space-between">
+                <div>
+                  <h4>
+                    {isModalAddToTableOpen.adding === "invoices" ? "Factura" : "Pago"} {row.id}
+                  </h4>
+                  <p>{formatDate(row.updated_at)}</p>
+                </div>
+                <h3>{formatMoney(row.current_value)}</h3>
+              </Flex>
+            }
           />
         ))}
       </div>
+      <Pagination
+        current={currentPage}
+        onChange={handlePageChange}
+        total={rows.length}
+        pageSize={ITEMS_PER_PAGE}
+        style={{ textAlign: "right", margin: ".5rem 0" }}
+      />
 
       <div className="modal-footer">
         <SecondaryButton fullWidth onClick={onCancel}>
@@ -209,7 +200,7 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
         <PrincipalButton
           fullWidth
           // onClick={onAdd}
-          onClick={() => console.log("Agregar ", rows)}
+          onClick={() => console.log("Agregar ", selectedRows)}
         >
           {isLoading ? (
             <Spin size="small" />
