@@ -1,21 +1,26 @@
 import React, { useState } from "react";
+import { Plus } from "phosphor-react";
 import { Button, Flex, Spin } from "antd";
+
 import Collapse from "@/components/ui/collapse";
 import LabelCollapse from "@/components/ui/label-collapse";
 import UiSearchInput from "@/components/ui/search-input/search-input";
-import "./apply-tab.scss";
-import { SectionData } from "./tables/Types";
 import InvoiceTable from "./tables/InvoiceTable";
 import PaymentsTable from "./tables/PaymentsTable";
 import DiscountTable from "./tables/DiscountTable";
-import { Plus } from "phosphor-react";
-
 import { useSelectedPayments } from "@/context/SelectedPaymentsContext";
 import { ModalResultAppy } from "./Modals/ModalResultApply/ModalResultAppy";
-import ModalAddInvoice from "./Modals/ModalAddInvoice/ModalAddInvoice";
+import ModalAddToTables from "./Modals/ModalAddToTables/ModalAddToTables";
 import { ModalSelectAjustements } from "./Modals/ModalSelectAjustements/ModalSelectAjustements";
 import ModalNoteInvoice from "./Modals/ModalNoteInvoice/ModalNoteInvoice";
 
+import { SectionData } from "./tables/Types";
+
+import "./apply-tab.scss";
+export interface IModalAddToTableOpen {
+  isOpen: boolean;
+  adding?: "invoices" | "payments";
+}
 const ApplyTab: React.FC = () => {
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -23,22 +28,31 @@ const ApplyTab: React.FC = () => {
   //TODO this is the context that is not being used
   // const { selectedPayments } = useSelectedPayments();
 
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isModalAddToTableOpen, setIsModalAddToTableOpen] = useState<IModalAddToTableOpen>(
+    {} as IModalAddToTableOpen
+  );
 
   const [modalActionPayment, setModalActionPayment] = useState(
     {} as { isOpen: boolean; modal: number }
   );
-  const showModal = () => {
-    setIsModalVisible(true);
+  const showModal = (adding_type: "invoices" | "payments") => {
+    setIsModalAddToTableOpen({
+      isOpen: true,
+      adding: adding_type
+    });
   };
 
   const handleCancel = () => {
-    setIsModalVisible(false);
+    setIsModalAddToTableOpen({
+      isOpen: false
+    });
   };
 
   const handleAdd = () => {
     // Handle adding selected invoices
-    setIsModalVisible(false);
+    setIsModalAddToTableOpen({
+      isOpen: false
+    });
   };
 
   const data: SectionData[] = [
@@ -227,7 +241,10 @@ const ApplyTab: React.FC = () => {
                     className="buttonActionApply"
                     onClick={() => {
                       if (section.statusName === "facturas") {
-                        showModal();
+                        showModal("invoices");
+                      }
+                      if (section.statusName === "pagos") {
+                        showModal("payments");
                       }
                       if (section.statusName === "ajustes") {
                         setModalActionPayment(
@@ -254,7 +271,11 @@ const ApplyTab: React.FC = () => {
           />
         )}
       </div>
-      <ModalAddInvoice visible={isModalVisible} onCancel={handleCancel} onAdd={handleAdd} />
+      <ModalAddToTables
+        onCancel={handleCancel}
+        onAdd={handleAdd}
+        isModalAddToTableOpen={isModalAddToTableOpen}
+      />
       <ModalSelectAjustements
         isOpen={modalActionPayment && modalActionPayment.isOpen && modalActionPayment.modal === 0}
         onClose={() =>

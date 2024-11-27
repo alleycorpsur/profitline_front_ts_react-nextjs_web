@@ -1,10 +1,20 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { Modal, Checkbox, Spin, message, Flex } from "antd";
-import "./modalAddInvoice.scss";
-import ItemsActionsModalInvoice from "@/components/atoms/ItemsModalInvoice/ItemsActionsModalInvoice";
-import { CheckboxChangeEvent } from "antd/es/checkbox";
 import { CopySimple } from "phosphor-react";
+import { CheckboxChangeEvent } from "antd/es/checkbox";
+
+import { useInvoices } from "@/hooks/useInvoices";
+import ItemsActionsModalInvoice from "@/components/atoms/ItemsModalInvoice/ItemsActionsModalInvoice";
 import UiSearchInputLong from "@/components/ui/search-input-long";
+
+import { IClientPayment } from "@/types/clientPayments/IClientPayments";
+
+import "./modalAddToTables.scss";
+import { IModalAddToTableOpen } from "../../apply-tab";
+import { IInvoice } from "@/types/invoices/IInvoices";
+import { useClientsPayments } from "@/hooks/useClientsPayments";
+import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
+import SecondaryButton from "@/components/atoms/buttons/secondaryButton/SecondaryButton";
 
 interface Invoice {
   id: number;
@@ -13,27 +23,37 @@ interface Invoice {
   date: string;
 }
 
-interface ModalAddInvoiceProps {
-  visible: boolean;
+interface ModalAddToTablesProps {
   onCancel: () => void;
   onAdd: () => void;
+  isModalAddToTableOpen: IModalAddToTableOpen;
 }
 
-const ModalAddInvoice: React.FC<ModalAddInvoiceProps> = ({ visible, onCancel, onAdd }) => {
+const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
+  onCancel,
+  onAdd,
+  isModalAddToTableOpen
+}) => {
+  const [rows, setRows] = useState<IInvoice[] | IClientPayment[]>([]);
   const [invoices, setInvoices] = useState<Invoice[]>([
     { id: 12345, current_value: 12000000, selected: false, date: "19/04/2024" },
-    { id: 2357462, current_value: 20000000, selected: false, date: "19/04/2024" },
-    { id: 4678678, current_value: 28000000, selected: false, date: "19/04/2024" },
-    { id: 7865876, current_value: 12000000, selected: false, date: "19/04/2024" },
-    { id: 7865382, current_value: 12000000, selected: false, date: "19/04/2024" },
-    { id: 168376, current_value: 12000000, selected: false, date: "19/04/2024" },
-    { id: 781366, current_value: 12000000, selected: false, date: "19/04/2024" },
-    { id: 816576, current_value: 12000000, selected: false, date: "19/04/2024" },
-    { id: 765876, current_value: 12000000, selected: false, date: "19/04/2024" },
-    { id: 623876, current_value: 12000000, selected: false, date: "19/04/2024" },
-    { id: 123349, current_value: 16000000, selected: false, date: "19/04/2024" },
-    { id: 786386, current_value: 12000000, selected: false, date: "19/04/2024" }
+    { id: 2357462, current_value: 20000000, selected: false, date: "19/04/2024" }
   ]);
+
+  const { data: invoicesByState } = useInvoices({});
+  const allInvoices = invoicesByState?.map((data) => data.invoices).flat();
+  console.log("allInvoices", allInvoices);
+
+  const { data: paymentsByState } = useClientsPayments();
+  const allPayments = paymentsByState?.map((data) => data.payments).flat();
+
+  useEffect(() => {
+    if (isModalAddToTableOpen.adding === "invoices" && allInvoices) {
+      setRows(allInvoices);
+    } else if (isModalAddToTableOpen.adding === "payments" && allPayments) {
+      setRows(allPayments);
+    }
+  }, [isModalAddToTableOpen.adding]);
 
   const [notFoundInvoices, setNotFoundInvoices] = useState<number[]>([]);
   const [adjustments, setAdjustments] = useState(15000000);
@@ -110,8 +130,8 @@ const ModalAddInvoice: React.FC<ModalAddInvoiceProps> = ({ visible, onCancel, on
 
   return (
     <Modal
-      title="Agregar factura"
-      visible={visible}
+      title={`Agregar ${isModalAddToTableOpen.adding === "invoices" ? "facturas" : "pagos"}`}
+      open={isModalAddToTableOpen.isOpen}
       onCancel={onCancel}
       footer={null}
       width={700}
@@ -180,24 +200,26 @@ const ModalAddInvoice: React.FC<ModalAddInvoiceProps> = ({ visible, onCancel, on
           />
         ))}
       </div>
+
       <div className="modal-footer">
-        <button
-          type="button"
-          className="button__action__text button__action__text__white"
-          onClick={onCancel}
-        >
+        <SecondaryButton fullWidth onClick={onCancel}>
           Cancelar
-        </button>
-        <button
-          type="button"
-          className={`button__action__text ${!isLoading ? "button__action__text__green" : ""}`}
-          onClick={onAdd}
+        </SecondaryButton>
+
+        <PrincipalButton
+          fullWidth
+          // onClick={onAdd}
+          onClick={() => console.log("Agregar ", rows)}
         >
-          {isLoading ? <Spin size="small" /> : "Agregar factura"}
-        </button>
+          {isLoading ? (
+            <Spin size="small" />
+          ) : (
+            `Agregar ${isModalAddToTableOpen.adding === "invoices" ? "facturas" : "pagos"}`
+          )}
+        </PrincipalButton>
       </div>
     </Modal>
   );
 };
 
-export default ModalAddInvoice;
+export default ModalAddToTables;
