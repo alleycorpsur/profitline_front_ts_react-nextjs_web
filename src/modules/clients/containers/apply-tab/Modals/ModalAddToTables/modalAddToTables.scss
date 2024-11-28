@@ -26,21 +26,41 @@
     .select-all {
         margin-bottom: 12px;
         margin-left: 12px;
+
+        &__checkbox {
+            font-size: 1rem;
+            font-weight: 300;
+        }
     }
 
     .invoices-list {
         display: flex;
-        max-height: 30vh;
+        max-height: 25vh;
         overflow-y: auto;
         flex-direction: column;
         gap: 8px;
         overflow-y: scroll;
         scrollbar-width: none;
+
+        &__title {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        &__date {
+            font-weight: 300;
+            font-size: 0.875rem;
+        }
+
+        &__amount {
+            font-weight: 500;
+            font-size: 1.25rem;
+        }
     }
 
     .modal-footer {
         display: grid;
-        margin-top: 24px;
+        margin-top: 16px;
         gap: 1rem;
         grid-template-columns: 1fr 1fr;
     }
@@ -60,13 +80,14 @@
         display: flex;
         justify-content: space-between;
         margin-bottom: 10px;
+        font-weight: 300;
 
         &:last-child {
             margin-bottom: 0;
         }
 
         &.pending {
-            font-weight: bold;
+            font-weight: 600;
         }
     }
 }

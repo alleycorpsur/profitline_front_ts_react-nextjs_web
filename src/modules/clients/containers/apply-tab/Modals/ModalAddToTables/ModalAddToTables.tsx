@@ -29,8 +29,9 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
 }) => {
   const [rows, setRows] = useState<(IInvoice | IClientPayment)[]>([]);
   const [selectedRows, setSelectedRows] = useState<(IInvoice | IClientPayment)[]>([]);
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
-  const ITEMS_PER_PAGE = 8;
+  const ITEMS_PER_PAGE = 5;
 
   const { data: invoicesByState } = useInvoices({});
   const allInvoices = invoicesByState?.map((data) => data.invoices).flat();
@@ -48,8 +49,15 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
     return () => {
       setSelectedRows([]);
       setRows([]);
+      setNotFoundInvoices([]);
+      setSearchQuery("");
+      setCurrentPage(1);
     };
   }, [isModalAddToTableOpen.adding]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
 
   const [notFoundInvoices, setNotFoundInvoices] = useState<number[]>([]);
   const [adjustments, setAdjustments] = useState(15000000);
@@ -76,13 +84,58 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
     setCurrentPage(page);
   };
 
+  useEffect(() => {
+    if (searchQuery === "") {
+      setNotFoundInvoices([]);
+      return;
+    }
+    const searchQueryArray = searchQuery.split(",").map((query) => query.trim());
+    const notFoundInvoices = searchQueryArray.filter(
+      (query) => !rows.some((row) => row.id.toString() === query)
+    );
+    setNotFoundInvoices(notFoundInvoices.map(Number));
+  }, [rows, searchQuery]);
+
+  const filteredData = useMemo(() => {
+    const searchQueryArray = searchQuery.split(",").map((query) => query.trim());
+    const filtered = rows.filter((row) =>
+      searchQueryArray.some((query) => row.id.toString().toLowerCase().includes(query))
+    );
+
+    const sorted = filtered.sort((a, b) => {
+      const aMatches = searchQueryArray.some((query) => a.id.toString().toLowerCase() === query);
+      const bMatches = searchQueryArray.some((query) => b.id.toString().toLowerCase() === query);
+
+      if (aMatches && !bMatches) return -1; // Exact match comes first
+      if (!aMatches && bMatches) return 1; // Partial match comes after
+      return 0; // Otherwise, keep the existing order
+    });
+
+    return sorted;
+  }, [rows, searchQuery]);
+
   const paginatedRows = useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     const endIndex = startIndex + ITEMS_PER_PAGE;
-    return rows.slice(startIndex, endIndex);
-  }, [rows, currentPage]);
+    return filteredData.slice(startIndex, endIndex);
+  }, [filteredData, currentPage]);
 
-  const handlePasteInvoices = async () => {};
+  const handlePasteInvoices = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+
+      const pastedIds = text
+        .split("\n")
+        .map((row) => row.trim())
+        .filter((row) => row !== "" && !isNaN(+row))
+        .map(Number);
+
+      setSearchQuery(pastedIds.join(", "));
+    } catch (err) {
+      console.error("Error pasting invoices:", err);
+      message.error("Error al pegar facturas. Por favor, inténtelo de nuevo.");
+    }
+  };
 
   const summary = useMemo(() => {
     const total = selectedRows.reduce((sum, row) => sum + row.current_value, 0);
@@ -91,12 +144,6 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
   }, [selectedRows, adjustments]);
 
   const isLoading = false;
-
-  useEffect(() => {
-    return () => {
-      setNotFoundInvoices([]);
-    };
-  }, []);
 
   return (
     <Modal
@@ -125,7 +172,12 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
       )}
 
       <div className="search-container">
-        <UiSearchInputLong placeholder="Buscar" className={"custom-input"} />
+        <UiSearchInputLong
+          value={searchQuery}
+          onChange={(event) => setSearchQuery(event.target.value)}
+          placeholder="Buscar"
+          className={"custom-input"}
+        />
       </div>
       {notFoundInvoices.length > 0 && (
         <div className="not-found-invoices">
@@ -158,7 +210,12 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
       )}
 
       <div className="select-all">
-        <Checkbox onChange={(e) => handleSelectAll(e.target.checked)}>Seleccionar todo</Checkbox>
+        <Checkbox
+          className="select-all__checkbox"
+          onChange={(e) => handleSelectAll(e.target.checked)}
+        >
+          Seleccionar todo
+        </Checkbox>
       </div>
       <div className="invoices-list">
         {paginatedRows.map((row) => (
@@ -173,12 +230,12 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
             content={
               <Flex style={{ width: "100%" }} justify="space-between">
                 <div>
-                  <h4>
+                  <h4 className="invoices-list__title">
                     {isModalAddToTableOpen.adding === "invoices" ? "Factura" : "Pago"} {row.id}
                   </h4>
-                  <p>{formatDate(row.updated_at)}</p>
+                  <p className="invoices-list__date">{formatDate(row.updated_at)}</p>
                 </div>
-                <h3>{formatMoney(row.current_value)}</h3>
+                <h3 className="invoices-list__amount">{formatMoney(row.current_value)}</h3>
               </Flex>
             }
           />
@@ -187,7 +244,7 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
       <Pagination
         current={currentPage}
         onChange={handlePageChange}
-        total={rows.length}
+        total={filteredData.length}
         pageSize={ITEMS_PER_PAGE}
         style={{ textAlign: "right", margin: ".5rem 0" }}
       />
@@ -200,7 +257,6 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
         <PrincipalButton
           fullWidth
           // onClick={onAdd}
-          onClick={() => console.log("Agregar ", selectedRows)}
         >
           {isLoading ? (
             <Spin size="small" />
