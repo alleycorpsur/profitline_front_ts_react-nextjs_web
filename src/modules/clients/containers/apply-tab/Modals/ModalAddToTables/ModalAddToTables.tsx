@@ -31,13 +31,23 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
   const [selectedRows, setSelectedRows] = useState<(IInvoice | IClientPayment)[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [loadingData, setLoadingData] = useState(true);
   const ITEMS_PER_PAGE = 5;
 
-  const { data: invoicesByState } = useInvoices({});
+  const { data: invoicesByState, isLoading: loadingInvoices } = useInvoices({});
   const allInvoices = invoicesByState?.map((data) => data.invoices).flat();
 
-  const { data: paymentsByState } = useClientsPayments();
+  const { data: paymentsByState, isLoading: loadingPayments } = useClientsPayments();
   const allPayments = paymentsByState?.map((data) => data.payments).flat();
+
+  useEffect(() => {
+    if (loadingInvoices || loadingPayments) {
+      setLoadingData(true);
+    }
+    if (!loadingInvoices && !loadingPayments) {
+      setLoadingData(false);
+    }
+  }, [loadingInvoices, loadingPayments]);
 
   useEffect(() => {
     if (isModalAddToTableOpen.adding === "invoices" && allInvoices) {
@@ -53,7 +63,7 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
       setSearchQuery("");
       setCurrentPage(1);
     };
-  }, [isModalAddToTableOpen.adding]);
+  }, [isModalAddToTableOpen.adding, allInvoices, allPayments]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -219,46 +229,54 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
         </div>
       )}
 
-      <div className="select-all">
-        <Checkbox
-          className="select-all__checkbox"
-          onChange={(e) => handleSelectAll(e.target.checked)}
-          checked={isAllChecked ? true : undefined}
-        >
-          Seleccionar todo
-        </Checkbox>
-      </div>
-      <div className="invoices-list">
-        {paginatedRows.map((row) => (
-          <CheckboxColoredValues
-            customStyles={{ height: "76px" }}
-            customStyleDivider={{ width: "6px", height: "44px", alignSelf: "center" }}
-            key={row.id}
-            onChangeCheckbox={(e) => {
-              handleSelectOne(e.target.checked, row);
-            }}
-            checked={selectedRows.some((selected) => selected.id === row.id)}
-            content={
-              <Flex style={{ width: "100%" }} justify="space-between">
-                <div>
-                  <h4 className="invoices-list__title">
-                    {isModalAddToTableOpen.adding === "invoices" ? "Factura" : "Pago"} {row.id}
-                  </h4>
-                  <p className="invoices-list__date">{formatDate(row.updated_at)}</p>
-                </div>
-                <h3 className="invoices-list__amount">{formatMoney(row.current_value)}</h3>
-              </Flex>
-            }
+      {loadingData ? (
+        <Flex justify="center" style={{ width: "100%", margin: "2rem 0" }}>
+          <Spin />
+        </Flex>
+      ) : (
+        <>
+          <div className="select-all">
+            <Checkbox
+              className="select-all__checkbox"
+              onChange={(e) => handleSelectAll(e.target.checked)}
+              checked={isAllChecked ? true : undefined}
+            >
+              Seleccionar todo
+            </Checkbox>
+          </div>
+          <div className="invoices-list">
+            {paginatedRows.map((row) => (
+              <CheckboxColoredValues
+                customStyles={{ height: "76px" }}
+                customStyleDivider={{ width: "6px", height: "44px", alignSelf: "center" }}
+                key={row.id}
+                onChangeCheckbox={(e) => {
+                  handleSelectOne(e.target.checked, row);
+                }}
+                checked={selectedRows.some((selected) => selected.id === row.id)}
+                content={
+                  <Flex style={{ width: "100%" }} justify="space-between">
+                    <div>
+                      <h4 className="invoices-list__title">
+                        {isModalAddToTableOpen.adding === "invoices" ? "Factura" : "Pago"} {row.id}
+                      </h4>
+                      <p className="invoices-list__date">{formatDate(row.updated_at)}</p>
+                    </div>
+                    <h3 className="invoices-list__amount">{formatMoney(row.current_value)}</h3>
+                  </Flex>
+                }
+              />
+            ))}
+          </div>
+          <Pagination
+            current={currentPage}
+            onChange={handlePageChange}
+            total={filteredData.length}
+            pageSize={ITEMS_PER_PAGE}
+            style={{ textAlign: "right", margin: ".5rem 0" }}
           />
-        ))}
-      </div>
-      <Pagination
-        current={currentPage}
-        onChange={handlePageChange}
-        total={filteredData.length}
-        pageSize={ITEMS_PER_PAGE}
-        style={{ textAlign: "right", margin: ".5rem 0" }}
-      />
+        </>
+      )}
 
       <div className="modal-footer">
         <SecondaryButton fullWidth onClick={onCancel}>
