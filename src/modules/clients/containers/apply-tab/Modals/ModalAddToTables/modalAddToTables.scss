@@ -4,7 +4,6 @@
     flex-grow: 1;
     gap: 1.5rem;
 
-
     .ant-modal-content {
         border-radius: 8px;
     }
@@ -22,59 +21,77 @@
         display: flex;
         justify-content: space-between;
         margin-bottom: 12px;
-
-
     }
 
     .select-all {
         margin-bottom: 12px;
-        margin-left: 14px;
+        margin-left: 12px;
+
+        &__checkbox {
+            font-size: 1rem;
+            font-weight: 300;
+        }
     }
-
-
 
     .invoices-list {
         display: flex;
-        max-height: 40vh;
+        max-height: 25vh;
         overflow-y: auto;
         flex-direction: column;
         gap: 8px;
+        overflow-y: scroll;
+        scrollbar-width: none;
+
+        &__title {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        &__date {
+            font-weight: 300;
+            font-size: 0.875rem;
+        }
+
+        &__amount {
+            font-weight: 500;
+            font-size: 1.25rem;
+        }
     }
 
     .modal-footer {
-        display: flex;
-        margin-top: 24px;
+        display: grid;
+        margin-top: 16px;
         gap: 1rem;
-
-
-        .button__action__text {
-            height: 2.5rem;
-            border-radius: 0.5rem;
-            padding: 0 0.5rem;
-            font-size: 1.125rem;
-            font-weight: 500;
-            line-height: 1.25rem;
-            flex-grow: 1;
-            border: none;
-            box-shadow: none;
-
-
-            &__green {
-                background-color: #CBE71E;
-            }
-
-            &__white {
-                background-color: #ffff;
-                border: solid 2px;
-            }
-        }
+        grid-template-columns: 1fr 1fr;
     }
 
     .custom-input {
         width: 100% !important;
     }
 
+    .header {
+        display: flex;
+        justify-content: left;
+        align-items: center;
+        gap: 0.25rem;
+        margin-bottom: 1.5rem;
+        transition: all 0.1s;
+        width: fit-content;
+        h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
 
+        &:hover {
+            cursor: pointer;
+            opacity: 0.7;
+        }
+    }
+
+    .ant-modal-close {
+        margin-right: 1rem;
+        margin-top: 0.5rem;
+    }
 }
 
 .summary-section {
@@ -87,13 +104,14 @@
         display: flex;
         justify-content: space-between;
         margin-bottom: 10px;
+        font-weight: 300;
 
         &:last-child {
             margin-bottom: 0;
         }
 
         &.pending {
-            font-weight: bold;
+            font-weight: 600;
         }
     }
 }
@@ -105,7 +123,6 @@
     margin-bottom: 15px;
     border-radius: 4px;
 
-
     button {
         background-color: transparent;
         border: none;
@@ -116,19 +133,16 @@
             text-decoration: underline;
         }
     }
-
-
 }
 
 .excel-button-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: .5rem;
+    gap: 0.5rem;
     margin-left: auto;
     cursor: pointer;
 }
-
 
 .container-paste-invoice {
     display: flex;
@@ -139,5 +153,4 @@
 
 .buld-text-excel-not-found {
     font-weight: bold;
-
 }

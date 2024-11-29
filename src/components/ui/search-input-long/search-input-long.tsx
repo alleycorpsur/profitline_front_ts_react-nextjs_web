@@ -7,6 +7,7 @@ interface UiSearchInputProps {
   name?: string;
   placeholder?: string;
   className?: string;
+  value?: string;
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
@@ -15,6 +16,7 @@ const UiSearchInputLong: FC<UiSearchInputProps> = ({
   name,
   placeholder,
   className,
+  value,
   onChange
 }) => {
   const [inputValue, setInputValue] = useState("");
@@ -44,10 +46,10 @@ const UiSearchInputLong: FC<UiSearchInputProps> = ({
         id={id}
         name={name}
         placeholder={placeholder}
-        value={inputValue}
+        value={value || inputValue}
         onChange={handleInputChange}
       />
-      {inputValue && (
+      {(inputValue || value) && (
         <button onClick={handleClearClick} className={styles.clearButton} aria-label="Clear input">
           <X weight="bold" />
         </button>

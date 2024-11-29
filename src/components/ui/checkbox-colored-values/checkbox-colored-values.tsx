@@ -10,6 +10,8 @@ interface CheckboxColoredValuesProps extends React.ComponentProps<typeof Checkbo
   onChangeCheckbox: (e: any) => void;
   checked: boolean;
   content?: React.ReactNode;
+  customStyles?: React.CSSProperties;
+  customStyleDivider?: React.CSSProperties;
 }
 
 const CheckboxColoredValues: FC<CheckboxColoredValuesProps> = ({
@@ -17,19 +19,20 @@ const CheckboxColoredValues: FC<CheckboxColoredValuesProps> = ({
   onChangeCheckbox,
   checked,
   content,
+  customStyles,
+  customStyleDivider,
   ...restProps
 }) => {
   return (
-    <div className="checkboxColoredValues">
+    <div className="checkboxColoredValues" style={customStyles}>
       <div className="head">
         <Checkbox
           className="customCheckbox"
-          style={{ color }}
           checked={checked}
           onChange={onChangeCheckbox}
           {...restProps}
         />
-        <DividerVerticalModal />
+        <DividerVerticalModal color={color} customStyles={customStyleDivider} />
         {content}
       </div>
     </div>
