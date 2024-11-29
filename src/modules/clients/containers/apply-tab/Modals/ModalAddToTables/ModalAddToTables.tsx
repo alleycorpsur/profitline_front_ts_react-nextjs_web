@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { Modal, Checkbox, Spin, message, Flex, Pagination } from "antd";
-import { CopySimple } from "phosphor-react";
+import { CaretLeft, CopySimple, X } from "phosphor-react";
 
 import { useInvoices } from "@/hooks/useInvoices";
 import { useClientsPayments } from "@/hooks/useClientsPayments";
@@ -147,13 +147,17 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
 
   return (
     <Modal
-      title={`Agregar ${isModalAddToTableOpen.adding === "invoices" ? "facturas" : "pagos"}`}
       open={isModalAddToTableOpen.isOpen}
       onCancel={onCancel}
       footer={null}
       width={700}
       className="modal-add-invoice"
+      closeIcon={<X className="closeIcon" size={20} onClick={onCancel} />}
     >
+      <div onClick={onCancel} className="header">
+        <CaretLeft size={24} onClick={onCancel} />
+        <h2>{`Agregar ${isModalAddToTableOpen.adding === "invoices" ? "facturas" : "pagos"}`}</h2>
+      </div>
       {summary.count > 0 && (
         <div className="summary-section">
           <div className="summary-item">
