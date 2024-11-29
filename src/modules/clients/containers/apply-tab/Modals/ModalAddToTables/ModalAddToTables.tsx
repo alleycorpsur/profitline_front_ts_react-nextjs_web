@@ -62,24 +62,6 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
   const [notFoundInvoices, setNotFoundInvoices] = useState<number[]>([]);
   const [adjustments, setAdjustments] = useState(15000000);
 
-  const handleSelectAll = (checked: boolean) => {
-    if (checked) {
-      setSelectedRows(rows);
-    } else {
-      setSelectedRows([]);
-    }
-  };
-
-  const handleSelectOne = (checked: boolean, row: IClientPayment | IInvoice) => {
-    setSelectedRows((prevSelectedRows) =>
-      checked
-        ? [...(prevSelectedRows as (IInvoice | IClientPayment)[]), row]
-        : (prevSelectedRows as (IInvoice | IClientPayment)[]).filter(
-            (selected) => selected.id !== row.id
-          )
-    );
-  };
-
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
@@ -142,6 +124,30 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
     const pending = total - adjustments;
     return { total, adjustments, pending, count: selectedRows.length };
   }, [selectedRows, adjustments]);
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedRows((prevSelectedRows) => [...prevSelectedRows, ...paginatedRows]);
+    } else {
+      setSelectedRows((prevSelectedRows) =>
+        prevSelectedRows.filter((selected) => !paginatedRows.some((row) => row.id === selected.id))
+      );
+    }
+  };
+
+  const handleSelectOne = (checked: boolean, row: IClientPayment | IInvoice) => {
+    setSelectedRows((prevSelectedRows) =>
+      checked
+        ? [...(prevSelectedRows as (IInvoice | IClientPayment)[]), row]
+        : (prevSelectedRows as (IInvoice | IClientPayment)[]).filter(
+            (selected) => selected.id !== row.id
+          )
+    );
+  };
+
+  const isAllChecked =
+    paginatedRows.length > 0 &&
+    paginatedRows.every((row) => selectedRows.some((selected) => selected.id === row.id));
 
   const isLoading = false;
 
@@ -217,6 +223,7 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
         <Checkbox
           className="select-all__checkbox"
           onChange={(e) => handleSelectAll(e.target.checked)}
+          checked={isAllChecked ? true : undefined}
         >
           Seleccionar todo
         </Checkbox>
