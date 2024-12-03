@@ -63,7 +63,7 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
       setSearchQuery("");
       setCurrentPage(1);
     };
-  }, [isModalAddToTableOpen.adding, allInvoices, allPayments]);
+  }, [isModalAddToTableOpen.adding]);
 
   useEffect(() => {
     setCurrentPage(1);
