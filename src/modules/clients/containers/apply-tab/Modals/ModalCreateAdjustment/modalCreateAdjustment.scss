@@ -1,0 +1,27 @@
+.modalCreateAdjustment {
+    .header {
+        display: flex;
+        justify-content: left;
+        align-items: center;
+        gap: 0.25rem;
+        margin-bottom: 1.5rem;
+        transition: all 0.1s;
+        width: fit-content;
+        h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        &:hover {
+            cursor: pointer;
+            opacity: 0.7;
+        }
+    }
+
+    .modal-footer {
+        display: grid;
+        margin-top: 16px;
+        gap: 1rem;
+        grid-template-columns: 1fr 1fr;
+    }
+}

@@ -20,9 +20,16 @@ interface ModalNoteInvoiceProps {
   visible: boolean;
   onCancel: () => void;
   onAdd: () => void;
+  // eslint-disable-next-line no-unused-vars
+  setModalAction: (modalAction: number) => void;
 }
 
-const ModalNoteInvoice: React.FC<ModalNoteInvoiceProps> = ({ visible, onCancel, onAdd }) => {
+const ModalNoteInvoice: React.FC<ModalNoteInvoiceProps> = ({
+  visible,
+  onCancel,
+  onAdd,
+  setModalAction
+}) => {
   const [adjustments, setAdjustments] = useState<Adjustment[]>([
     {
       id: 1,
@@ -74,7 +81,7 @@ const ModalNoteInvoice: React.FC<ModalNoteInvoiceProps> = ({ visible, onCancel, 
   };
 
   const handleCreateAdjustments = () => {
-    console.log("Create adjustments");
+    setModalAction(2);
   };
 
   const isLoading = false;

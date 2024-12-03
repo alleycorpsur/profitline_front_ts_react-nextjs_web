@@ -6,6 +6,8 @@ import { CaretLeft } from "phosphor-react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import GeneralSelect from "@/components/ui/general-select";
 
+import "./modalCreateAdjustment.scss";
+
 interface ISelect {
   value: string;
   label: string;
@@ -49,7 +51,14 @@ const ModalCreateAdjustment: React.FC<ModalCreateAdjustmentProps> = ({
 
   return (
     <>
-      <Modal open={isOpen} onOk={onOk} onCancel={onCancel}>
+      <Modal
+        className="modalCreateAdjustment"
+        open={isOpen}
+        onOk={onOk}
+        closeIcon={false}
+        onCancel={onCancel}
+        footer={null}
+      >
         <div onClick={onCancel} className="header">
           <CaretLeft size={24} onClick={onCancel} />
           <h2>Crear ajuste</h2>
