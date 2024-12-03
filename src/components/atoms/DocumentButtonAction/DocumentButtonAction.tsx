@@ -65,14 +65,12 @@ export const DocumentButtonAction = ({
         </Flex>
       ) : (
         <>
-          <Flex align="left" vertical>
-            <Flex>
-              <FileArrowUp size={"25px"} />
-              <Text className="nameFile">
-                {documentUrl ? documentUrl.split("/").pop() : "Seleccionar archivo"}
-              </Text>
-            </Flex>
-          </Flex>
+          <div className="nameIconContainer">
+            <FileArrowUp size={"25px"} style={{ minWidth: "18px" }} />
+            <p className="nameFile">
+              {documentUrl ? documentUrl.split("/").pop() : "Seleccionar archivo"}
+            </p>
+          </div>
 
           {editable && (
             <Pencil onClick={handleReplaceDocument} className="editButton" size={"1.5rem"} />
