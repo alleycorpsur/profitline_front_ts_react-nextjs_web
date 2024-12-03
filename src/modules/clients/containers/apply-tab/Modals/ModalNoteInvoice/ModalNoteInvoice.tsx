@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { Modal, Spin } from "antd";
 import "./modalNoteInvoice.scss";
-import { ArrowLeft } from "phosphor-react";
+import { CaretLeft, Plus } from "phosphor-react";
 import UiSearchInputLong from "@/components/ui/search-input-long";
 import ItemsActionsModal from "@/components/atoms/ItemsModal/ItemsActionsModal";
+import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
+import SecondaryButton from "@/components/atoms/buttons/secondaryButton/SecondaryButton";
 
 interface Adjustment {
   id: number;
@@ -23,7 +25,7 @@ interface ModalNoteInvoiceProps {
 const ModalNoteInvoice: React.FC<ModalNoteInvoiceProps> = ({ visible, onCancel, onAdd }) => {
   const [adjustments, setAdjustments] = useState<Adjustment[]>([
     {
-      id: 12345,
+      id: 1,
       current_value: 12000000,
       selected: false,
       motive_name: "Volumen",
@@ -31,7 +33,7 @@ const ModalNoteInvoice: React.FC<ModalNoteInvoiceProps> = ({ visible, onCancel, 
       type: 2
     },
     {
-      id: 12345,
+      id: 2,
       current_value: 12000000,
       selected: false,
       motive_name: "Volumen",
@@ -39,7 +41,7 @@ const ModalNoteInvoice: React.FC<ModalNoteInvoiceProps> = ({ visible, onCancel, 
       type: 1
     },
     {
-      id: 12345,
+      id: 3,
       current_value: 12000000,
       selected: false,
       motive_name: "Volumen",
@@ -47,7 +49,7 @@ const ModalNoteInvoice: React.FC<ModalNoteInvoiceProps> = ({ visible, onCancel, 
       type: 2
     },
     {
-      id: 12345,
+      id: 4,
       current_value: 12000000,
       selected: false,
       motive_name: "Volumen",
@@ -55,7 +57,7 @@ const ModalNoteInvoice: React.FC<ModalNoteInvoiceProps> = ({ visible, onCancel, 
       type: 2
     },
     {
-      id: 12345,
+      id: 5,
       current_value: 12000000,
       selected: false,
       motive_name: "Volumen",
@@ -71,22 +73,24 @@ const ModalNoteInvoice: React.FC<ModalNoteInvoiceProps> = ({ visible, onCancel, 
     setAdjustments(newAdjustments);
   };
 
+  const handleCreateAdjustments = () => {
+    console.log("Create adjustments");
+  };
+
   const isLoading = false;
 
   return (
     <Modal
-      title={
-        <div className="modal-title">
-          <ArrowLeft className="back-arrow" onClick={onCancel} />
-          <span>Agregar ajuste</span>
-        </div>
-      }
-      visible={visible}
+      open={visible}
       onCancel={onCancel}
       footer={null}
       width={700}
       className="modal-note-invoice"
     >
+      <div onClick={onCancel} className="header">
+        <CaretLeft size={24} onClick={onCancel} />
+        <h2>Agregar ajuste</h2>
+      </div>
       <h2 className="modal-subtitle">Selecciona los ajustes a aplicar</h2>
       <div className="search-container">
         <UiSearchInputLong placeholder="Buscar" className={"custom-input"} />
@@ -102,23 +106,19 @@ const ModalNoteInvoice: React.FC<ModalNoteInvoiceProps> = ({ visible, onCancel, 
         ))}
       </div>
       <div className="create-adjustment">
-        <button className="create-adjustment-btn">+ Crear ajuste</button>
+        <button onClick={handleCreateAdjustments} className="create-adjustment-btn">
+          <Plus size={20} />
+          Crear ajuste
+        </button>
       </div>
+
       <div className="modal-footer">
-        <button
-          type="button"
-          className="button__action__text button__action__text__white"
-          onClick={onCancel}
-        >
+        <SecondaryButton fullWidth onClick={onCancel}>
           Cancelar
-        </button>
-        <button
-          type="button"
-          className={`button__action__text ${!isLoading ? "button__action__text__green" : ""}`}
-          onClick={onAdd}
-        >
+        </SecondaryButton>
+        <PrincipalButton fullWidth onClick={onAdd}>
           {isLoading ? <Spin size="small" /> : "Agregar"}
-        </button>
+        </PrincipalButton>
       </div>
     </Modal>
   );

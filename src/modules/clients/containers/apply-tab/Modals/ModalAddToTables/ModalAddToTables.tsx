@@ -285,13 +285,10 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
 
         <PrincipalButton
           fullWidth
+          loading={isLoading}
           // onClick={onAdd}
         >
-          {isLoading ? (
-            <Spin size="small" />
-          ) : (
-            `Agregar ${isModalAddToTableOpen.adding === "invoices" ? "facturas" : "pagos"}`
-          )}
+          {`Agregar ${isModalAddToTableOpen.adding === "invoices" ? "facturas" : "pagos"}`}
         </PrincipalButton>
       </div>
     </Modal>
