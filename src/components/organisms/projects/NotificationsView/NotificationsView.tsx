@@ -1,48 +1,49 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import "./notificationsView.scss";
 import { Flex, Tabs, Spin } from "antd";
-import UiSearchInput from "@/components/ui/search-input/search-input";
-import FiltersNotifications from "@/components/atoms/Filters/FiltersNotifications/FiltersNotifications";
+import { Eye } from "phosphor-react";
 
-import { Check, Eye, X } from "phosphor-react";
+import { useAppStore } from "@/lib/store/store";
 import { useModalDetail } from "@/context/ModalContext";
 import { useNotificationOpen } from "@/hooks/useNotificationOpen";
 import { useRejectedNotifications } from "@/hooks/useNotificationReject";
-import { useAppStore } from "@/lib/store/store";
+import UiSearchInput from "@/components/ui/search-input/search-input";
+import FiltersNotifications, {
+  ISelectFilterNotifications
+} from "@/components/atoms/Filters/FiltersNotifications/FiltersNotifications";
+
+import { INotification } from "@/types/notifications/INotifications";
+
+import "./notificationsView.scss";
 
 const ListPanel = [
   { key: "opened", value: "Abiertas" },
   { key: "closed", value: "Cerradas" }
 ];
 
-interface Notification {
-  create_at: string;
-  notification_type_name: string;
-  client_name: string;
-  incident_id: number | null;
-  is_client_change: number;
-  client_update_changes: Record<string, any>;
-  days: string;
-}
-
 export const NotificationsView = () => {
   const { openModal, modalType } = useModalDetail();
   const { ID: projectId } = useAppStore((state) => state.selectedProject);
+  const [filters, setFilters] = useState<ISelectFilterNotifications>({
+    lines: [],
+    sublines: [],
+    notificationTypes: []
+  });
+
   const {
     data: openNotifications,
     isLoading: isLoadingOpen,
     isError: isErrorOpen,
     mutate: mutateOpen
-  } = useNotificationOpen(projectId);
+  } = useNotificationOpen({ projectId, filters });
   const {
     data: closedNotifications,
     isLoading: isLoadingClosed,
     isError: isErrorClosed,
     mutate: mutateClosed
   } = useRejectedNotifications(projectId);
-  const [filteredOpenNotifications, setFilteredOpenNotifications] = useState<Notification[]>([]);
-  const [filteredClosedNotifications, setFilteredClosedNotifications] = useState<Notification[]>(
+  const [filteredOpenNotifications, setFilteredOpenNotifications] = useState<INotification[]>([]);
+  const [filteredClosedNotifications, setFilteredClosedNotifications] = useState<INotification[]>(
     []
   );
 
@@ -94,14 +95,12 @@ export const NotificationsView = () => {
             <div>
               <Flex gap="1rem">
                 <p className="item__title">
-                  {item.notification_type_name} - {item.incident_id}
+                  {item.notification_type_name} - {item.id_erp}
                 </p>
                 <p className="item__name">{item.client_name}</p>
                 <p className="item__date">{item.days}</p>
               </Flex>
-              <p className="item__description">
-                {item.is_client_change === 1 ? "Cambios en el cliente" : "Novedad"}
-              </p>
+              <p className="item__description">{item.incident_motive}</p>
             </div>
             <Flex gap="1rem">
               {/* {type === "closed" && (
@@ -153,7 +152,7 @@ export const NotificationsView = () => {
                       }, 300);
                     }}
                   />
-                  <FiltersNotifications />
+                  <FiltersNotifications setSelectedFilters={setFilters} />
                 </Flex>
                 {renderNotifications(item.key as "opened" | "closed")}
               </Flex>

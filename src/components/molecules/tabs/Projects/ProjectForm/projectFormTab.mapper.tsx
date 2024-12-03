@@ -11,7 +11,7 @@ export interface ProjectFormTabProps {
   disabled?: boolean;
   onEditProject?: () => void;
   // eslint-disable-next-line no-unused-vars
-  onSubmitForm?: (data: any) => void;
+  onSubmitForm?: (data: any) => Promise<void>;
   onActiveProject?: () => void;
   onDesactivateProject?: () => void;
   statusForm: "create" | "edit" | "review";
@@ -65,10 +65,9 @@ export const dataToProjectFormData = (data: IProject): IFormProject => {
   };
 };
 
-export const _onSubmit = (
+export const _onSubmit = async (
   data: any,
   // eslint-disable-next-line no-unused-vars
-  setloading: (value: SetStateAction<boolean>) => void,
   // eslint-disable-next-line no-unused-vars
   setImageError: (value: SetStateAction<boolean>) => void,
   imageFile: string,
@@ -76,16 +75,13 @@ export const _onSubmit = (
   onSubmitForm: (data: any) => void,
   reset: UseFormReset<IFormProject>
 ) => {
-  setloading(true);
   try {
     if (!imageFile) return setImageError(true);
     setImageError(false);
-    onSubmitForm({ ...data, logo: imageFile });
+    await onSubmitForm({ ...data, logo: imageFile });
     reset(data);
-    setloading(false);
   } catch (error) {
     console.warn({ error });
-    setloading(false);
   }
 };
 

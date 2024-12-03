@@ -3,29 +3,55 @@ import { Button, Flex, Table, TableProps, Typography } from "antd";
 import { Eye, Receipt } from "phosphor-react";
 
 import { formatDateDMY, formatMoney } from "@/utils/utils";
+import InvoiceDownloadModal from "@/modules/clients/components/invoice-download-modal";
 import { ISingleBank } from "@/types/banks/IBanks";
 
 import "./banks-table.scss";
 
 const { Text } = Typography;
 
+interface clientByStatus extends ISingleBank {
+  client_status_id: number;
+}
 interface PropsBanksTable {
-  clientsByStatus: any[];
+  clientsByStatus: clientByStatus[];
+  selectedRows: ISingleBank[] | undefined;
   setSelectedRows: Dispatch<SetStateAction<ISingleBank[] | undefined>>;
   // eslint-disable-next-line no-unused-vars
-  handleOpenPaymentDetail?: (payment: ISingleBank) => void;
+  handleOpenPaymentDetail?: (paymentId: number) => void;
   bankStatusId: number;
   clearSelected: boolean;
 }
 
 export const BanksTable = ({
   clientsByStatus,
+  selectedRows,
   setSelectedRows,
   handleOpenPaymentDetail,
   bankStatusId,
   clearSelected
 }: PropsBanksTable) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+  const [isModalFileDetailOpen, setIsModalFileDetailOpen] = useState<boolean>(false);
+  const [fileURL, setFileURL] = useState<string>("");
+
+  useEffect(() => {
+    setSelectedRowKeys([]);
+  }, [clearSelected]);
+
+  useEffect(() => {
+    setSelectedRowKeys(selectedRows?.map((row) => row.id) ?? []);
+  }, [selectedRows]);
+
+  const handleDocumentClick = (documentUrl: string) => {
+    const fileExtension = documentUrl?.split(".").pop()?.toLowerCase() ?? "";
+    if (["png", "jpg", "jpeg"].includes(fileExtension)) {
+      setFileURL(documentUrl);
+      if (isModalFileDetailOpen === false) setIsModalFileDetailOpen(true);
+    } else {
+      window.open(documentUrl, "_blank");
+    }
+  };
 
   useEffect(() => {
     setSelectedRowKeys([]);
@@ -85,9 +111,17 @@ export const BanksTable = ({
       title: "ID",
       dataIndex: "id",
       key: "id",
-      render: (text) => <Text className="idText">{text}</Text>,
+      render: (id) => (
+        <Text
+          className="idText"
+          onClick={() => handleOpenPaymentDetail && handleOpenPaymentDetail(id)}
+        >
+          {id}
+        </Text>
+      ),
       sorter: (a, b) => a.id - b.id,
-      showSorterTooltip: false
+      showSorterTooltip: false,
+      width: 100
     },
     {
       title: "Cliente",
@@ -119,7 +153,7 @@ export const BanksTable = ({
       title: "Descripción",
       key: "description",
       dataIndex: "description",
-      render: (text) => <Text>{text}</Text>,
+      render: (text) => <p className="description">{text}</p>,
       sorter: (a, b) => a.description.localeCompare(b.description),
       showSorterTooltip: false
     },
@@ -127,12 +161,13 @@ export const BanksTable = ({
       title: "Cuenta",
       key: "bank_description",
       dataIndex: "bank_description",
-      render: (text) => (
+      render: (text, record) => (
         <>
-          <Text>123456</Text>
+          <Text>{record.account_number}</Text>
           <p className="accountBankText">{text}</p>
         </>
-      )
+      ),
+      width: 110
     },
     {
       title: "",
@@ -140,16 +175,19 @@ export const BanksTable = ({
       width: "40px",
       dataIndex: "",
       render: (_, record) => (
-        <Flex gap={"0.5rem"}>
-          <Button className="buttonSeeEvidence" icon={<Receipt size={"1.3rem"} />} />
+        <Flex gap={"0.5rem"} justify="end">
+          {record.evidence_url && (
+            <Button
+              onClick={() => record.evidence_url && handleDocumentClick(record.evidence_url)}
+              className="buttonSeeEvidence"
+              icon={<Receipt size={"1.3rem"} />}
+            />
+          )}
+
           <Button
             className="buttonSeeClient"
-            icon={
-              <Eye
-                size={"1.3rem"}
-                onClick={() => handleOpenPaymentDetail && handleOpenPaymentDetail(record)}
-              />
-            }
+            onClick={() => handleOpenPaymentDetail && handleOpenPaymentDetail(record.id)}
+            icon={<Eye size={"1.3rem"} />}
           />
         </Flex>
       )
@@ -157,20 +195,28 @@ export const BanksTable = ({
   ];
 
   return (
-    <Table
-      className="banksTable"
-      loading={false}
-      columns={columns}
-      rowSelection={rowSelection}
-      dataSource={clientsByStatus.map((data) => ({
-        ...data,
-        key: data.id
-      }))}
-      pagination={{
-        pageSize: 15,
-        showSizeChanger: false
-      }}
-    />
+    <>
+      <Table
+        className="banksTable"
+        loading={false}
+        columns={columns}
+        rowSelection={rowSelection}
+        dataSource={clientsByStatus.map((data) => ({
+          ...data,
+          key: data.id
+        }))}
+        pagination={{
+          pageSize: 15,
+          showSizeChanger: false
+        }}
+      />
+      <InvoiceDownloadModal
+        isModalOpen={isModalFileDetailOpen}
+        handleCloseModal={setIsModalFileDetailOpen}
+        title="Imagen"
+        url={fileURL}
+      />
+    </>
   );
 };
 

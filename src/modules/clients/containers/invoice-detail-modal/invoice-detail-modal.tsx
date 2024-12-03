@@ -95,7 +95,7 @@ const InvoiceDetailModal: FC<InvoiceDetailModalProps> = ({
       case "Radicar factura":
         return "Radicación";
       case "Registrar novedad":
-        return "Novedad";
+        return "Nueva novedad";
       case "Emision de factura":
         return "Emisión de factura";
       default:
@@ -204,6 +204,19 @@ const InvoiceDetailModal: FC<InvoiceDetailModalProps> = ({
                                 {item.event_type_name === "Registrar novedad" && (
                                   <span
                                     className={`${styles.tagLabel} ${
+                                      item.is_rejected || item.is_rejected === 0
+                                        ? styles.tagLabelBlack
+                                        : styles.tagLabelGray
+                                    }`}
+                                  >
+                                    {item.is_rejected || item.is_rejected === 0
+                                      ? "Cerrada"
+                                      : "Abierta"}
+                                  </span>
+                                )}
+                                {item.event_type_name === "Cierre de novedad" && (
+                                  <span
+                                    className={`${styles.tagLabel} ${
                                       item.is_rejected === 1
                                         ? styles.tagLabelGreen
                                         : item.is_rejected === 0
@@ -219,7 +232,7 @@ const InvoiceDetailModal: FC<InvoiceDetailModalProps> = ({
                                   </span>
                                 )}
                                 {item.event_type_name === "Acuerdo de pago" &&
-                                  item.status_name == "Anulada" && (
+                                  item.status_name_payment_agreement == "Anulada" && (
                                     <span className={`${styles.tagLabel} ${styles.tagLabelBlack}`}>
                                       Anulado
                                     </span>
@@ -389,14 +402,17 @@ const InvoiceDetailModal: FC<InvoiceDetailModalProps> = ({
                               )}
                               {item.event_type_name === "Cambiar estado" ? (
                                 <div>
-                                  <div
-                                    className={styles.icons}
-                                    onClick={() => {
-                                      handleDocumentClick(item.files[0] || "");
-                                    }}
-                                  >
-                                    <ArrowLineDown size={14} onClick={() => {}} />
-                                  </div>
+                                  {item.files[0] && (
+                                    <div
+                                      className={styles.icons}
+                                      onClick={() => {
+                                        handleDocumentClick(item.files[0] || "");
+                                      }}
+                                    >
+                                      <ArrowLineDown size={14} onClick={() => {}} />
+                                    </div>
+                                  )}
+
                                   <div className={styles.name}>{`Acción: ${item.user_name}`}</div>
                                   <div
                                     className={styles.name}
@@ -430,13 +446,44 @@ const InvoiceDetailModal: FC<InvoiceDetailModalProps> = ({
                                         item.id && handelOpenNoveltyDetail(item.incident_id)
                                       }
                                     >
-                                      {item.sequence || item.id}
+                                      {item.sequence}
                                     </div>
                                   </div>
                                 </div>
                               ) : (
                                 ""
                               )}
+
+                              {item.event_type_name === "Cierre de novedad" ? (
+                                <div>
+                                  <div
+                                    className={styles.icons}
+                                    onClick={() => {
+                                      handleDocumentClick(item.files[0] || "");
+                                    }}
+                                  >
+                                    <ArrowLineDown size={14} onClick={() => {}} />
+                                  </div>
+                                  <div className={styles.name}>{`Acción: ${item.user_name}`}</div>
+                                  <div className={styles.adjustment}>
+                                    ID novedad:
+                                    <div
+                                      className={styles.idAdjustment}
+                                      onClick={() =>
+                                        item.id && handelOpenNoveltyDetail(item.incident_id)
+                                      }
+                                    >
+                                      {item.sequence}
+                                    </div>
+                                  </div>
+                                </div>
+                              ) : (
+                                ""
+                              )}
+
+                              {item.event_type_name === "Factura conciliada" ? (
+                                <div className={styles.name}>{`Acción: ${item.user_name}`}</div>
+                              ) : null}
 
                               {item.comments && (
                                 <div className={styles.commentsContainer}>

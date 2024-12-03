@@ -1,12 +1,17 @@
 import { fetcher } from "@/utils/api/api";
 import useSWR from "swr";
 
+export interface IInvoices {
+  id: number;
+  id_erp: string;
+}
+
 interface FinancialDiscountEvent {
   id: number;
   id_financial_discount: string;
   cp_id_financial_discount: number;
   cp_status: number;
-  invoices: number[] | Record<string, never>;
+  invoices: {} | IInvoices[];
   files: string[] | Record<string, never>;
   created_at: string;
   invoice_event_type: number;

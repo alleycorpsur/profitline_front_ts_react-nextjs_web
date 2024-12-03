@@ -18,6 +18,7 @@ import { InputForm } from "@/components/atoms/inputs/InputForm/InputForm";
 import "./projectformtab.scss";
 import { ModalBillingPeriod } from "@/components/molecules/modals/ModalBillingPeriod/ModalBillingPeriod";
 import { IBillingPeriodForm } from "@/types/billingPeriod/IBillingPeriod";
+import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
 import {
   _onSubmit,
   dataToProjectFormData,
@@ -31,7 +32,7 @@ const { Option } = Select;
 
 export const ProjectFormTab = ({
   onEditProject = () => {},
-  onSubmitForm = () => {},
+  onSubmitForm = async () => {},
   statusForm = "review",
   data = {} as IProject,
   onActiveProject = () => {},
@@ -40,7 +41,7 @@ export const ProjectFormTab = ({
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [isBillingPeriodOpen, setIsBillingPeriodOpen] = useState(false);
   const [imageFile, setImageFile] = useState(data.LOGO);
-  const [loading, setloading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [billingPeriod, setBillingPeriod] = useState<IBillingPeriodForm | undefined>();
   const defaultValues = statusForm === "create" ? {} : dataToProjectFormData(data);
@@ -50,11 +51,15 @@ export const ProjectFormTab = ({
     control,
     handleSubmit,
     reset,
-    formState: { errors, isDirty }
+    formState: { errors }
   } = useForm<IFormProject>({
     defaultValues,
     disabled: statusForm === "review"
   });
+
+  useEffect(() => {
+    console.log("cambio loading ", loading);
+  }, [loading]);
 
   const generalDSOCurrentlyYear = watch("general.DSO_currenly_year");
   useEffect(() => {
@@ -68,8 +73,15 @@ export const ProjectFormTab = ({
     [billingPeriod, generalDSOCurrentlyYear, setValue]
   );
 
-  const onSubmit = (data: any) =>
-    _onSubmit(data, setloading, setImageError, imageFile, onSubmitForm, reset);
+  const onSubmit = async (data: any) => {
+    setLoading(true);
+    try {
+      await _onSubmit(data, setImageError, imageFile, onSubmitForm, reset);
+      setLoading(false);
+    } catch (error) {
+      console.warn("error create project: ", error);
+    }
+  };
 
   return (
     <>
@@ -366,14 +378,9 @@ export const ProjectFormTab = ({
           </Flex>
           <Flex className="buttonNewProject">
             {["edit", "create"].includes(statusForm) && (
-              <Button
-                disabled={!isDirty}
-                className={`button ${isDirty ? "active" : ""}`}
-                style={{ display: "flex" }}
-                htmlType={"submit"}
-              >
+              <PrincipalButton disabled={loading} onClick={handleSubmit(onSubmit)}>
                 {validationButtonText(statusForm)}
-              </Button>
+              </PrincipalButton>
             )}
           </Flex>
         </Flex>

@@ -21,6 +21,7 @@
             .ant-table-cell {
                 padding-top: 0.4rem;
                 padding-bottom: 0.4rem;
+                font-size: 1rem !important;
             }
         }
     }
@@ -33,6 +34,18 @@
         color: $link;
         text-decoration: underline;
         cursor: pointer;
+    }
+
+    .description {
+        font-size: 0.875rem;
+        font-weight: 400;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: normal;
     }
 
     .accountBankText {

@@ -14,16 +14,22 @@ import { BankRuleModal } from "../../components/bank-rule-modal/Bank-rule-modal"
 
 import styles from "./banks-rules.module.scss";
 
+import { deleteManyBankRules } from "@/services/banksRules/banksRules";
+import { useMessageApi } from "@/context/MessageContext";
+
 interface PropsBanksRules {
   onClickBack: () => void;
 }
 
 export const BanksRules = ({ onClickBack }: PropsBanksRules) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [showBankRuleModal, setShowBankRuleModal] = useState({
     isOpen: false,
     ruleId: 0
   });
+
+  const { showMessage } = useMessageApi();
 
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -43,8 +49,20 @@ export const BanksRules = ({ onClickBack }: PropsBanksRules) => {
     setPage(pagePagination);
   };
 
-  const handleDeleteRules = () => {
-    console.info("Delete rules with ids", selectedRowKeys);
+  const handleDeleteRules = async () => {
+    if (!selectedRowKeys.length) return;
+
+    setIsDeleting(true);
+    try {
+      await deleteManyBankRules(selectedRowKeys);
+      showMessage("success", `${selectedRowKeys.length} regla(s) eliminada(s) exitosamente`);
+      setSelectedRowKeys([]);
+      mutate();
+    } catch (error) {
+      showMessage("error", "Error al eliminar las reglas");
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   const handleCreateNewRule = () => {
@@ -58,7 +76,12 @@ export const BanksRules = ({ onClickBack }: PropsBanksRules) => {
     {
       key: "discount-option-1",
       label: (
-        <Button className="buttonOutlined" onClick={handleDeleteRules}>
+        <Button
+          className="buttonOutlined"
+          onClick={handleDeleteRules}
+          loading={isDeleting}
+          disabled={selectedRowKeys.length === 0}
+        >
           Eliminar
         </Button>
       )

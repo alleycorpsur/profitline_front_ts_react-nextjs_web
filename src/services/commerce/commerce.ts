@@ -4,7 +4,7 @@ import {
   ICommerceAdresses,
   IConfirmOrderData,
   ICreateOrderData,
-  IDiscount,
+  IDiscountPackageAvailable,
   IEcommerceClient,
   IOrderConfirmedResponse,
   IOrderData,
@@ -12,6 +12,10 @@ import {
   ISingleOrder
 } from "@/types/commerce/ICommerce";
 import { MessageType } from "@/context/MessageContext";
+import {
+  InventoriesByWarehouse,
+  WarehouseProductsStock
+} from "@/components/molecules/modals/ChangeWarehouseModal/ChangeWarehouseModal";
 
 export const getAllOrders = async (projectId: number) => {
   const response: GenericResponse<IOrderData[]> = await API.get(
@@ -51,16 +55,16 @@ export const getAdresses = async (clientId: number) => {
 export const getDiscounts = async (
   projectId: number,
   clientId: number
-): Promise<GenericResponse<IDiscount[]>> => {
+): Promise<GenericResponse<IDiscountPackageAvailable[]>> => {
   try {
-    const response: GenericResponse<IDiscount[]> = await API.get(
-      `/marketplace/projects/${projectId}/clients/${clientId}/discounts`
+    const response: GenericResponse<IDiscountPackageAvailable[]> = await API.get(
+      `/marketplace/projects/${projectId}/clients/${clientId}/discounts-packages`
     );
 
     return response;
   } catch (error) {
     console.error(error);
-    return error as GenericResponse<IDiscount[]>;
+    return error as GenericResponse<IDiscountPackageAvailable[]>;
   }
 };
 
@@ -71,7 +75,7 @@ export const confirmOrder = async (
 ) => {
   try {
     const response: GenericResponse<IOrderConfirmedResponse> = await API.post(
-      `/marketplace/projects/${projectId}/clients/${clientId}/order-confirmation`,
+      `/marketplace/projects/${projectId}/clients/${clientId}/order-confirmation-package`,
       data
     );
     return response;
@@ -196,13 +200,15 @@ export const changeOrderState = async (
     throw error;
   }
 };
+interface DownloadResponse {
+  message: string;
+  data: string; // El contenido del CSV en formato string
+}
 
 export const dowloadOrderCSV = async (
   ordersIds: number[],
-  projectId: number,
-  // eslint-disable-next-line no-unused-vars
-  showMessage: (type: MessageType, content: string) => void
-) => {
+  projectId: number
+): Promise<DownloadResponse | null> => {
   const ordersIdsObject = {
     order_ids: ordersIds
   };
@@ -210,15 +216,77 @@ export const dowloadOrderCSV = async (
   formData.append("request", JSON.stringify(ordersIdsObject));
 
   try {
-    const response: string = await API.post(
+    const response: GenericResponse<string> = await API.post(
       `/marketplace/projects/${projectId}/downloadtxtorders`,
       formData
     );
-
-    showMessage("success", "Descarga exitosa");
-    return response;
+    if (response.success) {
+      return { message: response.message, data: response.data };
+    }
+    return null;
   } catch (error) {
-    showMessage("error", "Error al descargar archivo");
-    throw error;
+    return null;
+  }
+};
+
+export const getInventoriesWarehouse = async (projectId: number, orderIds: number[]) => {
+  try {
+    const form = {
+      projectId,
+      orderIds
+    };
+    const response: GenericResponse<InventoriesByWarehouse[]> = await API.post(
+      `/warehouse/calculate-warehouses-availables`,
+      form
+    );
+
+    if (response.success) {
+      return response.data;
+    }
+
+    throw new Error(response.message || "Error al obtener las bodegas");
+  } catch (error) {
+    throw new Error(
+      error instanceof Error ? error.message : "Error desconocido al al obtener las bodegas"
+    );
+  }
+};
+export const getWarehouseProducts = async (
+  projectId: number,
+  warehouseId: number,
+  orderId: number
+) => {
+  try {
+    const form = {
+      projectId,
+      warehouseId,
+      orderIds: [orderId]
+    };
+    const response: GenericResponse<WarehouseProductsStock[]> = await API.post(
+      `/warehouse/get-warehouse-details-by-order`,
+      form
+    );
+
+    if (response.success) {
+      return response.data;
+    }
+
+    throw new Error(response.message || `Error al obtener stock de la bodega ${warehouseId}`);
+  } catch (error) {
+    throw new Error(
+      error instanceof Error
+        ? error.message
+        : `Error desconocido al obtener stock de la bodega ${warehouseId}`
+    );
+  }
+};
+export const updateWarehouse = async (orderIds: number[], warehouseId: number) => {
+  const payload = { orderIds, warehouseId };
+  const response: GenericResponse<any> = await API.put("/marketplace/orders/warehouse", payload);
+
+  if (response.success) {
+    return response.success;
+  } else {
+    throw new Error(response.message || `Error al actualizar bodega`);
   }
 };

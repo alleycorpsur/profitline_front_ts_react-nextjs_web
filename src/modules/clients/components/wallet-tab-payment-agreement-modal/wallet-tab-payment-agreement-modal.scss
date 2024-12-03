@@ -142,18 +142,13 @@
             }
         }
     }
-
-
+    .ant-picker {
+        border-radius: 6px !important;
+        background-color: $background !important;
+        border: none !important;
+        padding: 0.5rem 1rem !important;
+    }
 }
-
-
-.ant-picker {
-    border-radius: 0.5rem !important;
-    background-color: $background !important;
-    border: none !important;
-    padding: 0.5rem 1rem !important;
-}
-
 
 .number__input {
     background-color: $background !important;
@@ -164,7 +159,6 @@
     .ant-input-number-handler-wrap {
         display: none !important;
     }
-
 
     input {
         &::placeholder {
@@ -186,6 +180,5 @@
         &:-ms-input-placeholder {
             color: $dark-gray !important;
         }
-
     }
 }

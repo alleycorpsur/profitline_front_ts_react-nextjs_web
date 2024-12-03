@@ -382,3 +382,20 @@ export const createAndDownloadTxt = (rawData: string) => {
   downloadLink.click();
   document.body.removeChild(downloadLink);
 };
+
+export function renameFile(file: File, newName: string): File {
+  if (!file || !file.name) {
+    console.warn("Invalid file provided to renameFile");
+    return file; // Return the original file if invalid input
+  }
+
+  const extension = file.name.split(".").pop();
+
+  // Create a new name by appending the extension to the new name
+  const newFileName = `${newName}.${extension}`;
+
+  const blob = file.slice(0, file.size, file.type);
+
+  // Return a new File instance with the new name
+  return new File([blob], newFileName, { type: file.type });
+}

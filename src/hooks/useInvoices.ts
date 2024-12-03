@@ -1,10 +1,10 @@
 import useSWR from "swr";
 import { fetcher } from "@/utils/api/api";
 import { IInvoices } from "@/types/invoices/IInvoices";
+import { useParams } from "next/navigation";
+import { extractSingleParam } from "@/utils/utils";
 
 interface Props {
-  clientId: number;
-  projectId: number;
   page?: number;
   limit?: number;
   paymentAgreement?: number;
@@ -17,9 +17,6 @@ interface Props {
 }
 
 export const useInvoices = ({
-  clientId,
-  projectId,
-
   paymentAgreement,
   radicationType,
   lines,
@@ -30,6 +27,12 @@ export const useInvoices = ({
   page = 1,
   limit = 50
 }: Props) => {
+  const params = useParams();
+  const clientIdParam = extractSingleParam(params.clientId);
+  const projectIdParam = extractSingleParam(params.projectId);
+  const clientId = clientIdParam ? parseInt(clientIdParam) : 0;
+  const projectId = projectIdParam ? parseInt(projectIdParam) : 0;
+
   const pageQuery = `page=${page}`;
   const limitQuery = `&limit=${limit}`;
   const paymentAgreementQuery =

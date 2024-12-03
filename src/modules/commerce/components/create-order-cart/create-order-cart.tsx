@@ -61,15 +61,11 @@ const CreateOrderCart: FC = ({}) => {
             quantity: product.quantity
           }));
         const confirmOrderData = {
-          discount_id: discountId,
+          discount_package_id: discountId,
           order_summary: products
         };
         try {
-          const response = (await confirmOrder(
-            projectId,
-            client.id,
-            confirmOrderData
-          )) as GenericResponse<IOrderConfirmedResponse>;
+          const response = await confirmOrder(projectId, client.id, confirmOrderData);
           if (response.status === 200) {
             setConfirmOrderData(response.data);
             setInsufficientStockProducts(response.data.insufficientStockProducts);
@@ -174,7 +170,7 @@ const CreateOrderCart: FC = ({}) => {
             </Flex>
             <Flex justify="space-between">
               <p>Descuentos</p>
-              <p>-{formatMoney(confirmOrderData.discounts)}</p>
+              <p>-{formatMoney(confirmOrderData.discounts?.totalDiscount)}</p>
             </Flex>
             <Flex justify="space-between">
               <strong>Total</strong>

@@ -60,8 +60,6 @@ export const WalletTab = () => {
   const projectId = projectIdParam ? parseInt(projectIdParam) : 0;
 
   const { data, isLoading, mutate } = useInvoices({
-    clientId: clientId || 0,
-    projectId: projectId || 0,
     searchQuery: debouncedSearchQuery,
     paymentAgreement: filters.paymentAgreement !== null ? filters.paymentAgreement : undefined,
     radicationType: filters.radicationType !== null ? filters.radicationType : undefined,
