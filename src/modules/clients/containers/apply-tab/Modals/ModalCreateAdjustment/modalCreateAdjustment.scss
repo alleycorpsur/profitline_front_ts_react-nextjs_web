@@ -27,6 +27,15 @@
         grid-template-columns: 1fr 1fr;
     }
 
+    &__allAdjustments {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        max-height: 40vh;
+        overflow-y: scroll;
+        scrollbar-width: none;
+    }
+
     &__adjustment {
         display: grid;
         grid-template-columns: repeat(3, 1fr);

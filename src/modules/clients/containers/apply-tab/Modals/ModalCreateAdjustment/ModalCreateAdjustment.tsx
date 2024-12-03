@@ -73,7 +73,7 @@ const ModalCreateAdjustment: React.FC<ModalCreateAdjustmentProps> = ({
           <h2>Crear ajuste</h2>
         </div>
 
-        <div>
+        <div className="modalCreateAdjustment__allAdjustments">
           {fields.map((field, index) => (
             <div key={field.id} className="modalCreateAdjustment__adjustment">
               <Controller
