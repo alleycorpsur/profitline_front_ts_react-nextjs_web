@@ -38,6 +38,10 @@ import { selectDayOptions } from "@/components/atoms/SelectDay/SelectDay";
 
 const { Title } = Typography;
 
+interface ISelect {
+  value: number;
+  label: string;
+}
 interface Props {
   showCommunicationDetails: {
     communicationId: number;
@@ -70,7 +74,7 @@ export const CommunicationProjectForm = ({
   });
   const [assignedGroups, setAssignedGroups] = useState<number[]>([]);
   const [isFrequencyModalOpen, setIsFrequencyModalOpen] = useState(false);
-  const [events, setEvents] = useState<string[]>([]);
+  const [events, setEvents] = useState<ISelect[]>([]);
   const [templateTags, setTemplateTags] = useState<string[]>([]);
   const [forwardToEmails, setForwardToEmails] = useState<string[]>([]);
   const { ID: projectId } = useAppStore((state) => state.selectedProject);
@@ -101,7 +105,7 @@ export const CommunicationProjectForm = ({
     //set values for selects
     const fecthEvents = async () => {
       const events = await getForwardEvents();
-      setEvents(events);
+      setEvents(events.map((event) => ({ value: event.id, label: event.name })));
     };
     fecthEvents();
     const fetchTemplateTags = async () => {

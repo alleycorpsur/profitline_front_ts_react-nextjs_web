@@ -8,9 +8,13 @@ import {
   IPeriodicityModalForm,
   ISingleCommunication
 } from "@/types/communications/ICommunications";
-import { GenericResponse } from "@/types/global/IGlobal";
 import { API, getIdToken } from "@/utils/api/api";
 import axios, { AxiosResponse } from "axios";
+
+interface IGetSelect {
+  id: number;
+  name: string;
+}
 
 export const getAllCommunications = async (projectId: number) => {
   const response: ICommunication[] = await API.get(
@@ -37,8 +41,8 @@ export const getCommunicationById = async (
   }
 };
 
-export const getForwardEvents = async (): Promise<string[]> => {
-  const response: string[] = await API.get(`${config.API_HOST}/comunication/get_events`);
+export const getForwardEvents = async (): Promise<IGetSelect[]> => {
+  const response: IGetSelect[] = await API.get(`${config.API_HOST}/comunication/events`);
   return response;
 };
 
