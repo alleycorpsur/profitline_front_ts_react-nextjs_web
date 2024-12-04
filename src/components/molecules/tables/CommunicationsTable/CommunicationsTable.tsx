@@ -109,10 +109,9 @@ export const CommunicationsTable = ({
         const interval = row?.JSON_frecuency?.repeat?.interval;
         const day = row?.JSON_frecuency?.repeat?.day;
         if (frequency?.toLowerCase() === "semanal") {
-          console.info(`${frequency}, los ${day}`);
-          return <Text>{`${frequency}, los ${day}`}</Text>;
+          return <Text>{`${day}, cada ${interval > 1 ? `${interval} semanas` : "semana"}`}</Text>;
         } else if (frequency?.toLowerCase() === "mensual") {
-          return <Text>{`${frequency}, ${interval} veces`}</Text>;
+          return <Text>{`El día ${day}, cada ${interval > 1 ? `${interval} meses` : "mes"}`}</Text>;
         }
       },
       showSorterTooltip: false
@@ -131,6 +130,7 @@ export const CommunicationsTable = ({
       dataIndex: "",
       render: (_, row) => (
         <Button
+          className="buttonEye"
           onClick={() => handleSeeCommunicationDetails(row.id)}
           icon={<Eye size={"1.3rem"} />}
         />
