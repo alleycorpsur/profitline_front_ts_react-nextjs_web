@@ -40,7 +40,7 @@ export const CommunicationsTable = ({
   useEffect(() => {
     const fetchCommunications = async () => {
       const response = await getAllCommunications(projectId);
-      setCommunications(response.data);
+      setCommunications(response);
     };
     fetchCommunications();
   }, [projectId]);
@@ -71,7 +71,7 @@ export const CommunicationsTable = ({
     );
   };
 
-  const columns: TableProps<any>["columns"] = [
+  const columns: TableProps<ICommunication>["columns"] = [
     {
       title: "Nombre",
       dataIndex: "name",
@@ -86,10 +86,10 @@ export const CommunicationsTable = ({
     },
     {
       title: "Motivo",
-      dataIndex: "reason",
-      key: "reason",
+      dataIndex: "description",
+      key: "description",
       render: (text) => <Text>{text}</Text>,
-      sorter: (a, b) => b.reason.localeCompare(a.reason),
+      sorter: (a, b) => b.description.localeCompare(a.description),
       showSorterTooltip: false
     },
     {
@@ -102,10 +102,19 @@ export const CommunicationsTable = ({
     },
     {
       title: "Frecuencia",
-      key: "frequency",
-      dataIndex: "frequency",
-      render: (text) => <Text>{text}</Text>,
-      sorter: (a, b) => b.frequency.localeCompare(a.frequency),
+      key: "JSON_frecuency",
+      dataIndex: "JSON_frecuency",
+      render: (_, row) => {
+        const frequency = row?.JSON_frecuency?.repeat?.frequency;
+        const interval = row?.JSON_frecuency?.repeat?.interval;
+        const day = row?.JSON_frecuency?.repeat?.day;
+        if (frequency?.toLowerCase() === "semanal") {
+          console.info(`${frequency}, los ${day}`);
+          return <Text>{`${frequency}, los ${day}`}</Text>;
+        } else if (frequency?.toLowerCase() === "mensual") {
+          return <Text>{`${frequency}, ${interval} veces`}</Text>;
+        }
+      },
       showSorterTooltip: false
     },
     {
@@ -113,7 +122,6 @@ export const CommunicationsTable = ({
       key: "clients",
       dataIndex: "clients",
       render: (text) => <Text>{text}</Text>,
-      sorter: (a, b) => b.clients - a.clients,
       showSorterTooltip: false
     },
     {

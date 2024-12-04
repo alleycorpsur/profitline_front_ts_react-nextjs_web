@@ -84,18 +84,38 @@ export interface ICreateCommunication {
   };
 }
 
-export interface ICommunication {
-  name: string;
+interface ISelect {
   id: number;
+  name: string;
+}
+
+interface Frequency {
+  repeat: Repeat;
+  endDate: string;
+  startDate: string;
+}
+
+interface Repeat {
+  day: string;
+  interval: number;
+  frequency: "Semanal" | "Mensual";
+}
+export interface ICommunication {
+  id: number;
+  idProject: number;
+  name: string;
+  description: string;
+  userRoles: ISelect[];
+  contactRoles: ISelect[];
+  actionTypeIds: number[];
+  subActionTypeIds: number[];
+  clientGroupId: ISelect[];
+  idCommunicationType: ISelect;
+  comunicacionState: number;
   via: string;
-  reason: string;
-  frequency: string;
-  clients: number;
-  projectId: number;
-  rules: null;
-  created_at: string;
-  updated_at: string;
-  IS_DELETED: boolean;
+  subject: string;
+  message: string;
+  JSON_frecuency: Frequency;
 }
 
 export interface ISingleCommunication {

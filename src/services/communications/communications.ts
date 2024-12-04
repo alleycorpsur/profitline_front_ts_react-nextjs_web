@@ -13,8 +13,8 @@ import { API, getIdToken } from "@/utils/api/api";
 import axios, { AxiosResponse } from "axios";
 
 export const getAllCommunications = async (projectId: number) => {
-  const response: GenericResponse<ICommunication[]> = await API.get(
-    `${config.API_HOST}/comunication/get_comunications?projectId=${projectId}`
+  const response: ICommunication[] = await API.get(
+    `${config.API_HOST}/comunication/?project_id=${projectId}`
   );
   return response;
 };
