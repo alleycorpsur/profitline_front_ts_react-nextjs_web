@@ -54,6 +54,13 @@ export const getActions = async (): Promise<IGetSelect[]> => {
   return response;
 };
 
+export const getSubActions = async (action_ids: string[]): Promise<IGetSelect[]> => {
+  const response: IGetSelect[] = await API.get(
+    `${config.API_HOST}/comunication/actions/${action_ids[0]}/sub-actions`
+  );
+  return response;
+};
+
 interface IGetTags extends IGetSelect {
   description: string;
 }
@@ -114,7 +121,7 @@ export const createCommunication = async ({
                 ? parseInt(eventTriggerDays)
                 : undefined
               : selectedPeriodicity?.days?.map((day) => day.value.toLowerCase()),
-          values: data.trigger.settings.values?.map((value) => value.value),
+          values: data.trigger.settings.actions?.map((value) => value.value),
           event_type: data.trigger.settings.event_type?.value
         }
       },

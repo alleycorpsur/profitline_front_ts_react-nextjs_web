@@ -2,8 +2,8 @@ import dayjs from "dayjs";
 
 interface TriggerSettingsForm {
   days?: string[];
-  values?: ISelectStringType[];
-  subValues?: ISelectStringType[];
+  actions?: ISelectStringType[];
+  subActions?: ISelectStringType[];
   event_type?: ISelectStringType;
   noticeDaysEvent?: string;
 }

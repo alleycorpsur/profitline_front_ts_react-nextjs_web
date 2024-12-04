@@ -29,6 +29,7 @@ import {
   getCommunicationById,
   getForwardEvents,
   getForwardToEmails,
+  getSubActions,
   getTemplateTags
 } from "@/services/communications/communications";
 import { useAppStore } from "@/lib/store/store";
@@ -77,6 +78,7 @@ export const CommunicationProjectForm = ({
   const [isFrequencyModalOpen, setIsFrequencyModalOpen] = useState(false);
   const [events, setEvents] = useState<ISelect[]>([]);
   const [actions, setActions] = useState<ISelect[]>([]);
+  const [subActions, setSubActions] = useState<ISelect[]>([]);
   const [templateTags, setTemplateTags] = useState<ISelect[]>([]);
   const [forwardToEmails, setForwardToEmails] = useState<string[]>([]);
   const { ID: projectId } = useAppStore((state) => state.selectedProject);
@@ -102,6 +104,9 @@ export const CommunicationProjectForm = ({
     values: showCommunicationDetails.active ? dataToDataForm(communicationData.data) : undefined
   });
   const watchTemplateTagsLabels = watch("template.tags")?.map((tag) => `\[${tag.label}\]`);
+  const watchSelectedAction = watch("trigger.settings.actions");
+
+  console.log("watchSelectedAction", watchSelectedAction);
 
   useEffect(() => {
     //set values for selects
@@ -155,6 +160,16 @@ export const CommunicationProjectForm = ({
     };
     fetchSingleCommunication();
   }, [showCommunicationDetails.communicationId]);
+
+  useEffect(() => {
+    const fetchSubActions = async () => {
+      const action_ids = watchSelectedAction?.map((action) => action.value);
+      if (!action_ids || action_ids.length === 0) return;
+      const subActions = await getSubActions(action_ids);
+      setSubActions(subActions.map((action) => ({ value: action.id, label: action.name })));
+    };
+    fetchSubActions();
+  }, [watchSelectedAction]);
 
   const dayToLabel = (day: string) => {
     const dayObj = selectDayOptions.find((option) => option.value === day);
@@ -215,14 +230,14 @@ export const CommunicationProjectForm = ({
     //useEffect to clean values from otherRadioButtons when clicked
     if (radioValue === "frecuencia") {
       setValue("trigger.settings.days", undefined);
-      setValue("trigger.settings.values", undefined);
-      setValue("trigger.settings.subValues", undefined);
+      setValue("trigger.settings.actions", undefined);
+      setValue("trigger.settings.subActions", undefined);
       setValue("trigger.settings.event_type", undefined);
       setValue("trigger.settings.noticeDaysEvent", undefined);
     } else if (radioValue === "evento") {
       setValue("trigger.settings.days", undefined);
-      setValue("trigger.settings.values", undefined);
-      setValue("trigger.settings.subValues", undefined);
+      setValue("trigger.settings.actions", undefined);
+      setValue("trigger.settings.subActions", undefined);
       setValue("trigger.settings.noticeDaysEvent", undefined);
       setSelectedPeriodicity(undefined);
     } else if (radioValue === "accion") {
@@ -379,7 +394,7 @@ export const CommunicationProjectForm = ({
                       />
                       <Controller
                         disabled={radioValue !== "accion" && !isEditAvailable}
-                        name="trigger.settings.values"
+                        name="trigger.settings.actions"
                         control={control}
                         rules={{ required: radioValue === "accion" }}
                         render={({ field }) => (
@@ -387,7 +402,7 @@ export const CommunicationProjectForm = ({
                             title="Tipo de acción"
                             placeholder="Seleccionar tipo de acción"
                             options={actions}
-                            errors={errors.trigger?.settings?.values}
+                            errors={errors.trigger?.settings?.actions}
                             field={field}
                             titleAbsolute
                           />
@@ -397,15 +412,15 @@ export const CommunicationProjectForm = ({
 
                     <Controller
                       disabled={radioValue !== "accion" && !isEditAvailable}
-                      name="trigger.settings.subValues"
+                      name="trigger.settings.subActions"
                       control={control}
                       rules={{ required: radioValue === "accion" }}
                       render={({ field }) => (
                         <SelectOuterTags
                           title="Subtipo de acción"
                           placeholder="Seleccionar subtipo de acción"
-                          options={subActionsOptions}
-                          errors={errors.trigger?.settings?.subValues}
+                          options={subActions}
+                          errors={errors.trigger?.settings?.subActions}
                           field={field}
                           titleAbsolute
                         />
@@ -612,12 +627,6 @@ export const CommunicationProjectForm = ({
   );
 };
 
-const subActionsOptions = [
-  "Error en facturación",
-  "Diferencia en precios",
-  "Devolución",
-  "No radicado"
-];
 const viasSelectOption = ["Email", "SMS", "WhatsApp"];
 
 const mockAttachments = ["PDF Estado de cuenta", "Excel cartera", "PDF Factura"];
@@ -636,8 +645,8 @@ const dataToDataForm = (data: ISingleCommunication): ICommunicationForm => {
       type: data.type,
       settings: {
         days: ["test"],
-        values: undefined,
-        subValues: undefined,
+        actions: undefined,
+        subActions: undefined,
         event_type: data.EVENT_TYPE ? { value: data.EVENT_TYPE, label: data.EVENT_TYPE } : undefined
       }
     },
