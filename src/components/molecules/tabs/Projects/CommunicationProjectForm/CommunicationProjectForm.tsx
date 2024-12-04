@@ -75,7 +75,7 @@ export const CommunicationProjectForm = ({
   const [assignedGroups, setAssignedGroups] = useState<number[]>([]);
   const [isFrequencyModalOpen, setIsFrequencyModalOpen] = useState(false);
   const [events, setEvents] = useState<ISelect[]>([]);
-  const [templateTags, setTemplateTags] = useState<string[]>([]);
+  const [templateTags, setTemplateTags] = useState<ISelect[]>([]);
   const [forwardToEmails, setForwardToEmails] = useState<string[]>([]);
   const { ID: projectId } = useAppStore((state) => state.selectedProject);
 
@@ -110,7 +110,7 @@ export const CommunicationProjectForm = ({
     fecthEvents();
     const fetchTemplateTags = async () => {
       const tags = await getTemplateTags();
-      setTemplateTags(tags);
+      setTemplateTags(tags.map((tag) => ({ value: tag.id, label: tag.name })));
     };
     fetchTemplateTags();
     const fetchEmails = async () => {

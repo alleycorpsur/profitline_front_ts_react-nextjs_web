@@ -1,5 +1,9 @@
 import config from "@/config";
+import axios, { AxiosResponse } from "axios";
+
+import { API, getIdToken } from "@/utils/api/api";
 import { MessageType } from "@/context/MessageContext";
+
 import { ISelectedBussinessRules } from "@/types/bre/IBRE";
 import {
   ICommunication,
@@ -8,8 +12,7 @@ import {
   IPeriodicityModalForm,
   ISingleCommunication
 } from "@/types/communications/ICommunications";
-import { API, getIdToken } from "@/utils/api/api";
-import axios, { AxiosResponse } from "axios";
+import { GenericResponse } from "@/types/global/IGlobal";
 
 interface IGetSelect {
   id: number;
@@ -46,9 +49,15 @@ export const getForwardEvents = async (): Promise<IGetSelect[]> => {
   return response;
 };
 
-export const getTemplateTags = async (): Promise<string[]> => {
-  const response: string[] = await API.get(`${config.API_HOST}/comunication/get_tags`);
-  return response;
+interface IGetTags extends IGetSelect {
+  description: string;
+}
+
+export const getTemplateTags = async (): Promise<IGetTags[]> => {
+  const response: GenericResponse<IGetTags[]> = await API.get(
+    `${config.API_HOST}/comunication/tags`
+  );
+  return response.data;
 };
 
 export const getForwardToEmails = async (): Promise<string[]> => {
