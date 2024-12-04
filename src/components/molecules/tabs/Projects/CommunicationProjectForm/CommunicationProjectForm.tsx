@@ -106,8 +106,6 @@ export const CommunicationProjectForm = ({
   const watchTemplateTagsLabels = watch("template.tags")?.map((tag) => `\[${tag.label}\]`);
   const watchSelectedAction = watch("trigger.settings.actions");
 
-  console.log("watchSelectedAction", watchSelectedAction);
-
   useEffect(() => {
     //set values for selects
     const fecthEvents = async () => {
@@ -162,9 +160,14 @@ export const CommunicationProjectForm = ({
   }, [showCommunicationDetails.communicationId]);
 
   useEffect(() => {
+    const action_ids = watchSelectedAction?.map((action) => action.value);
+    if (!action_ids) return;
+
+    if (action_ids.length === 0) {
+      setSubActions([]);
+      return;
+    }
     const fetchSubActions = async () => {
-      const action_ids = watchSelectedAction?.map((action) => action.value);
-      if (!action_ids || action_ids.length === 0) return;
       const subActions = await getSubActions(action_ids);
       setSubActions(subActions.map((action) => ({ value: action.id, label: action.name })));
     };
