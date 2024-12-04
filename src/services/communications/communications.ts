@@ -49,6 +49,11 @@ export const getForwardEvents = async (): Promise<IGetSelect[]> => {
   return response;
 };
 
+export const getActions = async (): Promise<IGetSelect[]> => {
+  const response: IGetSelect[] = await API.get(`${config.API_HOST}/comunication/actions`);
+  return response;
+};
+
 interface IGetTags extends IGetSelect {
   description: string;
 }

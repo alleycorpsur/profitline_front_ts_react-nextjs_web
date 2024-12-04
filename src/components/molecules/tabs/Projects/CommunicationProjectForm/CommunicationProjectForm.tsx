@@ -25,6 +25,7 @@ import { OptionType } from "@/components/ui/select-outer-tags/select-outer-tags"
 import { CustomTextArea } from "@/components/atoms/CustomTextArea/CustomTextArea";
 import {
   createCommunication,
+  getActions,
   getCommunicationById,
   getForwardEvents,
   getForwardToEmails,
@@ -75,6 +76,7 @@ export const CommunicationProjectForm = ({
   const [assignedGroups, setAssignedGroups] = useState<number[]>([]);
   const [isFrequencyModalOpen, setIsFrequencyModalOpen] = useState(false);
   const [events, setEvents] = useState<ISelect[]>([]);
+  const [actions, setActions] = useState<ISelect[]>([]);
   const [templateTags, setTemplateTags] = useState<ISelect[]>([]);
   const [forwardToEmails, setForwardToEmails] = useState<string[]>([]);
   const { ID: projectId } = useAppStore((state) => state.selectedProject);
@@ -108,6 +110,11 @@ export const CommunicationProjectForm = ({
       setEvents(events.map((event) => ({ value: event.id, label: event.name })));
     };
     fecthEvents();
+    const fetchActions = async () => {
+      const actions = await getActions();
+      setActions(actions.map((action) => ({ value: action.id, label: action.name })));
+    };
+    fetchActions();
     const fetchTemplateTags = async () => {
       const tags = await getTemplateTags();
       setTemplateTags(tags.map((tag) => ({ value: tag.id, label: tag.name })));
@@ -379,7 +386,7 @@ export const CommunicationProjectForm = ({
                           <SelectOuterTags
                             title="Tipo de acción"
                             placeholder="Seleccionar tipo de acción"
-                            options={actionsOptions}
+                            options={actions}
                             errors={errors.trigger?.settings?.values}
                             field={field}
                             titleAbsolute
@@ -604,13 +611,6 @@ export const CommunicationProjectForm = ({
     </main>
   );
 };
-
-const actionsOptions = [
-  "Novedad",
-  "Aplicación de pago",
-  "Generación nota crédito",
-  "Cambio estado de factura"
-];
 
 const subActionsOptions = [
   "Error en facturación",
