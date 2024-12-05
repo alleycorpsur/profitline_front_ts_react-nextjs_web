@@ -10,13 +10,6 @@ import { fetcher } from "@/utils/api/api";
 import { createDiscountPackage, getOneDiscountPackage } from "@/services/discount/discount.service";
 import { Discount } from "@/types/discount/DiscountPackage";
 import { mapGetOneToDiscountPackageSchema } from "../logic/createPackageLogic";
-import weekday from 'dayjs/plugin/weekday'
-import isLapYear from "dayjs/plugin/isLeapYear";
-import localeData from "dayjs/plugin/localeData";
-import dayjs from "dayjs";
-dayjs.extend(weekday);
-dayjs.extend(isLapYear);
-dayjs.extend(localeData);
 
 type Props = {
   params?: { id: string };

@@ -10,11 +10,11 @@ import { useRouter } from "next/navigation";
 import { mapDiscountGetOneToDiscountSchema } from "../logic/createDiscountLogic";
 import { message } from "antd";
 import isLapYear from "dayjs/plugin/isLeapYear";
-import weekDay from "dayjs/plugin/weekDay";
+import weekday from "dayjs/plugin/weekday";
 import localeData from "dayjs/plugin/localeData";
 import dayjs from "dayjs";
 dayjs.extend(isLapYear);
-dayjs.extend(weekDay);
+dayjs.extend(weekday);
 dayjs.extend(localeData);
 
 type Props = {
