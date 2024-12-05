@@ -9,6 +9,13 @@ import { FileObject } from "@/components/atoms/UploadDocumentButton/UploadDocume
 import { useRouter } from "next/navigation";
 import { mapDiscountGetOneToDiscountSchema } from "../logic/createDiscountLogic";
 import { message } from "antd";
+import isLapYear from "dayjs/plugin/isLeapYear";
+import weekDay from "dayjs/plugin/weekDay";
+import localeData from "dayjs/plugin/localeData";
+import dayjs from "dayjs";
+dayjs.extend(isLapYear);
+dayjs.extend(weekDay);
+dayjs.extend(localeData);
 
 type Props = {
   params?: { id: string };
