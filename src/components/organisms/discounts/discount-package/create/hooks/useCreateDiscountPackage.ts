@@ -11,7 +11,7 @@ import { createDiscountPackage, getOneDiscountPackage } from "@/services/discoun
 import { Discount } from "@/types/discount/DiscountPackage";
 import { mapGetOneToDiscountPackageSchema } from "../logic/createPackageLogic";
 import isLapYear from "dayjs/plugin/isLeapYear";
-import weekDay from "dayjs/plugin/weekDay";
+import weekDay from "dayjs/plugin/weekday";
 import localeData from "dayjs/plugin/localeData";
 import dayjs from "dayjs";
 dayjs.extend(isLapYear);
