@@ -24,7 +24,7 @@
     "antd": "^5.17.0",
     "apexcharts": "^3.49.1",
     "axios": "^1.6.7",
-    "dayjs": "^1.11.12",
+    "dayjs": "^1.11.13",
     "dayjs-plugin-utc": "^0.1.2",
     "encoding": "^0.1.13",
     "eslint-config-prettier": "^9.1.0",
