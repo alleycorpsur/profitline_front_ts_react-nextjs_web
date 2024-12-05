@@ -309,10 +309,10 @@ export const CommunicationProjectForm = ({
                 <div className={styles.radioGroup}>
                   <div className={styles.radioGroup__frequency}>
                     <Radio
-                      checked={radioValue === "frecuencia"}
-                      onChange={() => handleChangeRadio("frecuencia", field)}
+                      checked={radioValue === 1}
+                      onChange={() => handleChangeRadio(1, field)}
                       className={styles.radioGroup__frequency__radio}
-                      value={"frecuencia"}
+                      value={1}
                       disabled={!!showCommunicationDetails.communicationId && !isEditAvailable}
                     >
                       <InputClickable
@@ -338,11 +338,11 @@ export const CommunicationProjectForm = ({
                   <div className={styles.radioGroup__event}>
                     <div className={styles.radioGroup__event__left}>
                       <Radio
-                        checked={radioValue === "evento"}
-                        onChange={() => handleChangeRadio("evento", field)}
+                        checked={radioValue === 2}
+                        onChange={() => handleChangeRadio(2, field)}
                         name="test"
                         className={styles.radioGroup__event__radio}
-                        value={"evento"}
+                        value={2}
                         disabled={!!showCommunicationDetails.communicationId && !isEditAvailable}
                       />
                       <Controller
@@ -390,16 +390,16 @@ export const CommunicationProjectForm = ({
                     <div className={styles.radioGroup__actions__left}>
                       <Radio
                         className={styles.radioGroup__actions__radio}
-                        checked={radioValue === "accion"}
-                        onChange={() => handleChangeRadio("accion", field)}
-                        value={"accion"}
+                        checked={radioValue === 3}
+                        onChange={() => handleChangeRadio(3, field)}
+                        value={3}
                         disabled={!!showCommunicationDetails.communicationId && !isEditAvailable}
                       />
                       <Controller
-                        disabled={radioValue !== "accion" && !isEditAvailable}
+                        disabled={radioValue !== 3 && !isEditAvailable}
                         name="trigger.settings.actions"
                         control={control}
-                        rules={{ required: radioValue === "accion" }}
+                        rules={{ required: radioValue === 3 }}
                         render={({ field }) => (
                           <SelectOuterTags
                             title="Tipo de acción"
@@ -414,10 +414,10 @@ export const CommunicationProjectForm = ({
                     </div>
 
                     <Controller
-                      disabled={radioValue !== "accion" && !isEditAvailable}
+                      disabled={radioValue !== 3 && !isEditAvailable}
                       name="trigger.settings.subActions"
                       control={control}
-                      rules={{ required: radioValue === "accion" }}
+                      rules={{ required: radioValue === 3 }}
                       render={({ field }) => (
                         <SelectOuterTags
                           title="Subtipo de acción"

@@ -13,6 +13,7 @@ import {
   ISingleCommunication
 } from "@/types/communications/ICommunications";
 import { GenericResponse } from "@/types/global/IGlobal";
+import { start } from "repl";
 
 interface IGetSelect {
   id: number;
@@ -98,53 +99,41 @@ export const createCommunication = async ({
   showMessage
 }: ICreateCommunicationProps) => {
   const token = await getIdToken();
-  const now = new Date();
-  const timeString = now.toLocaleString("es-CO");
   const eventTriggerDays = data?.trigger?.settings?.noticeDaysEvent;
+
+  const jsonFreq = {
+    start_date: selectedPeriodicity?.init_date?.toISOString() || "",
+    repeat: {
+      interval: selectedPeriodicity?.frequency_number || 0,
+      frequency: selectedPeriodicity?.frequency.value || "mensual",
+      day: selectedPeriodicity?.init_date?.toISOString().split("-")[-1] || ""
+    },
+    end_date: selectedPeriodicity?.end_date?.toISOString() || ""
+  };
   const modelData: ICreateCommunication = {
     // Where does invoice should come from?
-    invoice_id: 1,
     project_id: projectId,
-    data: {
-      name: data.name,
-      descripcion: data.description,
-      trigger: {
-        type: data.trigger.type,
-        settings: {
-          init_date: selectedPeriodicity?.init_date?.toISOString().split("T")[0],
-          end_date: selectedPeriodicity?.end_date?.toISOString().split("T")[0],
-          repeat: selectedPeriodicity?.frequency_number,
-          frequency: selectedPeriodicity?.frequency?.value.toLowerCase(),
-          days:
-            data.trigger.type === "evento"
-              ? eventTriggerDays
-                ? parseInt(eventTriggerDays)
-                : undefined
-              : selectedPeriodicity?.days?.map((day) => day.value.toLowerCase()),
-          values: data.trigger.settings.actions?.map((value) => value.value),
-          event_type: data.trigger.settings.event_type?.value
-        }
-      },
-      rules: {
-        channel: selectedBusinessRules.channels,
-        line: selectedBusinessRules.lines,
-        subline: selectedBusinessRules.sublines,
-        zone: zones,
-        groups_id: assignedGroups
-      },
-      template: {
-        via: data.template.via.value,
-        send_to: data.template.send_to.map((mail) => mail.value),
-        copy_to: data.template.copy_to?.map((mail) => mail.value),
-        tags: data.template.tags?.map((tag) => tag.value),
-        time: timeString,
-        message: data.template.message,
-        // Where does title should come from?
-        title: data.template?.title || "titulo quemado",
-        subject: data.template.subject,
-        files: data.template.files.map((file) => file.value)
-      }
-    }
+    name: data.name,
+    description: data.description,
+    subject: data.template.subject,
+    message: data.template.message,
+    via: data.template.via.value,
+    user_roles: [1, 2],
+    contact_roles: [1, 2],
+    client_group_ids: assignedGroups,
+    communication_type: data.trigger.type,
+    // Frequency-specific properties (optional)
+    json_frequency: data.trigger.type === 1 ? jsonFreq && jsonFreq : undefined,
+
+    // Event-specific properties (optional)
+    id_event_type: Number(data.trigger.settings?.event_type?.value) || undefined,
+    delay_event: Number(eventTriggerDays) || undefined,
+
+    // Action-specific properties (optional)
+    action_type_ids:
+      data.trigger.settings?.actions?.map((action) => Number(action.value)) || undefined,
+    sub_action_type_ids:
+      data.trigger.settings?.subActions?.map((subAction) => Number(subAction.value)) || undefined
   };
 
   try {

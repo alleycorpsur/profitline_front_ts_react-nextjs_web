@@ -9,7 +9,7 @@ interface TriggerSettingsForm {
 }
 
 interface TriggerForm {
-  type: "accion" | "frecuencia" | "evento" | string;
+  type: 1 | 2 | 3;
   settings: TriggerSettingsForm;
 }
 
@@ -46,42 +46,35 @@ export interface IPeriodicityModalForm {
 }
 
 export interface ICreateCommunication {
-  invoice_id: number;
   project_id: number;
-  data: {
-    name: string;
-    descripcion: string;
-    trigger: {
-      type: string;
-      settings: {
-        init_date?: string;
-        end_date?: string | null;
-        repeat?: number;
-        frequency?: string;
-        days?: string[] | number;
-        values?: string[];
-        event_type?: string;
-      };
+  name: string;
+  description: string;
+  subject: string;
+  message: string;
+  via: "email" | string;
+  user_roles: number[];
+  contact_roles: number[];
+  client_group_ids: number[];
+  communication_type: 1 | 2 | 3; // Enforce valid communication types //1 frecuency, 2 event, 3 action
+
+  // Frequency-specific properties (optional)
+  json_frequency?: {
+    start_date: string;
+    repeat: {
+      interval: number;
+      frequency: "mensual" | "semanal" | string;
+      day: string;
     };
-    rules: {
-      channel: number[];
-      line: number[];
-      subline: number[];
-      zone: number[];
-      groups_id: number[];
-    };
-    template: {
-      via: string;
-      send_to: string[];
-      copy_to: string[] | undefined;
-      tags: string[];
-      time: string;
-      message: string;
-      title: string;
-      subject: string;
-      files: string[];
-    };
+    end_date: string;
   };
+
+  // Action-specific properties (optional)
+  action_type_ids?: number[];
+  sub_action_type_ids?: number[];
+
+  // Event-specific properties (optional, can be added if needed)
+  id_event_type?: number;
+  delay_event?: number;
 }
 
 interface ISelect {
