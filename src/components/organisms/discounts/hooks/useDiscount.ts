@@ -3,7 +3,9 @@ import useSearch from "@/hooks/useSearch";
 import { useAppStore } from "@/lib/store/store";
 import {
   changeStatus,
+  changeStatusPackage,
   deleteDiscount,
+  deleteDiscountPackages,
   getAllDiscountPackages,
   getAllDiscounts
 } from "@/services/discount/discount.service";
@@ -19,7 +21,6 @@ type Props = {
   tabActive: string;
 };
 
-//type DiscountBasicsState = DiscountBasics & { checked: boolean };
 type DiscountBasicsState = DiscountBasics & { checked: boolean };
 type DiscountPackageState = DiscountPackage & { checked: boolean };
 
@@ -97,7 +98,15 @@ export default function useDiscount({ messageApi, tabActive }: Props) {
   const handleDeleteDiscount = async () => {
     try {
       setIsLoadingDelete(true);
-      await deleteDiscount(data.filter((item) => item.checked).map((item) => item.id));
+      // Filtrar los IDs de los elementos seleccionados
+      const selectedIds = data.filter((item) => item.checked).map((item) => item.id);
+
+      // Llamar a la función adecuada según `tabActive`
+      if (tabActive === "1") {
+        await deleteDiscountPackages(selectedIds);
+      } else {
+        await deleteDiscount(selectedIds);
+      }
     } catch (error) {
     } finally {
       handleClose();
@@ -116,6 +125,7 @@ export default function useDiscount({ messageApi, tabActive }: Props) {
   };
 
   const handleChangeStatus = async (id: number, newStatus: boolean) => {
+    let response;
     mutate(
       {
         ...res,
@@ -123,7 +133,7 @@ export default function useDiscount({ messageApi, tabActive }: Props) {
           if (item.id === id) {
             return {
               ...item,
-              status: newStatus
+              [tabActive === "1" ? "active" : "status"]: newStatus
             };
           }
           return item;
@@ -131,9 +141,19 @@ export default function useDiscount({ messageApi, tabActive }: Props) {
       } as GenericResponsePage<DiscountBasics[] | DiscountPackage[]>,
       { revalidate: false }
     );
-    const response = await changeStatus(id, newStatus);
+    if (tabActive === "1") {
+      response = await changeStatusPackage(id, newStatus);
+    } else {
+      response = await changeStatus(id, newStatus);
+    }
     if (response.success) {
-      messageApi.success(`Descuento ${newStatus ? "activado" : "desactivado"} con éxito`);
+      let message = "";
+      if (tabActive === "1") {
+        message = `Paquete de descuentos ${newStatus ? "activado" : "desactivado"} con éxito`;
+      } else {
+        message = `Descuento ${newStatus ? "activado" : "desactivado"} con éxito`;
+      }
+      messageApi.success(message);
     } else {
       mutate();
       messageApi.error(response.message);

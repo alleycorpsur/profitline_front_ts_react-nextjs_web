@@ -40,6 +40,7 @@ export default function DiscountRulesTable({
         itemRender: TablePaginator,
         current: page
       }}
+      rowKey={"id"}
     />
   );
 }
