@@ -38,11 +38,11 @@ export interface ISelectStringType {
 }
 
 export interface IPeriodicityModalForm {
-  init_date: Date | undefined | dayjs.Dayjs;
+  init_date: undefined | dayjs.Dayjs;
   frequency_number: number | undefined;
   frequency: ISelectStringType;
   days: ISelectStringType[];
-  end_date: Date | undefined | dayjs.Dayjs;
+  end_date: undefined | dayjs.Dayjs;
 }
 
 export interface ICreateCommunication {
@@ -55,10 +55,10 @@ export interface ICreateCommunication {
   user_roles: number[];
   contact_roles: number[];
   client_group_ids: number[];
-  communication_type: 1 | 2 | 3; // Enforce valid communication types //1 frecuency, 2 event, 3 action
+  comunication_type: 1 | 2 | 3; // Enforce valid communication types //1 frecuency, 2 event, 3 action
 
   // Frequency-specific properties (optional)
-  json_frequency?: {
+  json_frecuency?: {
     start_date: string;
     repeat: {
       interval: number;

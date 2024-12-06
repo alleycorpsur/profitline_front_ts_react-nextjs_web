@@ -28,7 +28,6 @@ import {
   getActions,
   getCommunicationById,
   getForwardEvents,
-  getForwardToEmails,
   getSubActions,
   getTemplateTags
 } from "@/services/communications/communications";
@@ -37,6 +36,8 @@ import { capitalize, stringFromArrayOfSelect } from "@/utils/utils";
 import { useMessageApi } from "@/context/MessageContext";
 import dayjs from "dayjs";
 import { selectDayOptions } from "@/components/atoms/SelectDay/SelectDay";
+import { getAllRoles } from "@/services/roles/roles";
+import { getContactOptions } from "@/services/contacts/contacts";
 
 const { Title } = Typography;
 
@@ -80,7 +81,12 @@ export const CommunicationProjectForm = ({
   const [actions, setActions] = useState<ISelect[]>([]);
   const [subActions, setSubActions] = useState<ISelect[]>([]);
   const [templateTags, setTemplateTags] = useState<ISelect[]>([]);
-  const [forwardToEmails, setForwardToEmails] = useState<string[]>([]);
+  const [forwardTo, setForwardTo] = useState<
+    {
+      value: string;
+      label: string;
+    }[]
+  >([]);
   const { ID: projectId } = useAppStore((state) => state.selectedProject);
 
   const { showMessage } = useMessageApi();
@@ -123,11 +129,21 @@ export const CommunicationProjectForm = ({
       setTemplateTags(tags.map((tag) => ({ value: tag.id, label: tag.name })));
     };
     fetchTemplateTags();
-    const fetchEmails = async () => {
-      const emails = await getForwardToEmails();
-      setForwardToEmails(emails);
+    const fetchForwardOptions = async () => {
+      const rolesData = await getAllRoles();
+      const roles = rolesData.data.data.map((role) => ({
+        value: `1_${role.ID}`,
+        label: role.ROL_NAME
+      }));
+
+      const contactPositionsData = await getContactOptions();
+      const contactPositions = contactPositionsData.contact_position.map((position) => ({
+        value: `0_${position.id}`,
+        label: position.name
+      }));
+      setForwardTo([...roles, ...contactPositions]);
     };
-    fetchEmails();
+    fetchForwardOptions();
 
     // set values for communication detail
     const fetchSingleCommunication = async () => {
@@ -215,17 +231,21 @@ export const CommunicationProjectForm = ({
       frequency: false
     });
 
-    await createCommunication({
-      data,
-      selectedPeriodicity,
-      zones,
-      selectedBusinessRules,
-      assignedGroups,
-      projectId,
-      showMessage
-    });
+    try {
+      await createCommunication({
+        data,
+        selectedPeriodicity,
+        zones,
+        selectedBusinessRules,
+        assignedGroups,
+        projectId,
+        showMessage
+      });
 
-    setIsCreateCommunication(false);
+      setIsCreateCommunication(false);
+    } catch (error) {
+      console.error(error);
+    }
     setLoadingRequest(false);
   };
 
@@ -318,7 +338,7 @@ export const CommunicationProjectForm = ({
                       <InputClickable
                         title="Frecuencia"
                         error={customFieldsError.frequency}
-                        disabled={radioValue !== "frecuencia"}
+                        disabled={radioValue !== 1}
                         callBackFunction={() => setIsFrequencyModalOpen(true)}
                         customStyles={
                           customFieldsError.frequency ? { border: "1px dashed red" } : undefined
@@ -347,12 +367,12 @@ export const CommunicationProjectForm = ({
                       />
                       <Controller
                         disabled={
-                          radioValue !== "evento" ||
+                          radioValue !== 2 ||
                           (!isEditAvailable && !!showCommunicationDetails.communicationId)
                         }
                         name="trigger.settings.event_type"
                         control={control}
-                        rules={{ required: radioValue === "evento" }}
+                        rules={{ required: radioValue === 2 }}
                         render={({ field }) => (
                           <GeneralSelect
                             errors={errors.trigger?.settings?.event_type}
@@ -365,7 +385,7 @@ export const CommunicationProjectForm = ({
                         )}
                       />
                     </div>
-                    {radioValue === "evento" && (
+                    {radioValue === 2 && (
                       <Controller
                         name="trigger.settings.noticeDaysEvent"
                         control={control}
@@ -515,7 +535,7 @@ export const CommunicationProjectForm = ({
                   field={field}
                   title="Para"
                   placeholder="Enviar a"
-                  options={forwardToEmails}
+                  options={forwardTo}
                   suffixIcon={null}
                   disabled={!isEditAvailable && !!showCommunicationDetails.communicationId}
                 />
@@ -531,7 +551,7 @@ export const CommunicationProjectForm = ({
                   field={field}
                   title="Copia"
                   placeholder="Copia a"
-                  options={forwardToEmails}
+                  options={forwardTo}
                   suffixIcon={null}
                   disabled={!isEditAvailable && !!showCommunicationDetails.communicationId}
                 />

@@ -13,7 +13,6 @@ import {
   ISingleCommunication
 } from "@/types/communications/ICommunications";
 import { GenericResponse } from "@/types/global/IGlobal";
-import { start } from "repl";
 
 interface IGetSelect {
   id: number;
@@ -101,15 +100,46 @@ export const createCommunication = async ({
   const token = await getIdToken();
   const eventTriggerDays = data?.trigger?.settings?.noticeDaysEvent;
 
+  const sendToRoles = data.template.send_to
+    .filter((role) => {
+      const isRole = role.value.split("_")[0];
+      return isRole !== "0";
+    })
+    .map((role) => Number(role.value.split("_")[1]));
+  const copyToRoles =
+    data.template.copy_to
+      ?.filter((role) => {
+        const isRole = role.value.split("_")[0];
+        return isRole !== "0";
+      })
+      .map((role) => Number(role.value.split("_")[1])) || [];
+  const roles_ids = [...sendToRoles, ...copyToRoles];
+
+  const sendToContactPositions = data.template.send_to
+    .filter((role) => {
+      const isContactPos = role.value.split("_")[0];
+      return isContactPos === "0";
+    })
+    .map((role) => Number(role.value.split("_")[1]));
+  const copyToContactPositions =
+    data.template.copy_to
+      ?.filter((role) => {
+        const isContactPos = role.value.split("_")[0];
+        return isContactPos === "0";
+      })
+      .map((role) => Number(role.value.split("_")[1])) || [];
+  const contact_positions_ids = [...sendToContactPositions, ...copyToContactPositions];
+
   const jsonFreq = {
-    start_date: selectedPeriodicity?.init_date?.toISOString() || "",
+    start_date: selectedPeriodicity?.init_date?.format("YYYY-MM-DD") || "",
     repeat: {
       interval: selectedPeriodicity?.frequency_number || 0,
       frequency: selectedPeriodicity?.frequency.value || "mensual",
-      day: selectedPeriodicity?.init_date?.toISOString().split("-")[-1] || ""
+      day: selectedPeriodicity?.init_date?.format("YYYY-MM-DD").split("-")[2] || ""
     },
-    end_date: selectedPeriodicity?.end_date?.toISOString() || ""
+    end_date: selectedPeriodicity?.end_date?.format("YYYY-MM-DD") || ""
   };
+
   const modelData: ICreateCommunication = {
     // Where does invoice should come from?
     project_id: projectId,
@@ -117,13 +147,13 @@ export const createCommunication = async ({
     description: data.description,
     subject: data.template.subject,
     message: data.template.message,
-    via: data.template.via.value,
-    user_roles: [1, 2],
-    contact_roles: [1, 2],
+    via: data.template.via.value.toLowerCase(),
+    user_roles: roles_ids,
+    contact_roles: contact_positions_ids,
     client_group_ids: assignedGroups,
-    communication_type: data.trigger.type,
+    comunication_type: data.trigger.type,
     // Frequency-specific properties (optional)
-    json_frequency: data.trigger.type === 1 ? jsonFreq && jsonFreq : undefined,
+    json_frecuency: data.trigger.type === 1 ? jsonFreq && jsonFreq : undefined,
 
     // Event-specific properties (optional)
     id_event_type: Number(data.trigger.settings?.event_type?.value) || undefined,
@@ -137,18 +167,22 @@ export const createCommunication = async ({
   };
 
   try {
-    const response: any = await axios.post(`${config.API_HOST}/comunication/create`, modelData, {
-      headers: {
-        Accept: "application/json, text/plain, */*",
-        Authorization: `Bearer ${token}`
+    const response: GenericResponse<{ id: number }> = await axios.post(
+      `${config.API_HOST}/comunication`,
+      modelData,
+      {
+        headers: {
+          Accept: "application/json, text/plain, */*",
+          Authorization: `Bearer ${token}`
+        }
       }
-    });
+    );
 
     if (response.status === 200) showMessage("success", "Comunicación creada correctamente");
     return response;
   } catch (error) {
     console.error("Error creating communication", error);
     showMessage("error", "Ocurrió un error al crear la comunicación");
-    return error;
+    throw error;
   }
 };
