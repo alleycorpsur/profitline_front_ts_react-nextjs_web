@@ -133,13 +133,13 @@ export const CommunicationProjectForm = ({
       const rolesData = await getAllRoles();
       const roles = rolesData.data.data.map((role) => ({
         value: `1_${role.ID}`,
-        label: role.ROL_NAME
+        label: `Rol - ${role.ROL_NAME}`
       }));
 
       const contactPositionsData = await getContactOptions();
       const contactPositions = contactPositionsData.contact_position.map((position) => ({
         value: `0_${position.id}`,
-        label: position.name
+        label: `Cliente - ${position.name}`
       }));
       setForwardTo([...roles, ...contactPositions]);
     };

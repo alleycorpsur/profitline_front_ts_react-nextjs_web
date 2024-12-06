@@ -7,6 +7,7 @@ import { MessageType } from "@/context/MessageContext";
 import { ISelectedBussinessRules } from "@/types/bre/IBRE";
 import {
   ICommunication,
+  ICommunicationDetail,
   ICommunicationForm,
   ICreateCommunication,
   IPeriodicityModalForm,
@@ -28,10 +29,10 @@ export const getAllCommunications = async (projectId: number) => {
 
 export const getCommunicationById = async (
   communicationId: number
-): Promise<ISingleCommunication | null> => {
+): Promise<ICommunicationDetail | null> => {
   try {
-    const response: AxiosResponse<ISingleCommunication> = await API.get(
-      `${config.API_HOST}/comunication/detail_comunicaction?comunication_consolidated_id=${communicationId}`
+    const response: AxiosResponse<ICommunicationDetail> = await API.get(
+      `${config.API_HOST}/comunication/detail/${communicationId}`
     );
     if (response.status === 200) {
       return response.data;

@@ -111,6 +111,32 @@ export interface ICommunication {
   JSON_frecuency: Frequency;
 }
 
+export interface ICommunicationDetail {
+  id: number;
+  id_project: number;
+  name: string;
+  description: string;
+  user_roles: ISelect[];
+  contact_roles: ISelect[];
+  action_type_ids: ISelect[];
+  sub_action_type_ids: ISelect[];
+  client_group_id: ISelect[];
+  id_comunication_type: ISelect;
+  comunicacion_state: number; // 1 or 0
+  via: string;
+  subject: string;
+  message: string;
+  JSON_frecuency: {
+    repeat: {
+      day: string;
+      interval: number;
+      frequency: string; // e.g., "Semanal" or "Mensual"
+    };
+    end_date: string; // e.g., "2024-11-23" (ISO 8601 date format)
+    start_date: string; // e.g., "2024-11-08" (ISO 8601 date format)
+  };
+}
+
 export interface ISingleCommunication {
   id: number;
   via: string;
