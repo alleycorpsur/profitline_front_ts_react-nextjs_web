@@ -120,7 +120,6 @@ const discountPackagesColumns: (
           <Checkbox
             id={id}
             checked={record.checked}
-            disabled={true}
             onChange={(e) => handleSelect(id, e.target.checked)}
           />
         }
@@ -166,10 +165,12 @@ const discountPackagesColumns: (
   },
   {
     title: "Estado",
-    dataIndex: "status",
-    key: "status",
-    sorter: (a, b) => (a.status && b.status ? a.status - b.status : -1),
-    render: (text, record) => <Switch checked={true} disabled={true} onChange={() => {}} />
+    dataIndex: "active",
+    key: "StatusDiscount",
+    sorter: (a, b) => (a.active && b.active ? a.active - b.active : -1),
+    render: (text, record) => (
+      <Switch checked={text} onChange={(newStatus) => handleChangeStatus(record.id, newStatus)} />
+    )
   },
   {
     title: "",

@@ -64,11 +64,24 @@ export const deleteDiscount = async (ids: number[]) => {
   const res = ids.map((id) => API.delete(`/discount/${id}`));
   return Promise.all(res);
 };
+export const deleteDiscountPackages = async (ids: number[]) => {
+  const response: GenericResponse = await API.delete(`/discount/delete-discount-package`, {
+    data: { discountPackageIds: ids }
+  });
+
+  return response?.success;
+};
 
 export const changeStatus = async (id: number, newStatus: boolean) => {
-  const res = (await API.put(`/discount/change-status/${id}`, {
+  const res: GenericResponse = await API.put(`/discount/change-status/${id}`, {
     status: newStatus ? 1 : 0
-  })) as GenericResponse;
+  });
+  return res;
+};
+export const changeStatusPackage = async (id: number, newStatus: boolean) => {
+  const res: GenericResponse = await API.put(`/discount/change-status-package/${id}`, {
+    status: newStatus ? 1 : 0
+  });
   return res;
 };
 
