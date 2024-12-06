@@ -30,7 +30,6 @@ export default function useDiscount({ messageApi, tabActive }: Props) {
   const [isLoadingDelete, setIsLoadingDelete] = useState(false);
   const [active, setActive] = useState<number | undefined>(undefined);
   const [data, setData] = useState<any[]>([]);
-  console.log("data", data);
   const { searchQuery, handleChangeSearch } = useSearch();
   const { ID } = useAppStore((project) => project.selectedProject);
   const fetcher = tabActive === "1" ? getAllDiscountPackages : getAllDiscounts;
