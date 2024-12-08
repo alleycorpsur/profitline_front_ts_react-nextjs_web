@@ -1,5 +1,5 @@
 import config from "@/config";
-import axios, { AxiosResponse } from "axios";
+import axios from "axios";
 
 import { API, getIdToken } from "@/utils/api/api";
 import { MessageType } from "@/context/MessageContext";
@@ -10,8 +10,7 @@ import {
   ICommunicationDetail,
   ICommunicationForm,
   ICreateCommunication,
-  IPeriodicityModalForm,
-  ISingleCommunication
+  IPeriodicityModalForm
 } from "@/types/communications/ICommunications";
 import { GenericResponse } from "@/types/global/IGlobal";
 
@@ -31,14 +30,11 @@ export const getCommunicationById = async (
   communicationId: number
 ): Promise<ICommunicationDetail | null> => {
   try {
-    const response: AxiosResponse<ICommunicationDetail> = await API.get(
+    const response: ICommunicationDetail = await API.get(
       `${config.API_HOST}/comunication/detail/${communicationId}`
     );
-    if (response.status === 200) {
-      return response.data;
-    } else {
-      throw new Error(`Error getting communication by id. Status: ${response.status}`);
-    }
+
+    return response;
   } catch (error) {
     console.error("Error getting communication by id", error);
     return null;

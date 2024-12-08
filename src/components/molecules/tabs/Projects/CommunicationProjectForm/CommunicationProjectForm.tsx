@@ -16,9 +16,9 @@ import SelectOuterTags from "@/components/ui/select-outer-tags";
 import InputClickable from "@/components/ui/input-clickable";
 import { ModalPeriodicity } from "@/components/molecules/modals/ModalPeriodicity/ModalPeriodicity";
 import {
+  ICommunicationDetail,
   ICommunicationForm,
-  IPeriodicityModalForm,
-  ISingleCommunication
+  IPeriodicityModalForm
 } from "@/types/communications/ICommunications";
 import { InputExpirationNoticeDays } from "@/components/atoms/inputs/InputExpirationNoticeDays/InputExpirationNoticeDays";
 import { OptionType } from "@/components/ui/select-outer-tags/select-outer-tags";
@@ -41,6 +41,10 @@ import { getContactOptions } from "@/services/contacts/contacts";
 
 const { Title } = Typography;
 
+interface ICommunicationDatatState {
+  data: ICommunicationDetail | undefined;
+  isLoading: boolean;
+}
 interface ISelect {
   value: number;
   label: string;
@@ -66,8 +70,8 @@ export const CommunicationProjectForm = ({
   const [selectedBusinessRules, setSelectedBusinessRules] = useState<ISelectedBussinessRules>(
     initDatSelectedBusinessRules
   );
-  const [communicationData, setCommunicationData] = useState({
-    data: {} as ISingleCommunication,
+  const [communicationData, setCommunicationData] = useState<ICommunicationDatatState>({
+    data: undefined,
     isLoading: false
   });
   const [customFieldsError, setCustomFieldsError] = useState({
@@ -107,7 +111,10 @@ export const CommunicationProjectForm = ({
     setValue,
     getValues
   } = useForm<ICommunicationForm>({
-    values: showCommunicationDetails.active ? dataToDataForm(communicationData.data) : undefined
+    values:
+      showCommunicationDetails.active && communicationData.data
+        ? dataToDataForm(communicationData.data)
+        : undefined
   });
   const watchTemplateTagsLabels = watch("template.tags")?.map((tag) => `\[${tag.label}\]`);
   const watchSelectedAction = watch("trigger.settings.actions");
@@ -148,27 +155,27 @@ export const CommunicationProjectForm = ({
     // set values for communication detail
     const fetchSingleCommunication = async () => {
       if (!showCommunicationDetails.communicationId) return;
-      setCommunicationData({ data: {} as ISingleCommunication, isLoading: true });
+      setCommunicationData({ data: undefined, isLoading: true });
       const res = await getCommunicationById(showCommunicationDetails.communicationId);
+
       if (res) {
         setCommunicationData({ data: res, isLoading: false });
-        setRadioValue(res.type);
-        setSelectedBusinessRules({
-          channels: res.rules.channel,
-          lines: res.rules.line,
-          sublines: res.rules.subline
-        });
-        setZones(res.rules.zone);
-        setAssignedGroups(res.rules.groups_id);
+        setRadioValue(res.id_comunication_type.id);
+        // setSelectedBusinessRules({
+        //   channels: res.rules.channel,
+        //   lines: res.rules.line,
+        //   sublines: res.rules.subline
+        // });
+        // setZones(res.rules.zone);
+        setAssignedGroups(res.client_group_id.map((group) => group.id));
+
+        const { repeat, end_date, start_date } = res.JSON_frecuency;
         setSelectedPeriodicity({
-          init_date: dayjs(new Date(res.date_init_frequency)).add(1, "day"),
-          frequency_number: res.repeats,
-          frequency: { value: capitalize(res.frequency), label: capitalize(res.frequency) },
-          days: res.frequency_days.map((day) => ({
-            value: capitalize(day),
-            label: dayToLabel(day)
-          })),
-          end_date: dayjs(new Date(res.date_end_frequency)).add(1, "day")
+          init_date: dayjs(new Date(start_date)).add(1, "day"),
+          frequency_number: repeat.interval,
+          frequency: { value: capitalize(repeat.frequency), label: capitalize(repeat.frequency) },
+          days: [{ value: repeat.day, label: dayToLabel(repeat.day) }],
+          end_date: dayjs(new Date(end_date)).add(1, "day")
         });
       }
     };
@@ -396,7 +403,7 @@ export const CommunicationProjectForm = ({
                             setValue={setValue}
                             error={errors.trigger?.settings?.noticeDaysEvent}
                             field={field}
-                            event_days_before={communicationData.data.event_days_before}
+                            event_days_before={99}
                             disabled={
                               !isEditAvailable && !!showCommunicationDetails.communicationId
                             }
@@ -660,28 +667,45 @@ const initDatSelectedBusinessRules: ISelectedBussinessRules = {
   sublines: []
 };
 
-const dataToDataForm = (data: ISingleCommunication): ICommunicationForm => {
+const dataToDataForm = (data: ICommunicationDetail | undefined): ICommunicationForm | undefined => {
+  if (!data || Object.keys(data).length === 0) return undefined;
+  const roles = data.user_roles?.map((role) => ({
+    value: `1_${role.id}`,
+    label: `Rol - ${role.name}`
+  }));
+
+  const contactPositions = data.contact_roles?.map((position) => ({
+    value: `0_${position.id}`,
+    label: `Cliente - ${position.name}`
+  }));
+  const send_to = [...roles, ...contactPositions];
+
   return {
-    name: data.COMUNICATION_NAME,
-    description: data.reason,
+    name: data.name,
+    description: data.description,
     trigger: {
-      type: data.type,
+      type: data.id_comunication_type.id,
       settings: {
         days: ["test"],
-        actions: undefined,
-        subActions: undefined,
-        event_type: data.EVENT_TYPE ? { value: data.EVENT_TYPE, label: data.EVENT_TYPE } : undefined
+        actions: data.action_type_ids.map((action) => ({
+          value: action.id.toString(),
+          label: action.name
+        })),
+        subActions: data.sub_action_type_ids.map((action) => ({
+          value: action.id.toString(),
+          label: action.name
+        })),
+        event_type: undefined
       }
     },
     template: {
       via: { value: data.via, label: data.via },
-      send_to: data.send_to?.map((mail) => ({ value: mail, label: mail })),
-      copy_to: data.copy_to?.map((mail) => ({ value: mail, label: mail })),
-      tags: data.tags?.map((tag) => ({ value: tag, label: tag })),
-      time: data.updated_at,
-      message: data.BODY,
-      title: data.TITLE,
-      subject: data.TEMPLATE_SUBJECT,
+      send_to: send_to,
+      copy_to: [],
+      tags: [{ value: "1", label: "Quemado" }],
+      message: "quemado",
+      title: "quemado",
+      subject: "quemado",
       files: []
     }
   };

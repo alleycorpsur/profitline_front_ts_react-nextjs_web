@@ -9,7 +9,7 @@ interface TriggerSettingsForm {
 }
 
 interface TriggerForm {
-  type: 1 | 2 | 3;
+  type: 1 | 2 | 3 | number;
   settings: TriggerSettingsForm;
 }
 
@@ -18,7 +18,6 @@ interface ITemplateForm {
   send_to: ISelectStringType[];
   copy_to: ISelectStringType[] | undefined;
   tags: ISelectStringType[];
-  time: string;
   message: string;
   title?: string;
   subject: string;
@@ -55,7 +54,7 @@ export interface ICreateCommunication {
   user_roles: number[];
   contact_roles: number[];
   client_group_ids: number[];
-  comunication_type: 1 | 2 | 3; // Enforce valid communication types //1 frecuency, 2 event, 3 action
+  comunication_type: 1 | 2 | 3 | number; // Enforce valid communication types //1 frecuency, 2 event, 3 action
 
   // Frequency-specific properties (optional)
   json_frecuency?: {
