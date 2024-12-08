@@ -116,7 +116,7 @@ export const CommunicationProjectForm = ({
         ? dataToDataForm(communicationData.data)
         : undefined
   });
-  const watchTemplateTagsLabels = watch("template.tags")?.map((tag) => `\[${tag.label}\]`);
+  const watchTemplateTagsLabels = watch("template.tags")?.map((tag) => `\{{${tag.label}\}}`);
   const watchSelectedAction = watch("trigger.settings.actions");
 
   useEffect(() => {
@@ -203,22 +203,27 @@ export const CommunicationProjectForm = ({
     return dayObj.label;
   };
 
-  const handleAddTagToBody = (value: OptionType[], deletedValue: OptionType[]) => {
+  const handleAddTagToBodyAndSubject = (value: OptionType[], deletedValue: OptionType[]) => {
     const valueBody = getValues("template.message");
+    const valueSubject = getValues("template.subject");
 
     if (deletedValue.length > 0) {
       const deletedTag = deletedValue[0].label;
-      setValue("template.message", valueBody.replace(`[${deletedTag}]`, ""));
+      setValue("template.message", valueBody.replace(`{{${deletedTag}}}`, ""));
+      setValue("template.subject", valueSubject.replace(`{{${deletedTag}}}`, ""));
+
       return;
     }
 
     const lastAddedTag = value.length > 0 ? value[value.length - 1] : undefined;
 
-    setValue("template.message", `${valueBody ? valueBody : ""}[${lastAddedTag?.label}]`);
+    setValue("template.message", `${valueBody ? valueBody : ""}{{${lastAddedTag?.label}}}`);
+    setValue("template.subject", `${valueSubject ? valueSubject : ""}{{${lastAddedTag?.label}}}`);
   };
 
   const handleCreateCommunication = async (data: any) => {
     setLoadingRequest(true);
+    console.log("data", data);
     if (
       zones.length === 0 ||
       selectedBusinessRules?.channels.length === 0 ||
@@ -403,7 +408,10 @@ export const CommunicationProjectForm = ({
                             setValue={setValue}
                             error={errors.trigger?.settings?.noticeDaysEvent}
                             field={field}
-                            event_days_before={99}
+                            // Event days before is a prop that comes from the backend to set the value when showing the communication details
+                            event_days_before={
+                              showCommunicationDetails.communicationId ? 0 : undefined
+                            }
                             disabled={
                               !isEditAvailable && !!showCommunicationDetails.communicationId
                             }
@@ -580,17 +588,44 @@ export const CommunicationProjectForm = ({
                     field={field}
                     customStyleContainer={{ width: "25%" }}
                     hiddenTags
-                    addedOnchangeBehaviour={handleAddTagToBody}
+                    addedOnchangeBehaviour={handleAddTagToBodyAndSubject}
                   />
                 )}
               />
-              <InputForm
+              {/* <InputForm
                 customStyle={{ width: "75%" }}
                 titleInput="Asunto"
                 control={control}
                 nameInput="template.subject"
                 error={errors.template?.subject}
                 readOnly={!isEditAvailable && !!showCommunicationDetails.communicationId}
+              /> */}
+              <Controller
+                name="template.subject"
+                control={control}
+                rules={{ required: true }}
+                disabled={!isEditAvailable && !!showCommunicationDetails.communicationId}
+                render={({ field }) => (
+                  <div className={styles.textArea}>
+                    <p className={styles.textArea__label}>Asunto</p>
+                    <CustomTextArea
+                      {...field}
+                      onChange={field.onChange}
+                      placeholder="Asunto"
+                      customStyles={
+                        errors.template?.subject ? { borderColor: "red" } : { height: "48px" }
+                      }
+                      customStyleTextArea={{
+                        height: "48px",
+                        minHeight: "48px",
+                        padding: "12px 1rem"
+                      }}
+                      value={field.value}
+                      highlightWords={watchTemplateTagsLabels}
+                      disabled={!isEditAvailable && !!showCommunicationDetails.communicationId}
+                    />
+                  </div>
+                )}
               />
             </Flex>
             <Controller
