@@ -37,7 +37,7 @@ export interface IResponseContactOptions {
   data: IContactOptions | [];
 }
 
-interface IContactOptions {
+export interface IContactOptions {
   country_calling_code: ICountryCallingCode[];
   contact_position: IContactPosition[];
 }
