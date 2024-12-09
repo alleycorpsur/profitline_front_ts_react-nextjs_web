@@ -12,6 +12,7 @@ type CustomTextAreProps = {
   highlightWords?: string[];
   readOnly?: boolean;
   disabled?: boolean;
+  customStyleTextArea?: React.CSSProperties;
 };
 
 export const CustomTextArea = ({
@@ -22,7 +23,8 @@ export const CustomTextArea = ({
   value,
   highlightWords,
   readOnly,
-  disabled
+  disabled,
+  customStyleTextArea
 }: CustomTextAreProps) => {
   //
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -95,12 +97,12 @@ export const CustomTextArea = ({
     if (onChange) onChange(e);
   };
 
-  //
   return (
     <div className="container" id="container" style={customStyles}>
       <div ref={mirrorRef} className="container__mirror" />
       <textarea
         {...field}
+        style={customStyleTextArea}
         ref={textareaRef}
         id="textarea"
         className="container__textarea"

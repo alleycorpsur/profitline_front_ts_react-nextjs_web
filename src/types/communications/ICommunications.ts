@@ -2,14 +2,14 @@ import dayjs from "dayjs";
 
 interface TriggerSettingsForm {
   days?: string[];
-  values?: ISelectStringType[];
-  subValues?: ISelectStringType[];
+  actions?: ISelectStringType[];
+  subActions?: ISelectStringType[];
   event_type?: ISelectStringType;
   noticeDaysEvent?: string;
 }
 
 interface TriggerForm {
-  type: "accion" | "frecuencia" | "evento" | string;
+  type: 1 | 2 | 3 | number;
   settings: TriggerSettingsForm;
 }
 
@@ -18,7 +18,6 @@ interface ITemplateForm {
   send_to: ISelectStringType[];
   copy_to: ISelectStringType[] | undefined;
   tags: ISelectStringType[];
-  time: string;
   message: string;
   title?: string;
   subject: string;
@@ -38,64 +37,103 @@ export interface ISelectStringType {
 }
 
 export interface IPeriodicityModalForm {
-  init_date: Date | undefined | dayjs.Dayjs;
+  init_date: undefined | dayjs.Dayjs;
   frequency_number: number | undefined;
   frequency: ISelectStringType;
   days: ISelectStringType[];
-  end_date: Date | undefined | dayjs.Dayjs;
+  end_date: undefined | dayjs.Dayjs;
 }
 
 export interface ICreateCommunication {
-  invoice_id: number;
   project_id: number;
-  data: {
-    name: string;
-    descripcion: string;
-    trigger: {
-      type: string;
-      settings: {
-        init_date?: string;
-        end_date?: string | null;
-        repeat?: number;
-        frequency?: string;
-        days?: string[] | number;
-        values?: string[];
-        event_type?: string;
-      };
+  name: string;
+  description: string;
+  subject: string;
+  message: string;
+  via: "email" | string;
+  user_roles: number[];
+  contact_roles: number[];
+  client_group_ids: number[];
+  comunication_type: 1 | 2 | 3 | number; // Enforce valid communication types //1 frecuency, 2 event, 3 action
+
+  // Frequency-specific properties (optional)
+  json_frecuency?: {
+    start_date: string;
+    repeat: {
+      interval: number;
+      frequency: "mensual" | "semanal" | string;
+      day: string;
     };
-    rules: {
-      channel: number[];
-      line: number[];
-      subline: number[];
-      zone: number[];
-      groups_id: number[];
-    };
-    template: {
-      via: string;
-      send_to: string[];
-      copy_to: string[] | undefined;
-      tags: string[];
-      time: string;
-      message: string;
-      title: string;
-      subject: string;
-      files: string[];
-    };
+    end_date: string;
   };
+
+  // Action-specific properties (optional)
+  action_type_ids?: number[];
+  sub_action_type_ids?: number[];
+
+  // Event-specific properties (optional, can be added if needed)
+  id_event_type?: number;
+  delay_event?: number;
 }
 
-export interface ICommunication {
-  name: string;
+interface ISelect {
   id: number;
+  name: string;
+}
+
+interface Frequency {
+  repeat: Repeat;
+  endDate: string;
+  startDate: string;
+}
+
+interface Repeat {
+  day: string;
+  interval: number;
+  frequency: "Semanal" | "Mensual";
+}
+export interface ICommunication {
+  id: number;
+  idProject: number;
+  name: string;
+  description: string;
+  userRoles: ISelect[];
+  contactRoles: ISelect[];
+  actionTypeIds: number[];
+  subActionTypeIds: number[];
+  clientGroupId: ISelect[];
+  idCommunicationType: ISelect;
+  comunicacionState: number;
   via: string;
-  reason: string;
-  frequency: string;
-  clients: number;
-  projectId: number;
-  rules: null;
-  created_at: string;
-  updated_at: string;
-  IS_DELETED: boolean;
+  subject: string;
+  message: string;
+  JSON_frecuency: Frequency;
+}
+
+export interface ICommunicationDetail {
+  id: number;
+  id_project: number;
+  name: string;
+  description: string;
+  user_roles: ISelect[];
+  contact_roles: ISelect[];
+  action_type_ids: ISelect[];
+  sub_action_type_ids: ISelect[];
+  client_group_id: ISelect[];
+  id_comunication_type: ISelect;
+  comunicacion_state: number; // 1 or 0
+  via: string;
+  subject: string;
+  message: string;
+  JSON_frecuency: {
+    repeat: {
+      day: string;
+      interval: number;
+      frequency: string; // e.g., "Semanal" or "Mensual"
+    };
+    end_date: string; // e.g., "2024-11-23" (ISO 8601 date format)
+    start_date: string; // e.g., "2024-11-08" (ISO 8601 date format)
+  };
 }
 
 export interface ISingleCommunication {
