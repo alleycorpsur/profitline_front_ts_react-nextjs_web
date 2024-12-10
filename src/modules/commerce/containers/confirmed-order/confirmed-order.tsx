@@ -5,12 +5,12 @@ import ConfirmedOrderItem from "../../components/confirmed-order-item";
 import { CheckCircle } from "phosphor-react";
 import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
 import ConfirmedOrderShippingInfo from "../../components/confirmed-order-shipping-info";
-import { extractSingleParam, formatMoney } from "@/utils/utils";
+import { extractSingleParam, formatNumber } from "@/utils/utils";
 
 import styles from "./confirmed-order.module.scss";
 import { getSingleOrder } from "@/services/commerce/commerce";
 import { useAppStore } from "@/lib/store/store";
-import { ISingleOrder } from "@/types/commerce/ICommerce";
+import { DiscountItem, ISingleOrder } from "@/types/commerce/ICommerce";
 
 export const ConfirmedOrderView: FC = () => {
   const { ID: projectId } = useAppStore((state) => state.selectedProject);
@@ -19,6 +19,7 @@ export const ConfirmedOrderView: FC = () => {
   const orderIdParam = extractSingleParam(params.orderId);
   const [order, setOrder] = useState<ISingleOrder>();
   const [loading, setLoading] = useState(false);
+  const [appliedDiscounts, setAppliedDiscounts] = useState<DiscountItem[]>([]);
 
   useEffect(() => {
     if (!orderIdParam || !projectId) return;
@@ -26,6 +27,8 @@ export const ConfirmedOrderView: FC = () => {
       setLoading(true);
       const response = await getSingleOrder(projectId, parseInt(orderIdParam));
       setOrder(response?.data[0]);
+      if (response.data[0].detail?.discounts?.discountItems?.length > 0)
+        setAppliedDiscounts(response.data[0].detail?.discounts?.discountItems);
       setLoading(false);
     };
     fetchOrder();
@@ -68,9 +71,26 @@ export const ConfirmedOrderView: FC = () => {
                         <p className={styles.category__header}>Skus: {category.products.length}</p>
                       </Flex>
                       <div className={styles.products}>
-                        {category.products.map((product) => (
-                          <ConfirmedOrderItem key={product.product_sku} product={product} />
-                        ))}
+                        {category.products.map((product) => {
+                          const productDiscount = appliedDiscounts?.find(
+                            (discount: any) => discount.product_sku === product.product_sku
+                          )?.discount;
+                          const productDiscountData =
+                            productDiscount && productDiscount.subtotalDiscount > 0
+                              ? {
+                                  discountPercentage:
+                                    productDiscount.primary?.discount_applied?.discount,
+                                  subtotal: productDiscount.primary?.new_price
+                                }
+                              : undefined;
+                          return (
+                            <ConfirmedOrderItem
+                              key={product.product_sku}
+                              product={product}
+                              productDiscount={productDiscountData}
+                            />
+                          );
+                        })}
                       </div>
                     </div>
                   ))}
@@ -117,23 +137,23 @@ export const ConfirmedOrderView: FC = () => {
               <Flex vertical gap={"0.25rem"}>
                 <Flex justify="space-between">
                   <p>Subtotal</p>
-                  <p>{formatMoney(order?.detail?.subtotal)}</p>
-                </Flex>
-                <Flex justify="space-between">
-                  <p>IVA 19%</p>
-                  <p>{formatMoney(order?.detail?.taxes)}</p>
+                  <p>${formatNumber(order?.detail?.subtotal ?? 0)}</p>
                 </Flex>
                 <Flex justify="space-between">
                   <p>Descuentos</p>
-                  <p>-{formatMoney(order?.detail?.discounts?.totalDiscount)}</p>
+                  <p>-${formatNumber(order?.detail?.discounts?.totalDiscount ?? 0)}</p>
+                </Flex>
+                <Flex justify="space-between" style={{ marginTop: "0.5rem" }}>
+                  <strong>Total</strong>
+                  <strong>${formatNumber(order?.total ?? 0)}</strong>
                 </Flex>
                 <Flex justify="space-between">
-                  <strong>Total</strong>
-                  <strong>{formatMoney(order?.total)}</strong>
+                  <p>IVA 19%</p>
+                  <p>${formatNumber(order?.detail?.taxes ?? 0)}</p>
                 </Flex>
                 <Flex className={styles.footer__earlyPaymentTotal} justify="space-between">
                   <p>Total con pronto pago</p>
-                  <p>{formatMoney(order?.total_pronto_pago)}</p>
+                  <p>${formatNumber(order?.total_pronto_pago ?? 0)}</p>
                 </Flex>
               </Flex>
               <PrincipalButton onClick={handleGoBack}>Salir</PrincipalButton>
