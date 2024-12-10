@@ -1,48 +1,53 @@
 import React from "react";
-import { Table } from "antd";
-import { InvoiceData } from "./Types";
+import { Table, TableProps } from "antd";
+import { IApplyTabRecord } from "@/types/applyTabClients/IApplyTabClients";
+import { formatMoney } from "@/utils/utils";
 
 interface DiscountTableProps {
-  data: InvoiceData[];
+  data?: IApplyTabRecord[];
 }
 
 const DiscountTable: React.FC<DiscountTableProps> = ({ data }) => {
-  const columns = [
-    { 
-      title: "ID ajuste", 
-      dataIndex: "adjustmentId", 
-      key: "adjustmentId",
-      sorter: (a: InvoiceData, b: InvoiceData) => a.adjustmentId! - b.adjustmentId!
+  const columns: TableProps<IApplyTabRecord>["columns"] = [
+    {
+      title: "ID ajuste",
+      dataIndex: "financial_discount_id",
+      key: "financial_discount_id",
+      render: (id) => <p className="sectionContainerTable__id">{id}</p>,
+      sorter: (a, b) => {
+        if (a.financial_discount_id && b.financial_discount_id) {
+          return a.financial_discount_id - b.financial_discount_id;
+        }
+        return 0;
+      }
     },
-    { 
-      title: "Tipo de ajuste", 
-      dataIndex: "adjustmentType", 
-      key: "adjustmentType",
-      sorter: (a: InvoiceData, b: InvoiceData) => a.adjustmentType!.localeCompare(b.adjustmentType!)
+    {
+      title: "Tipo de ajuste",
+      dataIndex: "adjustmentType",
+      key: "adjustmentType"
     },
-    { 
-      title: "Facturas", 
-      dataIndex: "invoices", 
-      key: "invoices",
-      sorter: (a: InvoiceData, b: InvoiceData) => a.invoices! - b.invoices!
+    {
+      title: "Facturas",
+      dataIndex: "invoices",
+      key: "invoices"
     },
-    { 
-      title: "Monto", 
-      dataIndex: "amount", 
+    {
+      title: "Monto",
+      dataIndex: "amount",
       key: "amount",
-      sorter: (a: InvoiceData, b: InvoiceData) => a.amount! - b.amount!
+      render: (amount) => <p className="cell -alignRight">{formatMoney(amount)}</p>,
+      sorter: (a, b) => a.amount - b.amount,
+      showSorterTooltip: false
     },
-    { 
-      title: "Monto aplicado", 
-      dataIndex: "appliedAmount", 
-      key: "appliedAmount",
-      sorter: (a: InvoiceData, b: InvoiceData) => a.appliedAmount - b.appliedAmount
+    {
+      title: "Monto aplicado",
+      dataIndex: "appliedAmount",
+      key: "appliedAmount"
     },
-    { 
-      title: "Saldo", 
-      dataIndex: "balance", 
-      key: "balance",
-      sorter: (a: InvoiceData, b: InvoiceData) => a.balance - b.balance
+    {
+      title: "Saldo",
+      dataIndex: "balance",
+      key: "balance"
     }
   ];
 
