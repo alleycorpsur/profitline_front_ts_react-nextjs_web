@@ -30,7 +30,7 @@ const ConfirmedOrderItem: FC<ConfirmedOrderItemProps> = ({ product, productDisco
 
       <div className={styles.price}>
         {productDiscount ? (
-          <>
+          <Flex vertical gap={4}>
             <h5 className={styles.oldPrice}>${formatNumber(product.price ?? 0)}</h5>
             <Flex gap={4} align="baseline">
               <h5 className={styles.price__amount}>
@@ -38,7 +38,7 @@ const ConfirmedOrderItem: FC<ConfirmedOrderItemProps> = ({ product, productDisco
               </h5>
               <p className={styles.discountPercentage}>-{productDiscount.discountPercentage}%</p>
             </Flex>
-          </>
+          </Flex>
         ) : (
           <h5 className={styles.price}>${formatNumber(product.price ?? 0)}</h5>
         )}

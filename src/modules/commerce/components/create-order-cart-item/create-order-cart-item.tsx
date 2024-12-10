@@ -54,15 +54,15 @@ const CreateOrderItem: FC<CreateOrderItemProps> = ({ product, categoryName, prod
 
       <div className={styles.price}>
         {productDiscount ? (
-          <>
+          <Flex vertical gap={4}>
             <h5 className={styles.oldPrice}>${formatNumber(product.price ?? 0)}</h5>
-            <Flex gap={4} align="baseline">
+            <Flex gap={8} align="baseline">
               <h5 className={styles.price__amount}>
                 ${formatNumber(productDiscount.subtotal ?? 0)}
               </h5>
               <p className={styles.discountPercentage}>-{productDiscount.discountPercentage}%</p>
             </Flex>
-          </>
+          </Flex>
         ) : (
           <h5 className={styles.price}>${formatNumber(product.price ?? 0)}</h5>
         )}
