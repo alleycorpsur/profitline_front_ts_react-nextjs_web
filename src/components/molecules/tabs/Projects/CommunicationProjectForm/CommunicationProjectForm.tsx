@@ -738,9 +738,8 @@ const dataToDataForm = (data: ICommunicationDetail | undefined): ICommunicationF
       send_to: send_to,
       copy_to: [],
       tags: [{ value: "1", label: "Quemado" }],
-      message: "quemado",
-      title: "quemado",
-      subject: "quemado",
+      message: data.message,
+      subject: data.subject,
       files: []
     }
   };
