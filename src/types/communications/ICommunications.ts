@@ -19,7 +19,6 @@ interface ITemplateForm {
   copy_to: ISelectStringType[] | undefined;
   tags: ISelectStringType[];
   message: string;
-  title?: string;
   subject: string;
   files: ISelectStringType[];
 }

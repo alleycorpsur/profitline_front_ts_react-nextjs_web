@@ -170,6 +170,7 @@ export const CommunicationProjectForm = ({
         setAssignedGroups(res.client_group_id.map((group) => group.id));
 
         const { repeat, end_date, start_date } = res.JSON_frecuency;
+        if (Object.keys(res.JSON_frecuency).length === 0) return;
         setSelectedPeriodicity({
           init_date: dayjs(new Date(start_date)).add(1, "day"),
           frequency_number: repeat.interval,
@@ -223,7 +224,6 @@ export const CommunicationProjectForm = ({
 
   const handleCreateCommunication = async (data: any) => {
     setLoadingRequest(true);
-    console.log("data", data);
     if (
       zones.length === 0 ||
       selectedBusinessRules?.channels.length === 0 ||
@@ -738,9 +738,8 @@ const dataToDataForm = (data: ICommunicationDetail | undefined): ICommunicationF
       send_to: send_to,
       copy_to: [],
       tags: [{ value: "1", label: "Quemado" }],
-      message: "quemado",
-      title: "quemado",
-      subject: "quemado",
+      message: data.message,
+      subject: data.subject,
       files: []
     }
   };
