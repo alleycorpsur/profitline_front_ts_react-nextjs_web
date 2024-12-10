@@ -140,16 +140,16 @@ export const ConfirmedOrderView: FC = () => {
                   <p>${formatNumber(order?.detail?.subtotal ?? 0)}</p>
                 </Flex>
                 <Flex justify="space-between">
-                  <p>IVA 19%</p>
-                  <p>${formatNumber(order?.detail?.taxes ?? 0)}</p>
-                </Flex>
-                <Flex justify="space-between">
                   <p>Descuentos</p>
                   <p>-${formatNumber(order?.detail?.discounts?.totalDiscount ?? 0)}</p>
                 </Flex>
-                <Flex justify="space-between">
+                <Flex justify="space-between" style={{ marginTop: "0.5rem" }}>
                   <strong>Total</strong>
                   <strong>${formatNumber(order?.total ?? 0)}</strong>
+                </Flex>
+                <Flex justify="space-between">
+                  <p>IVA 19%</p>
+                  <p>${formatNumber(order?.detail?.taxes ?? 0)}</p>
                 </Flex>
                 <Flex className={styles.footer__earlyPaymentTotal} justify="space-between">
                   <p>Total con pronto pago</p>
