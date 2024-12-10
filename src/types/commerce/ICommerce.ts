@@ -79,6 +79,7 @@ export interface PrimaryDiscount {
   price: number;
   unit_discount: number;
   discount_applied: DiscountApplied;
+  new_price: number;
 }
 
 export interface Discount {
