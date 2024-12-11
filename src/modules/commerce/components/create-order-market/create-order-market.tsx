@@ -67,7 +67,8 @@ const CreateOrderMarket: FC = () => {
             image: product.image,
             category_id: Number(product.id_category),
             SKU: product.SKU,
-            stock: true
+            stock: true,
+            category_name: product.category_name
           };
 
           newProductsMap.set(formattedProduct.id, formattedProduct);

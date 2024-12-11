@@ -112,14 +112,8 @@ export const ChangeWarehouseModal: React.FC<Props> = ({
     },
     {
       title: "Detalle",
-      dataIndex: "pendiente",
-      key: "pendiente"
-    },
-    {
-      title: "",
-      key: "buttonSee",
+      key: "buttonSeeDetail",
       dataIndex: "",
-
       render: (_, row) => (
         <Button
           onClick={() => {
@@ -195,6 +189,7 @@ export const ChangeWarehouseModal: React.FC<Props> = ({
 
   return (
     <Modal
+      centered
       width={686}
       open={isOpen}
       title={
@@ -218,13 +213,14 @@ export const ChangeWarehouseModal: React.FC<Props> = ({
           </Title>
         </Flex>
       }
+      styles={{ body: { maxHeight: "30rem", overflowY: "auto", paddingRight: "0.5rem" } }}
       footer={
         view === "change-warehouse" && (
           <FooterButtons
             titleConfirm="Guardar bodega"
             onClose={onClose}
             handleOk={onSubmit}
-            isConfirmDisabled={!warehouseSelected}
+            isConfirmDisabled={warehouseSelected === currentWarehouseId}
             isConfirmLoading={loadingSubmit}
           />
         )

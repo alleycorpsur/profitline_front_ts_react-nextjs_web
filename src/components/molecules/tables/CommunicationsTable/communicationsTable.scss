@@ -9,4 +9,12 @@
     .communicationsTable {
         margin-top: 1rem;
     }
+
+    .buttonEye {
+        background-color: $dark-gray;
+
+        &:hover {
+            background-color: $dark-gray !important;
+        }
+    }
 }

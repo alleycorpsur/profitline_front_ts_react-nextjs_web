@@ -1,6 +1,6 @@
 import { API } from "@/utils/api/api";
 import { GenericResponse } from "@/types/global/IGlobal";
-import { ILine, ISubLine } from "@/types/lines/line";
+import { ICategory, ILine, ISubLine } from "@/types/lines/line";
 
 export const getAllLinesByProject = async (idProject: string) => {
   const response: GenericResponse<ILine[]> = await API.get(`/line/project/${idProject}`);
@@ -9,6 +9,12 @@ export const getAllLinesByProject = async (idProject: string) => {
 export const getSubLinesByProject = async (idProject: string) => {
   const response: GenericResponse<ISubLine[]> = await API.get(
     `/bussines-rule/project/${idProject}/subline`
+  );
+  return response?.data || [];
+};
+export const getAllLinesByClient = async (idProject: string, clientId: number) => {
+  const response: GenericResponse<ICategory[]> = await API.get(
+    `marketplace/projects/${idProject}/clients/${clientId}/products`
   );
   return response?.data || [];
 };

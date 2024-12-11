@@ -46,8 +46,8 @@ export default function FeatByOrder({ discountType, form, statusForm }: FeatByOr
       };
     } else if (discountType === 3) {
       return {
-        unitsFrom: "Minimo de lineas",
-        unitsTo: "Mínimo de unidades por linea"
+        unitsFrom: "Minimo de Marcas",
+        unitsTo: "Mínimo de unidades por Marca"
       };
     } else {
       return {

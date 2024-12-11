@@ -1,50 +1,72 @@
 import config from "@/config";
+import axios from "axios";
+
+import { API, getIdToken } from "@/utils/api/api";
 import { MessageType } from "@/context/MessageContext";
+
 import { ISelectedBussinessRules } from "@/types/bre/IBRE";
 import {
   ICommunication,
+  ICommunicationDetail,
   ICommunicationForm,
   ICreateCommunication,
-  IPeriodicityModalForm,
-  ISingleCommunication
+  IPeriodicityModalForm
 } from "@/types/communications/ICommunications";
 import { GenericResponse } from "@/types/global/IGlobal";
-import { API, getIdToken } from "@/utils/api/api";
-import axios, { AxiosResponse } from "axios";
+
+interface IGetSelect {
+  id: number;
+  name: string;
+}
 
 export const getAllCommunications = async (projectId: number) => {
-  const response: GenericResponse<ICommunication[]> = await API.get(
-    `${config.API_HOST}/comunication/get_comunications?projectId=${projectId}`
+  const response: ICommunication[] = await API.get(
+    `${config.API_HOST}/comunication/?project_id=${projectId}`
   );
   return response;
 };
 
 export const getCommunicationById = async (
   communicationId: number
-): Promise<ISingleCommunication | null> => {
+): Promise<ICommunicationDetail | null> => {
   try {
-    const response: AxiosResponse<ISingleCommunication> = await API.get(
-      `${config.API_HOST}/comunication/detail_comunicaction?comunication_consolidated_id=${communicationId}`
+    const response: ICommunicationDetail = await API.get(
+      `${config.API_HOST}/comunication/detail/${communicationId}`
     );
-    if (response.status === 200) {
-      return response.data;
-    } else {
-      throw new Error(`Error getting communication by id. Status: ${response.status}`);
-    }
+
+    return response;
   } catch (error) {
     console.error("Error getting communication by id", error);
     return null;
   }
 };
 
-export const getForwardEvents = async (): Promise<string[]> => {
-  const response: string[] = await API.get(`${config.API_HOST}/comunication/get_events`);
+export const getForwardEvents = async (): Promise<IGetSelect[]> => {
+  const response: IGetSelect[] = await API.get(`${config.API_HOST}/comunication/events`);
   return response;
 };
 
-export const getTemplateTags = async (): Promise<string[]> => {
-  const response: string[] = await API.get(`${config.API_HOST}/comunication/get_tags`);
+export const getActions = async (): Promise<IGetSelect[]> => {
+  const response: IGetSelect[] = await API.get(`${config.API_HOST}/comunication/actions`);
   return response;
+};
+
+export const getSubActions = async (action_ids: string[]): Promise<IGetSelect[]> => {
+  const response: IGetSelect[] = await API.get(
+    `${config.API_HOST}/comunication/actions/${action_ids[0]}/sub-actions`
+  );
+  return response;
+};
+
+interface IGetTags extends IGetSelect {
+  description: string;
+}
+
+export const getTemplateTags = async (): Promise<IGetTags[]> => {
+  const response: GenericResponse<IGetTags[]> = await API.get(
+    `${config.API_HOST}/comunication/tags`
+  );
+  return response.data;
 };
 
 export const getForwardToEmails = async (): Promise<string[]> => {
@@ -73,68 +95,91 @@ export const createCommunication = async ({
   showMessage
 }: ICreateCommunicationProps) => {
   const token = await getIdToken();
-  const now = new Date();
-  const timeString = now.toLocaleString("es-CO");
   const eventTriggerDays = data?.trigger?.settings?.noticeDaysEvent;
+
+  const sendToRoles = data.template.send_to
+    .filter((role) => {
+      const isRole = role.value.split("_")[0];
+      return isRole !== "0";
+    })
+    .map((role) => Number(role.value.split("_")[1]));
+  const copyToRoles =
+    data.template.copy_to
+      ?.filter((role) => {
+        const isRole = role.value.split("_")[0];
+        return isRole !== "0";
+      })
+      .map((role) => Number(role.value.split("_")[1])) || [];
+  const roles_ids = [...sendToRoles, ...copyToRoles];
+
+  const sendToContactPositions = data.template.send_to
+    .filter((role) => {
+      const isContactPos = role.value.split("_")[0];
+      return isContactPos === "0";
+    })
+    .map((role) => Number(role.value.split("_")[1]));
+  const copyToContactPositions =
+    data.template.copy_to
+      ?.filter((role) => {
+        const isContactPos = role.value.split("_")[0];
+        return isContactPos === "0";
+      })
+      .map((role) => Number(role.value.split("_")[1])) || [];
+  const contact_positions_ids = [...sendToContactPositions, ...copyToContactPositions];
+
+  const jsonFreq = {
+    start_date: selectedPeriodicity?.init_date?.format("YYYY-MM-DD") || "",
+    repeat: {
+      interval: selectedPeriodicity?.frequency_number || 0,
+      frequency: selectedPeriodicity?.frequency.value || "mensual",
+      day: selectedPeriodicity?.init_date?.format("YYYY-MM-DD").split("-")[2] || ""
+    },
+    end_date: selectedPeriodicity?.end_date?.format("YYYY-MM-DD") || ""
+  };
+
   const modelData: ICreateCommunication = {
     // Where does invoice should come from?
-    invoice_id: 1,
     project_id: projectId,
-    data: {
-      name: data.name,
-      descripcion: data.description,
-      trigger: {
-        type: data.trigger.type,
-        settings: {
-          init_date: selectedPeriodicity?.init_date?.toISOString().split("T")[0],
-          end_date: selectedPeriodicity?.end_date?.toISOString().split("T")[0],
-          repeat: selectedPeriodicity?.frequency_number,
-          frequency: selectedPeriodicity?.frequency?.value.toLowerCase(),
-          days:
-            data.trigger.type === "evento"
-              ? eventTriggerDays
-                ? parseInt(eventTriggerDays)
-                : undefined
-              : selectedPeriodicity?.days?.map((day) => day.value.toLowerCase()),
-          values: data.trigger.settings.values?.map((value) => value.value),
-          event_type: data.trigger.settings.event_type?.value
-        }
-      },
-      rules: {
-        channel: selectedBusinessRules.channels,
-        line: selectedBusinessRules.lines,
-        subline: selectedBusinessRules.sublines,
-        zone: zones,
-        groups_id: assignedGroups
-      },
-      template: {
-        via: data.template.via.value,
-        send_to: data.template.send_to.map((mail) => mail.value),
-        copy_to: data.template.copy_to?.map((mail) => mail.value),
-        tags: data.template.tags?.map((tag) => tag.value),
-        time: timeString,
-        message: data.template.message,
-        // Where does title should come from?
-        title: data.template?.title || "titulo quemado",
-        subject: data.template.subject,
-        files: data.template.files.map((file) => file.value)
-      }
-    }
+    name: data.name,
+    description: data.description,
+    subject: data.template.subject,
+    message: data.template.message,
+    via: data.template.via.value.toLowerCase(),
+    user_roles: roles_ids,
+    contact_roles: contact_positions_ids,
+    client_group_ids: assignedGroups,
+    comunication_type: data.trigger.type,
+    // Frequency-specific properties (optional)
+    json_frecuency: data.trigger.type === 1 ? jsonFreq && jsonFreq : undefined,
+
+    // Event-specific properties (optional)
+    id_event_type: Number(data.trigger.settings?.event_type?.value) || undefined,
+    delay_event: Number(eventTriggerDays) || undefined,
+
+    // Action-specific properties (optional)
+    action_type_ids:
+      data.trigger.settings?.actions?.map((action) => Number(action.value)) || undefined,
+    sub_action_type_ids:
+      data.trigger.settings?.subActions?.map((subAction) => Number(subAction.value)) || undefined
   };
 
   try {
-    const response: any = await axios.post(`${config.API_HOST}/comunication/create`, modelData, {
-      headers: {
-        Accept: "application/json, text/plain, */*",
-        Authorization: `Bearer ${token}`
+    const response: GenericResponse<{ id: number }> = await axios.post(
+      `${config.API_HOST}/comunication`,
+      modelData,
+      {
+        headers: {
+          Accept: "application/json, text/plain, */*",
+          Authorization: `Bearer ${token}`
+        }
       }
-    });
+    );
 
     if (response.status === 200) showMessage("success", "Comunicación creada correctamente");
     return response;
   } catch (error) {
     console.error("Error creating communication", error);
     showMessage("error", "Ocurrió un error al crear la comunicación");
-    return error;
+    throw error;
   }
 };

@@ -219,6 +219,7 @@ export const StateConcilationTable = ({ invoices, clientId, setInvoices }: Props
             placeholder="Seleccionar acción para todos"
             loading={isLoading}
             className="select__container"
+            popupClassName="concilation_table__select__popup"
             options={motives?.map((motive) => ({ value: motive.id, label: motive.name })) || []}
             onChange={(value) => addSelectMotiveToAll(value)}
             style={{ width: "200px", marginRight: "10px" }}

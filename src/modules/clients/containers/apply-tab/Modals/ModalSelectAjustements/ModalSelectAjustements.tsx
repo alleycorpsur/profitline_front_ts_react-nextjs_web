@@ -30,7 +30,6 @@ export const ModalSelectAjustements: React.FC<ModalActionPaymentProps> = ({
           icon={<Globe size={20} />}
           title="Global"
           onClick={() => {
-            console.log("Identificar pago clicked");
             setModalAction(1);
           }}
         />
@@ -38,7 +37,6 @@ export const ModalSelectAjustements: React.FC<ModalActionPaymentProps> = ({
           icon={<NewspaperClipping size={20} />}
           title="Por factura"
           onClick={() => {
-            console.log("Aplicar pagos clicked");
             setModalAction(2);
           }}
         />

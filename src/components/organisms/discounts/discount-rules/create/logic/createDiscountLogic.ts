@@ -8,6 +8,7 @@ export const mapDiscountGetOneToDiscountSchema: (discount: DiscountGetOne) => Di
 ) => {
   return {
     client: discount.id_client,
+    client_name: discount.client_name,
     contract_archive: discount.contract_archive || "",
     description: discount.description,
     discount_type: discount.discount_type_id,
@@ -38,7 +39,8 @@ export const mapDiscountGetOneToDiscountSchema: (discount: DiscountGetOne) => Di
         id: e.id,
         idLine: e.id_line,
         units: e.units,
-        idContract: e.id_discount_contracts_ranges
+        idProduct: e.id_product,
+        discount: e.discount
       })) || []
   };
 };

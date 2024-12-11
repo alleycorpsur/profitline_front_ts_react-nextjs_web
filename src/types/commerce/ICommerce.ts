@@ -36,6 +36,7 @@ export interface ISelectedProduct {
   quantity: number;
   image: string;
   category_id: number;
+  category_name: string;
   SKU: string;
   stock: boolean;
 }
@@ -62,6 +63,7 @@ export interface IProductInDetail {
   taxes: number;
   image: string;
   id_category: number;
+  category_name: string;
   discount: number;
   discount_percentage: number;
 }
@@ -79,6 +81,7 @@ export interface PrimaryDiscount {
   price: number;
   unit_discount: number;
   discount_applied: DiscountApplied;
+  new_price: number;
 }
 
 export interface Discount {

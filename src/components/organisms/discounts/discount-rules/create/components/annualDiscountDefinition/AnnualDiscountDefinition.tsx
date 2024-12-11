@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { Controller, UseFormReturn, useFieldArray } from "react-hook-form";
 import { Button, DatePicker, Flex, Select, Typography } from "antd";
-import { useInfiniteQuery } from "react-query";
-
 import { InputForm } from "@/components/atoms/inputs/InputForm/InputForm";
 import {
   FileObject,
@@ -15,9 +13,8 @@ import { useAppStore } from "@/lib/store/store";
 import { Pencil } from "phosphor-react";
 import UploadDocumentChild from "@/components/atoms/UploadDocumentChild/UploadDocumentChild";
 import style from "./AnnualDiscountDefinition.module.scss";
-
 import { fetcher } from "@/utils/api/api";
-import { useDebounce } from "@/hooks/useDeabouce";
+import useSWR from "swr";
 
 const { Title, Text } = Typography;
 
@@ -39,46 +36,40 @@ export default function AnnualDiscountDefinition({
   handleChangeStatusForm,
   loadingMain,
   handleUpdateContract
-}: Props) {
+}: Readonly<Props>) {
   const { ID: projectId } = useAppStore((project) => project.selectedProject);
-  const [searchQuery, setSearchQuery] = useState<string>("");
-  const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
-  const fetchClients = async ({ pageParam = 1 }) => {
-    const limit = 50;
-    const searchQueryParam = debouncedSearchQuery
-      ? `&searchQuery=${encodeURIComponent(debouncedSearchQuery.toLowerCase().trim())}`
-      : "";
+  interface IResponseClients {
+    status: number;
+    message: string;
+    data: IClient[];
+  }
+  interface IClient {
+    client_id: string;
+    client_name: string;
+  }
 
-    const pathKey = `/portfolio/client/project/${projectId}?page=${pageParam}&limit=${limit}${searchQueryParam}`;
-
-    return fetcher(pathKey);
-  };
-
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useInfiniteQuery(
-    ["clients", debouncedSearchQuery, projectId],
-    fetchClients,
-    {
-      getNextPageParam: (lastPage, pages) => {
-        if (lastPage.message === "no rows" || lastPage?.data?.clientsPortfolio?.length < 50)
-          return undefined;
-        return pages.length + 1;
-      }
-    }
+  const { data: clients, isLoading } = useSWR<IResponseClients>(
+    `/marketplace/projects/${projectId}/clients`,
+    fetcher,
+    {}
   );
 
   const {
     setValue,
     control,
     getValues,
-    formState: { errors }
+    formState: { errors },
+    watch
   } = form;
+  const formNow = watch();
+  console.log("form", formNow);
 
   const { fields, append, remove } = useFieldArray({
     control,
     name: "annual_ranges"
   });
-
+  const clientName = watch("client_name");
   useEffect(() => {
     const options = getOptionsByType(selectedType);
     setValue("discount_type", options[0].value);
@@ -87,23 +78,15 @@ export default function AnnualDiscountDefinition({
     };
   }, [selectedType, setValue]);
 
-  const options =
-    data?.pages.flatMap(
-      (page) =>
-        page.data?.clientsPortfolio?.map((client: { client_name: string; client_id: string }) => ({
-          label: client.client_name,
-          value: client.client_id
-        })) || []
-    ) || [];
+  const options = useMemo(() => {
+    return (
+      clients?.data?.map((client: { client_name: string; client_id: string }) => ({
+        label: client.client_name,
+        value: client.client_id
+      })) || []
+    );
+  }, [clients]);
 
-  const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
-    const { currentTarget } = event;
-    if (currentTarget.scrollTop + currentTarget.clientHeight >= currentTarget.scrollHeight - 20) {
-      if (hasNextPage && !isFetchingNextPage) {
-        fetchNextPage();
-      }
-    }
-  };
   return (
     <Flex className={style.HeaderContainer} vertical gap={20}>
       <Flex gap={20} justify="space-between">
@@ -130,22 +113,28 @@ export default function AnnualDiscountDefinition({
           render={({ field }) => (
             <>
               <Select
+                {...field}
                 showSearch
                 optionFilterProp="label"
                 placeholder="Selecciona cliente"
                 className={`${style.selectInput} translate`}
-                loading={isFetchingNextPage || isLoading}
+                loading={isLoading}
                 variant="borderless"
                 optionLabelProp="label"
-                options={options}
+                options={
+                  statusForm !== "create" && field.value
+                    ? [
+                        ...options,
+                        { value: field.value, label: clientName } // Añade el valor actual si no está en las opciones
+                      ]
+                    : options
+                }
+                value={field.value}
                 disabled={statusForm !== "create"}
-                onSearch={setSearchQuery}
-                filterOption={false}
-                onPopupScroll={handleScroll}
-                {...field}
-              >
-                {isFetchingNextPage && <Select.Option disabled>Cargando más...</Select.Option>}
-              </Select>
+                filterOption={(input, option) =>
+                  option!.label!.toString().toLowerCase().indexOf(input.toLowerCase()) >= 0
+                }
+              />
               <Text type="danger" hidden={!errors.client}>
                 {errors?.client?.message}
               </Text>
@@ -181,14 +170,14 @@ export default function AnnualDiscountDefinition({
           nameInput="name"
           titleInput="Nombre"
           className={style.input}
-        ></InputForm>
+        />
         <InputForm
           control={control}
           error={errors.description}
           nameInput="description"
           titleInput="Descripción"
           className={style.inputDesc}
-        ></InputForm>
+        />
       </Flex>
       <Title level={4}>Fechas</Title>
       <Flex gap={20}>
@@ -205,7 +194,7 @@ export default function AnnualDiscountDefinition({
                     placeholder="Inicio"
                     type="secondary"
                     {...field}
-                  ></DatePicker>
+                  />
                   <Text type="danger" style={{ textWrap: "wrap" }} hidden={!errors.start_date}>
                     {errors?.start_date?.message}
                   </Text>
@@ -227,7 +216,7 @@ export default function AnnualDiscountDefinition({
                     placeholder="Fin"
                     type="secondary"
                     {...field}
-                  ></DatePicker>
+                  />
                   <Text type="danger" style={{ textWrap: "wrap" }} hidden={!errors.end_date}>
                     {errors?.end_date?.message}
                   </Text>
@@ -246,10 +235,10 @@ export default function AnnualDiscountDefinition({
         append={append}
         remove={remove}
         statusForm={statusForm}
-      ></AnnualFeatures>
+      />
       {
-        <Text type="danger" hidden={!errors.annual_ranges?.root}>
-          {errors?.annual_ranges?.root?.message}
+        <Text type="danger" hidden={!errors.annual_ranges?.message}>
+          {errors?.annual_ranges?.message}
         </Text>
       }
     </Flex>

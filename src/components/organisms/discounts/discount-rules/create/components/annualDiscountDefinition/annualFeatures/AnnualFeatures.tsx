@@ -1,7 +1,7 @@
 import style from "./AnnualFeatures.module.scss";
 import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
 import { InputForm } from "@/components/atoms/inputs/InputForm/InputForm";
-import { Button, Col, Flex, Row, Select, Typography } from "antd";
+import { Button, Flex, Select, Typography } from "antd";
 import {
   Controller,
   FieldArrayWithId,
@@ -29,104 +29,130 @@ export default function AnnualFeatures({
   append,
   remove,
   statusForm
-}: AnnualFeaturesProps) {
+}: Readonly<AnnualFeaturesProps>) {
   const {
     control,
     register,
     watch,
-    formState: { errors }
+    formState: { errors },
+    setValue
   } = form;
 
-  const { findContract, matchRanges, options, isLoadingOption } = useAnnualFeatures({ form });
+  const { options, isLoadingOption, clientWithoutProducts } = useAnnualFeatures({ form });
 
+  const getFilteredProducts = (idLine: number | undefined) => {
+    const optionSelectedIndex = options.findIndex((line) => line.value === idLine);
+    return options[optionSelectedIndex]?.productsAvailable || [];
+  };
+
+  const watchIdLines = watch("annual_ranges");
+
+  if (clientWithoutProducts) {
+    return <div>No hay productos para esta cliente</div>;
+  }
   return (
-    <Flex className={style.container} vertical gap={10}>
-      {fields.map((field, index) => (
-        <Flex key={`row-${index}`} vertical gap={10}>
-          <Row>
-            <Col span={5}>
-              <span className={style.columnHeader}>Línea</span>
-            </Col>
-            <Col span={5} offset={1}>
-              <span className={style.columnHeader}>Unidades</span>
-            </Col>
-            <Col span={7} offset={1}>
-              <span className={style.columnHeader}>Rango de descuento</span>
-            </Col>
-            <Col span={4} offset={1}>
-              <span className={style.columnHeader}>Descuento</span>
-            </Col>
-          </Row>
-          <Row>
-            <Col span={5}>
-              <Controller
-                control={control}
-                {...register(`annual_ranges.${index}.idLine`)}
-                render={({ field }) => {
-                  return (
-                    <>
+    <Flex className={style.container} vertical gap={12}>
+      {fields.map((field, index) => {
+        const idLine = watchIdLines?.[index]?.idLine;
+        const filteredProducts = getFilteredProducts(idLine);
+
+        return (
+          <Flex key={`row-${index}`} vertical gap={12}>
+            <Flex gap={12} align="center">
+              <Flex vertical gap={4}>
+                <span className={style.columnHeader}>Línea</span>
+                <Controller
+                  control={control}
+                  {...register(`annual_ranges.${index}.idLine`)}
+                  render={({ field }) => {
+                    return (
                       <Select
+                        {...field}
                         variant="borderless"
                         className={`${style.selectInput}`}
                         loading={isLoadingOption}
                         options={options}
-                        {...field}
-                      ></Select>
-                    </>
-                  );
-                }}
-              />
-            </Col>
-            <Col span={5} offset={1}>
-              <InputForm
-                hiddenTitle={true}
-                control={control}
-                error={undefined}
-                changeInterceptor={matchRanges}
-                nameInput={`annual_ranges.${index}.units`}
-                className={style.input}
-              ></InputForm>
-            </Col>
-            <Col span={7} offset={1} className={style.discountFeatures}>
-              <span>{findContract(watch(`annual_ranges.${index}.idContract`)).range}</span>
-            </Col>
-            <Col span={3} offset={1} className={style.discountFeatures}>
-              <span>{findContract(watch(`annual_ranges.${index}.idContract`)).discount}</span>
-            </Col>
-            <Col span={1} className={style.discountFeatures}>
+                        placeholder="Selecciona una línea"
+                        onChange={(value) => {
+                          field.onChange(value);
+                          setValue(`annual_ranges.${index}.idProduct`, undefined);
+                        }}
+                      />
+                    );
+                  }}
+                />
+                <Text type="danger" hidden={!errors?.annual_ranges?.[index]?.idLine}>
+                  {errors?.annual_ranges?.[index]?.idLine?.message}
+                </Text>
+              </Flex>
+              <Flex vertical gap={4}>
+                <span className={style.columnHeader}>Producto</span>
+                <Controller
+                  control={control}
+                  {...register(`annual_ranges.${index}.idProduct`)}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      placeholder="Selecciona producto"
+                      variant="borderless"
+                      className={`${style.selectInput}`}
+                      value={field.value}
+                      disabled={filteredProducts?.length === 0 || statusForm === "review"}
+                    >
+                      {filteredProducts?.map((product) => (
+                        <Select.Option key={product.id} value={product.id}>
+                          {product.description}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  )}
+                />
+                <Text type="danger" hidden={!errors?.annual_ranges?.[index]?.units}>
+                  {errors?.annual_ranges?.[index]?.idProduct?.message}
+                </Text>
+              </Flex>
+              <Flex vertical gap={4}>
+                <span className={style.columnHeader}>Unidades</span>
+                <InputForm
+                  hiddenTitle={true}
+                  control={control}
+                  error={undefined}
+                  nameInput={`annual_ranges.${index}.units`}
+                  className={style.input}
+                />
+                <Text type="danger" hidden={!errors?.annual_ranges?.[index]?.units}>
+                  {errors?.annual_ranges?.[index]?.units?.message}
+                </Text>
+              </Flex>
+              <Flex vertical gap={4}>
+                <span className={style.columnHeader}>Descuento</span>
+                <InputForm
+                  hiddenTitle={true}
+                  control={control}
+                  error={undefined}
+                  nameInput={`annual_ranges.${index}.discount`}
+                  className={style.input}
+                />
+                <Text type="danger" hidden={!errors?.annual_ranges?.[index]?.units}>
+                  {errors?.annual_ranges?.[index]?.discount?.message}
+                </Text>
+              </Flex>
               {statusForm !== "review" && (
                 <Button type="text" onClick={() => remove(index)}>
                   <Trash size={20} />
                 </Button>
               )}
-            </Col>
-          </Row>
-          {/* Errors Row */}
-          <Row>
-            <Col span={5}>
-              <Text type="danger" hidden={!errors?.annual_ranges?.[index]?.idLine}>
-                {errors?.annual_ranges?.[index]?.idLine?.message}
-              </Text>
-            </Col>
-            <Col span={5} offset={1}>
-              <Text type="danger" hidden={!errors?.annual_ranges?.[index]?.units}>
-                {errors?.annual_ranges?.[index]?.units?.message}
-              </Text>
-            </Col>
-            <Col span={7} offset={1}>
-              <Text type="danger" hidden={!errors?.annual_ranges?.[index]?.idContract}>
-                {errors?.annual_ranges?.[index]?.idContract?.message}
-              </Text>
-            </Col>
-            <Col span={4} offset={1}></Col>
-          </Row>
-          <hr />
-        </Flex>
-      ))}
+            </Flex>
+            <hr />
+          </Flex>
+        );
+      })}
       {statusForm !== "review" && (
         <Flex justify="end">
           <PrincipalButton
-            onClick={() => append({ id: 0, idLine: undefined, units: 0, idContract: undefined })}
+            onClick={() =>
+              append({ id: 0, idLine: undefined, idProduct: undefined, units: 0, discount: 0 })
+            }
             className={style.button}
             icon={<Plus />}
             iconPosition="end"

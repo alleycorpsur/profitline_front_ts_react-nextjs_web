@@ -57,10 +57,6 @@ export const ProjectFormTab = ({
     disabled: statusForm === "review"
   });
 
-  useEffect(() => {
-    console.log("cambio loading ", loading);
-  }, [loading]);
-
   const generalDSOCurrentlyYear = watch("general.DSO_currenly_year");
   useEffect(() => {
     if (data.BILLING_PERIOD_CONFIG) {

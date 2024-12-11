@@ -2,8 +2,7 @@ import { FC, useContext, useEffect, useState } from "react";
 import { Flex } from "antd";
 import { AxiosError } from "axios";
 import { BagSimple } from "phosphor-react";
-
-import { formatMoney } from "@/utils/utils";
+import { formatNumber } from "@/utils/utils";
 import { useAppStore } from "@/lib/store/store";
 import { confirmOrder } from "@/services/commerce/commerce";
 
@@ -12,8 +11,6 @@ import CreateOrderItem from "../create-order-cart-item";
 import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
 import CreateOrderDiscountsModal from "../create-order-discounts-modal";
 
-import { IOrderConfirmedResponse } from "@/types/commerce/ICommerce";
-import { GenericResponse } from "@/types/global/IGlobal";
 import { ISelectType } from "@/types/clients/IClients";
 
 import styles from "./create-order-cart.module.scss";
@@ -25,6 +22,8 @@ const CreateOrderCart: FC = ({}) => {
   const { ID: projectId } = useAppStore((state) => state.selectedProject);
   const [openDiscountsModal, setOpenDiscountsModal] = useState(false);
   const [insufficientStockProducts, setInsufficientStockProducts] = useState<string[]>([]);
+  const [appliedDiscounts, setAppliedDiscounts] = useState<any>([]);
+
   const {
     selectedCategories,
     setSelectedCategories,
@@ -37,7 +36,6 @@ const CreateOrderCart: FC = ({}) => {
     categories,
     setCategories
   } = useContext(OrderViewContext);
-
   const numberOfSelectedProducts = selectedCategories.reduce(
     (acc, category) => acc + category.products.length,
     0
@@ -69,6 +67,9 @@ const CreateOrderCart: FC = ({}) => {
           if (response.status === 200) {
             setConfirmOrderData(response.data);
             setInsufficientStockProducts(response.data.insufficientStockProducts);
+            console.log("response.data.discounts", response.data.discounts);
+            if (response.data.discounts?.discountItems?.length > 0)
+              setAppliedDiscounts(response.data.discounts?.discountItems);
           }
         } catch (error) {
           if (error instanceof AxiosError) {
@@ -131,16 +132,29 @@ const CreateOrderCart: FC = ({}) => {
           {selectedCategories.map((category) => (
             <div key={category.category_id}>
               <Flex className={styles.products__header} justify="space-between">
-                <p>{category.category}</p>
+                <p>{category.products[0].category_name}</p>
                 <p>SKUs: {category.products.length}</p>
               </Flex>
-              {category.products.map((product) => (
-                <CreateOrderItem
-                  key={product.id}
-                  product={product}
-                  categoryName={category.category}
-                />
-              ))}
+              {category.products.map((product) => {
+                const productDiscount = appliedDiscounts?.find(
+                  (discount: any) => discount.product_sku === product.SKU
+                )?.discount;
+                const productDiscountData =
+                  productDiscount && productDiscount.subtotalDiscount > 0
+                    ? {
+                        discountPercentage: productDiscount.primary?.discount_applied?.discount,
+                        subtotal: productDiscount.primary?.new_price
+                      }
+                    : undefined;
+                return (
+                  <CreateOrderItem
+                    key={`${product.id}-${product.SKU}`}
+                    product={product}
+                    categoryName={category.category}
+                    productDiscount={productDiscountData}
+                  />
+                );
+              })}
             </div>
           ))}
         </div>
@@ -162,23 +176,27 @@ const CreateOrderCart: FC = ({}) => {
           <Flex vertical gap={"0.25rem"}>
             <Flex justify="space-between">
               <p>Subtotal</p>
-              <p>{formatMoney(confirmOrderData?.subtotal)}</p>
-            </Flex>
-            <Flex justify="space-between">
-              <p>IVA</p>
-              <p>{formatMoney(confirmOrderData?.taxes)}</p>
+              <p>${formatNumber(confirmOrderData?.subtotal)}</p>
             </Flex>
             <Flex justify="space-between">
               <p>Descuentos</p>
-              <p>-{formatMoney(confirmOrderData.discounts?.totalDiscount)}</p>
+              {confirmOrderData.discounts ? (
+                <p>-${formatNumber(confirmOrderData.discounts?.totalDiscount)}</p>
+              ) : (
+                <p>-$0</p>
+              )}
+            </Flex>
+            <Flex justify="space-between" style={{ marginTop: "0.5rem" }}>
+              <strong>Total</strong>
+              <strong>${formatNumber(confirmOrderData?.total)}</strong>
             </Flex>
             <Flex justify="space-between">
-              <strong>Total</strong>
-              <strong>{formatMoney(confirmOrderData?.total)}</strong>
+              <p>IVA</p>
+              <p>${formatNumber(confirmOrderData?.taxes)}</p>
             </Flex>
             <Flex justify="space-between">
               <p>Total con pronto pago</p>
-              <p>{formatMoney(confirmOrderData?.total_pronto_pago)}</p>
+              <p>${formatNumber(confirmOrderData?.total_pronto_pago)}</p>
             </Flex>
           </Flex>
 

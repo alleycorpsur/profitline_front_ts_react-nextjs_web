@@ -77,7 +77,8 @@ export const CreateOrderView: FC = () => {
             image: product.image,
             category_id: product.id_category,
             SKU: product.product_sku,
-            stock: true
+            stock: true,
+            category_name: product.category_name
           }))
         }));
         setSelectedCategories(selectedCategories);

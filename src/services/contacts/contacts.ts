@@ -1,5 +1,6 @@
 import config from "@/config";
-import { ICreateEditContact, IGetContacts } from "@/types/contacts/IContacts";
+import { IContactOptions, ICreateEditContact, IGetContacts } from "@/types/contacts/IContacts";
+import { GenericResponse } from "@/types/global/IGlobal";
 import { API } from "@/utils/api/api";
 
 interface genericResponse {
@@ -62,5 +63,17 @@ export const deleteContact = async (
     return response;
   } catch (error) {
     return Promise.reject(error);
+  }
+};
+
+export const getContactOptions = async (): Promise<IContactOptions> => {
+  try {
+    const response: GenericResponse<IContactOptions> = await API.get(
+      `${config.API_HOST}/client/contact/options`
+    );
+
+    return response.data;
+  } catch (error) {
+    throw Promise.reject(error);
   }
 };

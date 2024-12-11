@@ -56,7 +56,7 @@ export const OrdersGenerateActionModal = ({
         return showMessage("error", "Error al descargar CSV");
       }
       createAndDownloadTxt(res.data);
-      if (res.message == "Order Ids correctos") {
+      if (res.message == "") {
         showMessage("success", "Descarga exitosa");
       } else {
         setErrorMessage(res?.message);
@@ -111,6 +111,7 @@ export const OrdersGenerateActionModal = ({
         title={<Title level={4}>Descarga de plano de facturación</Title>}
       >
         <Flex vertical gap={12}>
+          <Text>Ordenes sin stock</Text>
           <Text strong>{errorMessage}</Text>
         </Flex>
       </Modal>
