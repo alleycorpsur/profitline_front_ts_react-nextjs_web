@@ -23,6 +23,7 @@ const CreateOrderCart: FC = ({}) => {
   const [openDiscountsModal, setOpenDiscountsModal] = useState(false);
   const [insufficientStockProducts, setInsufficientStockProducts] = useState<string[]>([]);
   const [appliedDiscounts, setAppliedDiscounts] = useState<any>([]);
+
   const {
     selectedCategories,
     setSelectedCategories,
@@ -35,7 +36,6 @@ const CreateOrderCart: FC = ({}) => {
     categories,
     setCategories
   } = useContext(OrderViewContext);
-  console.log("sc", selectedCategories);
   const numberOfSelectedProducts = selectedCategories.reduce(
     (acc, category) => acc + category.products.length,
     0
@@ -132,7 +132,7 @@ const CreateOrderCart: FC = ({}) => {
           {selectedCategories.map((category) => (
             <div key={category.category_id}>
               <Flex className={styles.products__header} justify="space-between">
-                <p>{category.category}</p>
+                <p>{category.products[0].category_name}</p>
                 <p>SKUs: {category.products.length}</p>
               </Flex>
               {category.products.map((product) => {
