@@ -5,7 +5,7 @@ import { CaretLeft } from "phosphor-react";
 
 import { useMessageApi } from "@/context/MessageContext";
 import { useAppStore } from "@/lib/store/store";
-import { getAccountsByProject } from "@/services/clientsPayments/clientsPayments";
+import { getAccountsByProject, getPaymentTypes } from "@/services/clientsPayments/clientsPayments";
 
 import SecondaryButton from "@/components/atoms/buttons/secondaryButton/SecondaryButton";
 import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
@@ -48,6 +48,7 @@ export interface IFormIdentifyPaymentModal {
 const ModalIdentifyPayment: FC<ModalIdentifyPaymentProps> = ({ isOpen, onClose }) => {
   const { ID: projectId } = useAppStore((state) => state.selectedProject);
   const [accounts, setAccounts] = useState<ISelect[]>([]);
+  const [paymentTypes, setPaymentTypes] = useState<ISelect[]>([]);
   const [viewInfo, setViewInfo] = useState<{
     current: "form" | "identified" | "not_identified";
     paymentInfo: IFormIdentifyPaymentModal | undefined;
@@ -75,7 +76,28 @@ const ModalIdentifyPayment: FC<ModalIdentifyPaymentProps> = ({ isOpen, onClose }
       }
     };
     fetchAccounts();
+
+    const fetchPaymentTypes = async () => {
+      try {
+        const res = await getPaymentTypes();
+        const formattedPaymentTypes = res.map((paymentType) => ({
+          value: paymentType.id,
+          label: paymentType.name
+        }));
+        setPaymentTypes(formattedPaymentTypes);
+      } catch (error) {
+        console.error("Failed to fetch payment types", error);
+        setPaymentTypes([]);
+      }
+    };
+    fetchPaymentTypes();
   }, [projectId]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      reset();
+    }
+  }, [isOpen]);
 
   const {
     control,
@@ -83,7 +105,8 @@ const ModalIdentifyPayment: FC<ModalIdentifyPaymentProps> = ({ isOpen, onClose }
     formState: { errors, isValid },
     setValue,
     watch,
-    trigger
+    trigger,
+    reset
   } = useForm<IFormIdentifyPaymentModal>({});
 
   const onSubmit = async (data: IFormIdentifyPaymentModal) => {
@@ -153,7 +176,7 @@ const ModalIdentifyPayment: FC<ModalIdentifyPaymentProps> = ({ isOpen, onClose }
                 <GeneralSelect
                   field={field}
                   title="Cuenta"
-                  placeholder="Ingresar nombre"
+                  placeholder="Seleccionar cuenta"
                   options={accounts}
                 />
               )}
@@ -184,7 +207,7 @@ const ModalIdentifyPayment: FC<ModalIdentifyPaymentProps> = ({ isOpen, onClose }
               nameInput={`amount`}
               control={control}
               error={errors?.amount}
-              placeholder="Valor"
+              placeholder="Ingresar monto"
               customStyle={{ width: "100%" }}
               validationRules={{
                 required: "Valor es obligatorio",
@@ -197,6 +220,7 @@ const ModalIdentifyPayment: FC<ModalIdentifyPaymentProps> = ({ isOpen, onClose }
               titleInput="Referencia"
               control={control}
               nameInput="reference"
+              placeholder="Ingresar No. de referencia"
               error={errors.reference}
             />
 
@@ -208,8 +232,8 @@ const ModalIdentifyPayment: FC<ModalIdentifyPaymentProps> = ({ isOpen, onClose }
                 <GeneralSelect
                   field={field}
                   title="Tipo de pago"
-                  placeholder="Ingresar tipo de pago"
-                  options={accounts}
+                  placeholder="Seleccionar tipo"
+                  options={paymentTypes}
                 />
               )}
             />

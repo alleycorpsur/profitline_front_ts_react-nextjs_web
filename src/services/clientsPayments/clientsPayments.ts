@@ -16,3 +16,14 @@ export const getAccountsByProject = async (projectId: number = 157) => {
   );
   return response.data;
 };
+
+interface ISelectPayment {
+  id: number;
+  name: string;
+}
+export const getPaymentTypes = async () => {
+  const response: GenericResponse<ISelectPayment[]> = await API.get(
+    `${config.API_HOST}/bank/payment-types`
+  );
+  return response.data;
+};
