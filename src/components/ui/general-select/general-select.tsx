@@ -60,6 +60,12 @@ const GeneralSelect = <T extends FieldValues>({
             label: option,
             className: "selectOptions"
           };
+        } else if (option === null) {
+          return {
+            value: "",
+            label: "",
+            className: "selectOptions"
+          };
         }
         return {
           value: option.value,

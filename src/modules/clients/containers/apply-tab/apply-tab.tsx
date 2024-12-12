@@ -13,6 +13,7 @@ import { ModalResultAppy } from "./Modals/ModalResultApply/ModalResultAppy";
 import ModalAddToTables from "./Modals/ModalAddToTables/ModalAddToTables";
 import { ModalSelectAjustements } from "./Modals/ModalSelectAjustements/ModalSelectAjustements";
 import ModalNoteInvoice from "./Modals/ModalNoteInvoice/ModalNoteInvoice";
+import ModalCreateAdjustment from "./Modals/ModalCreateAdjustment/ModalCreateAdjustment";
 
 import { SectionData } from "./tables/Types";
 
@@ -300,6 +301,17 @@ const ApplyTab: React.FC = () => {
           })
         }
         onAdd={() => console.log("add")}
+        setModalAction={(e: number) => {
+          setModalActionPayment({
+            isOpen: true,
+            modal: e
+          });
+        }}
+      />
+      <ModalCreateAdjustment
+        isOpen={modalActionPayment && modalActionPayment.isOpen && modalActionPayment.modal === 2}
+        onCancel={() => setModalActionPayment({ isOpen: true, modal: 1 })}
+        onOk={() => console.log("ssss")}
       />
     </>
   );

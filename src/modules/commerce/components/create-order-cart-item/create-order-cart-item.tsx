@@ -3,7 +3,7 @@ import Image from "next/image";
 import { Button, Flex } from "antd";
 import { Minus, Plus, Trash } from "phosphor-react";
 
-import { formatMoney } from "@/utils/utils";
+import { formatNumber } from "@/utils/utils";
 
 import { useHandleProductsItems } from "../../hooks/create-order/handle-products-items.hook";
 import SimpleTag from "@/components/atoms/SimpleTag/SimpleTag";
@@ -11,12 +11,17 @@ import SimpleTag from "@/components/atoms/SimpleTag/SimpleTag";
 import { ISelectedProduct } from "@/types/commerce/ICommerce";
 
 import styles from "./create-order-cart-item.module.scss";
+interface IproductDiscount {
+  discountPercentage: number;
+  subtotal: number;
+}
 export interface CreateOrderItemProps {
   product: ISelectedProduct;
   categoryName: string;
+  productDiscount?: IproductDiscount;
 }
 
-const CreateOrderItem: FC<CreateOrderItemProps> = ({ product, categoryName }) => {
+const CreateOrderItem: FC<CreateOrderItemProps> = ({ product, categoryName, productDiscount }) => {
   const {
     alreadySelectedProduct,
     handleDecrementQuantity,
@@ -48,16 +53,18 @@ const CreateOrderItem: FC<CreateOrderItemProps> = ({ product, categoryName }) =>
       </h4>
 
       <div className={styles.price}>
-        {product.discount ? (
-          <>
-            <h5 className={styles.oldPrice}>{formatMoney(product.price)}</h5>
-            <Flex gap={4} align="baseline">
-              <h5 className={styles.price__amount}>{formatMoney(product.discount)}</h5>
-              <p className={styles.discountPercentage}>-%{product.discount_percentage}</p>
+        {productDiscount ? (
+          <Flex vertical gap={4}>
+            <h5 className={styles.oldPrice}>${formatNumber(product.price ?? 0)}</h5>
+            <Flex gap={8} align="baseline">
+              <h5 className={styles.price__amount}>
+                ${formatNumber(productDiscount.subtotal ?? 0)}
+              </h5>
+              <p className={styles.discountPercentage}>-{productDiscount.discountPercentage}%</p>
             </Flex>
-          </>
+          </Flex>
         ) : (
-          <h5 className={styles.price}>{formatMoney(product.price)}</h5>
+          <h5 className={styles.price}>${formatNumber(product.price ?? 0)}</h5>
         )}
       </div>
 

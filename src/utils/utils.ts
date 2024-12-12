@@ -399,3 +399,16 @@ export function renameFile(file: File, newName: string): File {
   // Return a new File instance with the new name
   return new File([blob], newFileName, { type: file.type });
 }
+
+export function formatNumber(num: number | string, decimals = 0) {
+  const parsedNum = typeof num === "string" ? parseFloat(num) : num;
+
+  const entireNumber = Math.floor(parsedNum);
+  const formattedThousands = entireNumber.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  const rest = parsedNum - entireNumber;
+
+  // Convertir el número a una cadena y usar el método replace para añadir separadores de miles
+  return decimals
+    ? `${formattedThousands},${Math.floor(Math.pow(10, decimals) * rest)}`
+    : formattedThousands;
+}

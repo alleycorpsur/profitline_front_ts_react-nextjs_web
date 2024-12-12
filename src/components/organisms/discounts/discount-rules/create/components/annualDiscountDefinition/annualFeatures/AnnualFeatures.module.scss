@@ -3,10 +3,11 @@
 .selectInput {
     margin-bottom: 0.2rem;
     background-color: $background;
+    padding: 1.4rem 0.45rem !important;
     border-radius: 0.25rem;
     border-bottom: none;
-    height: 100% !important;
-    width: 100%;
+    height: auto;
+    width: 250px;
 
     span {
         font-size: 1rem;
