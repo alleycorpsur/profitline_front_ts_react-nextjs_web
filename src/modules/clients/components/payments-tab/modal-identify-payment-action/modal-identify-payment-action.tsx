@@ -1,9 +1,11 @@
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { Checkbox, Flex, Modal } from "antd";
 import { Controller, useForm } from "react-hook-form";
 import { CaretLeft } from "phosphor-react";
 
 import { useMessageApi } from "@/context/MessageContext";
+import { useAppStore } from "@/lib/store/store";
+import { getAccountsByProject } from "@/services/clientsPayments/clientsPayments";
 
 import SecondaryButton from "@/components/atoms/buttons/secondaryButton/SecondaryButton";
 import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
@@ -12,10 +14,10 @@ import { InputFormMoney } from "@/components/atoms/inputs/InputFormMoney/InputFo
 import { InputForm } from "@/components/atoms/inputs/InputForm/InputForm";
 import { InputDateForm } from "@/components/atoms/inputs/InputDate/InputDateForm";
 import { DocumentButton } from "@/components/atoms/DocumentButton/DocumentButton";
-
-import "./modal-identify-payment-action.scss";
 import ModalNotIdentifiedPayment from "../modal-not-identified-payment";
 import ModalIdentifiedPayments from "../modal-identified-payments";
+
+import "./modal-identify-payment-action.scss";
 
 interface ModalIdentifyPaymentProps {
   isOpen: boolean;
@@ -44,6 +46,8 @@ export interface IFormIdentifyPaymentModal {
 }
 
 const ModalIdentifyPayment: FC<ModalIdentifyPaymentProps> = ({ isOpen, onClose }) => {
+  const { ID: projectId } = useAppStore((state) => state.selectedProject);
+  const [accounts, setAccounts] = useState<ISelect[]>([]);
   const [viewInfo, setViewInfo] = useState<{
     current: "form" | "identified" | "not_identified";
     paymentInfo: IFormIdentifyPaymentModal | undefined;
@@ -51,6 +55,27 @@ const ModalIdentifyPayment: FC<ModalIdentifyPaymentProps> = ({ isOpen, onClose }
 
   const { showMessage } = useMessageApi();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  useEffect(() => {
+    const fetchAccounts = async () => {
+      if (!projectId) {
+        setAccounts([]);
+        return;
+      }
+
+      try {
+        const res = await getAccountsByProject(projectId);
+        const formattedAccounts = res.map((account) => ({
+          value: account.id,
+          label: `${account.bank_name} ${account.account_number}`
+        }));
+        setAccounts(formattedAccounts);
+      } catch (error) {
+        console.error("Failed to fetch accounts", error);
+        setAccounts([]);
+      }
+    };
+    fetchAccounts();
+  }, [projectId]);
 
   const {
     control,
@@ -244,18 +269,3 @@ const ModalIdentifyPayment: FC<ModalIdentifyPaymentProps> = ({ isOpen, onClose }
 };
 
 export default ModalIdentifyPayment;
-
-const accounts = [
-  {
-    value: 1,
-    label: "Cuenta 1"
-  },
-  {
-    value: 2,
-    label: "Cuenta 2"
-  },
-  {
-    value: 3,
-    label: "Cuenta 3"
-  }
-];
