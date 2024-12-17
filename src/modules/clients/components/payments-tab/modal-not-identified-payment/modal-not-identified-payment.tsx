@@ -8,7 +8,8 @@ import { useMessageApi } from "@/context/MessageContext";
 import SecondaryButton from "@/components/atoms/buttons/secondaryButton/SecondaryButton";
 import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
 import { DocumentButton } from "@/components/atoms/DocumentButton/DocumentButton";
-import { IFormIdentifyPaymentModal } from "../modal-identify-payment-action/modal-identify-payment-action";
+
+import { IFormIdentifyPaymentModal } from "@/types/clientPayments/IClientPayments";
 
 import styles from "./modal-not-identified-payment.module.scss";
 
@@ -20,6 +21,8 @@ interface ModalNotIdentifiedPaymentProps {
       paymentInfo: IFormIdentifyPaymentModal | undefined;
     }>
   >;
+  // eslint-disable-next-line no-unused-vars
+  onClose: (cancelClicked?: boolean) => void;
 }
 
 interface infoObject {
@@ -32,7 +35,10 @@ interface IFormNotIdentifiedPaymentModal {
   comment: string;
 }
 
-const ModalNotIdentifiedPayment: FC<ModalNotIdentifiedPaymentProps> = ({ setViewInfo }) => {
+const ModalNotIdentifiedPayment: FC<ModalNotIdentifiedPaymentProps> = ({
+  setViewInfo,
+  onClose
+}) => {
   const { showMessage } = useMessageApi();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -73,6 +79,8 @@ const ModalNotIdentifiedPayment: FC<ModalNotIdentifiedPaymentProps> = ({ setView
 
     try {
       console.info("Form data:", data);
+      showMessage("success", "Notificación enviada correctamente");
+      // onClose()
     } catch (error) {
       showMessage("error", "Error al enviar notificación");
     }

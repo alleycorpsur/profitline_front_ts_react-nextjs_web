@@ -1,3 +1,5 @@
+import dayjs from "dayjs";
+
 export interface IClientPayment {
   id: number;
   description: string;
@@ -60,4 +62,19 @@ export interface IIdentifiedPayment {
   CLIENT_NAME: string | null;
   account_number: string;
   bank_name: string;
+}
+
+interface ISelect {
+  value: string | number;
+  label: string;
+}
+
+export interface IFormIdentifyPaymentModal {
+  account: ISelect | undefined;
+  date: dayjs.Dayjs;
+  amount: number;
+  reference: string;
+  payment_type: ISelect | undefined;
+  is_advance_payment: boolean;
+  evidence?: File;
 }

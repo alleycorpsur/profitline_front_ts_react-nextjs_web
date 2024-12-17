@@ -1,17 +1,24 @@
 import { Dispatch, FC, SetStateAction, useState } from "react";
 import { Radio } from "antd";
 import { CaretLeft } from "phosphor-react";
+import { useParams } from "next/navigation";
 
+import { useAppStore } from "@/lib/store/store";
 import { useMessageApi } from "@/context/MessageContext";
-import { formatDateDMY, formatMoney } from "@/utils/utils";
+import { extractSingleParam, formatDateDMY, formatMoney } from "@/utils/utils";
+import { matchPayment } from "@/services/clientsPayments/clientsPayments";
 
 import SecondaryButton from "@/components/atoms/buttons/secondaryButton/SecondaryButton";
 import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
-import { IFormIdentifyPaymentModal } from "../modal-identify-payment-action/modal-identify-payment-action";
+
 import { DividerVerticalModal } from "@/components/atoms/DividerVertical/DividerVerticalModal";
 
+import {
+  IFormIdentifyPaymentModal,
+  IIdentifiedPayment
+} from "@/types/clientPayments/IClientPayments";
+
 import styles from "./modal-identified-payments.module.scss";
-import { IIdentifiedPayment } from "@/types/clientPayments/IClientPayments";
 
 interface ModalIdentifiedPaymentProps {
   setViewInfo: Dispatch<
@@ -20,22 +27,42 @@ interface ModalIdentifiedPaymentProps {
       paymentInfo: IFormIdentifyPaymentModal | undefined;
     }>
   >;
+  paymentInfo: IFormIdentifyPaymentModal | undefined;
   identifiedPayments?: IIdentifiedPayment[];
+  // eslint-disable-next-line no-unused-vars
+  onClose: (cancelClicked?: boolean) => void;
 }
 
 const ModalIdentifiedPayment: FC<ModalIdentifiedPaymentProps> = ({
   setViewInfo,
-  identifiedPayments
+  paymentInfo,
+  identifiedPayments,
+  onClose
 }) => {
   const { showMessage } = useMessageApi();
+  const params = useParams();
+  const clientId = extractSingleParam(params.clientId);
+  const userId = useAppStore((state) => state.userId);
   const [selectedPaymentId, setSelectedPaymentId] = useState<number | null>(null);
 
-  const handleIdentifyPayments = () => {
+  const handleIdentifyPayments = async () => {
     try {
-      const identifiedPayment = mockPayments.find((payment) => payment.id === selectedPaymentId);
-      console.info("Pago identificado:", identifiedPayment);
+      const identifiedPayment = identifiedPayments?.find(
+        (payment) => payment.id === selectedPaymentId
+      );
+
+      if (!identifiedPayment || !paymentInfo || !clientId) {
+        return;
+      }
+      await matchPayment({
+        data: paymentInfo,
+        paymentId: identifiedPayment.id,
+        clientId,
+        userId
+      });
 
       showMessage("success", "Pago identificado enviado correctamente!");
+      onClose();
     } catch (error) {
       showMessage("error", "Ocurrió un error al identificar el pago");
     }
@@ -92,30 +119,3 @@ const ModalIdentifiedPayment: FC<ModalIdentifiedPaymentProps> = ({
 };
 
 export default ModalIdentifiedPayment;
-
-const mockPayments = [
-  {
-    id: 1,
-    date: "10/03/2024",
-    client: "Consignación Cooperativa Nacional de Medicamentos",
-    amount: 1000000
-  },
-  {
-    id: 2,
-    date: "10/03/2024",
-    client: "Consignación Cooperativa Nacional de Medicamentos",
-    amount: 2000000
-  },
-  {
-    id: 3,
-    date: "10/03/2024",
-    client: "Consignación Cooperativa Nacional de Medicamentos",
-    amount: 3000000
-  },
-  {
-    id: 4,
-    date: "10/03/2024",
-    client: "Consignación Cooperativa Nacional de Medicamentos",
-    amount: 4000000
-  }
-];

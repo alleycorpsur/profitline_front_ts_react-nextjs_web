@@ -2,7 +2,6 @@ import { FC, useEffect, useState } from "react";
 import { Checkbox, Flex, Modal } from "antd";
 import { Controller, useForm } from "react-hook-form";
 import { CaretLeft } from "phosphor-react";
-import dayjs from "dayjs";
 
 import { useMessageApi } from "@/context/MessageContext";
 import { useAppStore } from "@/lib/store/store";
@@ -22,7 +21,10 @@ import { DocumentButton } from "@/components/atoms/DocumentButton/DocumentButton
 import ModalNotIdentifiedPayment from "../modal-not-identified-payment";
 import ModalIdentifiedPayments from "../modal-identified-payments";
 
-import { IIdentifiedPayment } from "@/types/clientPayments/IClientPayments";
+import {
+  IFormIdentifyPaymentModal,
+  IIdentifiedPayment
+} from "@/types/clientPayments/IClientPayments";
 
 import "./modal-identify-payment-action.scss";
 
@@ -42,16 +44,6 @@ interface ISelect {
   label: string;
 }
 
-export interface IFormIdentifyPaymentModal {
-  account: ISelect;
-  date: dayjs.Dayjs;
-  amount: number;
-  reference: string;
-  payment_type: ISelect;
-  is_advance_payment: boolean;
-  evidence?: File;
-}
-
 const ModalIdentifyPayment: FC<ModalIdentifyPaymentProps> = ({ isOpen, onClose }) => {
   const { ID: projectId } = useAppStore((state) => state.selectedProject);
   const [accounts, setAccounts] = useState<ISelect[]>([]);
@@ -61,9 +53,21 @@ const ModalIdentifyPayment: FC<ModalIdentifyPaymentProps> = ({ isOpen, onClose }
     current: "form" | "identified" | "not_identified";
     paymentInfo: IFormIdentifyPaymentModal | undefined;
   }>({ current: "form", paymentInfo: undefined });
+  const [key, setKey] = useState<number>(0); // Key to force remount
 
   const { showMessage } = useMessageApi();
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isValid },
+    setValue,
+    watch,
+    trigger,
+    reset
+  } = useForm<IFormIdentifyPaymentModal>();
+
   useEffect(() => {
     const fetchAccounts = async () => {
       if (!projectId) {
@@ -104,30 +108,22 @@ const ModalIdentifyPayment: FC<ModalIdentifyPaymentProps> = ({ isOpen, onClose }
   useEffect(() => {
     if (!isOpen) {
       reset();
+      setKey((prevKey) => prevKey + 1); // Increment key to force remount
     }
   }, [isOpen]);
-
-  const {
-    control,
-    handleSubmit,
-    formState: { errors, isValid },
-    setValue,
-    watch,
-    trigger,
-    reset
-  } = useForm<IFormIdentifyPaymentModal>({});
 
   const onSubmit = async (data: IFormIdentifyPaymentModal) => {
     setIsSubmitting(true);
     try {
       const res = await identifyPayment({
-        accountId: data.account.value as string,
-        paymentDate: data.date.format("YYYY-MM-DD"),
+        accountId: data.account?.value as string,
+        paymentDate: data.date?.format("YYYY-MM-DD"),
         amount: data.amount
       });
 
       // Open identified payments modal or not Identify modal
       if (res === 0) {
+        showMessage("info", "No se identificó ningún pago");
         setViewInfo({ current: "not_identified", paymentInfo: data });
       } else {
         if (res && Array.isArray(res.data)) {
@@ -135,8 +131,6 @@ const ModalIdentifyPayment: FC<ModalIdentifyPaymentProps> = ({ isOpen, onClose }
         }
         setViewInfo({ current: "identified", paymentInfo: data });
       }
-
-      // onClose();
     } catch (error) {
       showMessage("error", "Error al identificar pago");
     } finally {
@@ -175,6 +169,7 @@ const ModalIdentifyPayment: FC<ModalIdentifyPaymentProps> = ({ isOpen, onClose }
       open={isOpen}
       closable={false}
       destroyOnClose
+      key={key} // Force remount
     >
       {viewInfo.current === "form" && (
         <>
@@ -282,7 +277,7 @@ const ModalIdentifyPayment: FC<ModalIdentifyPaymentProps> = ({ isOpen, onClose }
               rules={{ required: "Evidencia es obligatoria" }}
               render={() => (
                 <DocumentButton
-                  key={evidence?.name || "default-key"} // Ensure a unique key
+                  key={evidence?.name || "default-key"}
                   title={evidence?.name}
                   handleOnChange={handleOnChangeDocument}
                   handleOnDelete={handleOnDeleteDocument}
@@ -304,13 +299,15 @@ const ModalIdentifyPayment: FC<ModalIdentifyPaymentProps> = ({ isOpen, onClose }
       )}
 
       {viewInfo.current === "not_identified" && (
-        <ModalNotIdentifiedPayment setViewInfo={setViewInfo} />
+        <ModalNotIdentifiedPayment setViewInfo={setViewInfo} onClose={onClose} />
       )}
 
       {viewInfo.current === "identified" && (
         <ModalIdentifiedPayments
           setViewInfo={setViewInfo}
           identifiedPayments={identifiedPayments}
+          paymentInfo={viewInfo.paymentInfo}
+          onClose={onClose}
         />
       )}
     </Modal>

@@ -1,8 +1,13 @@
+import axios from "axios";
 import config from "@/config";
-import { IFormIdentifyPaymentModal } from "@/modules/clients/components/payments-tab/modal-identify-payment-action/modal-identify-payment-action";
-import { IIdentifiedPayment } from "@/types/clientPayments/IClientPayments";
+
+import { API, getIdToken } from "@/utils/api/api";
+
+import {
+  IFormIdentifyPaymentModal,
+  IIdentifiedPayment
+} from "@/types/clientPayments/IClientPayments";
 import { GenericResponse } from "@/types/global/IGlobal";
-import { API } from "@/utils/api/api";
 
 interface IAccount {
   id: number;
@@ -58,21 +63,37 @@ export const identifyPayment = async ({ accountId, paymentDate, amount }: IIdent
 interface IMatchPayment {
   data: IFormIdentifyPaymentModal;
   paymentId: number;
+  clientId: string;
+  userId: number;
 }
 
-export const matchPayment = async ({ data, paymentId }: IMatchPayment) => {
+export const matchPayment = async ({ data, paymentId, clientId, userId }: IMatchPayment) => {
+  const token = await getIdToken();
+
   const modelData = {
-    clientId: 1,
-    accountId: data.account.value,
-    paymentDate: data.date,
+    clientId,
+    accountId: data.account?.value,
+    paymentDate: data.date?.format("YYYY-MM-DD"),
     amount: data.amount,
-    userId: 1,
+    userId,
     evidence: data.evidence
   };
 
-  const response: GenericResponse<IIdentifiedPayment> = await API.post(
+  const formData = new FormData();
+  for (const key in modelData) {
+    formData.append(key, modelData[key as keyof typeof modelData] as any);
+  }
+
+  const response: GenericResponse<any> = await axios.post(
     `${config.API_HOST}/bank/match-payment/${paymentId}`,
-    modelData
+    formData,
+    {
+      headers: {
+        Accept: "application/json, text/plain, */*",
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${token}`
+      }
+    }
   );
 
   return response;
