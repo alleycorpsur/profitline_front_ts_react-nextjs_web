@@ -189,3 +189,31 @@ export const getPaymentsStatus = async () => {
     throw error;
   }
 };
+
+interface IChangePaymentStatus {
+  projectId: number;
+  clientId: number;
+  payment_ids: number[];
+  status_id: number;
+}
+
+export const changePaymentStatus = async ({
+  projectId,
+  clientId,
+  payment_ids,
+  status_id
+}: IChangePaymentStatus) => {
+  try {
+    const response: GenericResponse<any> = await API.put("/bank/change-status", {
+      project_id: projectId,
+      client_id: clientId,
+      payments: payment_ids,
+      status: status_id
+    });
+
+    return response;
+  } catch (error) {
+    console.error("Error al cambiar el estado del pago:", error);
+    throw error;
+  }
+};

@@ -2,10 +2,11 @@ import React, { useEffect, useState } from "react";
 import { Button, Flex, Modal, Radio, RadioChangeEvent } from "antd";
 import { CaretLeft, Plus } from "phosphor-react";
 
-import { DocumentButton } from "@/components/atoms/DocumentButton/DocumentButton";
+import { useAppStore } from "@/lib/store/store";
 import { useMessageApi } from "@/context/MessageContext";
-import { getPaymentsStatus } from "@/services/banksPayments/banksPayments";
+import { changePaymentStatus, getPaymentsStatus } from "@/services/banksPayments/banksPayments";
 
+import { DocumentButton } from "@/components/atoms/DocumentButton/DocumentButton";
 import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
 import SecondaryButton from "@/components/atoms/buttons/secondaryButton/SecondaryButton";
 
@@ -26,11 +27,13 @@ interface infoObject {
 
 const ModalActionsChangeStatus: React.FC<Props> = ({ isOpen, onClose, selectedRows }) => {
   const [states, setStates] = useState<{ id: number; label: string }[]>();
-  const [selectedState, setSelectedState] = useState<string | undefined>();
+  const [selectedStatus, setSelectedStatus] = useState<string | undefined>();
   const [selectedEvidence, setSelectedEvidence] = useState<File[]>([]);
   const [commentary, setCommentary] = useState<string | undefined>();
   const [isSecondView, setIsSecondView] = useState(false);
+  const [loading, setLoading] = useState(false);
   const { showMessage } = useMessageApi();
+  const { ID: projectId } = useAppStore((state) => state.selectedProject);
 
   useEffect(() => {
     const fetchStatus = async () => {
@@ -41,12 +44,12 @@ const ModalActionsChangeStatus: React.FC<Props> = ({ isOpen, onClose, selectedRo
   }, []);
 
   const handleOnChangeRadioGroup = (e: RadioChangeEvent) => {
-    setSelectedState(e.target.value);
+    setSelectedStatus(e.target.value);
   };
 
   const handlegoBackToFirstView = () => {
     setIsSecondView(false);
-    setSelectedState(undefined);
+    setSelectedStatus(undefined);
     setSelectedEvidence([]);
     setCommentary(undefined);
   };
@@ -56,19 +59,28 @@ const ModalActionsChangeStatus: React.FC<Props> = ({ isOpen, onClose, selectedRo
   };
 
   const handleAttachEvidence = async () => {
+    if (!selectedRows || !selectedStatus) {
+      return;
+    }
+    setLoading(true);
     try {
       // Call API to change the status of the payment
-      console.info("selectedState", selectedState);
-      console.info("selectedRows", selectedRows);
-      console.info("commentary", commentary);
-      console.info("selectedEvidence", selectedEvidence);
-
+      // console.info("commentary", commentary);
+      // console.info("selectedEvidence", selectedEvidence);
+      const modelData = {
+        projectId,
+        clientId: selectedRows[0].id_client,
+        payment_ids: selectedRows.map((row) => row.id),
+        status_id: parseInt(selectedStatus)
+      };
+      await changePaymentStatus(modelData);
       showMessage("success", "Estado cambiado con éxito");
       onClose();
       handlegoBackToFirstView();
     } catch (error) {
       showMessage("error", "Ha ocurrido un error al cambiar el estado del pago");
     }
+    setLoading(false);
   };
 
   const handleOnChangeDocument: any = (info: infoObject) => {
@@ -114,7 +126,7 @@ const ModalActionsChangeStatus: React.FC<Props> = ({ isOpen, onClose, selectedRo
       <>
         <div className={styles.content__status}>
           {states?.map((state) => (
-            <Radio.Group onChange={handleOnChangeRadioGroup} value={selectedState} key={state.id}>
+            <Radio.Group onChange={handleOnChangeRadioGroup} value={selectedStatus} key={state.id}>
               <Radio className={styles.content__status__item} value={state?.id}>
                 {state.label}
               </Radio>
@@ -127,7 +139,7 @@ const ModalActionsChangeStatus: React.FC<Props> = ({ isOpen, onClose, selectedRo
           </SecondaryButton>
           <PrincipalButton
             fullWidth
-            disabled={!selectedState}
+            disabled={!selectedStatus}
             onClick={() => setIsSecondView(!isSecondView)}
           >
             Cambiar de estado
@@ -205,6 +217,7 @@ const ModalActionsChangeStatus: React.FC<Props> = ({ isOpen, onClose, selectedRo
             fullWidth
             onClick={handleAttachEvidence}
             disabled={commentary && selectedEvidence.length > 0 ? false : true}
+            loading={loading}
           >
             Adjuntar evidencia
           </PrincipalButton>
@@ -215,7 +228,7 @@ const ModalActionsChangeStatus: React.FC<Props> = ({ isOpen, onClose, selectedRo
 
   useEffect(() => {
     return () => {
-      setSelectedState(undefined);
+      setSelectedStatus(undefined);
       setSelectedEvidence([]);
       setCommentary(undefined);
     };

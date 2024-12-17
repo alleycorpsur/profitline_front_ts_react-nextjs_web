@@ -184,10 +184,22 @@ export const ActivePaymentsTab: FC = () => {
             onClose={() => setisGenerateActionOpen(false)}
             setSelectOpen={(e) => {
               const { selected } = e;
-              if (selected !== 2 && selectedRows && selectedRows.length > 1) {
-                showMessage("error", "Solo puedes seleccionar un pago para esta acción");
+              if (selected !== 2 && selected !== 6 && selectedRows && selectedRows.length > 1) {
+                showMessage("info", "Solo puedes seleccionar un pago para esta acción");
                 return;
               }
+
+              if (selected === 6 && selectedRows && selectedRows.length > 1) {
+                const clientId = selectedRows[0].id_client;
+                if (!selectedRows.every((row) => row.id_client === clientId)) {
+                  showMessage(
+                    "info",
+                    "Solo puedes seleccionar pagos del mismo cliente para esta acción"
+                  );
+                  return;
+                }
+              }
+
               setisGenerateActionOpen((prev) => !prev);
               setIsSelectOpen(e);
             }}
