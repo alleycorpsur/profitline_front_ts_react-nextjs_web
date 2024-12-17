@@ -3,7 +3,6 @@ import { Radio } from "antd";
 import { CaretLeft } from "phosphor-react";
 import { useParams } from "next/navigation";
 
-import { useAppStore } from "@/lib/store/store";
 import { useMessageApi } from "@/context/MessageContext";
 import { extractSingleParam, formatDateDMY, formatMoney } from "@/utils/utils";
 import { matchPayment } from "@/services/clientsPayments/clientsPayments";
@@ -42,7 +41,6 @@ const ModalIdentifiedPayment: FC<ModalIdentifiedPaymentProps> = ({
   const { showMessage } = useMessageApi();
   const params = useParams();
   const clientId = extractSingleParam(params.clientId);
-  const userId = useAppStore((state) => state.userId);
   const [selectedPaymentId, setSelectedPaymentId] = useState<number | null>(null);
 
   const handleIdentifyPayments = async () => {
@@ -57,8 +55,7 @@ const ModalIdentifiedPayment: FC<ModalIdentifiedPaymentProps> = ({
       await matchPayment({
         data: paymentInfo,
         paymentId: identifiedPayment.id,
-        clientId,
-        userId
+        clientId
       });
 
       showMessage("success", "Pago identificado enviado correctamente!");

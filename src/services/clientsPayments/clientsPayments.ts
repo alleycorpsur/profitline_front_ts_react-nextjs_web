@@ -64,10 +64,9 @@ interface IMatchPayment {
   data: IFormIdentifyPaymentModal;
   paymentId: number;
   clientId: string;
-  userId: number;
 }
 
-export const matchPayment = async ({ data, paymentId, clientId, userId }: IMatchPayment) => {
+export const matchPayment = async ({ data, paymentId, clientId }: IMatchPayment) => {
   const token = await getIdToken();
 
   const modelData = {
@@ -75,7 +74,6 @@ export const matchPayment = async ({ data, paymentId, clientId, userId }: IMatch
     accountId: data.account?.value,
     paymentDate: data.date?.format("YYYY-MM-DD"),
     amount: data.amount,
-    userId,
     evidence: data.evidence
   };
 
