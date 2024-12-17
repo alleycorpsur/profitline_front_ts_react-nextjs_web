@@ -1,14 +1,21 @@
 import { Dispatch, FC, SetStateAction, useState } from "react";
 import { Radio } from "antd";
 import { CaretLeft } from "phosphor-react";
+import { useParams } from "next/navigation";
 
 import { useMessageApi } from "@/context/MessageContext";
-import { formatMoney } from "@/utils/utils";
+import { extractSingleParam, formatDateDMY, formatMoney } from "@/utils/utils";
+import { matchPayment } from "@/services/clientsPayments/clientsPayments";
 
 import SecondaryButton from "@/components/atoms/buttons/secondaryButton/SecondaryButton";
 import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
-import { IFormIdentifyPaymentModal } from "../modal-identify-payment-action/modal-identify-payment-action";
+
 import { DividerVerticalModal } from "@/components/atoms/DividerVertical/DividerVerticalModal";
+
+import {
+  IFormIdentifyPaymentModal,
+  IIdentifiedPayment
+} from "@/types/clientPayments/IClientPayments";
 
 import styles from "./modal-identified-payments.module.scss";
 
@@ -19,18 +26,40 @@ interface ModalIdentifiedPaymentProps {
       paymentInfo: IFormIdentifyPaymentModal | undefined;
     }>
   >;
+  paymentInfo: IFormIdentifyPaymentModal | undefined;
+  identifiedPayments?: IIdentifiedPayment[];
+  // eslint-disable-next-line no-unused-vars
+  onClose: (cancelClicked?: boolean) => void;
 }
 
-const ModalIdentifiedPayment: FC<ModalIdentifiedPaymentProps> = ({ setViewInfo }) => {
+const ModalIdentifiedPayment: FC<ModalIdentifiedPaymentProps> = ({
+  setViewInfo,
+  paymentInfo,
+  identifiedPayments,
+  onClose
+}) => {
   const { showMessage } = useMessageApi();
+  const params = useParams();
+  const clientId = extractSingleParam(params.clientId);
   const [selectedPaymentId, setSelectedPaymentId] = useState<number | null>(null);
 
-  const handleIdentifyPayments = () => {
+  const handleIdentifyPayments = async () => {
     try {
-      const identifiedPayment = mockPayments.find((payment) => payment.id === selectedPaymentId);
-      console.info("Pago identificado:", identifiedPayment);
+      const identifiedPayment = identifiedPayments?.find(
+        (payment) => payment.id === selectedPaymentId
+      );
+
+      if (!identifiedPayment || !paymentInfo || !clientId) {
+        return;
+      }
+      await matchPayment({
+        data: paymentInfo,
+        paymentId: identifiedPayment.id,
+        clientId
+      });
 
       showMessage("success", "Pago identificado enviado correctamente!");
+      onClose();
     } catch (error) {
       showMessage("error", "Ocurrió un error al identificar el pago");
     }
@@ -53,7 +82,7 @@ const ModalIdentifiedPayment: FC<ModalIdentifiedPaymentProps> = ({ setViewInfo }
         onChange={(e) => setSelectedPaymentId(e.target.value)}
         value={selectedPaymentId}
       >
-        {mockPayments.map((payment) => (
+        {identifiedPayments?.map((payment) => (
           <Radio key={payment.id} value={payment.id} className={styles.paymentRadio}>
             <div className={styles.paymentContent}>
               <div className={styles.paymentContent__colorLabelContainer}>
@@ -62,11 +91,13 @@ const ModalIdentifiedPayment: FC<ModalIdentifiedPaymentProps> = ({ setViewInfo }
               <div className={styles.paymentContent__content}>
                 <div className={styles.paymentContent__content__left}>
                   <h3 className={styles.paymentContent__content__name}>Pago {payment.id}</h3>
-                  <p className={styles.paymentContent__content__date}>{payment.date}</p>
-                  <p className={styles.paymentContent__content__client}>{payment.client}</p>
+                  <p className={styles.paymentContent__content__date}>
+                    {formatDateDMY(payment.payment_date)}
+                  </p>
+                  <p className={styles.paymentContent__content__client}>{payment.CLIENT_NAME}</p>
                 </div>
                 <h2 className={styles.paymentContent__content__amount}>
-                  {formatMoney(payment.amount)}
+                  {formatMoney(payment.initial_value)}
                 </h2>
               </div>
             </div>
@@ -85,30 +116,3 @@ const ModalIdentifiedPayment: FC<ModalIdentifiedPaymentProps> = ({ setViewInfo }
 };
 
 export default ModalIdentifiedPayment;
-
-const mockPayments = [
-  {
-    id: 1,
-    date: "10/03/2024",
-    client: "Consignación Cooperativa Nacional de Medicamentos",
-    amount: 1000000
-  },
-  {
-    id: 2,
-    date: "10/03/2024",
-    client: "Consignación Cooperativa Nacional de Medicamentos",
-    amount: 2000000
-  },
-  {
-    id: 3,
-    date: "10/03/2024",
-    client: "Consignación Cooperativa Nacional de Medicamentos",
-    amount: 3000000
-  },
-  {
-    id: 4,
-    date: "10/03/2024",
-    client: "Consignación Cooperativa Nacional de Medicamentos",
-    amount: 4000000
-  }
-];
