@@ -3,7 +3,7 @@ import { Radio } from "antd";
 import { CaretLeft } from "phosphor-react";
 
 import { useMessageApi } from "@/context/MessageContext";
-import { formatMoney } from "@/utils/utils";
+import { formatDateDMY, formatMoney } from "@/utils/utils";
 
 import SecondaryButton from "@/components/atoms/buttons/secondaryButton/SecondaryButton";
 import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
@@ -11,6 +11,7 @@ import { IFormIdentifyPaymentModal } from "../modal-identify-payment-action/moda
 import { DividerVerticalModal } from "@/components/atoms/DividerVertical/DividerVerticalModal";
 
 import styles from "./modal-identified-payments.module.scss";
+import { IIdentifiedPayment } from "@/types/clientPayments/IClientPayments";
 
 interface ModalIdentifiedPaymentProps {
   setViewInfo: Dispatch<
@@ -19,9 +20,13 @@ interface ModalIdentifiedPaymentProps {
       paymentInfo: IFormIdentifyPaymentModal | undefined;
     }>
   >;
+  identifiedPayments?: IIdentifiedPayment[];
 }
 
-const ModalIdentifiedPayment: FC<ModalIdentifiedPaymentProps> = ({ setViewInfo }) => {
+const ModalIdentifiedPayment: FC<ModalIdentifiedPaymentProps> = ({
+  setViewInfo,
+  identifiedPayments
+}) => {
   const { showMessage } = useMessageApi();
   const [selectedPaymentId, setSelectedPaymentId] = useState<number | null>(null);
 
@@ -53,7 +58,7 @@ const ModalIdentifiedPayment: FC<ModalIdentifiedPaymentProps> = ({ setViewInfo }
         onChange={(e) => setSelectedPaymentId(e.target.value)}
         value={selectedPaymentId}
       >
-        {mockPayments.map((payment) => (
+        {identifiedPayments?.map((payment) => (
           <Radio key={payment.id} value={payment.id} className={styles.paymentRadio}>
             <div className={styles.paymentContent}>
               <div className={styles.paymentContent__colorLabelContainer}>
@@ -62,11 +67,13 @@ const ModalIdentifiedPayment: FC<ModalIdentifiedPaymentProps> = ({ setViewInfo }
               <div className={styles.paymentContent__content}>
                 <div className={styles.paymentContent__content__left}>
                   <h3 className={styles.paymentContent__content__name}>Pago {payment.id}</h3>
-                  <p className={styles.paymentContent__content__date}>{payment.date}</p>
-                  <p className={styles.paymentContent__content__client}>{payment.client}</p>
+                  <p className={styles.paymentContent__content__date}>
+                    {formatDateDMY(payment.payment_date)}
+                  </p>
+                  <p className={styles.paymentContent__content__client}>{payment.CLIENT_NAME}</p>
                 </div>
                 <h2 className={styles.paymentContent__content__amount}>
-                  {formatMoney(payment.amount)}
+                  {formatMoney(payment.initial_value)}
                 </h2>
               </div>
             </div>

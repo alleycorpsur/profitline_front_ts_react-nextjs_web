@@ -2,10 +2,15 @@ import { FC, useEffect, useState } from "react";
 import { Checkbox, Flex, Modal } from "antd";
 import { Controller, useForm } from "react-hook-form";
 import { CaretLeft } from "phosphor-react";
+import dayjs from "dayjs";
 
 import { useMessageApi } from "@/context/MessageContext";
 import { useAppStore } from "@/lib/store/store";
-import { getAccountsByProject, getPaymentTypes } from "@/services/clientsPayments/clientsPayments";
+import {
+  getAccountsByProject,
+  getPaymentTypes,
+  identifyPayment
+} from "@/services/clientsPayments/clientsPayments";
 
 import SecondaryButton from "@/components/atoms/buttons/secondaryButton/SecondaryButton";
 import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
@@ -16,6 +21,8 @@ import { InputDateForm } from "@/components/atoms/inputs/InputDate/InputDateForm
 import { DocumentButton } from "@/components/atoms/DocumentButton/DocumentButton";
 import ModalNotIdentifiedPayment from "../modal-not-identified-payment";
 import ModalIdentifiedPayments from "../modal-identified-payments";
+
+import { IIdentifiedPayment } from "@/types/clientPayments/IClientPayments";
 
 import "./modal-identify-payment-action.scss";
 
@@ -36,11 +43,11 @@ interface ISelect {
 }
 
 export interface IFormIdentifyPaymentModal {
-  account: ISelect[];
-  date: string;
+  account: ISelect;
+  date: dayjs.Dayjs;
   amount: number;
   reference: string;
-  payment_type: ISelect[];
+  payment_type: ISelect;
   is_advance_payment: boolean;
   evidence?: File;
 }
@@ -49,6 +56,7 @@ const ModalIdentifyPayment: FC<ModalIdentifyPaymentProps> = ({ isOpen, onClose }
   const { ID: projectId } = useAppStore((state) => state.selectedProject);
   const [accounts, setAccounts] = useState<ISelect[]>([]);
   const [paymentTypes, setPaymentTypes] = useState<ISelect[]>([]);
+  const [identifiedPayments, setIdentifiedPayments] = useState<IIdentifiedPayment[]>();
   const [viewInfo, setViewInfo] = useState<{
     current: "form" | "identified" | "not_identified";
     paymentInfo: IFormIdentifyPaymentModal | undefined;
@@ -112,13 +120,25 @@ const ModalIdentifyPayment: FC<ModalIdentifyPaymentProps> = ({ isOpen, onClose }
   const onSubmit = async (data: IFormIdentifyPaymentModal) => {
     setIsSubmitting(true);
     try {
-      console.info("data enviada:", data);
-      setViewInfo({ current: "identified", paymentInfo: data });
+      const res = await identifyPayment({
+        accountId: data.account.value as string,
+        paymentDate: data.date.format("YYYY-MM-DD"),
+        amount: data.amount
+      });
+
       // Open identified payments modal or not Identify modal
+      if (res === 0) {
+        setViewInfo({ current: "not_identified", paymentInfo: data });
+      } else {
+        if (res && Array.isArray(res.data)) {
+          setIdentifiedPayments(res.data);
+        }
+        setViewInfo({ current: "identified", paymentInfo: data });
+      }
 
       // onClose();
     } catch (error) {
-      showMessage("error", "Error al enviar tirilla");
+      showMessage("error", "Error al identificar pago");
     } finally {
       setIsSubmitting(false);
     }
@@ -287,7 +307,12 @@ const ModalIdentifyPayment: FC<ModalIdentifyPaymentProps> = ({ isOpen, onClose }
         <ModalNotIdentifiedPayment setViewInfo={setViewInfo} />
       )}
 
-      {viewInfo.current === "identified" && <ModalIdentifiedPayments setViewInfo={setViewInfo} />}
+      {viewInfo.current === "identified" && (
+        <ModalIdentifiedPayments
+          setViewInfo={setViewInfo}
+          identifiedPayments={identifiedPayments}
+        />
+      )}
     </Modal>
   );
 };

@@ -35,3 +35,29 @@ export interface IClientPaymentStatus {
   color: string; // Hex color code
   payments: IClientPayment[];
 }
+
+export interface IIdentifiedPayment {
+  id: number;
+  description: string;
+  id_account: number;
+  project_id: number;
+  id_client: number | null;
+  payment_date: string;
+  created_at: string;
+  currency: string;
+  initial_value: number;
+  current_value: number;
+  multiclient: number;
+  id_status: number;
+  is_delete: number;
+  updated_at: string;
+  updated_by: string | null;
+  evidence_url: string | null;
+  id_payment: number | null;
+  sequence: string | null;
+  rule_id: number | null;
+  payment_type_id: number | null;
+  CLIENT_NAME: string | null;
+  account_number: string;
+  bank_name: string;
+}
