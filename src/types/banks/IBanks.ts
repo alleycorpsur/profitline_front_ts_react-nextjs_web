@@ -98,3 +98,10 @@ export interface IPostRule {
   id_client: number;
   is_exactly: boolean;
 }
+
+export interface IPaymentStatus {
+  id: number;
+  status_description: string;
+  color: string;
+  order_status: number;
+}

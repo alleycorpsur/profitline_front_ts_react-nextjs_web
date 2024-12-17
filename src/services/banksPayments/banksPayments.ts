@@ -2,7 +2,7 @@ import { GenericResponse } from "@/types/global/IGlobal";
 import axios from "axios";
 import config from "@/config";
 import { API, getIdToken } from "@/utils/api/api";
-import { IClientsByProject, IPaymentDetail } from "@/types/banks/IBanks";
+import { IClientsByProject, IPaymentDetail, IPaymentStatus } from "@/types/banks/IBanks";
 
 export const getPaymentDetail = async (payment_id: number) => {
   try {
@@ -176,6 +176,16 @@ export const splitPayment = async ({ payment_id, userId, data, files }: ISpliPay
     return response.data;
   } catch (error) {
     console.error("Error al dividir el pago:", error);
+    throw error;
+  }
+};
+
+export const getPaymentsStatus = async () => {
+  try {
+    const response: GenericResponse<IPaymentStatus[]> = await API.get("/bank/get-status");
+    return response.data;
+  } catch (error) {
+    console.error("Error al obtener los estados de los pagos:", error);
     throw error;
   }
 };

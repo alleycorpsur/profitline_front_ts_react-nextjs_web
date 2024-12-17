@@ -4,12 +4,14 @@ import { CaretLeft, Plus } from "phosphor-react";
 
 import { DocumentButton } from "@/components/atoms/DocumentButton/DocumentButton";
 import { useMessageApi } from "@/context/MessageContext";
+import { getPaymentsStatus } from "@/services/banksPayments/banksPayments";
+
+import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
+import SecondaryButton from "@/components/atoms/buttons/secondaryButton/SecondaryButton";
 
 import { ISingleBank } from "@/types/banks/IBanks";
 
 import styles from "./modal-actions-change-status.module.scss";
-import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
-import SecondaryButton from "@/components/atoms/buttons/secondaryButton/SecondaryButton";
 
 interface Props {
   isOpen: boolean;
@@ -23,11 +25,20 @@ interface infoObject {
 }
 
 const ModalActionsChangeStatus: React.FC<Props> = ({ isOpen, onClose, selectedRows }) => {
+  const [states, setStates] = useState<{ id: number; label: string }[]>();
   const [selectedState, setSelectedState] = useState<string | undefined>();
   const [selectedEvidence, setSelectedEvidence] = useState<File[]>([]);
   const [commentary, setCommentary] = useState<string | undefined>();
   const [isSecondView, setIsSecondView] = useState(false);
   const { showMessage } = useMessageApi();
+
+  useEffect(() => {
+    const fetchStatus = async () => {
+      const res = await getPaymentsStatus();
+      setStates(res.map((status) => ({ id: status.id, label: status.status_description })));
+    };
+    fetchStatus();
+  }, []);
 
   const handleOnChangeRadioGroup = (e: RadioChangeEvent) => {
     setSelectedState(e.target.value);
@@ -102,14 +113,10 @@ const ModalActionsChangeStatus: React.FC<Props> = ({ isOpen, onClose, selectedRo
     innerContent: (
       <>
         <div className={styles.content__status}>
-          {paymentsStates.map((state) => (
-            <Radio.Group
-              onChange={handleOnChangeRadioGroup}
-              value={selectedState?.toLocaleLowerCase()}
-              key={state}
-            >
-              <Radio className={styles.content__status__item} value={state?.toLocaleLowerCase()}>
-                {state}
+          {states?.map((state) => (
+            <Radio.Group onChange={handleOnChangeRadioGroup} value={selectedState} key={state.id}>
+              <Radio className={styles.content__status__item} value={state?.id}>
+                {state.label}
               </Radio>
             </Radio.Group>
           ))}
@@ -236,5 +243,3 @@ const ModalActionsChangeStatus: React.FC<Props> = ({ isOpen, onClose, selectedRo
 };
 
 export default ModalActionsChangeStatus;
-
-const paymentsStates = ["Anticipo", "Pago auditado", "Pago aplicado", "Otros pagos"];
