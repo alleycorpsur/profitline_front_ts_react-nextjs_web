@@ -195,21 +195,39 @@ interface IChangePaymentStatus {
   clientId: number;
   payment_ids: number[];
   status_id: number;
+  comment: string;
+  file: File;
 }
 
 export const changePaymentStatus = async ({
   projectId,
   clientId,
   payment_ids,
-  status_id
+  status_id,
+  comment,
+  file
 }: IChangePaymentStatus) => {
+  const token = await getIdToken();
+
+  const formData = new FormData();
+  formData.append("project_id", projectId.toString());
+  formData.append("client_id", clientId.toString());
+  formData.append("payments", JSON.stringify(payment_ids));
+  formData.append("status", status_id.toString());
+  formData.append("comment", comment);
+  formData.append("file", file);
+
   try {
-    const response: GenericResponse<any> = await API.put("/bank/change-status", {
-      project_id: projectId,
-      client_id: clientId,
-      payments: payment_ids,
-      status: status_id
-    });
+    const response: GenericResponse<any> = await axios.put(
+      `${config.API_HOST}/bank/change-status`,
+      formData,
+      {
+        headers: {
+          Accept: "application/json, text/plain, */*",
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
 
     return response;
   } catch (error) {

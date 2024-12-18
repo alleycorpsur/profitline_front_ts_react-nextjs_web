@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button, Flex, Modal, Radio, RadioChangeEvent } from "antd";
-import { CaretLeft, Plus } from "phosphor-react";
+import { CaretLeft } from "phosphor-react";
 
 import { useAppStore } from "@/lib/store/store";
 import { useMessageApi } from "@/context/MessageContext";
@@ -60,6 +60,7 @@ const ModalActionsChangeStatus: React.FC<Props> = ({ isOpen, onClose, selectedRo
 
   const handleAttachEvidence = async () => {
     if (!selectedRows || !selectedStatus) {
+      console.error("No se han seleccionado filas o estado");
       return;
     }
     setLoading(true);
@@ -71,7 +72,9 @@ const ModalActionsChangeStatus: React.FC<Props> = ({ isOpen, onClose, selectedRo
         projectId,
         clientId: selectedRows[0].id_client,
         payment_ids: selectedRows.map((row) => row.id),
-        status_id: parseInt(selectedStatus)
+        status_id: parseInt(selectedStatus),
+        comment: commentary || "",
+        file: selectedEvidence[0]
       };
       await changePaymentStatus(modelData);
       showMessage("success", "Estado cambiado con éxito");
@@ -103,21 +106,22 @@ const ModalActionsChangeStatus: React.FC<Props> = ({ isOpen, onClose, selectedRo
     setSelectedEvidence(updatedFiles);
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files && files.length > 0) {
-      const file = files[0];
-      const fileSizeInMB = file.size / (1024 * 1024);
-      if (fileSizeInMB > 30) {
-        showMessage(
-          "error",
-          "El archivo es demasiado grande. Por favor, sube un archivo de menos de 30 MB."
-        );
-        return;
-      }
-      setSelectedEvidence((prevFiles) => [...prevFiles, file]);
-    }
-  };
+  //  Commented logic to add more than 1 document
+  // const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const files = e.target.files;
+  //   if (files && files.length > 0) {
+  //     const file = files[0];
+  //     const fileSizeInMB = file.size / (1024 * 1024);
+  //     if (fileSizeInMB > 30) {
+  //       showMessage(
+  //         "error",
+  //         "El archivo es demasiado grande. Por favor, sube un archivo de menos de 30 MB."
+  //       );
+  //       return;
+  //     }
+  //     setSelectedEvidence((prevFiles) => [...prevFiles, file]);
+  //   }
+  // };
 
   const firstViewModal = {
     title: "Cambio de estado",
@@ -182,7 +186,9 @@ const ModalActionsChangeStatus: React.FC<Props> = ({ isOpen, onClose, selectedRo
                 );
               })
             : null}
-          {selectedEvidence.length > 0 && (
+
+          {/* Commented logic to add more than 1 document */}
+          {/* {selectedEvidence.length > 0 && (
             <>
               <Button
                 onClick={() => {
@@ -204,7 +210,7 @@ const ModalActionsChangeStatus: React.FC<Props> = ({ isOpen, onClose, selectedRo
                 accept=".pdf, .png, .doc, .docx, .xls, .xlsx, .msg, .txt, .eml"
               />
             </>
-          )}
+          )} */}
 
           <p>Comentarios</p>
           <textarea onChange={handleOnChangeTextArea} placeholder="Ingresar un comentario" />
