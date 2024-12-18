@@ -131,8 +131,11 @@ export const createCommunication = async ({
     start_date: selectedPeriodicity?.init_date?.format("YYYY-MM-DD") || "",
     repeat: {
       interval: selectedPeriodicity?.frequency_number || 0,
-      frequency: selectedPeriodicity?.frequency.value || "mensual",
-      day: selectedPeriodicity?.init_date?.format("YYYY-MM-DD").split("-")[2] || ""
+      frequency: selectedPeriodicity?.frequency.value || "Mensual",
+      day:
+        selectedPeriodicity?.frequency.value.toLowerCase() === "semanal"
+          ? selectedPeriodicity?.days.map((day) => day.value.toLowerCase())
+          : selectedPeriodicity?.init_date?.format("YYYY-MM-DD").split("-")[2] || ""
     },
     end_date: selectedPeriodicity?.end_date?.format("YYYY-MM-DD") || ""
   };
