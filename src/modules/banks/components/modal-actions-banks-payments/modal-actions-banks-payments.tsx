@@ -1,6 +1,13 @@
 "use client";
 import { Flex, Modal } from "antd";
-import { PencilLine, User, CheckCircle, CirclesFour, FileArrowUp } from "@phosphor-icons/react";
+import {
+  PencilLine,
+  User,
+  CheckCircle,
+  CirclesFour,
+  FileArrowUp,
+  ArrowsClockwise
+} from "@phosphor-icons/react";
 
 import { ButtonGenerateAction } from "@/components/atoms/ButtonGenerateAction/ButtonGenerateAction";
 
@@ -65,6 +72,13 @@ const ModalActionsBanksPayments = ({ isOpen, onClose, setSelectOpen }: Props) =>
           title="Cargar tirilla"
           onClick={() => {
             handleOpenModal(5);
+          }}
+        />
+        <ButtonGenerateAction
+          icon={<ArrowsClockwise size={16} />}
+          title="Cambiar de estado"
+          onClick={() => {
+            handleOpenModal(6);
           }}
         />
       </Flex>
