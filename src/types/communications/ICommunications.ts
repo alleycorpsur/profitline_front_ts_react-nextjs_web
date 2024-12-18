@@ -61,7 +61,7 @@ export interface ICreateCommunication {
     repeat: {
       interval: number;
       frequency: "mensual" | "semanal" | string;
-      day: string | string[];
+      day: string[] | number[];
     };
     end_date: string;
   };
