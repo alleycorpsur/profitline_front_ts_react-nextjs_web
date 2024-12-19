@@ -20,7 +20,7 @@ const PaymentsTable: React.FC<PaymentsTableProps> = ({ data }) => {
       title: "Fecha",
       dataIndex: "created_at",
       key: "created_at",
-      render: (date) => <p className="cell -alignRight">{date ? formatDate(date) : "-"}</p>,
+      render: (date) => <p>{date ? formatDate(date) : "-"}</p>,
       sorter: (a, b) => Date.parse(a.created_at) - Date.parse(b.created_at),
       showSorterTooltip: false
     },
@@ -28,19 +28,25 @@ const PaymentsTable: React.FC<PaymentsTableProps> = ({ data }) => {
       title: "Monto",
       dataIndex: "amount",
       key: "amount",
-      render: (amount) => <p className="cell -alignRight">{formatMoney(amount)}</p>,
+      render: (amount) => <p>{formatMoney(amount)}</p>,
       sorter: (a, b) => a.amount - b.amount,
       showSorterTooltip: false
     },
     {
       title: "Monto aplicado",
-      dataIndex: "appliedAmount",
-      key: "appliedAmount"
+      dataIndex: "applied_amount",
+      key: "applied_amount",
+      render: (applied_amount) => <p>{formatMoney(applied_amount)}</p>,
+      sorter: (a, b) => a.applied_amount - b.applied_amount,
+      showSorterTooltip: false
     },
     {
       title: "Saldo",
-      dataIndex: "balance",
-      key: "balance"
+      dataIndex: "current_value",
+      key: "current_value",
+      render: (current_value) => <p>{formatMoney(current_value)}</p>,
+      sorter: (a, b) => a.current_value - b.current_value,
+      showSorterTooltip: false
     }
   ];
 

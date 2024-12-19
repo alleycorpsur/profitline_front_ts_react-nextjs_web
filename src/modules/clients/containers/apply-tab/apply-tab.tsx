@@ -76,7 +76,6 @@ const ApplyTab: React.FC = () => {
   };
 
   const dataForCollapse = useMemo(() => {
-    console.log("appData:", applicationData);
     const invoices = {
       statusName: "facturas",
       color: "#FF7A00",
