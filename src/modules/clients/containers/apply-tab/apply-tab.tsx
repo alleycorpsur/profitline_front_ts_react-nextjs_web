@@ -5,11 +5,18 @@ import { Button, Flex, Spin } from "antd";
 import { useApplicationTable } from "@/hooks/useApplicationTable";
 import Collapse from "@/components/ui/collapse";
 import LabelCollapse from "@/components/ui/label-collapse";
+import { useParams } from "next/navigation";
+
+import { useAppStore } from "@/lib/store/store";
+import { extractSingleParam } from "@/utils/utils";
+import { addItemsToTable } from "@/services/applyTabClients/applyTabClients";
+import { useMessageApi } from "@/context/MessageContext";
+import { useSelectedPayments } from "@/context/SelectedPaymentsContext";
+
 import UiSearchInput from "@/components/ui/search-input/search-input";
 import InvoiceTable from "./tables/InvoiceTable";
 import PaymentsTable from "./tables/PaymentsTable";
 import DiscountTable from "./tables/DiscountTable";
-import { useSelectedPayments } from "@/context/SelectedPaymentsContext";
 import { ModalResultAppy } from "./Modals/ModalResultApply/ModalResultAppy";
 import ModalAddToTables from "./Modals/ModalAddToTables/ModalAddToTables";
 import { ModalSelectAjustements } from "./Modals/ModalSelectAjustements/ModalSelectAjustements";
@@ -22,7 +29,11 @@ export interface IModalAddToTableOpen {
   adding?: "invoices" | "payments";
 }
 const ApplyTab: React.FC = () => {
+  const { ID: projectId } = useAppStore((state) => state.selectedProject);
+  const params = useParams();
+  const clientId = Number(extractSingleParam(params.clientId)) || 0;
   const [search, setSearch] = useState("");
+  const { showMessage } = useMessageApi();
 
   //TODO this is the context that is not being used
   // const { selectedPayments } = useSelectedPayments();
@@ -49,14 +60,22 @@ const ApplyTab: React.FC = () => {
     });
   };
 
-  const handleAdd = () => {
+  const handleAdd = async (adding_type: "invoices" | "payments", selectedIds: number[]) => {
     // Handle adding selected invoices
-    setIsModalAddToTableOpen({
-      isOpen: false
-    });
+    try {
+      await addItemsToTable(projectId, clientId, adding_type, selectedIds);
+
+      showMessage("success", "Se han agregado los elementos correctamente");
+      setIsModalAddToTableOpen({
+        isOpen: false
+      });
+    } catch (error) {
+      showMessage("error", "Ha ocurrido un error al agregar los elementos");
+    }
   };
 
   const dataForCollapse = useMemo(() => {
+    console.log("appData:", applicationData);
     const invoices = {
       statusName: "facturas",
       color: "#FF7A00",

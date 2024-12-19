@@ -18,7 +18,8 @@ import { IInvoice } from "@/types/invoices/IInvoices";
 import "./modalAddToTables.scss";
 interface ModalAddToTablesProps {
   onCancel: () => void;
-  onAdd: () => void;
+  // eslint-disable-next-line no-unused-vars
+  onAdd: (adding_type: "invoices" | "payments", selectedIds: number[]) => void;
   isModalAddToTableOpen: IModalAddToTableOpen;
 }
 
@@ -286,7 +287,13 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
         <PrincipalButton
           fullWidth
           loading={isLoading}
-          // onClick={onAdd}
+          onClick={() => {
+            if (!isModalAddToTableOpen.adding) return console.error("No adding type selected");
+            onAdd(
+              isModalAddToTableOpen.adding,
+              selectedRows.map((row) => row.id)
+            );
+          }}
         >
           {`Agregar ${isModalAddToTableOpen.adding === "invoices" ? "facturas" : "pagos"}`}
         </PrincipalButton>
