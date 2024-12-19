@@ -46,7 +46,7 @@ const ApplyTab: React.FC = () => {
     {} as { isOpen: boolean; modal: number }
   );
 
-  const { data: applicationData, isLoading } = useApplicationTable();
+  const { data: applicationData, isLoading, mutate } = useApplicationTable();
   const showModal = (adding_type: "invoices" | "payments") => {
     setIsModalAddToTableOpen({
       isOpen: true,
@@ -61,7 +61,7 @@ const ApplyTab: React.FC = () => {
   };
 
   const handleAdd = async (adding_type: "invoices" | "payments", selectedIds: number[]) => {
-    // Handle adding selected invoices
+    // Handle adding selected
     try {
       await addItemsToTable(projectId, clientId, adding_type, selectedIds);
 
@@ -69,6 +69,7 @@ const ApplyTab: React.FC = () => {
       setIsModalAddToTableOpen({
         isOpen: false
       });
+      mutate();
     } catch (error) {
       showMessage("error", "Ha ocurrido un error al agregar los elementos");
     }
