@@ -1,9 +1,15 @@
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { Checkbox, Flex, Modal } from "antd";
 import { Controller, useForm } from "react-hook-form";
 import { CaretLeft } from "phosphor-react";
 
 import { useMessageApi } from "@/context/MessageContext";
+import { useAppStore } from "@/lib/store/store";
+import {
+  getAccountsByProject,
+  getPaymentTypes,
+  identifyPayment
+} from "@/services/clientsPayments/clientsPayments";
 
 import SecondaryButton from "@/components/atoms/buttons/secondaryButton/SecondaryButton";
 import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
@@ -12,10 +18,15 @@ import { InputFormMoney } from "@/components/atoms/inputs/InputFormMoney/InputFo
 import { InputForm } from "@/components/atoms/inputs/InputForm/InputForm";
 import { InputDateForm } from "@/components/atoms/inputs/InputDate/InputDateForm";
 import { DocumentButton } from "@/components/atoms/DocumentButton/DocumentButton";
-
-import "./modal-identify-payment-action.scss";
 import ModalNotIdentifiedPayment from "../modal-not-identified-payment";
 import ModalIdentifiedPayments from "../modal-identified-payments";
+
+import {
+  IFormIdentifyPaymentModal,
+  IIdentifiedPayment
+} from "@/types/clientPayments/IClientPayments";
+
+import "./modal-identify-payment-action.scss";
 
 interface ModalIdentifyPaymentProps {
   isOpen: boolean;
@@ -33,21 +44,16 @@ interface ISelect {
   label: string;
 }
 
-export interface IFormIdentifyPaymentModal {
-  account: ISelect[];
-  date: string;
-  amount: number;
-  reference: string;
-  payment_type: ISelect[];
-  is_advance_payment: boolean;
-  evidence?: File;
-}
-
 const ModalIdentifyPayment: FC<ModalIdentifyPaymentProps> = ({ isOpen, onClose }) => {
+  const { ID: projectId } = useAppStore((state) => state.selectedProject);
+  const [accounts, setAccounts] = useState<ISelect[]>([]);
+  const [paymentTypes, setPaymentTypes] = useState<ISelect[]>([]);
+  const [identifiedPayments, setIdentifiedPayments] = useState<IIdentifiedPayment[]>();
   const [viewInfo, setViewInfo] = useState<{
     current: "form" | "identified" | "not_identified";
     paymentInfo: IFormIdentifyPaymentModal | undefined;
   }>({ current: "form", paymentInfo: undefined });
+  const [key, setKey] = useState<number>(0); // Key to force remount
 
   const { showMessage } = useMessageApi();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -58,19 +64,75 @@ const ModalIdentifyPayment: FC<ModalIdentifyPaymentProps> = ({ isOpen, onClose }
     formState: { errors, isValid },
     setValue,
     watch,
-    trigger
-  } = useForm<IFormIdentifyPaymentModal>({});
+    trigger,
+    reset
+  } = useForm<IFormIdentifyPaymentModal>();
+
+  useEffect(() => {
+    const fetchAccounts = async () => {
+      if (!projectId) {
+        setAccounts([]);
+        return;
+      }
+
+      try {
+        const res = await getAccountsByProject(projectId);
+        const formattedAccounts = res.map((account) => ({
+          value: account.id,
+          label: `${account.bank_name} ${account.account_number}`
+        }));
+        setAccounts(formattedAccounts);
+      } catch (error) {
+        console.error("Failed to fetch accounts", error);
+        setAccounts([]);
+      }
+    };
+    fetchAccounts();
+
+    const fetchPaymentTypes = async () => {
+      try {
+        const res = await getPaymentTypes();
+        const formattedPaymentTypes = res.map((paymentType) => ({
+          value: paymentType.id,
+          label: paymentType.name
+        }));
+        setPaymentTypes(formattedPaymentTypes);
+      } catch (error) {
+        console.error("Failed to fetch payment types", error);
+        setPaymentTypes([]);
+      }
+    };
+    fetchPaymentTypes();
+  }, [projectId]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      reset();
+      setKey((prevKey) => prevKey + 1); // Increment key to force remount
+    }
+  }, [isOpen]);
 
   const onSubmit = async (data: IFormIdentifyPaymentModal) => {
     setIsSubmitting(true);
     try {
-      console.info("data enviada:", data);
-      setViewInfo({ current: "identified", paymentInfo: data });
-      // Open identified payments modal or not Identify modal
+      const res = await identifyPayment({
+        accountId: data.account?.value as string,
+        paymentDate: data.date?.format("YYYY-MM-DD"),
+        amount: data.amount
+      });
 
-      // onClose();
+      // Open identified payments modal or not Identify modal
+      if (res === 0) {
+        showMessage("info", "No se identificó ningún pago");
+        setViewInfo({ current: "not_identified", paymentInfo: data });
+      } else {
+        if (res && Array.isArray(res.data)) {
+          setIdentifiedPayments(res.data);
+        }
+        setViewInfo({ current: "identified", paymentInfo: data });
+      }
     } catch (error) {
-      showMessage("error", "Error al enviar tirilla");
+      showMessage("error", "Error al identificar pago");
     } finally {
       setIsSubmitting(false);
     }
@@ -107,6 +169,7 @@ const ModalIdentifyPayment: FC<ModalIdentifyPaymentProps> = ({ isOpen, onClose }
       open={isOpen}
       closable={false}
       destroyOnClose
+      key={key} // Force remount
     >
       {viewInfo.current === "form" && (
         <>
@@ -128,7 +191,7 @@ const ModalIdentifyPayment: FC<ModalIdentifyPaymentProps> = ({ isOpen, onClose }
                 <GeneralSelect
                   field={field}
                   title="Cuenta"
-                  placeholder="Ingresar nombre"
+                  placeholder="Seleccionar cuenta"
                   options={accounts}
                 />
               )}
@@ -159,7 +222,7 @@ const ModalIdentifyPayment: FC<ModalIdentifyPaymentProps> = ({ isOpen, onClose }
               nameInput={`amount`}
               control={control}
               error={errors?.amount}
-              placeholder="Valor"
+              placeholder="Ingresar monto"
               customStyle={{ width: "100%" }}
               validationRules={{
                 required: "Valor es obligatorio",
@@ -172,6 +235,7 @@ const ModalIdentifyPayment: FC<ModalIdentifyPaymentProps> = ({ isOpen, onClose }
               titleInput="Referencia"
               control={control}
               nameInput="reference"
+              placeholder="Ingresar No. de referencia"
               error={errors.reference}
             />
 
@@ -183,8 +247,8 @@ const ModalIdentifyPayment: FC<ModalIdentifyPaymentProps> = ({ isOpen, onClose }
                 <GeneralSelect
                   field={field}
                   title="Tipo de pago"
-                  placeholder="Ingresar tipo de pago"
-                  options={accounts}
+                  placeholder="Seleccionar tipo"
+                  options={paymentTypes}
                 />
               )}
             />
@@ -213,7 +277,7 @@ const ModalIdentifyPayment: FC<ModalIdentifyPaymentProps> = ({ isOpen, onClose }
               rules={{ required: "Evidencia es obligatoria" }}
               render={() => (
                 <DocumentButton
-                  key={evidence?.name || "default-key"} // Ensure a unique key
+                  key={evidence?.name || "default-key"}
                   title={evidence?.name}
                   handleOnChange={handleOnChangeDocument}
                   handleOnDelete={handleOnDeleteDocument}
@@ -235,27 +299,19 @@ const ModalIdentifyPayment: FC<ModalIdentifyPaymentProps> = ({ isOpen, onClose }
       )}
 
       {viewInfo.current === "not_identified" && (
-        <ModalNotIdentifiedPayment setViewInfo={setViewInfo} />
+        <ModalNotIdentifiedPayment setViewInfo={setViewInfo} onClose={onClose} />
       )}
 
-      {viewInfo.current === "identified" && <ModalIdentifiedPayments setViewInfo={setViewInfo} />}
+      {viewInfo.current === "identified" && (
+        <ModalIdentifiedPayments
+          setViewInfo={setViewInfo}
+          identifiedPayments={identifiedPayments}
+          paymentInfo={viewInfo.paymentInfo}
+          onClose={onClose}
+        />
+      )}
     </Modal>
   );
 };
 
 export default ModalIdentifyPayment;
-
-const accounts = [
-  {
-    value: 1,
-    label: "Cuenta 1"
-  },
-  {
-    value: 2,
-    label: "Cuenta 2"
-  },
-  {
-    value: 3,
-    label: "Cuenta 3"
-  }
-];

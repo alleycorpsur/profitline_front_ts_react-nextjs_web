@@ -2,7 +2,7 @@ import { GenericResponse } from "@/types/global/IGlobal";
 import axios from "axios";
 import config from "@/config";
 import { API, getIdToken } from "@/utils/api/api";
-import { IClientsByProject, IPaymentDetail } from "@/types/banks/IBanks";
+import { IClientsByProject, IPaymentDetail, IPaymentStatus } from "@/types/banks/IBanks";
 
 export const getPaymentDetail = async (payment_id: number) => {
   try {
@@ -176,6 +176,62 @@ export const splitPayment = async ({ payment_id, userId, data, files }: ISpliPay
     return response.data;
   } catch (error) {
     console.error("Error al dividir el pago:", error);
+    throw error;
+  }
+};
+
+export const getPaymentsStatus = async () => {
+  try {
+    const response: GenericResponse<IPaymentStatus[]> = await API.get("/bank/get-status");
+    return response.data;
+  } catch (error) {
+    console.error("Error al obtener los estados de los pagos:", error);
+    throw error;
+  }
+};
+
+interface IChangePaymentStatus {
+  projectId: number;
+  clientId: number;
+  payment_ids: number[];
+  status_id: number;
+  comment: string;
+  file: File;
+}
+
+export const changePaymentStatus = async ({
+  projectId,
+  clientId,
+  payment_ids,
+  status_id,
+  comment,
+  file
+}: IChangePaymentStatus) => {
+  const token = await getIdToken();
+
+  const formData = new FormData();
+  formData.append("project_id", projectId.toString());
+  formData.append("client_id", clientId.toString());
+  formData.append("payments", JSON.stringify(payment_ids));
+  formData.append("status", status_id.toString());
+  formData.append("comment", comment);
+  formData.append("file", file);
+
+  try {
+    const response: GenericResponse<any> = await axios.put(
+      `${config.API_HOST}/bank/change-status`,
+      formData,
+      {
+        headers: {
+          Accept: "application/json, text/plain, */*",
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    return response;
+  } catch (error) {
+    console.error("Error al cambiar el estado del pago:", error);
     throw error;
   }
 };

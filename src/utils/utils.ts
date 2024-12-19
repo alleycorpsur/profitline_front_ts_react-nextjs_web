@@ -338,7 +338,7 @@ export const stringFromArrayOfSelect = (array: ISelectStringType[]): string => {
 
 export const formatDateDMY = (dateString: string): string => {
   const date = dayjs(dateString);
-  return date.format("DD/MM/YYYY");
+  return date.utc().format("DD/MM/YYYY");
 };
 
 export const checkUserViewPermissions = (
