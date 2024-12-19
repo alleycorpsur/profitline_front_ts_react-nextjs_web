@@ -7,12 +7,13 @@ import { formatMoney } from "@/utils/utils";
 const { Panel } = Collapse;
 
 interface Props {
-  invoices: number;
-  desconts: number;
-  payments: number;
+  invoices?: number;
+  desconts?: number;
+  payments?: number;
+  total?: number;
 }
 
-export const ModalResultAppy = ({ invoices, desconts, payments }: Props) => {
+export const ModalResultAppy = ({ invoices, desconts, payments, total }: Props) => {
   const updateDefaultPosition = () => {
     const modalWidth = draggleRef.current?.offsetWidth || 240;
     setDefaultPosition({ x: window.innerWidth - modalWidth - 20, y: 0 });
@@ -80,7 +81,7 @@ export const ModalResultAppy = ({ invoices, desconts, payments }: Props) => {
         </Collapse>
         <Flex justify="space-between" className="divider__conciliation saldo">
           <div>Saldo</div>
-          <div>{formatMoney(payments - desconts)}</div>
+          <div>{formatMoney(total)}</div>
         </Flex>
       </div>
     </Draggable>

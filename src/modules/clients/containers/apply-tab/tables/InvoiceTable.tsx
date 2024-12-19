@@ -1,48 +1,58 @@
 import React from "react";
-import { Table } from "antd";
-import { InvoiceData } from "./Types";
+import { Table, TableProps } from "antd";
+import { IApplyTabRecord } from "@/types/applyTabClients/IApplyTabClients";
+import { formatDate, formatMoney } from "@/utils/utils";
 
 interface InvoiceTableProps {
-  data: InvoiceData[];
+  data?: IApplyTabRecord[];
 }
 
 const InvoiceTable: React.FC<InvoiceTableProps> = ({ data }) => {
-  const columns = [
-    { 
-      title: "Factura", 
-      dataIndex: "invoice", 
-      key: "invoice",
-      sorter: (a: InvoiceData, b: InvoiceData) => a.invoice! - b.invoice!
+  const columns: TableProps<IApplyTabRecord>["columns"] = [
+    {
+      title: "Factura",
+      dataIndex: "id_erp",
+      key: "id_erp",
+      render: (id_erp) => <p className="sectionContainerTable__id">{id_erp}</p>,
+      sorter: (a, b) => a.id_erp.localeCompare(b.id_erp),
+      showSorterTooltip: false
     },
-    { 
-      title: "Fecha", 
-      dataIndex: "date", 
-      key: "date",
-      sorter: (a: InvoiceData, b: InvoiceData) => new Date(a.date!).getTime() - new Date(b.date!).getTime()
+    {
+      title: "Fecha",
+      dataIndex: "created_at",
+      key: "created_at",
+      render: (date) => <p>{date ? formatDate(date) : "-"}</p>,
+      sorter: (a, b) => Date.parse(a.created_at) - Date.parse(b.created_at),
+      showSorterTooltip: false
     },
-    { 
-      title: "Monto", 
-      dataIndex: "amount", 
+    {
+      title: "Monto",
+      dataIndex: "initial_value",
+      key: "initial_value",
+      render: (initial_value) => <p>{formatMoney(initial_value)}</p>,
+      sorter: (a, b) => a.initial_value - b.initial_value,
+      showSorterTooltip: false
+    },
+    {
+      title: "Pago",
+      dataIndex: "amount",
       key: "amount",
-      sorter: (a: InvoiceData, b: InvoiceData) => a.amount! - b.amount!
+      render: (amount) => <p>{formatMoney(amount)}</p>,
+      sorter: (a, b) => a.amount - b.amount,
+      showSorterTooltip: false
     },
-    { 
-      title: "Pago", 
-      dataIndex: "payment", 
-      key: "payment",
-      sorter: (a: InvoiceData, b: InvoiceData) => a.payment! - b.payment!
+    {
+      title: "Ajuste",
+      dataIndex: "adjustment",
+      key: "adjustment"
     },
-    { 
-      title: "Ajuste", 
-      dataIndex: "adjustment", 
-      key: "adjustment",
-      sorter: (a: InvoiceData, b: InvoiceData) => a.adjustment! - b.adjustment!
-    },
-    { 
-      title: "Saldo", 
-      dataIndex: "balance", 
-      key: "balance",
-      sorter: (a: InvoiceData, b: InvoiceData) => a.balance - b.balance
+    {
+      title: "Saldo",
+      dataIndex: "current_value",
+      key: "current_value",
+      render: (current_value) => <p>{formatMoney(current_value)}</p>,
+      sorter: (a, b) => a.current_value - b.current_value,
+      showSorterTooltip: false
     }
   ];
 
