@@ -1,11 +1,18 @@
 import React, { useState } from "react";
-import { Modal, Spin } from "antd";
-import "./modalNoteInvoice.scss";
+import { useParams } from "next/navigation";
+import { Flex, Modal, Spin } from "antd";
 import { CaretLeft, Plus } from "phosphor-react";
+
+import { IFinancialDiscount, useAcountingAdjustment } from "@/hooks/useAcountingAdjustment";
+import { useAppStore } from "@/lib/store/store";
+import { extractSingleParam, formatMoney } from "@/utils/utils";
+
 import UiSearchInputLong from "@/components/ui/search-input-long";
-import ItemsActionsModal from "@/components/atoms/ItemsModal/ItemsActionsModal";
 import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
 import SecondaryButton from "@/components/atoms/buttons/secondaryButton/SecondaryButton";
+import CheckboxColoredValues from "@/components/ui/checkbox-colored-values/checkbox-colored-values";
+
+import "./modalListAdjustments.scss";
 
 interface Adjustment {
   id: number;
@@ -16,7 +23,7 @@ interface Adjustment {
   type: number;
 }
 
-interface ModalNoteInvoiceProps {
+interface ModalListAdjustmentsProps {
   visible: boolean;
   onCancel: () => void;
   onAdd: () => void;
@@ -24,12 +31,17 @@ interface ModalNoteInvoiceProps {
   setModalAction: (modalAction: number) => void;
 }
 
-const ModalNoteInvoice: React.FC<ModalNoteInvoiceProps> = ({
+const ModalListAdjustments: React.FC<ModalListAdjustmentsProps> = ({
   visible,
   onCancel,
   onAdd,
   setModalAction
 }) => {
+  const params = useParams();
+  const clientId = extractSingleParam(params.clientId) || "";
+  const { ID: projectId } = useAppStore((state) => state.selectedProject);
+  const [selectedRows, setSelectedRows] = useState<IFinancialDiscount[]>([]);
+
   const [adjustments, setAdjustments] = useState<Adjustment[]>([
     {
       id: 1,
@@ -73,6 +85,9 @@ const ModalNoteInvoice: React.FC<ModalNoteInvoiceProps> = ({
     }
   ]);
 
+  const { data } = useAcountingAdjustment(clientId, projectId.toString(), 2);
+  console.log("data", data?.[0]);
+
   const handleAdjustmentSelect = (id: number) => {
     const newAdjustments = adjustments.map((adjustment) =>
       adjustment.id === id ? { ...adjustment, selected: !adjustment.selected } : adjustment
@@ -84,6 +99,14 @@ const ModalNoteInvoice: React.FC<ModalNoteInvoiceProps> = ({
     setModalAction(2);
   };
 
+  const handleSelectOne = (checked: boolean, row: IFinancialDiscount) => {
+    setSelectedRows((prevSelectedRows) =>
+      checked
+        ? [...prevSelectedRows, row]
+        : prevSelectedRows.filter((selected) => selected.id !== row.id)
+    );
+  };
+
   const isLoading = false;
 
   return (
@@ -92,7 +115,7 @@ const ModalNoteInvoice: React.FC<ModalNoteInvoiceProps> = ({
       onCancel={onCancel}
       footer={null}
       width={700}
-      className="modal-note-invoice"
+      className="modal-list-adjustments"
     >
       <div onClick={onCancel} className="header">
         <CaretLeft size={24} onClick={onCancel} />
@@ -103,12 +126,28 @@ const ModalNoteInvoice: React.FC<ModalNoteInvoiceProps> = ({
         <UiSearchInputLong placeholder="Buscar" className={"custom-input"} />
       </div>
       <div className="adjustments-list">
-        {adjustments.map((adjustment) => (
-          <ItemsActionsModal
-            key={adjustment.id}
-            onHeaderClick={() => handleAdjustmentSelect(adjustment.id)}
-            type={adjustment.type}
-            item={adjustment}
+        {data?.[0].financial_discounts?.map((row) => (
+          <CheckboxColoredValues
+            customStyles={{ height: "76px" }}
+            customStyleDivider={{ width: "6px", height: "44px", alignSelf: "center" }}
+            key={row.id}
+            onChangeCheckbox={(e) => {
+              handleSelectOne(e.target.checked, row);
+            }}
+            checked={selectedRows.some((selected) => selected.id === row.id)}
+            content={
+              <Flex style={{ width: "100%" }} justify="space-between">
+                <div>
+                  <h4 className="adjustments-list__title">Nota crédito {row.id}</h4>
+                  <p className="adjustments-list__subtitle">Volumen</p>
+                </div>
+
+                <div>
+                  <h3 className="adjustments-list__amount">{formatMoney(row.current_value)}</h3>
+                  <p className="adjustments-list__subtitle">{formatMoney(row.initial_value)}</p>
+                </div>
+              </Flex>
+            }
           />
         ))}
       </div>
@@ -131,4 +170,4 @@ const ModalNoteInvoice: React.FC<ModalNoteInvoiceProps> = ({
   );
 };
 
-export default ModalNoteInvoice;
+export default ModalListAdjustments;

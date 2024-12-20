@@ -1,4 +1,6 @@
-.modal-note-invoice {
+@import "@styles/variables.scss";
+
+.modal-list-adjustments {
     .header {
         display: flex;
         justify-content: left;
@@ -29,9 +31,29 @@
     }
 
     .adjustments-list {
-        max-height: 400px;
+        display: flex;
+        max-height: 27vh;
         overflow-y: auto;
-        gap: 0.5rem;
+        flex-direction: column;
+        gap: 8px;
+        overflow-y: scroll;
+        scrollbar-width: none;
+        color: $black;
+
+        &__title {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        &__subtitle {
+            font-size: 0.875rem;
+            font-weight: 275;
+        }
+
+        &__amount {
+            font-size: 1.25rem;
+            font-weight: 500;
+        }
     }
 
     .create-adjustment {

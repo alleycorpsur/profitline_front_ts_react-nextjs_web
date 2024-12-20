@@ -20,7 +20,7 @@ import DiscountTable from "./tables/DiscountTable";
 import { ModalResultAppy } from "./Modals/ModalResultApply/ModalResultAppy";
 import ModalAddToTables from "./Modals/ModalAddToTables/ModalAddToTables";
 import { ModalSelectAjustements } from "./Modals/ModalSelectAjustements/ModalSelectAjustements";
-import ModalNoteInvoice from "./Modals/ModalNoteInvoice/ModalNoteInvoice";
+import ModalListAdjustments from "./Modals/ModalListAdjustments/ModalListAdjustments";
 import ModalCreateAdjustment from "./Modals/ModalCreateAdjustment/ModalCreateAdjustment";
 
 import "./apply-tab.scss";
@@ -80,7 +80,7 @@ const ApplyTab: React.FC = () => {
       statusName: "facturas",
       color: "#FF7A00",
       statusId: 1,
-      invoices: applicationData?.invoices,
+      itemsList: applicationData?.invoices,
       total: applicationData?.summary.total_invoices,
       count: applicationData?.invoices.length
     };
@@ -89,7 +89,7 @@ const ApplyTab: React.FC = () => {
       statusName: "pagos",
       color: "#0085FF",
       statusId: 2,
-      invoices: applicationData?.payments,
+      itemsList: applicationData?.payments,
       total: applicationData?.summary.total_payments,
       count: applicationData?.payments.length
     };
@@ -98,7 +98,7 @@ const ApplyTab: React.FC = () => {
       statusName: "ajustes",
       color: "#E53261",
       statusId: 3,
-      invoices: applicationData?.discounts,
+      itemsList: applicationData?.discounts,
       total: applicationData?.summary.total_discounts,
       count: applicationData?.discounts.length
     };
@@ -176,9 +176,9 @@ const ApplyTab: React.FC = () => {
               ),
               children: (
                 <div>
-                  {section.statusName === "facturas" && <InvoiceTable data={section.invoices} />}
-                  {section.statusName === "pagos" && <PaymentsTable data={section.invoices} />}
-                  {section.statusName === "ajustes" && <DiscountTable data={section.invoices} />}
+                  {section.statusName === "facturas" && <InvoiceTable data={section.itemsList} />}
+                  {section.statusName === "pagos" && <PaymentsTable data={section.itemsList} />}
+                  {section.statusName === "ajustes" && <DiscountTable data={section.itemsList} />}
                 </div>
               )
             }))}
@@ -205,7 +205,7 @@ const ApplyTab: React.FC = () => {
           });
         }}
       />
-      <ModalNoteInvoice
+      <ModalListAdjustments
         visible={modalActionPayment && modalActionPayment.isOpen && modalActionPayment.modal === 1}
         onCancel={() =>
           setModalActionPayment({

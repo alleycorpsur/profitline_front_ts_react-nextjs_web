@@ -7,6 +7,7 @@ import { Globe, NewspaperClipping } from "phosphor-react";
 type ModalActionPaymentProps = {
   isOpen: boolean;
   onClose: () => void;
+  // eslint-disable-next-line no-unused-vars
   setModalAction: (modalAction: number) => void;
 };
 
