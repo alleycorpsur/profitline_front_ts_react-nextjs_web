@@ -14,15 +14,6 @@ import CheckboxColoredValues from "@/components/ui/checkbox-colored-values/check
 
 import "./modalListAdjustments.scss";
 
-interface Adjustment {
-  id: number;
-  current_value: number;
-  selected: boolean;
-  motive_name: string;
-  intialAmount: number;
-  type: number;
-}
-
 interface ModalListAdjustmentsProps {
   visible: boolean;
   onCancel: () => void;
@@ -42,58 +33,7 @@ const ModalListAdjustments: React.FC<ModalListAdjustmentsProps> = ({
   const { ID: projectId } = useAppStore((state) => state.selectedProject);
   const [selectedRows, setSelectedRows] = useState<IFinancialDiscount[]>([]);
 
-  const [adjustments, setAdjustments] = useState<Adjustment[]>([
-    {
-      id: 1,
-      current_value: 12000000,
-      selected: false,
-      motive_name: "Volumen",
-      intialAmount: 15000000,
-      type: 2
-    },
-    {
-      id: 2,
-      current_value: 12000000,
-      selected: false,
-      motive_name: "Volumen",
-      intialAmount: 15000000,
-      type: 1
-    },
-    {
-      id: 3,
-      current_value: 12000000,
-      selected: false,
-      motive_name: "Volumen",
-      intialAmount: 15000000,
-      type: 2
-    },
-    {
-      id: 4,
-      current_value: 12000000,
-      selected: false,
-      motive_name: "Volumen",
-      intialAmount: 15000000,
-      type: 2
-    },
-    {
-      id: 5,
-      current_value: 12000000,
-      selected: false,
-      motive_name: "Volumen",
-      intialAmount: 15000000,
-      type: 2
-    }
-  ]);
-
   const { data } = useAcountingAdjustment(clientId, projectId.toString(), 2);
-  console.log("data", data?.[0]);
-
-  const handleAdjustmentSelect = (id: number) => {
-    const newAdjustments = adjustments.map((adjustment) =>
-      adjustment.id === id ? { ...adjustment, selected: !adjustment.selected } : adjustment
-    );
-    setAdjustments(newAdjustments);
-  };
 
   const handleCreateAdjustments = () => {
     setModalAction(2);
