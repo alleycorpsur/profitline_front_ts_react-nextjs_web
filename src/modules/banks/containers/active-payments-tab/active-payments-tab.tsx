@@ -104,10 +104,12 @@ export const ActivePaymentsTab: FC = () => {
     });
   };
 
-  const filteredData = data?.map((status) => ({
-    ...status,
-    payments: searchPayments(status.payments_status_id, searchQuery)
-  }));
+  const filteredData = data
+    ?.map((status) => ({
+      ...status,
+      payments: searchPayments(status.payments_status_id, searchQuery)
+    }))
+    .filter((status) => status.payments.length > 0);
 
   const items: MenuProps["items"] = [
     {
