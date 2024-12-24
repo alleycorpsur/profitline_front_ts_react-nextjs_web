@@ -13,7 +13,7 @@ export interface ISingleBank {
   id_account: number;
   project_id: number;
   id_client: number;
-  payment_date: string | null;
+  payment_date: string;
   created_at: string;
   currency: string;
   initial_value: number;
