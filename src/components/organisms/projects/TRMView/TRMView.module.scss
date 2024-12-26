@@ -1,0 +1,28 @@
+@import "@styles/variables.scss";
+.trmView {
+
+  .button {
+    &__actions {
+        padding: 0.75rem 1rem;
+        background-color: $background;
+        border: solid 1px transparent;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        height: 3rem;
+  
+        &:hover {
+            border: solid 1px $dark-gray;
+        }
+    }
+  }
+  .trmsTable {
+    margin-top: 1rem;
+  }
+  .customSeparator{
+    width: 1px;
+    height: 100%;
+    background-color:black; /* Color del separador */
+    margin: 0 8px; /* Espaciado horizontal */
+  }
+}

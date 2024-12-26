@@ -1,0 +1,22 @@
+@import "@/styles/variables.scss";
+
+
+.removebutton {
+    background-color: transparent !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none !important;
+}
+.alternatingRowsTable{
+    border: #E9E9E9 1px solid;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+.alternatingRowsTable tbody tr:nth-child(odd) {
+    background-color: #f5f5f5; /* Gris claro */
+  }
+  
+  .alternatingRowsTable tbody tr:nth-child(even) {
+    background-color: #ffffff; /* Blanco */
+  }

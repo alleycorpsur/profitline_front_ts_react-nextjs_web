@@ -21,6 +21,7 @@ import { useMessageApi } from "@/context/MessageContext";
 
 import "./detailproject.scss";
 import { CommunicationsProjectView } from "../CommunicationsProjectView/CommunicationsProjectView";
+import { TRMsTable } from "../TRMView/TRMView";
 
 const { Title, Text } = Typography;
 interface Props {
@@ -146,6 +147,11 @@ export const DetailsProjectView = ({ isEdit = false, idProjectParam = "" }: Prop
       key: "7",
       label: "Comunicaciones",
       children: <CommunicationsProjectView />
+    },
+    {
+      key: "8",
+      label: "TRM",
+      children: <TRMsTable />
     }
   ];
 

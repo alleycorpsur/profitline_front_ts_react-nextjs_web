@@ -1,0 +1,9 @@
+.ant-input-number-input input::-webkit-outer-spin-button,
+.ant-input-number-input input::-webkit-inner-spin-button {
+  -webkit-appearance: none !important;
+  margin: 0 !important;
+}
+
+.ant-input-number input[type="number"] {
+  -moz-appearance: textfield !important;
+}
