@@ -206,6 +206,7 @@ export const CommunicationProjectForm = ({
 
   const handleAddTagToBodyAndSubject = (value: OptionType[], deletedValue: OptionType[]) => {
     const valueBody = getValues("template.message");
+    //  SubjectAdding tags commented because it is not being used
     const valueSubject = getValues("template.subject");
 
     if (deletedValue.length > 0) {
@@ -219,7 +220,7 @@ export const CommunicationProjectForm = ({
     const lastAddedTag = value.length > 0 ? value[value.length - 1] : undefined;
 
     setValue("template.message", `${valueBody ? valueBody : ""}{{${lastAddedTag?.label}}}`);
-    setValue("template.subject", `${valueSubject ? valueSubject : ""}{{${lastAddedTag?.label}}}`);
+    // setValue("template.subject", `${valueSubject ? valueSubject : ""}{{${lastAddedTag?.label}}}`);
   };
 
   const handleCreateCommunication = async (data: any) => {
@@ -618,7 +619,8 @@ export const CommunicationProjectForm = ({
                       customStyleTextArea={{
                         height: "48px",
                         minHeight: "48px",
-                        padding: "12px 1rem"
+                        padding: "12px 1rem",
+                        scrollbarWidth: "none"
                       }}
                       value={field.value}
                       highlightWords={watchTemplateTagsLabels}

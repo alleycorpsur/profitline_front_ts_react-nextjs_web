@@ -1,21 +1,27 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Plus } from "phosphor-react";
 import { Button, Flex, Spin } from "antd";
 
+import { useApplicationTable } from "@/hooks/useApplicationTable";
 import Collapse from "@/components/ui/collapse";
 import LabelCollapse from "@/components/ui/label-collapse";
+import { useParams } from "next/navigation";
+
+import { useAppStore } from "@/lib/store/store";
+import { extractSingleParam } from "@/utils/utils";
+import { addItemsToTable } from "@/services/applyTabClients/applyTabClients";
+import { useMessageApi } from "@/context/MessageContext";
+import { useSelectedPayments } from "@/context/SelectedPaymentsContext";
+
 import UiSearchInput from "@/components/ui/search-input/search-input";
 import InvoiceTable from "./tables/InvoiceTable";
 import PaymentsTable from "./tables/PaymentsTable";
 import DiscountTable from "./tables/DiscountTable";
-import { useSelectedPayments } from "@/context/SelectedPaymentsContext";
 import { ModalResultAppy } from "./Modals/ModalResultApply/ModalResultAppy";
 import ModalAddToTables from "./Modals/ModalAddToTables/ModalAddToTables";
 import { ModalSelectAjustements } from "./Modals/ModalSelectAjustements/ModalSelectAjustements";
 import ModalNoteInvoice from "./Modals/ModalNoteInvoice/ModalNoteInvoice";
 import ModalCreateAdjustment from "./Modals/ModalCreateAdjustment/ModalCreateAdjustment";
-
-import { SectionData } from "./tables/Types";
 
 import "./apply-tab.scss";
 export interface IModalAddToTableOpen {
@@ -23,8 +29,11 @@ export interface IModalAddToTableOpen {
   adding?: "invoices" | "payments";
 }
 const ApplyTab: React.FC = () => {
+  const { ID: projectId } = useAppStore((state) => state.selectedProject);
+  const params = useParams();
+  const clientId = Number(extractSingleParam(params.clientId)) || 0;
   const [search, setSearch] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const { showMessage } = useMessageApi();
 
   //TODO this is the context that is not being used
   // const { selectedPayments } = useSelectedPayments();
@@ -36,6 +45,8 @@ const ApplyTab: React.FC = () => {
   const [modalActionPayment, setModalActionPayment] = useState(
     {} as { isOpen: boolean; modal: number }
   );
+
+  const { data: applicationData, isLoading, mutate } = useApplicationTable();
   const showModal = (adding_type: "invoices" | "payments") => {
     setIsModalAddToTableOpen({
       isOpen: true,
@@ -49,157 +60,60 @@ const ApplyTab: React.FC = () => {
     });
   };
 
-  const handleAdd = () => {
-    // Handle adding selected invoices
-    setIsModalAddToTableOpen({
-      isOpen: false
-    });
+  const handleAdd = async (adding_type: "invoices" | "payments", selectedIds: number[]) => {
+    // Handle adding selected
+    try {
+      await addItemsToTable(projectId, clientId, adding_type, selectedIds);
+
+      showMessage("success", "Se han agregado los elementos correctamente");
+      setIsModalAddToTableOpen({
+        isOpen: false
+      });
+      mutate();
+    } catch (error) {
+      showMessage("error", "Ha ocurrido un error al agregar los elementos");
+    }
   };
 
-  const data: SectionData[] = [
-    {
-      statusName: "pagos",
-      color: "#0085FF",
-      statusId: 2,
-      invoices: [
-        {
-          id: "175356",
-          key: "1",
-          payments: 175356,
-          date: "06/06/2024",
-          amount: 2000000,
-          appliedAmount: 2000000,
-          balance: 0
-        },
-        {
-          id: "175357",
-          key: "2",
-          payments: 175357,
-          date: "07/06/2024",
-          amount: 1500000,
-          appliedAmount: 1500000,
-          balance: 0
-        },
-        {
-          id: "175358",
-          key: "3",
-          payments: 175358,
-          date: "08/06/2024",
-          amount: 3000000,
-          appliedAmount: 2500000,
-          balance: 500000
-        },
-        {
-          id: "175359",
-          key: "4",
-          payments: 175359,
-          date: "09/06/2024",
-          amount: 1800000,
-          appliedAmount: 1800000,
-          balance: 0
-        }
-      ],
-      total: 8300000,
-      count: 4
-    },
-    {
+  const dataForCollapse = useMemo(() => {
+    const invoices = {
       statusName: "facturas",
       color: "#FF7A00",
       statusId: 1,
-      invoices: [
-        {
-          id: "275356",
-          key: "1",
-          payments: 275356,
-          date: "06/06/2024",
-          amount: 2000000,
-          appliedAmount: 2000000,
-          balance: 0
-        },
-        {
-          id: "275357",
-          key: "2",
-          payments: 275357,
-          date: "07/06/2024",
-          amount: 1500000,
-          appliedAmount: 1000000,
-          balance: 500000
-        },
-        {
-          id: "275358",
-          key: "3",
-          payments: 275358,
-          date: "08/06/2024",
-          amount: 3000000,
-          appliedAmount: 3000000,
-          balance: 0
-        },
-        {
-          id: "275359",
-          key: "4",
-          payments: 275359,
-          date: "09/06/2024",
-          amount: 1800000,
-          appliedAmount: 1800000,
-          balance: 0
-        },
-        {
-          id: "275360",
-          key: "5",
-          payments: 275360,
-          date: "10/06/2024",
-          amount: 2500000,
-          appliedAmount: 2000000,
-          balance: 500000
-        }
-      ],
-      total: 10800000,
-      count: 5
-    },
-    {
+      invoices: applicationData?.invoices,
+      total: applicationData?.summary.total_invoices,
+      count: applicationData?.invoices.length
+    };
+
+    const payments = {
+      statusName: "pagos",
+      color: "#0085FF",
+      statusId: 2,
+      invoices: applicationData?.payments,
+      total: applicationData?.summary.total_payments,
+      count: applicationData?.payments.length
+    };
+
+    const discounts = {
       statusName: "ajustes",
       color: "#E53261",
       statusId: 3,
-      invoices: [
-        {
-          id: "375356",
-          key: "1",
-          adjustmentId: 375356,
-          adjustmentType: "descuento",
-          invoices: 5,
-          amount: 500000,
-          appliedAmount: 500000,
-          balance: 0
-        },
-        {
-          id: "375357",
-          key: "2",
-          adjustmentId: 375357,
-          adjustmentType: "recargo",
-          invoices: 3,
-          amount: 300000,
-          appliedAmount: 300000,
-          balance: 0
-        },
-        {
-          id: "375358",
-          key: "3",
-          adjustmentId: 375358,
-          adjustmentType: "descuento",
-          invoices: 2,
-          amount: 200000,
-          appliedAmount: 150000,
-          balance: 50000
-        }
-      ],
-      total: 1000000,
-      count: 3
-    }
-  ];
+      invoices: applicationData?.discounts,
+      total: applicationData?.summary.total_discounts,
+      count: applicationData?.discounts.length
+    };
+
+    return [invoices, payments, discounts];
+  }, [applicationData]);
 
   return (
     <>
-      <ModalResultAppy invoices={10800000} desconts={1000000} payments={8300000} />
+      <ModalResultAppy
+        invoices={applicationData?.summary.total_invoices}
+        desconts={applicationData?.summary.total_discounts}
+        payments={applicationData?.summary.total_payments}
+        total={applicationData?.summary.total_balance}
+      />
       <div className="applyContainerTab">
         <Flex justify="space-between" className="accountingAdjustmentsTab__header">
           <Flex gap={"0.5rem"}>
@@ -210,7 +124,6 @@ const ApplyTab: React.FC = () => {
                 setSearch(event.target.value);
               }}
             />
-            {/* <AccountingAdjustmentsFilter onFilterChange={setFilters} /> */}
           </Flex>
           <Button
             type="primary"
@@ -227,7 +140,7 @@ const ApplyTab: React.FC = () => {
           </Flex>
         ) : (
           <Collapse
-            items={data?.map((section: SectionData) => ({
+            items={dataForCollapse?.map((section) => ({
               key: section.statusId,
               label: (
                 <Flex>

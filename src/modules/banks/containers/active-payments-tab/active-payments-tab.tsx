@@ -20,6 +20,7 @@ import ModalActionsEditClient from "../../components/modal-actions-edit-client";
 import ModalActionsUploadEvidence from "../../components/modal-actions-upload-evidence";
 import ModalActionsAssignClient from "../../components/modal-actions-assign-client";
 import ModalActionsSplitPayment from "../../components/modal-actions-split-payment";
+import ModalActionsChangeStatus from "../../components/modal-actions-change-status";
 
 import { ISingleBank } from "@/types/banks/IBanks";
 import { IClientPayment } from "@/types/clientPayments/IClientPayments";
@@ -65,7 +66,7 @@ export const ActivePaymentsTab: FC = () => {
       .filter(([id]) => id.includes(query))
       .map(([, payment]) => payment);
   };
- 
+
   const handleOpenBankRules = () => {
     setShowBankRules(true);
   };
@@ -103,10 +104,12 @@ export const ActivePaymentsTab: FC = () => {
     });
   };
 
-  const filteredData = data?.map((status) => ({
-    ...status,
-    payments: searchPayments(status.payments_status_id, searchQuery)
-  }));
+  const filteredData = data
+    ?.map((status) => ({
+      ...status,
+      payments: searchPayments(status.payments_status_id, searchQuery)
+    }))
+    .filter((status) => status.payments.length > 0);
 
   const items: MenuProps["items"] = [
     {
@@ -183,10 +186,22 @@ export const ActivePaymentsTab: FC = () => {
             onClose={() => setisGenerateActionOpen(false)}
             setSelectOpen={(e) => {
               const { selected } = e;
-              if (selected !== 2 && selectedRows && selectedRows.length > 1) {
-                showMessage("error", "Solo puedes seleccionar un pago para esta acción");
+              if (selected !== 2 && selected !== 6 && selectedRows && selectedRows.length > 1) {
+                showMessage("info", "Solo puedes seleccionar un pago para esta acción");
                 return;
               }
+
+              if (selected === 6 && selectedRows && selectedRows.length > 1) {
+                const clientId = selectedRows[0].id_client;
+                if (!selectedRows.every((row) => row.id_client === clientId)) {
+                  showMessage(
+                    "info",
+                    "Solo puedes seleccionar pagos del mismo cliente para esta acción"
+                  );
+                  return;
+                }
+              }
+
               setisGenerateActionOpen((prev) => !prev);
               setIsSelectOpen(e);
             }}
@@ -209,6 +224,11 @@ export const ActivePaymentsTab: FC = () => {
           />
           <ModalActionsUploadEvidence
             isOpen={isSelectOpen.selected === 5}
+            onClose={onCloseModal}
+            selectedRows={selectedRows}
+          />
+          <ModalActionsChangeStatus
+            isOpen={isSelectOpen.selected === 6}
             onClose={onCloseModal}
             selectedRows={selectedRows}
           />

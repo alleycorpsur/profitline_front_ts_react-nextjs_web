@@ -41,9 +41,11 @@ const ModalIdentifiedPayment: FC<ModalIdentifiedPaymentProps> = ({
   const { showMessage } = useMessageApi();
   const params = useParams();
   const clientId = extractSingleParam(params.clientId);
+  const [loading, setLoading] = useState(false);
   const [selectedPaymentId, setSelectedPaymentId] = useState<number | null>(null);
 
   const handleIdentifyPayments = async () => {
+    setLoading(true);
     try {
       const identifiedPayment = identifiedPayments?.find(
         (payment) => payment.id === selectedPaymentId
@@ -60,9 +62,11 @@ const ModalIdentifiedPayment: FC<ModalIdentifiedPaymentProps> = ({
 
       showMessage("success", "Pago identificado enviado correctamente!");
       onClose();
+      setViewInfo((prev) => ({ ...prev, current: "form" }));
     } catch (error) {
       showMessage("error", "Ocurrió un error al identificar el pago");
     }
+    setLoading(false);
   };
 
   const handleCancel = () => {
@@ -107,7 +111,11 @@ const ModalIdentifiedPayment: FC<ModalIdentifiedPaymentProps> = ({
 
       <div className={styles.footer}>
         <SecondaryButton onClick={handleCancel}>Cancelar</SecondaryButton>
-        <PrincipalButton onClick={handleIdentifyPayments} disabled={selectedPaymentId === null}>
+        <PrincipalButton
+          onClick={handleIdentifyPayments}
+          disabled={selectedPaymentId === null}
+          loading={loading}
+        >
           Identificar
         </PrincipalButton>
       </div>

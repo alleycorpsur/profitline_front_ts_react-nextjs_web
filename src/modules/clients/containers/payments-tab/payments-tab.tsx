@@ -66,6 +66,10 @@ const PaymentsTab: React.FC<PaymentProd> = ({ onChangeTab }) => {
     setIsModalActionPaymentOpen((prev) => !prev);
   };
 
+  const handleOpenIdentifyPayment = () => {
+    setIsSelectedActionModalOpen({ selected: 1 });
+  };
+
   return (
     <>
       <div className="paymentsTab">
@@ -92,7 +96,7 @@ const PaymentsTab: React.FC<PaymentProd> = ({ onChangeTab }) => {
             </Button>
           </Flex>
 
-          <Button type="primary" className="identifiyPayment">
+          <Button type="primary" className="identifiyPayment" onClick={handleOpenIdentifyPayment}>
             Identificar pago
             <MagnifyingGlassPlus size={16} style={{ marginLeft: "0.5rem" }} />
           </Button>
