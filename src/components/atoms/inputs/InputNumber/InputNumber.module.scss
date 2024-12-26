@@ -1,0 +1,38 @@
+// .inputCurrencyWrapper {
+//   position: relative;
+//   width: 100%;
+//   display: flex;
+//   align-items: center;
+// }
+
+// .currencySymbol {
+//   position: absolute;
+//   left: 10px;
+//   font-size: 16px;
+//   color: #555;
+//   pointer-events: none; /* Evita la interacción con el símbolo */
+// }
+// .inputCurrency {
+//   width: 100%;
+//   padding-left: 30px; /* Espacio para el símbolo de pesos */
+//   font-size: 16px;
+//   border: 1px solid #d9d9d9;
+//   border-radius: 4px;
+// }
+
+// .inputCurrency:focus {
+//   border-color: #40a9ff;
+//   box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+// }
+.inputCurrency {
+  border: 1px solid #d9d9d9; /* Estilo básico del borde */
+  padding: 4px 8px; /* Espaciado interno */
+  font-size: 14px; /* Tamaño de fuente */
+  border-radius: 4px; /* Bordes redondeados */
+  outline: none;
+
+  &:focus {
+    border-color: #40a9ff; /* Color del borde al enfocar */
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2); /* Sombra al enfocar */
+  }
+}
