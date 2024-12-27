@@ -4,14 +4,14 @@ import { ButtonGenerateAction } from "@/components/atoms/ButtonGenerateAction/Bu
 import "./modalSelectAjustements.scss";
 import { Globe, NewspaperClipping } from "phosphor-react";
 
-type ModalActionPaymentProps = {
+type ModalSelectAjustementsProps = {
   isOpen: boolean;
   onClose: () => void;
   // eslint-disable-next-line no-unused-vars
-  setModalAction: (modalAction: number) => void;
+  setModalAction: (modalAction: number, adjustmentType: "global" | "byInvoice") => void;
 };
 
-export const ModalSelectAjustements: React.FC<ModalActionPaymentProps> = ({
+export const ModalSelectAjustements: React.FC<ModalSelectAjustementsProps> = ({
   isOpen,
   onClose,
   setModalAction
@@ -31,14 +31,14 @@ export const ModalSelectAjustements: React.FC<ModalActionPaymentProps> = ({
           icon={<Globe size={20} />}
           title="Global"
           onClick={() => {
-            setModalAction(1);
+            setModalAction(2, "global");
           }}
         />
         <ButtonGenerateAction
           icon={<NewspaperClipping size={20} />}
           title="Por factura"
           onClick={() => {
-            setModalAction(2);
+            setModalAction(2, "byInvoice");
           }}
         />
       </div>

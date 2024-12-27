@@ -22,15 +22,10 @@ interface IAdjustment {
 }
 interface ModalCreateAdjustmentProps {
   onCancel: () => void;
-  onOk: () => void;
   isOpen: boolean;
 }
 
-const ModalCreateAdjustment: React.FC<ModalCreateAdjustmentProps> = ({
-  isOpen,
-  onCancel,
-  onOk
-}) => {
+const ModalCreateAdjustment: React.FC<ModalCreateAdjustmentProps> = ({ isOpen, onCancel }) => {
   const {
     control,
     handleSubmit,
@@ -63,7 +58,6 @@ const ModalCreateAdjustment: React.FC<ModalCreateAdjustmentProps> = ({
         className="modalCreateAdjustment"
         width={"60%"}
         open={isOpen}
-        onOk={onOk}
         closeIcon={false}
         onCancel={onCancel}
         footer={null}

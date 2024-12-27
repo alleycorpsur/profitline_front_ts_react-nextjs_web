@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { Flex, Modal, Spin } from "antd";
+import { Flex, Modal } from "antd";
 import { CaretLeft, Plus } from "phosphor-react";
 
 import { IFinancialDiscount, useAcountingAdjustment } from "@/hooks/useAcountingAdjustment";
@@ -12,31 +12,51 @@ import PrincipalButton from "@/components/atoms/buttons/principalButton/Principa
 import SecondaryButton from "@/components/atoms/buttons/secondaryButton/SecondaryButton";
 import CheckboxColoredValues from "@/components/ui/checkbox-colored-values/checkbox-colored-values";
 
+import { IModalAdjustmentsState } from "../../apply-tab";
+
 import "./modalListAdjustments.scss";
 
 interface ModalListAdjustmentsProps {
   visible: boolean;
   onCancel: () => void;
-  onAdd: () => void;
   // eslint-disable-next-line no-unused-vars
   setModalAction: (modalAction: number) => void;
+  addGlobalAdjustment: (
+    // eslint-disable-next-line no-unused-vars
+    adding_type: "invoices" | "payments" | "discounts",
+    // eslint-disable-next-line no-unused-vars
+    selectedIds: number[]
+  ) => Promise<void>;
+  modalAdjustmentsState: IModalAdjustmentsState;
 }
 
 const ModalListAdjustments: React.FC<ModalListAdjustmentsProps> = ({
   visible,
   onCancel,
-  onAdd,
-  setModalAction
+  setModalAction,
+  addGlobalAdjustment,
+  modalAdjustmentsState
 }) => {
   const params = useParams();
   const clientId = extractSingleParam(params.clientId) || "";
   const { ID: projectId } = useAppStore((state) => state.selectedProject);
   const [selectedRows, setSelectedRows] = useState<IFinancialDiscount[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const { data } = useAcountingAdjustment(clientId, projectId.toString(), 2);
 
+  useEffect(() => {
+    return () => {
+      setSelectedRows([]);
+    };
+  }, [visible]);
+
   const handleCreateAdjustments = () => {
-    setModalAction(2);
+    if (modalAdjustmentsState.adjustmentType === "global") {
+      setModalAction(3);
+    } else if (modalAdjustmentsState.adjustmentType === "byInvoice") {
+      console.info("by invoice");
+    }
   };
 
   const handleSelectOne = (checked: boolean, row: IFinancialDiscount) => {
@@ -47,7 +67,18 @@ const ModalListAdjustments: React.FC<ModalListAdjustmentsProps> = ({
     );
   };
 
-  const isLoading = false;
+  const handleAddAdjustments = async () => {
+    setLoading(true);
+    if (modalAdjustmentsState.adjustmentType === "global") {
+      await addGlobalAdjustment(
+        "discounts",
+        selectedRows.map((row) => row.id)
+      );
+    } else if (modalAdjustmentsState.adjustmentType === "byInvoice") {
+      console.info("by invoice");
+    }
+    setLoading(false);
+  };
 
   return (
     <Modal
@@ -76,16 +107,16 @@ const ModalListAdjustments: React.FC<ModalListAdjustmentsProps> = ({
             }}
             checked={selectedRows.some((selected) => selected.id === row.id)}
             content={
-              <Flex style={{ width: "100%" }} justify="space-between">
-                <div>
+              <Flex style={{ width: "100%" }} justify="space-between" align="center">
+                <Flex vertical>
                   <h4 className="adjustments-list__title">Nota crédito {row.id}</h4>
                   <p className="adjustments-list__subtitle">Volumen</p>
-                </div>
+                </Flex>
 
-                <div>
+                <Flex vertical>
                   <h3 className="adjustments-list__amount">{formatMoney(row.current_value)}</h3>
-                  <p className="adjustments-list__subtitle">{formatMoney(row.initial_value)}</p>
-                </div>
+                  <p className="adjustments-list__subvalue">{formatMoney(row.initial_value)}</p>
+                </Flex>
               </Flex>
             }
           />
@@ -102,8 +133,8 @@ const ModalListAdjustments: React.FC<ModalListAdjustmentsProps> = ({
         <SecondaryButton fullWidth onClick={onCancel}>
           Cancelar
         </SecondaryButton>
-        <PrincipalButton fullWidth onClick={onAdd}>
-          {isLoading ? <Spin size="small" /> : "Agregar"}
+        <PrincipalButton fullWidth onClick={handleAddAdjustments} loading={loading}>
+          Agregar
         </PrincipalButton>
       </div>
     </Modal>

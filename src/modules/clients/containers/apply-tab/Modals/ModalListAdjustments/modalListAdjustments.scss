@@ -53,6 +53,13 @@
         &__amount {
             font-size: 1.25rem;
             font-weight: 500;
+            align-self: flex-end;
+        }
+
+        &__subvalue {
+            font-size: 0.875rem;
+            font-weight: 275;
+            align-self: flex-end;
         }
     }
 
@@ -67,6 +74,7 @@
             background: none;
             border: none;
             cursor: pointer;
+            font-family: inherit;
 
             &:hover {
                 cursor: pointer;
