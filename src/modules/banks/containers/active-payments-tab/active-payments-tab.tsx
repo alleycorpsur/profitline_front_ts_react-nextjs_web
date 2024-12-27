@@ -1,6 +1,6 @@
 import { FC, useState, useEffect } from "react";
-import { Button, Flex, MenuProps, Spin } from "antd";
-import { Bank } from "phosphor-react";
+import { Button, Flex, Spin } from "antd";
+import { Bank, DotsThree } from "phosphor-react";
 
 import { useModalDetail } from "@/context/ModalContext";
 import { useMessageApi } from "@/context/MessageContext";
@@ -9,7 +9,6 @@ import { useBankPayments } from "@/hooks/useBankPayments";
 
 import UiSearchInput from "@/components/ui/search-input";
 import FilterDiscounts from "@/components/atoms/Filters/FilterDiscounts/FilterDiscounts";
-import { DotsDropdown } from "@/components/atoms/DotsDropdown/DotsDropdown";
 import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
 import Collapse from "@/components/ui/collapse";
 import LabelCollapse from "@/components/ui/label-collapse";
@@ -111,26 +110,6 @@ export const ActivePaymentsTab: FC = () => {
     }))
     .filter((status) => status.payments.length > 0);
 
-  const items: MenuProps["items"] = [
-    {
-      key: "1",
-      label: (
-        <Button
-          className="buttonOutlined"
-          onClick={() => {
-            if (!selectedRows || selectedRows.length === 0) {
-              showMessage("error", "Seleccione al menos un pago");
-              return;
-            }
-            setisGenerateActionOpen(true);
-          }}
-        >
-          Generar acción
-        </Button>
-      )
-    }
-  ];
-
   return (
     <>
       {showBankRules ? (
@@ -147,7 +126,19 @@ export const ActivePaymentsTab: FC = () => {
               onChange={(event) => setSearchQuery(event.target.value)}
             />
             <FilterDiscounts />
-            <DotsDropdown items={items} />
+            <Button
+              className={styles.button__actions}
+              icon={<DotsThree size={"1.5rem"} />}
+              onClick={() => {
+                if (!selectedRows || selectedRows.length === 0) {
+                  showMessage("error", "Seleccione al menos un pago");
+                  return;
+                }
+                setisGenerateActionOpen(true);
+              }}
+            >
+              Generar acción
+            </Button>
             <PrincipalButton onClick={handleOpenBankRules} customStyles={{ marginLeft: "auto" }}>
               Reglas de bancos
               <Bank size={16} />
