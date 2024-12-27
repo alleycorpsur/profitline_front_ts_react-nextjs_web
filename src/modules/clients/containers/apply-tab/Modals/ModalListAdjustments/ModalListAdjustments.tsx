@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
-import { Flex, Modal } from "antd";
+import { Flex, Modal, Pagination, Spin } from "antd";
 import { CaretLeft, Plus } from "phosphor-react";
 
 import { IFinancialDiscount, useAcountingAdjustment } from "@/hooks/useAcountingAdjustment";
@@ -42,14 +42,21 @@ const ModalListAdjustments: React.FC<ModalListAdjustmentsProps> = ({
   const { ID: projectId } = useAppStore((state) => state.selectedProject);
   const [selectedRows, setSelectedRows] = useState<IFinancialDiscount[]>([]);
   const [loading, setLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 7;
 
-  const { data } = useAcountingAdjustment(clientId, projectId.toString(), 2);
+  const { data, isLoading } = useAcountingAdjustment(clientId, projectId.toString(), 2);
 
   useEffect(() => {
     return () => {
       setSelectedRows([]);
     };
   }, [visible]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
 
   const handleCreateAdjustments = () => {
     if (modalAdjustmentsState.adjustmentType === "global") {
@@ -80,6 +87,21 @@ const ModalListAdjustments: React.FC<ModalListAdjustmentsProps> = ({
     setLoading(false);
   };
 
+  const filteredData = useMemo(() => {
+    if (!data?.[0]?.financial_discounts) return [];
+    return data?.[0].financial_discounts.filter((row) => row.id.toString().includes(searchQuery));
+  }, [data, searchQuery]);
+
+  const paginatedRows = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    return filteredData?.slice(startIndex, endIndex);
+  }, [filteredData, currentPage]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
   return (
     <Modal
       open={visible}
@@ -94,34 +116,56 @@ const ModalListAdjustments: React.FC<ModalListAdjustmentsProps> = ({
       </div>
       <h2 className="modal-subtitle">Selecciona los ajustes a aplicar</h2>
       <div className="search-container">
-        <UiSearchInputLong placeholder="Buscar" className={"custom-input"} />
+        <UiSearchInputLong
+          placeholder="Buscar"
+          className={"custom-input"}
+          value={searchQuery}
+          onChange={(event) => setSearchQuery(event.target.value)}
+        />
       </div>
-      <div className="adjustments-list">
-        {data?.[0].financial_discounts?.map((row) => (
-          <CheckboxColoredValues
-            customStyles={{ height: "76px" }}
-            customStyleDivider={{ width: "6px", height: "44px", alignSelf: "center" }}
-            key={row.id}
-            onChangeCheckbox={(e) => {
-              handleSelectOne(e.target.checked, row);
-            }}
-            checked={selectedRows.some((selected) => selected.id === row.id)}
-            content={
-              <Flex style={{ width: "100%" }} justify="space-between" align="center">
-                <Flex vertical>
-                  <h4 className="adjustments-list__title">Nota crédito {row.id}</h4>
-                  <p className="adjustments-list__subtitle">Volumen</p>
-                </Flex>
 
-                <Flex vertical>
-                  <h3 className="adjustments-list__amount">{formatMoney(row.current_value)}</h3>
-                  <p className="adjustments-list__subvalue">{formatMoney(row.initial_value)}</p>
-                </Flex>
-              </Flex>
-            }
+      {isLoading ? (
+        <Flex justify="center" style={{ width: "100%", margin: "2rem 0" }}>
+          <Spin />
+        </Flex>
+      ) : (
+        <>
+          <div className="adjustments-list">
+            {paginatedRows?.map((row) => (
+              <CheckboxColoredValues
+                customStyles={{ height: "76px" }}
+                customStyleDivider={{ width: "6px", height: "44px", alignSelf: "center" }}
+                key={row.id}
+                onChangeCheckbox={(e) => {
+                  handleSelectOne(e.target.checked, row);
+                }}
+                checked={selectedRows.some((selected) => selected.id === row.id)}
+                content={
+                  <Flex style={{ width: "100%" }} justify="space-between" align="center">
+                    <Flex vertical>
+                      <h4 className="adjustments-list__title">Nota crédito {row.id}</h4>
+                      <p className="adjustments-list__subtitle">Volumen</p>
+                    </Flex>
+
+                    <Flex vertical>
+                      <h3 className="adjustments-list__amount">{formatMoney(row.current_value)}</h3>
+                      <p className="adjustments-list__subvalue">{formatMoney(row.initial_value)}</p>
+                    </Flex>
+                  </Flex>
+                }
+              />
+            ))}
+          </div>
+          <Pagination
+            pageSize={ITEMS_PER_PAGE}
+            current={currentPage}
+            onChange={handlePageChange}
+            total={filteredData?.length}
+            showSizeChanger={false}
+            style={{ textAlign: "right", margin: ".5rem 0" }}
           />
-        ))}
-      </div>
+        </>
+      )}
       <div className="create-adjustment">
         <button onClick={handleCreateAdjustments} className="create-adjustment-btn">
           <Plus size={20} />
