@@ -51,6 +51,8 @@ const ModalListAdjustments: React.FC<ModalListAdjustmentsProps> = ({
   useEffect(() => {
     return () => {
       setSelectedRows([]);
+      setSearchQuery("");
+      setCurrentPage(1);
     };
   }, [visible]);
 
