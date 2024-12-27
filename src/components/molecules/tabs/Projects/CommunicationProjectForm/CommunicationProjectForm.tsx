@@ -137,18 +137,18 @@ export const CommunicationProjectForm = ({
     };
     fetchTemplateTags();
     const fetchForwardOptions = async () => {
-      const rolesData = await getAllRoles();
-      const roles = rolesData.data.data.map((role) => ({
-        value: `1_${role.ID}`,
-        label: `Rol - ${role.ROL_NAME}`
-      }));
+      // const rolesData = await getAllRoles();
+      // const roles = rolesData.data.data.map((role) => ({
+      //   value: `1_${role.ID}`,
+      //   label: `Rol - ${role.ROL_NAME}`
+      // }));
 
       const contactPositionsData = await getContactOptions();
       const contactPositions = contactPositionsData.contact_position.map((position) => ({
         value: `0_${position.id}`,
         label: `Cliente - ${position.name}`
       }));
-      setForwardTo([...roles, ...contactPositions]);
+      setForwardTo([...contactPositions]);
     };
     fetchForwardOptions();
 
