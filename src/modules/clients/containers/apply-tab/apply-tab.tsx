@@ -20,14 +20,22 @@ import DiscountTable from "./tables/DiscountTable";
 import { ModalResultAppy } from "./Modals/ModalResultApply/ModalResultAppy";
 import ModalAddToTables from "./Modals/ModalAddToTables/ModalAddToTables";
 import { ModalSelectAjustements } from "./Modals/ModalSelectAjustements/ModalSelectAjustements";
-import ModalNoteInvoice from "./Modals/ModalNoteInvoice/ModalNoteInvoice";
+import ModalListAdjustments from "./Modals/ModalListAdjustments/ModalListAdjustments";
 import ModalCreateAdjustment from "./Modals/ModalCreateAdjustment/ModalCreateAdjustment";
 
 import "./apply-tab.scss";
+
 export interface IModalAddToTableOpen {
   isOpen: boolean;
   adding?: "invoices" | "payments";
 }
+
+export interface IModalAdjustmentsState {
+  isOpen: boolean;
+  modal: number;
+  adjustmentType?: "global" | "byInvoice";
+}
+
 const ApplyTab: React.FC = () => {
   const { ID: projectId } = useAppStore((state) => state.selectedProject);
   const params = useParams();
@@ -42,9 +50,7 @@ const ApplyTab: React.FC = () => {
     {} as IModalAddToTableOpen
   );
 
-  const [modalActionPayment, setModalActionPayment] = useState(
-    {} as { isOpen: boolean; modal: number }
-  );
+  const [modalAdjustmentsState, setModalAdjustmentsState] = useState({} as IModalAdjustmentsState);
 
   const { data: applicationData, isLoading, mutate } = useApplicationTable();
   const showModal = (adding_type: "invoices" | "payments") => {
@@ -60,15 +66,27 @@ const ApplyTab: React.FC = () => {
     });
   };
 
-  const handleAdd = async (adding_type: "invoices" | "payments", selectedIds: number[]) => {
+  const handleAdd = async (
+    adding_type: "invoices" | "payments" | "discounts",
+    selectedIds: number[]
+  ) => {
     // Handle adding selected
     try {
       await addItemsToTable(projectId, clientId, adding_type, selectedIds);
 
       showMessage("success", "Se han agregado los elementos correctamente");
-      setIsModalAddToTableOpen({
-        isOpen: false
-      });
+      if (adding_type !== "discounts") {
+        setIsModalAddToTableOpen({
+          isOpen: false
+        });
+      } else {
+        setModalAdjustmentsState({
+          isOpen: false,
+          modal: 0,
+          adjustmentType: undefined
+        });
+      }
+
       mutate();
     } catch (error) {
       showMessage("error", "Ha ocurrido un error al agregar los elementos");
@@ -80,7 +98,7 @@ const ApplyTab: React.FC = () => {
       statusName: "facturas",
       color: "#FF7A00",
       statusId: 1,
-      invoices: applicationData?.invoices,
+      itemsList: applicationData?.invoices,
       total: applicationData?.summary.total_invoices,
       count: applicationData?.invoices.length
     };
@@ -89,7 +107,7 @@ const ApplyTab: React.FC = () => {
       statusName: "pagos",
       color: "#0085FF",
       statusId: 2,
-      invoices: applicationData?.payments,
+      itemsList: applicationData?.payments,
       total: applicationData?.summary.total_payments,
       count: applicationData?.payments.length
     };
@@ -98,7 +116,7 @@ const ApplyTab: React.FC = () => {
       statusName: "ajustes",
       color: "#E53261",
       statusId: 3,
-      invoices: applicationData?.discounts,
+      itemsList: applicationData?.discounts,
       total: applicationData?.summary.total_discounts,
       count: applicationData?.discounts.length
     };
@@ -161,10 +179,10 @@ const ApplyTab: React.FC = () => {
                         showModal("payments");
                       }
                       if (section.statusName === "ajustes") {
-                        setModalActionPayment(
-                          modalActionPayment.isOpen
-                            ? { isOpen: false, modal: 0 }
-                            : { isOpen: true, modal: 0 }
+                        setModalAdjustmentsState(
+                          modalAdjustmentsState.isOpen
+                            ? { isOpen: false, modal: 1 }
+                            : { isOpen: true, modal: 1 }
                         );
                       }
                     }}
@@ -176,9 +194,9 @@ const ApplyTab: React.FC = () => {
               ),
               children: (
                 <div>
-                  {section.statusName === "facturas" && <InvoiceTable data={section.invoices} />}
-                  {section.statusName === "pagos" && <PaymentsTable data={section.invoices} />}
-                  {section.statusName === "ajustes" && <DiscountTable data={section.invoices} />}
+                  {section.statusName === "facturas" && <InvoiceTable data={section.itemsList} />}
+                  {section.statusName === "pagos" && <PaymentsTable data={section.itemsList} />}
+                  {section.statusName === "ajustes" && <DiscountTable data={section.itemsList} />}
                 </div>
               )
             }))}
@@ -191,40 +209,48 @@ const ApplyTab: React.FC = () => {
         isModalAddToTableOpen={isModalAddToTableOpen}
       />
       <ModalSelectAjustements
-        isOpen={modalActionPayment && modalActionPayment.isOpen && modalActionPayment.modal === 0}
+        isOpen={
+          modalAdjustmentsState && modalAdjustmentsState.isOpen && modalAdjustmentsState.modal === 1
+        }
         onClose={() =>
-          setModalActionPayment({
+          setModalAdjustmentsState({
             isOpen: false,
-            modal: 0
+            modal: 1
           })
         }
-        setModalAction={(e: number) => {
-          setModalActionPayment({
+        setModalAction={(e: number, adjustmentType: "global" | "byInvoice") => {
+          setModalAdjustmentsState({
             isOpen: true,
-            modal: e
+            modal: e,
+            adjustmentType
           });
         }}
       />
-      <ModalNoteInvoice
-        visible={modalActionPayment && modalActionPayment.isOpen && modalActionPayment.modal === 1}
+      <ModalListAdjustments
+        visible={
+          modalAdjustmentsState && modalAdjustmentsState.isOpen && modalAdjustmentsState.modal === 2
+        }
         onCancel={() =>
-          setModalActionPayment({
-            isOpen: false,
-            modal: 0
+          setModalAdjustmentsState({
+            isOpen: true,
+            modal: 1,
+            adjustmentType: undefined
           })
         }
-        onAdd={() => console.log("add")}
         setModalAction={(e: number) => {
-          setModalActionPayment({
+          setModalAdjustmentsState({
             isOpen: true,
             modal: e
           });
         }}
+        addGlobalAdjustment={handleAdd}
+        modalAdjustmentsState={modalAdjustmentsState}
       />
       <ModalCreateAdjustment
-        isOpen={modalActionPayment && modalActionPayment.isOpen && modalActionPayment.modal === 2}
-        onCancel={() => setModalActionPayment({ isOpen: true, modal: 1 })}
-        onOk={() => console.log("ssss")}
+        isOpen={
+          modalAdjustmentsState && modalAdjustmentsState.isOpen && modalAdjustmentsState.modal === 3
+        }
+        onCancel={() => setModalAdjustmentsState({ isOpen: true, modal: 2 })}
       />
     </>
   );
