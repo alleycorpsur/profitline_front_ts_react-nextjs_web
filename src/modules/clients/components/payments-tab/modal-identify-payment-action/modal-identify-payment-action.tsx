@@ -231,7 +231,7 @@ const ModalIdentifyPayment: FC<ModalIdentifyPaymentProps> = ({ isOpen, onClose }
             />
 
             <InputForm
-              validationRules={{ required: true }}
+              validationRules={{ required: false }}
               titleInput="Referencia"
               control={control}
               nameInput="reference"
