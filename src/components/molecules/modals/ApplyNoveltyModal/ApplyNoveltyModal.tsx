@@ -22,11 +22,13 @@ interface Props {
   onResolve: (data: { file?: File; comment: string }) => void;
   comment?: string;
 }
+
 interface IcurrentInvoices {
   id: number;
   current_value: number;
   newBalance: number;
 }
+
 interface NormalizedValue {
   invoice_id: number;
   discounts: {
@@ -194,13 +196,13 @@ export const ApplyNoveltyModal = ({
       title: "Pendiente",
       dataIndex: "current_value",
       key: "current_value",
-      render: (text) => `$${text}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+      render: (text) => `$${text || 0}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
     },
     {
       title: "Saldo nuevo",
       dataIndex: "newBalance",
       key: "newBalance",
-      render: (text) => `$${text}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+      render: (text) => `$${text || 0}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
     },
     {
       title: "Valor a aplicar",
@@ -222,6 +224,7 @@ export const ApplyNoveltyModal = ({
             handleApplyValueChange(isNaN(parsedValue) ? 0 : parsedValue, record);
           }}
           className="button__number__adjustment"
+          disabled={record.current_value === 0 || record.newBalance === 0}
         />
       )
     }
