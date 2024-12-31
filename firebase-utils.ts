@@ -44,18 +44,19 @@ const getAuth = async (
     signInWithEmailAndPassword(auth, email.trim(), password)
       .then(async (userCred) => {
         // Check email verification
-        if (!userCred.user.emailVerified) {
-          // Sign out the user
-          await signOut(auth);
-          openNotification({
-            api: api,
-            type: "warning",
-            title: "Email no verificado",
-            message:
-              "Por favor verifica tu correo electrónico antes de iniciar sesión. Se ha enviado un nuevo correo de verificación."
-          });
-          return;
-        }
+        //cuando se active la verificación de correo, descomentar
+        // if (!userCred.user.emailVerified) {
+        //   // Sign out the user
+        //   await signOut(auth);
+        //   openNotification({
+        //     api: api,
+        //     type: "warning",
+        //     title: "Email no verificado",
+        //     message:
+        //       "Por favor verifica tu correo electrónico antes de iniciar sesión. Se ha enviado un nuevo correo de verificación."
+        //   });
+        //   return;
+        // }
 
         const token = await userCred.user.getIdToken();
         fetch("/api/auth", {
