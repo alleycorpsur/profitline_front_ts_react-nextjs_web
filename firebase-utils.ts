@@ -43,6 +43,20 @@ const getAuth = async (
   } else {
     signInWithEmailAndPassword(auth, email.trim(), password)
       .then(async (userCred) => {
+        // Check email verification
+        if (!userCred.user.emailVerified) {
+          // Sign out the user
+          await signOut(auth);
+          openNotification({
+            api: api,
+            type: "warning",
+            title: "Email no verificado",
+            message:
+              "Por favor verifica tu correo electrónico antes de iniciar sesión. Se ha enviado un nuevo correo de verificación."
+          });
+          return;
+        }
+
         const token = await userCred.user.getIdToken();
         fetch("/api/auth", {
           method: "POST",
@@ -68,6 +82,7 @@ const getAuth = async (
       });
   }
 };
+
 const logOut = (router: AppRouterInstance) => {
   window.location.href = "/auth/login";
   signOut(auth);
@@ -92,7 +107,31 @@ const resetPassword = async (oobCode: string, newPassword: string) => {
   }
 };
 
-export { getAuth, logOut, sendEmailResetPassword, resetPassword };
+// New helper function to check email verification
+const checkEmailVerification = async (): Promise<boolean> => {
+  if (!auth.currentUser) return false;
+  await auth.currentUser.reload();
+  return auth.currentUser.emailVerified;
+};
+
+// New function to resend verification email
+const resendVerificationEmail = async (
+  openNotification: ({ api, title, message, placement }: IOpenNotificationProps) => void,
+  api: NotificationInstance
+) => {
+  try {
+    if (auth.currentUser) {
+      openNotification({
+        api: api,
+        type: "success",
+        title: "Correo enviado",
+        message: "Se ha enviado un nuevo correo de verificación"
+      });
+    }
+  } catch (error) {
+    handleError(error);
+  }
+};
 
 function handleError(error: unknown): void {
   if (error instanceof Error) {
@@ -102,3 +141,12 @@ function handleError(error: unknown): void {
   }
   throw error;
 }
+
+export {
+  getAuth,
+  logOut,
+  sendEmailResetPassword,
+  resetPassword,
+  checkEmailVerification,
+  resendVerificationEmail
+};
