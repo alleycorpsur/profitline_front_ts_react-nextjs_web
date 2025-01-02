@@ -140,7 +140,7 @@ const ResolveNoveltyModal: React.FC<ResolveNoveltyModalProps> = ({
       onCancel={onCloseAll}
       footer={null}
       width={"40%"}
-      bodyStyle={{
+      style={{
         height: currentView === "selectNote" ? "calc(80vh - 20px)" : "auto",
         zIndex: 100000
       }}
