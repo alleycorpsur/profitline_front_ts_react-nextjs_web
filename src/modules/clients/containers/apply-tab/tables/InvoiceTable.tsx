@@ -1,11 +1,22 @@
-import React from "react";
-import { Table, TableProps } from "antd";
-import { IApplyTabRecord } from "@/types/applyTabClients/IApplyTabClients";
+import React, { ReactNode } from "react";
+import { Button, Dropdown, Table, TableProps } from "antd";
+import { DotsThreeVertical, Eye, Trash } from "phosphor-react";
+
 import { formatDate, formatMoney } from "@/utils/utils";
+
+import { IApplyTabRecord } from "@/types/applyTabClients/IApplyTabClients";
 
 interface InvoiceTableProps {
   data?: IApplyTabRecord[];
 }
+
+const handleOpenDetail = (id: number) => {
+  console.info("Open detail", id);
+};
+
+const handleDeleteRow = (id: number) => {
+  console.info("Delete row", id);
+};
 
 const InvoiceTable: React.FC<InvoiceTableProps> = ({ data }) => {
   const columns: TableProps<IApplyTabRecord>["columns"] = [
@@ -53,6 +64,63 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ data }) => {
       render: (current_value) => <p>{formatMoney(current_value)}</p>,
       sorter: (a, b) => a.current_value - b.current_value,
       showSorterTooltip: false
+    },
+    {
+      title: "Detalle",
+      width: 75,
+      render: (_, row) => {
+        const items = [
+          {
+            key: "1",
+            label: (
+              <Button
+                icon={<Eye size={20} />}
+                className="buttonNoBorder"
+                onClick={() => handleOpenDetail(row.id)}
+              >
+                Ver
+              </Button>
+            )
+          },
+          {
+            key: "2",
+            label: (
+              <Button
+                icon={<Trash size={20} />}
+                className="buttonNoBorder"
+                onClick={() => handleDeleteRow(row.id)}
+              >
+                Eliminar
+              </Button>
+            )
+          },
+          {
+            key: "3",
+            label: (
+              <Button icon={<Eye size={20} />} className="buttonNoBorder">
+                Marcar como abono
+              </Button>
+            )
+          }
+        ];
+
+        const customDropdown = (menu: ReactNode) => (
+          <div className="dropdownApplicationTable">{menu}</div>
+        );
+
+        return (
+          <Dropdown
+            dropdownRender={customDropdown}
+            menu={{ items }}
+            placement="bottomLeft"
+            trigger={["click"]}
+          >
+            <Button className="dotsBtn">
+              <DotsThreeVertical size={16} />
+            </Button>
+          </Dropdown>
+        );
+      }
     }
   ];
 
