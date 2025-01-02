@@ -205,7 +205,8 @@ export const insertPeriodEveryThreeDigits = (number: number) => {
 export function formatMoney(
   amount: string | number | undefined | null,
   hideCurrencySymbol?: boolean,
-  countryCode?: CountryCode
+  countryCode?: CountryCode,
+  hideDecimals?: boolean
 ): string {
   if (!amount) {
     return "$0";
@@ -220,6 +221,11 @@ export function formatMoney(
 
   if (hideCurrencySymbol) {
     return formatter.format(number).replace(/[^\d.,]/g, "");
+  }
+
+  if (hideDecimals) {
+    const noDecimalNumber = Math.floor(number);
+    return formatter.format(noDecimalNumber);
   }
 
   return formatter.format(number);
