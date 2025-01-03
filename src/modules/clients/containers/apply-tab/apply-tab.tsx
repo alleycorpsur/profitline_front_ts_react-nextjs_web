@@ -22,6 +22,7 @@ import ModalAddToTables from "./Modals/ModalAddToTables/ModalAddToTables";
 import { ModalSelectAjustements } from "./Modals/ModalSelectAjustements/ModalSelectAjustements";
 import ModalListAdjustments from "./Modals/ModalListAdjustments/ModalListAdjustments";
 import ModalCreateAdjustment from "./Modals/ModalCreateAdjustment/ModalCreateAdjustment";
+import ModalEditRow from "./Modals/ModalEditRow/ModalEditRow";
 
 import "./apply-tab.scss";
 
@@ -51,6 +52,8 @@ const ApplyTab: React.FC = () => {
   );
 
   const [modalAdjustmentsState, setModalAdjustmentsState] = useState({} as IModalAdjustmentsState);
+
+  const [editingRow, setEditingRow] = useState<boolean>(false);
 
   const { data: applicationData, isLoading, mutate } = useApplicationTable();
   const showModal = (adding_type: "invoices" | "payments") => {
@@ -102,6 +105,11 @@ const ApplyTab: React.FC = () => {
     } catch (error) {
       showMessage("error", "Ha ocurrido un error al eliminar el elemento");
     }
+  };
+
+  const handleEditRow = (row_id: number) => {
+    console.info("Edit row", row_id);
+    setEditingRow(true);
   };
 
   const dataForCollapse = useMemo(() => {
@@ -206,13 +214,25 @@ const ApplyTab: React.FC = () => {
               children: (
                 <div>
                   {section.statusName === "facturas" && (
-                    <InvoiceTable data={section.itemsList} handleDeleteRow={handleRemoveRow} />
+                    <InvoiceTable
+                      data={section.itemsList}
+                      handleDeleteRow={handleRemoveRow}
+                      handleEditRow={handleEditRow}
+                    />
                   )}
                   {section.statusName === "pagos" && (
-                    <PaymentsTable data={section.itemsList} handleDeleteRow={handleRemoveRow} />
+                    <PaymentsTable
+                      data={section.itemsList}
+                      handleDeleteRow={handleRemoveRow}
+                      handleEditRow={handleEditRow}
+                    />
                   )}
                   {section.statusName === "ajustes" && (
-                    <DiscountTable data={section.itemsList} handleDeleteRow={handleRemoveRow} />
+                    <DiscountTable
+                      data={section.itemsList}
+                      handleDeleteRow={handleRemoveRow}
+                      handleEditRow={handleEditRow}
+                    />
                   )}
                 </div>
               )
@@ -269,6 +289,7 @@ const ApplyTab: React.FC = () => {
         }
         onCancel={() => setModalAdjustmentsState({ isOpen: true, modal: 2 })}
       />
+      <ModalEditRow visible={editingRow} onCancel={() => setEditingRow(false)} />
     </>
   );
 };

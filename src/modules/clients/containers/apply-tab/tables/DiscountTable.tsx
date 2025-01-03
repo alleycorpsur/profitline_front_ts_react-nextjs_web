@@ -11,15 +11,13 @@ interface DiscountTableProps {
   data?: IApplyTabRecord[];
   // eslint-disable-next-line no-unused-vars
   handleDeleteRow?: (id: number) => void;
+  // eslint-disable-next-line no-unused-vars
+  handleEditRow: (row_id: number) => void;
 }
 
-const DiscountTable: React.FC<DiscountTableProps> = ({ data, handleDeleteRow }) => {
+const DiscountTable: React.FC<DiscountTableProps> = ({ data, handleDeleteRow, handleEditRow }) => {
   const [activeRow, setActiveRow] = useState<IApplyTabRecord | null>(null);
   const [removeModal, setRemoveModal] = useState(false);
-
-  const handleOpenDetail = (id: number) => {
-    console.info("Open detail", id);
-  };
 
   const columns: TableProps<IApplyTabRecord>["columns"] = [
     {
@@ -81,7 +79,9 @@ const DiscountTable: React.FC<DiscountTableProps> = ({ data, handleDeleteRow }) 
                 icon={<Eye size={20} />}
                 className="buttonNoBorder"
                 onClick={() =>
-                  row.financial_discount_id && handleOpenDetail(row.financial_discount_id)
+                  row.financial_discount_id &&
+                  handleEditRow &&
+                  handleEditRow(row.financial_discount_id)
                 }
               >
                 Ver

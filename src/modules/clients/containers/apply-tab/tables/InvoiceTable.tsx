@@ -11,15 +11,13 @@ interface InvoiceTableProps {
   data?: IApplyTabRecord[];
   // eslint-disable-next-line no-unused-vars
   handleDeleteRow?: (id: number) => void;
+  // eslint-disable-next-line no-unused-vars
+  handleEditRow: (row_id: number) => void;
 }
 
-const InvoiceTable: React.FC<InvoiceTableProps> = ({ data, handleDeleteRow }) => {
+const InvoiceTable: React.FC<InvoiceTableProps> = ({ data, handleDeleteRow, handleEditRow }) => {
   const [activeRow, setActiveRow] = useState<IApplyTabRecord | null>(null);
   const [removeModal, setRemoveModal] = useState(false);
-
-  const handleOpenDetail = (id: number) => {
-    console.info("Open detail", id);
-  };
 
   const columns: TableProps<IApplyTabRecord>["columns"] = [
     {
@@ -80,7 +78,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ data, handleDeleteRow }) =>
                 className="buttonNoBorder"
                 onClick={() => {
                   setActiveRow(row);
-                  handleOpenDetail(row.id);
+                  handleEditRow(row.id);
                 }}
               >
                 Ver

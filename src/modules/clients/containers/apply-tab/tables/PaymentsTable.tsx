@@ -11,15 +11,13 @@ interface PaymentsTableProps {
   data?: IApplyTabRecord[];
   // eslint-disable-next-line no-unused-vars
   handleDeleteRow?: (id: number) => void;
+  // eslint-disable-next-line no-unused-vars
+  handleEditRow: (row_id: number) => void;
 }
 
-const PaymentsTable: React.FC<PaymentsTableProps> = ({ data, handleDeleteRow }) => {
+const PaymentsTable: React.FC<PaymentsTableProps> = ({ data, handleDeleteRow, handleEditRow }) => {
   const [activeRow, setActiveRow] = useState<IApplyTabRecord | null>(null);
   const [removeModal, setRemoveModal] = useState(false);
-
-  const handleOpenDetail = (id: number) => {
-    console.info("Open detail", id);
-  };
 
   const columns: TableProps<IApplyTabRecord>["columns"] = [
     {
@@ -74,7 +72,7 @@ const PaymentsTable: React.FC<PaymentsTableProps> = ({ data, handleDeleteRow }) 
                 className="buttonNoBorder"
                 onClick={() => {
                   setActiveRow(row);
-                  handleOpenDetail(row.payment_id);
+                  handleEditRow(row.payment_id);
                 }}
               >
                 Ver
