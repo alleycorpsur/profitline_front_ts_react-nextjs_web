@@ -9,7 +9,7 @@ import { useParams } from "next/navigation";
 
 import { useAppStore } from "@/lib/store/store";
 import { extractSingleParam } from "@/utils/utils";
-import { addItemsToTable } from "@/services/applyTabClients/applyTabClients";
+import { addItemsToTable, removeItemsFromTable } from "@/services/applyTabClients/applyTabClients";
 import { useMessageApi } from "@/context/MessageContext";
 import { useSelectedPayments } from "@/context/SelectedPaymentsContext";
 
@@ -90,6 +90,17 @@ const ApplyTab: React.FC = () => {
       mutate();
     } catch (error) {
       showMessage("error", "Ha ocurrido un error al agregar los elementos");
+    }
+  };
+
+  const handleRemoveRow = async (row_id: number) => {
+    // Handle removing selected
+    try {
+      await removeItemsFromTable(row_id);
+      showMessage("success", `Se ha eliminado el elemento correctamente ${row_id}`);
+      mutate();
+    } catch (error) {
+      showMessage("error", "Ha ocurrido un error al eliminar el elemento");
     }
   };
 
@@ -194,9 +205,15 @@ const ApplyTab: React.FC = () => {
               ),
               children: (
                 <div>
-                  {section.statusName === "facturas" && <InvoiceTable data={section.itemsList} />}
-                  {section.statusName === "pagos" && <PaymentsTable data={section.itemsList} />}
-                  {section.statusName === "ajustes" && <DiscountTable data={section.itemsList} />}
+                  {section.statusName === "facturas" && (
+                    <InvoiceTable data={section.itemsList} handleDeleteRow={handleRemoveRow} />
+                  )}
+                  {section.statusName === "pagos" && (
+                    <PaymentsTable data={section.itemsList} handleDeleteRow={handleRemoveRow} />
+                  )}
+                  {section.statusName === "ajustes" && (
+                    <DiscountTable data={section.itemsList} handleDeleteRow={handleRemoveRow} />
+                  )}
                 </div>
               )
             }))}

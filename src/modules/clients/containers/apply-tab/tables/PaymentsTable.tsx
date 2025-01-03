@@ -1,22 +1,24 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useState } from "react";
 import { Button, Dropdown, Table, TableProps } from "antd";
 import { DotsThreeVertical, Eye, Trash } from "phosphor-react";
 
 import { formatDate, formatMoney } from "@/utils/utils";
+import { ModalRemove } from "@/components/molecules/modals/ModalRemove/ModalRemove";
 
 import { IApplyTabRecord } from "@/types/applyTabClients/IApplyTabClients";
 
 interface PaymentsTableProps {
   data?: IApplyTabRecord[];
+  // eslint-disable-next-line no-unused-vars
+  handleDeleteRow?: (id: number) => void;
 }
 
-const PaymentsTable: React.FC<PaymentsTableProps> = ({ data }) => {
+const PaymentsTable: React.FC<PaymentsTableProps> = ({ data, handleDeleteRow }) => {
+  const [activeRow, setActiveRow] = useState<IApplyTabRecord | null>(null);
+  const [removeModal, setRemoveModal] = useState(false);
+
   const handleOpenDetail = (id: number) => {
     console.info("Open detail", id);
-  };
-
-  const handleDeleteRow = (id: number) => {
-    console.info("Delete row", id);
   };
 
   const columns: TableProps<IApplyTabRecord>["columns"] = [
@@ -70,7 +72,10 @@ const PaymentsTable: React.FC<PaymentsTableProps> = ({ data }) => {
               <Button
                 icon={<Eye size={20} />}
                 className="buttonNoBorder"
-                onClick={() => handleOpenDetail(row.payment_id)}
+                onClick={() => {
+                  setActiveRow(row);
+                  handleOpenDetail(row.payment_id);
+                }}
               >
                 Ver
               </Button>
@@ -82,7 +87,10 @@ const PaymentsTable: React.FC<PaymentsTableProps> = ({ data }) => {
               <Button
                 icon={<Trash size={20} />}
                 className="buttonNoBorder"
-                onClick={() => handleDeleteRow(row.payment_id)}
+                onClick={() => {
+                  setActiveRow(row);
+                  setRemoveModal(true);
+                }}
               >
                 Eliminar
               </Button>
@@ -119,12 +127,28 @@ const PaymentsTable: React.FC<PaymentsTableProps> = ({ data }) => {
   ];
 
   return (
-    <Table
-      columns={columns}
-      dataSource={data}
-      className="sectionContainerTable"
-      pagination={false}
-    />
+    <>
+      <Table
+        columns={columns}
+        dataSource={data}
+        className="sectionContainerTable"
+        pagination={false}
+      />
+
+      <ModalRemove
+        name="elemento"
+        isOpen={removeModal}
+        onClose={() => {
+          setActiveRow(null);
+          setRemoveModal(false);
+        }}
+        onRemove={() => {
+          setActiveRow(null);
+          setRemoveModal(false);
+          handleDeleteRow && activeRow && handleDeleteRow(activeRow.id);
+        }}
+      />
+    </>
   );
 };
 

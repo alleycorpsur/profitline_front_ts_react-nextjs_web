@@ -1,22 +1,24 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useState } from "react";
 import { Button, Dropdown, Table, TableProps } from "antd";
 import { Eye, Trash, DotsThreeVertical } from "phosphor-react";
 
 import { formatMoney } from "@/utils/utils";
+import { ModalRemove } from "@/components/molecules/modals/ModalRemove/ModalRemove";
 
 import { IApplyTabRecord } from "@/types/applyTabClients/IApplyTabClients";
 
 interface DiscountTableProps {
   data?: IApplyTabRecord[];
+  // eslint-disable-next-line no-unused-vars
+  handleDeleteRow?: (id: number) => void;
 }
 
-const DiscountTable: React.FC<DiscountTableProps> = ({ data }) => {
+const DiscountTable: React.FC<DiscountTableProps> = ({ data, handleDeleteRow }) => {
+  const [activeRow, setActiveRow] = useState<IApplyTabRecord | null>(null);
+  const [removeModal, setRemoveModal] = useState(false);
+
   const handleOpenDetail = (id: number) => {
     console.info("Open detail", id);
-  };
-
-  const handleDeleteRow = (id: number) => {
-    console.info("Delete row", id);
   };
 
   const columns: TableProps<IApplyTabRecord>["columns"] = [
@@ -92,9 +94,10 @@ const DiscountTable: React.FC<DiscountTableProps> = ({ data }) => {
               <Button
                 icon={<Trash size={20} />}
                 className="buttonNoBorder"
-                onClick={() =>
-                  row.financial_discount_id && handleDeleteRow(row.financial_discount_id)
-                }
+                onClick={() => {
+                  setActiveRow(row);
+                  setRemoveModal(true);
+                }}
               >
                 Eliminar
               </Button>
@@ -131,12 +134,28 @@ const DiscountTable: React.FC<DiscountTableProps> = ({ data }) => {
   ];
 
   return (
-    <Table
-      columns={columns}
-      dataSource={data}
-      className="sectionContainerTable"
-      pagination={false}
-    />
+    <>
+      <Table
+        columns={columns}
+        dataSource={data}
+        className="sectionContainerTable"
+        pagination={false}
+      />
+
+      <ModalRemove
+        name="elemento"
+        isOpen={removeModal}
+        onClose={() => {
+          setActiveRow(null);
+          setRemoveModal(false);
+        }}
+        onRemove={() => {
+          setActiveRow(null);
+          setRemoveModal(false);
+          handleDeleteRow && activeRow && handleDeleteRow(activeRow.id);
+        }}
+      />
+    </>
   );
 };
 
