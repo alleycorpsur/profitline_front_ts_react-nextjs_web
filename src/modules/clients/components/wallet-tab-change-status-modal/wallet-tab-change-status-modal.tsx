@@ -240,7 +240,7 @@ const WalletTabChangeStatusModal: React.FC<Props> = ({
         </div>
       }
       closable={false}
-      bodyStyle={{
+      style={{
         height: !isSecondView ? "calc(60vh - 20px)" : "auto",
         padding: 0,
         overflow: "hidden",

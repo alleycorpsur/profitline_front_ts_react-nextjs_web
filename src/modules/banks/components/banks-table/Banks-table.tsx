@@ -140,7 +140,8 @@ export const BanksTable = ({
       title: "Monto",
       key: "current_value",
       dataIndex: "current_value",
-      render: (text) => <Text>{formatMoney(text)}</Text>,
+      align: "right",
+      render: (text) => <Text>{formatMoney(text, undefined, undefined, true)}</Text>,
       sorter: (a, b) => (a.current_value ?? 0) - (b.current_value ?? 0),
       showSorterTooltip: false,
       width: 130

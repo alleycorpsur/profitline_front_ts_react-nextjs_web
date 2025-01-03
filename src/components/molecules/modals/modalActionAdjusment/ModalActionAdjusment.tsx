@@ -117,7 +117,7 @@ export const ModalActionAdjusment = ({ isOpen, onClose, adjustment, clientId }: 
       }
       footer={null}
       width={"40%"}
-      bodyStyle={{
+      style={{
         height: currentView === "legalizeAccountingAdjustment" ? "calc(80vh - 20px)" : "auto"
       }}
     >
