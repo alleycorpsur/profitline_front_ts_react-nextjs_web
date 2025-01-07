@@ -11,7 +11,8 @@ import {
   Clipboard,
   Bank,
   SquaresFour,
-  Storefront
+  Storefront,
+  UsersFour
 } from "phosphor-react";
 
 import { logOut } from "../../../../firebase-utils";
@@ -188,6 +189,17 @@ export const SideBar = () => {
             </Button>
           </Link>
         )}
+
+        <Link href="/proveedores" passHref legacyBehavior>
+          <Button
+            type="primary"
+            size="large"
+            icon={<UsersFour size={26} />}
+            className={path === "/proveedores" ? "buttonIcon" : "buttonIconActive"}
+          >
+            {isSideBarLarge && "Ajustes"}
+          </Button>
+        </Link>
       </Flex>
       <Flex className="exit">
         <Button

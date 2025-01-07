@@ -1,0 +1,22 @@
+.selectTypeButton {
+  background-color: #F7F7F7 !important;
+  border: none !important;
+  height: 40px  !important;
+  box-shadow: none !important;
+  width: 100%;
+  border-radius: 4px;
+  font-size: 16px !important;
+  font-weight: 300 !important;
+  line-height: 20px !important;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  justify-content: flex-start !important;
+
+  &:hover {
+    background-color: #f5f5f5;
+  }
+  &.selected {
+    border: 1px solid black;
+  }
+}

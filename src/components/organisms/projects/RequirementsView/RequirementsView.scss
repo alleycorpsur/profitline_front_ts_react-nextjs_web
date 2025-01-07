@@ -1,0 +1,55 @@
+@import "@styles/variables.scss";
+
+.requirementsView {
+        .button {
+            &__actions {
+                padding: 0.75rem 1rem;
+                background-color: $background;
+                border: solid 1px transparent;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                height: 3rem;
+
+                &:hover {
+                    border: solid 1px $dark-gray;
+                }
+            }
+        }
+
+}
+  .statusContainer {
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.5rem;
+        width: fit-content;
+        border: 1px solid $active;
+
+        &__text {
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    }
+
+    .statusContainerPending {
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.5rem;
+        width: fit-content;
+        border: 1px solid $inactive;
+        cursor: pointer;
+    }
+
+    .statusPending {
+        width: 0.75rem;
+        height: 0.75rem;
+        border-radius: 1rem;
+        margin-right: 0.5rem;
+        background-color: $inactive;
+    }
+
+    .statusActive {
+        width: 0.75rem;
+        height: 0.75rem;
+        border-radius: 1rem;
+        margin-right: 0.5rem;
+        background-color: $active;
+    }
