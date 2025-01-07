@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { Button, Flex, Table, TableProps, Typography } from "antd";
 import { Eye, Triangle } from "phosphor-react";
 
@@ -15,10 +15,12 @@ const { Text } = Typography;
 
 interface PropsHistoryTable {
   dataAllRecords?: IHistoryRow[];
+  setSelectedRows: Dispatch<SetStateAction<IHistoryRow[] | undefined>>;
 }
 
-const HistoryTable = ({ dataAllRecords: data }: PropsHistoryTable) => {
+const HistoryTable = ({ dataAllRecords: data, setSelectedRows }: PropsHistoryTable) => {
   const [page, setPage] = useState(1);
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [isConfirmCancelModalOpen, setIsConfirmCancelModalOpen] = useState({
     isOpen: false,
     id: 0
@@ -33,6 +35,17 @@ const HistoryTable = ({ dataAllRecords: data }: PropsHistoryTable) => {
   const handleCancelApplication = () => {
     console.info("Anular aplicación con id", isConfirmCancelModalOpen.id);
     setIsConfirmCancelModalOpen({ isOpen: false, id: 0 });
+  };
+
+  const onSelectChange = (newSelectedRowKeys: React.Key[], newSelectedRow: any) => {
+    setSelectedRowKeys(newSelectedRowKeys);
+    setSelectedRows(newSelectedRow);
+  };
+
+  const rowSelection = {
+    columnWidth: 40,
+    selectedRowKeys,
+    onChange: onSelectChange
   };
 
   const columns: TableProps<IHistoryRow>["columns"] = [
@@ -90,6 +103,7 @@ const HistoryTable = ({ dataAllRecords: data }: PropsHistoryTable) => {
         className="historyTable"
         columns={columns}
         dataSource={data?.map((data) => ({ ...data, key: data.id }))}
+        rowSelection={rowSelection}
         virtual
         scroll={{ y: height - 400, x: 100 }}
         pagination={{

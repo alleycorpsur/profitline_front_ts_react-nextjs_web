@@ -1,21 +1,24 @@
 import { useState } from "react";
-import { Flex, Spin } from "antd";
+import { Button, Flex, Spin } from "antd";
 import { useParams } from "next/navigation";
 
 import { extractSingleParam } from "@/utils/utils";
 import { useClientHistory } from "@/hooks/useClientHistory";
 
 import UiSearchInput from "@/components/ui/search-input";
-import { DotsDropdown } from "@/components/atoms/DotsDropdown/DotsDropdown";
 import UiFilterDropdown from "@/components/ui/ui-filter-dropdown";
 import HistoryTable from "../../components/history-tab-table";
 
-import "./history-tab.scss";
+import styles from "./history-tab.module.scss";
+import { DotsThree } from "phosphor-react";
+import { IHistoryRow } from "@/types/clientHistory/IClientHistory";
 
 const HistoryTab = () => {
   const params = useParams();
   const clientIdParam = extractSingleParam(params.clientId);
+  const [selectedRows, setSelectedRows] = useState<IHistoryRow[] | undefined>(undefined);
   const [search, setSearch] = useState("");
+  const [openModal, setOpenModal] = useState({ selected: 0 });
   const isLoading = false;
 
   const { data } = useClientHistory({ clientId: Number(clientIdParam) });
@@ -27,8 +30,8 @@ const HistoryTab = () => {
           <Spin />
         </Flex>
       ) : (
-        <div className="historyTab">
-          <Flex justify="space-between" className="historyTab__header">
+        <div className={styles.historyTab}>
+          <Flex justify="space-between">
             <Flex gap={"0.5rem"}>
               <UiSearchInput
                 className="search"
@@ -40,10 +43,18 @@ const HistoryTab = () => {
                 }}
               />
               <UiFilterDropdown />
-              <DotsDropdown />
+              <Button
+                className={styles.button__actions}
+                size="large"
+                icon={<DotsThree size={"1.5rem"} />}
+                disabled={false}
+                onClick={() => setOpenModal({ selected: 1 })}
+              >
+                Generar acción
+              </Button>
             </Flex>
           </Flex>
-          <HistoryTable dataAllRecords={data} />
+          <HistoryTable dataAllRecords={data} setSelectedRows={setSelectedRows} />
         </div>
       )}
     </>
