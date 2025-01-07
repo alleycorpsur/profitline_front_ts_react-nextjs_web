@@ -1,62 +1,46 @@
-import { useState } from "react";
-import { Button, Flex, Table, TableProps, Tooltip, Typography } from "antd";
-import { DotsThreeVertical, DownloadSimple, Paperclip, Trash, Triangle } from "phosphor-react";
+import { Dispatch, SetStateAction, useState } from "react";
+import { Button, Flex, Table, TableProps, Typography } from "antd";
+import { Eye, Triangle } from "phosphor-react";
+
+import { formatDate } from "@/utils/utils";
 
 import useScreenHeight from "@/components/hooks/useScreenHeight";
-import { IHistoryRecord } from "../../containers/history-tab/history-tab";
-import { ModalConfirmAction } from "@/components/molecules/modals/ModalConfirmAction/ModalConfirmAction";
+
+import { IHistoryRow } from "@/types/clientHistory/IClientHistory";
 
 import "./history-tab-table.scss";
 
 const { Text } = Typography;
 
 interface PropsHistoryTable {
-  dataAllRecords: IHistoryRecord[];
+  dataAllRecords?: IHistoryRow[];
+  setSelectedRows: Dispatch<SetStateAction<IHistoryRow[] | undefined>>;
 }
 
-const HistoryTable = ({ dataAllRecords: data }: PropsHistoryTable) => {
+const HistoryTable = ({ dataAllRecords: data, setSelectedRows }: PropsHistoryTable) => {
   const [page, setPage] = useState(1);
-  const [isConfirmCancelModalOpen, setIsConfirmCancelModalOpen] = useState({
-    isOpen: false,
-    id: 0
-  });
-
   const height = useScreenHeight();
 
   const onChangePage = (pagePagination: number) => {
     setPage(pagePagination);
   };
 
-  const handleCancelApplication = () => {
-    console.info("Anular aplicación con id", isConfirmCancelModalOpen.id);
-    setIsConfirmCancelModalOpen({ isOpen: false, id: 0 });
+  const onSelectChange = (_newSelectedRowKeys: React.Key[], newSelectedRow: any) => {
+    setSelectedRows(newSelectedRow);
   };
 
-  const tootlTipOptions = [
-    {
-      title: "PDF",
-      icon: <DownloadSimple size={"1.2rem"} />,
-      onClick: () => console.info("PDF")
-    },
-    {
-      title: "Excel",
-      icon: <DownloadSimple size={"1.2rem"} />,
-      onClick: () => console.info("Excel")
-    },
-    {
-      title: "Anular aplicación",
-      icon: <Trash size={"1.2rem"} />,
-      onClick: (recordId: number) => setIsConfirmCancelModalOpen({ isOpen: true, id: recordId })
-    }
-  ];
+  const rowSelection = {
+    columnWidth: 40,
+    onChange: onSelectChange
+  };
 
-  const columns: TableProps<IHistoryRecord>["columns"] = [
+  const columns: TableProps<IHistoryRow>["columns"] = [
     {
       title: "Fecha",
-      dataIndex: "create_at",
-      key: "create_at",
-      render: (create_at) => <Text className="cell">{create_at}</Text>,
-      sorter: (a, b) => a.create_at.localeCompare(b.create_at),
+      dataIndex: "created_at",
+      key: "created_at",
+      render: (created_at) => <Text className="cell">{formatDate(created_at)}</Text>,
+      sorter: (a, b) => a.created_at.localeCompare(b.created_at),
       showSorterTooltip: false,
       width: 120
     },
@@ -70,53 +54,32 @@ const HistoryTable = ({ dataAllRecords: data }: PropsHistoryTable) => {
     },
     {
       title: "Descripción",
-      key: "payment_amount",
-      dataIndex: "payment_amount",
-      render: (payment_amount, row) => (
-        <span className="cell">
-          Pago {<span className="highlightText">#{row.payment_id}</span>} por {payment_amount}
-        </span>
-      ),
-      sorter: (a, b) => a.payment_amount - b.payment_amount,
+      key: "description",
+      dataIndex: "description",
+      render: (description) => <span className="cell">{description}</span>,
+      sorter: (a, b) => a.description.localeCompare(b.description),
       showSorterTooltip: false
     },
     {
       title: "Usuario",
-      key: "user",
-      dataIndex: "user",
+      key: "user_name",
+      dataIndex: "user_name",
       render: (text) => <Text className="cell">{text}</Text>,
-      sorter: (a, b) => a.user.localeCompare(b.user),
+      sorter: (a, b) => a.user_name.localeCompare(b.user_name),
       showSorterTooltip: false
     },
     {
       title: "",
-      render: (_, record) => (
+      render: () => (
         <Flex gap="0.5rem">
-          <Button className="eyeButton" icon={<Paperclip size={"1.2rem"} />} />
-          <Tooltip
-            overlayClassName="tooltipHistoryOptions"
-            title={
-              <Flex vertical gap={"0.5rem"}>
-                {tootlTipOptions.map((option) => (
-                  <Button
-                    key={option.title}
-                    className="tooltipButton"
-                    icon={option.icon}
-                    onClick={() => option.onClick(record.id)}
-                  >
-                    <p>{option.title}</p>
-                  </Button>
-                ))}
-              </Flex>
-            }
-            color={"white"}
-            key={record.id}
-          >
-            <Button className="eyeButton" icon={<DotsThreeVertical size={"1.2rem"} />} />
-          </Tooltip>
+          <Button
+            className="eyeButton"
+            onClick={() => console.info("Ver detalle")}
+            icon={<Eye size={"1.2rem"} />}
+          />
         </Flex>
       ),
-      width: 100
+      width: 65
     }
   ];
 
@@ -126,6 +89,7 @@ const HistoryTable = ({ dataAllRecords: data }: PropsHistoryTable) => {
         className="historyTable"
         columns={columns}
         dataSource={data?.map((data) => ({ ...data, key: data.id }))}
+        rowSelection={rowSelection}
         virtual
         scroll={{ y: height - 400, x: 100 }}
         pagination={{
@@ -144,19 +108,6 @@ const HistoryTable = ({ dataAllRecords: data }: PropsHistoryTable) => {
             return originalElement;
           }
         }}
-      />
-      <ModalConfirmAction
-        isOpen={isConfirmCancelModalOpen.isOpen}
-        onClose={() =>
-          setIsConfirmCancelModalOpen({
-            isOpen: false,
-            id: 0
-          })
-        }
-        title="¿Estás seguro que deseas anular esta apliación?"
-        content="Esta acción es definitiva"
-        onOk={handleCancelApplication}
-        okText="Anular aplicación"
       />
     </>
   );
