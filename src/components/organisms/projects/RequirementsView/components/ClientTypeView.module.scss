@@ -1,0 +1,94 @@
+@import "@styles/variables.scss";
+
+.clientRequirementView {
+
+  .content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin: 0.75rem 0.5rem;
+    height: "100%";
+  
+    &__header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 1.25rem;
+        font-weight: 600;
+        border: none;
+        padding: 0;
+        box-shadow: none;
+        width: fit-content;
+  
+        &:hover {
+            opacity: 0.6;
+        }
+    }
+  }
+  .buttonEdit {
+    display: flex;
+    background-color: transparent;
+    height: 100%;
+    gap: 8px;
+    padding: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 8px;
+    line-height: 24px;
+    align-items: center;
+    justify-content: center;
+    color: #141414;
+    border: 1px solid #141414;
+  }
+  .buttonSave {
+    display: flex;
+    background-color: #F7F7F7;
+    height: 100%;
+    gap: 8px;
+    padding: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 8px;
+    line-height: 24px;
+    align-items: center;
+    justify-content: center;
+    color: #141414;
+    border:none;
+    box-shadow: none;
+  }
+}
+
+.statusContainer {
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.5rem;
+  width: fit-content;
+  border: 1px solid #17CC07;
+
+}
+
+.statusContainerPending {
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.5rem;
+  width: fit-content;
+  border: 1px solid #DDDDDD;
+  cursor: pointer;
+  span {
+    color: #DDDDDD;
+  }
+}
+
+.statusPending {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 1rem;
+  margin-right: 0.5rem;
+  background-color: #DDDDDD;
+}
+
+.statusActive {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 1rem;
+  margin-right: 0.5rem;
+  background-color: #17CC07 ;
+}
