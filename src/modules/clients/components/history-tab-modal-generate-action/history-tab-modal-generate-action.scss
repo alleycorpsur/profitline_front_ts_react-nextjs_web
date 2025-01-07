@@ -1,0 +1,27 @@
+@import "@/styles/variables.scss";
+
+.modalActionsHistoryTab {
+    max-height: 90%;
+    .ant-modal-content {
+        padding: 2rem !important;
+
+        .ant-modal-close {
+            margin: 1.2rem;
+        }
+    }
+
+    &__description {
+        font-size: 1rem;
+        font-weight: 300;
+    }
+
+    .ant-modal-body {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .ant-collapse-header {
+        border-radius: 8px !important;
+    }
+}

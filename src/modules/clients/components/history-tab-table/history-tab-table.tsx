@@ -5,7 +5,6 @@ import { Eye, Triangle } from "phosphor-react";
 import { formatDate } from "@/utils/utils";
 
 import useScreenHeight from "@/components/hooks/useScreenHeight";
-import { ModalConfirmAction } from "@/components/molecules/modals/ModalConfirmAction/ModalConfirmAction";
 
 import { IHistoryRow } from "@/types/clientHistory/IClientHistory";
 
@@ -20,31 +19,18 @@ interface PropsHistoryTable {
 
 const HistoryTable = ({ dataAllRecords: data, setSelectedRows }: PropsHistoryTable) => {
   const [page, setPage] = useState(1);
-  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
-  const [isConfirmCancelModalOpen, setIsConfirmCancelModalOpen] = useState({
-    isOpen: false,
-    id: 0
-  });
-
   const height = useScreenHeight();
 
   const onChangePage = (pagePagination: number) => {
     setPage(pagePagination);
   };
 
-  const handleCancelApplication = () => {
-    console.info("Anular aplicación con id", isConfirmCancelModalOpen.id);
-    setIsConfirmCancelModalOpen({ isOpen: false, id: 0 });
-  };
-
-  const onSelectChange = (newSelectedRowKeys: React.Key[], newSelectedRow: any) => {
-    setSelectedRowKeys(newSelectedRowKeys);
+  const onSelectChange = (_newSelectedRowKeys: React.Key[], newSelectedRow: any) => {
     setSelectedRows(newSelectedRow);
   };
 
   const rowSelection = {
     columnWidth: 40,
-    selectedRowKeys,
     onChange: onSelectChange
   };
 
@@ -84,11 +70,11 @@ const HistoryTable = ({ dataAllRecords: data, setSelectedRows }: PropsHistoryTab
     },
     {
       title: "",
-      render: (_, record) => (
+      render: () => (
         <Flex gap="0.5rem">
           <Button
             className="eyeButton"
-            onClick={() => setIsConfirmCancelModalOpen({ isOpen: true, id: record.id })}
+            onClick={() => console.info("Ver detalle")}
             icon={<Eye size={"1.2rem"} />}
           />
         </Flex>
@@ -122,19 +108,6 @@ const HistoryTable = ({ dataAllRecords: data, setSelectedRows }: PropsHistoryTab
             return originalElement;
           }
         }}
-      />
-      <ModalConfirmAction
-        isOpen={isConfirmCancelModalOpen.isOpen}
-        onClose={() =>
-          setIsConfirmCancelModalOpen({
-            isOpen: false,
-            id: 0
-          })
-        }
-        title="¿Estás seguro que deseas anular esta apliación?"
-        content="Esta acción es definitiva"
-        onOk={handleCancelApplication}
-        okText="Anular aplicación"
       />
     </>
   );
