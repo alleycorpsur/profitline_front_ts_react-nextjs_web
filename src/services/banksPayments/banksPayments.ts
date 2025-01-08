@@ -192,7 +192,7 @@ export const getPaymentsStatus = async () => {
 
 interface IChangePaymentStatus {
   projectId: number;
-  clientId: number;
+  clientId: number | null;
   payment_ids: number[];
   status_id: number;
   comment: string;
@@ -211,7 +211,9 @@ export const changePaymentStatus = async ({
 
   const formData = new FormData();
   formData.append("project_id", projectId.toString());
-  formData.append("client_id", clientId.toString());
+  if (clientId) {
+    formData.append("client_id", clientId.toString());
+  }
   formData.append("payments", JSON.stringify(payment_ids));
   formData.append("status", status_id.toString());
   formData.append("comment", comment);
