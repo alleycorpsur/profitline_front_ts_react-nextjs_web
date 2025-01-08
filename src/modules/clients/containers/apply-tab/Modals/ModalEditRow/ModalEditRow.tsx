@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import { Button, Flex, Modal, Spin, Table, TableProps } from "antd";
 import { PencilLine, Plus, Trash } from "phosphor-react";
 import { useForm } from "react-hook-form";
@@ -38,6 +38,13 @@ const ModalEditRow: React.FC<ModalEditRowProps> = ({ visible, onCancel }) => {
       adjustments: mockData
     }
   });
+
+  useEffect(() => {
+    return () => {
+      setIsEditing(false);
+      reset();
+    };
+  }, [visible]);
 
   const isLoading = false;
   const columns: TableProps<IApplicationTabRow>["columns"] = [
