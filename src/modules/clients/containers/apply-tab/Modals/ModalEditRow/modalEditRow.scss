@@ -2,34 +2,63 @@
 
 .modalEditRow {
     .header {
+        width: 100%;
         display: flex;
         justify-content: space-between;
         align-items: center;
         margin-bottom: 1.5rem;
         transition: all 0.1s;
-        width: fit-content;
         h2 {
             font-size: 1.25rem;
             font-weight: 600;
         }
+
+        &__editBtn {
+            margin-right: 3rem;
+            background-color: $background;
+            border: none;
+
+            &:hover {
+                outline: 1px solid $black;
+            }
+        }
     }
 
     .EditRowTable {
-        .ant-table-row {
-            height: 15px !important;
+        /* row data */
+        .ant-table-tbody > tr > td {
+            // height: fit-content;
+            height: 49px;
+            padding: 0 2rem;
+            font-size: 1rem;
+            font-weight: 300;
         }
 
-        tr,
-        td {
-            .ant-table-cell {
-                padding: 1rem 2rem;
-            }
+        /* row header */
+        .ant-table-thead > tr > th {
+            padding: 0.625rem 2rem;
+            font-size: 1rem;
+            font-weight: 600;
         }
+    }
 
-        .TestRow {
-            .ant-table-cell {
-                height: fit-content !important;
-            }
+    .amountColumn {
+        position: relative;
+    }
+
+    .delete-btn {
+        position: absolute;
+        right: -1rem;
+        top: 0.75rem;
+        background-color: $background;
+        border: none;
+        padding: 0;
+        width: 1.5rem;
+        height: 1.5rem;
+        aspect-ratio: 1;
+
+        &:hover {
+            outline: 1px solid $black;
         }
     }
 
