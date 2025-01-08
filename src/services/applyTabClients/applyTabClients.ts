@@ -44,3 +44,16 @@ export const addItemsToTable = async (
     throw error;
   }
 };
+
+export const removeItemsFromTable = async (row_id: number) => {
+  try {
+    const response: GenericResponse<{ applications: number[] }> = await API.delete(
+      `${config.API_HOST}/paymentApplication/applications/${row_id}`
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("error removeItemsFromTable", error);
+    throw error;
+  }
+};
