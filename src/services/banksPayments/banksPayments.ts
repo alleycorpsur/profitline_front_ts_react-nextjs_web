@@ -211,9 +211,9 @@ export const changePaymentStatus = async ({
 
   const formData = new FormData();
   formData.append("project_id", projectId.toString());
-  if (clientId) {
-    formData.append("client_id", clientId.toString());
-  }
+
+  formData.append("client_id", clientId ? clientId.toString() : "");
+
   formData.append("payments", JSON.stringify(payment_ids));
   formData.append("status", status_id.toString());
   formData.append("comment", comment);
