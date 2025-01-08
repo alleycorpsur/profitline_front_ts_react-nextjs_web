@@ -75,7 +75,7 @@ export const ModalPeriodicity = ({
           placeholder="Seleccionar fecha"
           control={control}
           error={errors.init_date}
-          minDate={dayjs(new Date().toLocaleDateString())}
+          minDate={dayjs(new Date().toUTCString())}
           validationRules={{ required: true }}
           disabled={!isEditAvailable && !!showCommunicationDetails.communicationId}
         />
