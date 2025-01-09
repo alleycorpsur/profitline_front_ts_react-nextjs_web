@@ -4,7 +4,7 @@ export interface DiscountPackage {
   description: string;
   startDate: string;
   endDate?: string;
-  status?: number;
+  active: number;
   discountType: string;
 }
 

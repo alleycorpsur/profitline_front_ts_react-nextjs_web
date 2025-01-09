@@ -38,6 +38,7 @@ export default function DiscountPackages({
         itemRender: TablePaginator,
         current: page
       }}
+      rowKey={"id"}
     />
   );
 }

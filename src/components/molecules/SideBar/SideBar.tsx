@@ -7,11 +7,12 @@ import {
   ArrowLineRight,
   BellSimpleRinging,
   Gear,
-  Megaphone,
   User,
   Clipboard,
   Bank,
-  SquaresFour
+  SquaresFour,
+  Storefront,
+  UsersFour
 } from "phosphor-react";
 
 import { logOut } from "../../../../firebase-utils";
@@ -151,7 +152,7 @@ export const SideBar = () => {
             <Button
               type="primary"
               size="large"
-              icon={<Megaphone size={26} />}
+              icon={<Storefront size={26} />}
               className={path.startsWith("/comercio") ? "buttonIcon" : "buttonIconActive"}
             >
               {isSideBarLarge && "Descuentos"}
@@ -188,6 +189,17 @@ export const SideBar = () => {
             </Button>
           </Link>
         )}
+
+        <Link href="/proveedores" passHref legacyBehavior>
+          <Button
+            type="primary"
+            size="large"
+            icon={<UsersFour size={26} />}
+            className={path === "/proveedores" ? "buttonIcon" : "buttonIconActive"}
+          >
+            {isSideBarLarge && "Ajustes"}
+          </Button>
+        </Link>
       </Flex>
       <Flex className="exit">
         <Button

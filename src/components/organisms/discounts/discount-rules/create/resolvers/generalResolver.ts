@@ -207,6 +207,7 @@ export const generalResolver: ObjectSchema<DiscountSchema> = yup.object({
           }),
       otherwise: () => yup.number().optional().nullable()
     }),
+  client_name: yup.string().optional(),
   annual_ranges: yup.array().when("discount_type", {
     is: (discount_type: number) => discountTypeByAnnual.includes(discount_type),
     then: () =>
@@ -215,16 +216,17 @@ export const generalResolver: ObjectSchema<DiscountSchema> = yup.object({
         .of(
           yup.object({
             idLine: yup.number().required("La linea es requerida"),
-            idProduct: yup.number().optional(),
+            idProduct: yup.number().required("El producto es requerido"),
+            discount: yup
+              .number()
+              .typeError("Tipo de dato invalido")
+              .required("El descuento es requerido")
+              .min(1, "El valor mínimo debe ser mayor a 0"),
             units: yup
               .number()
               .typeError("Tipo de dato invalido")
               .required("El valor mínimo es requerido")
-              .min(1, "El valor mínimo debe ser mayor a 0"),
-            idContract: yup
-              .number()
-              .typeError("No se encontró ningun rango")
-              .required("El rango es requerido")
+              .min(1, "El valor mínimo debe ser mayor a 0")
           })
         )
         .min(1, "Debe haber al menos una regla de descuento"),
@@ -241,6 +243,8 @@ const findDiscountError = (arr: number[]) => {
   }
   return false;
 };
+
+export interface ProductSchema {}
 
 export interface DiscountSchema {
   name: string;
@@ -261,11 +265,13 @@ export interface DiscountSchema {
     discount: number;
   }[];
   client?: number | undefined;
+  client_name?: string | undefined;
   annual_ranges?: {
     id?: number | undefined;
     idLine?: number | undefined;
     units: number;
-    idContract?: number | undefined;
+    idProduct?: number | undefined;
+    discount?: number | undefined;
   }[];
   contract_archive?: string | undefined;
 }

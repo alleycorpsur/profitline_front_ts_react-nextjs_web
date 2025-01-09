@@ -32,6 +32,7 @@ export interface DiscountGetOne {
   min_units_by_order: number;
   discount_computation: number;
   id_client: any;
+  client_name: string;
   contract_archive: any;
   status: number;
   is_deleted: number;
@@ -77,6 +78,7 @@ export interface Contract {
   units: number;
   id_discount_contracts_ranges: number;
   is_deleted: number;
+  discount: number;
 }
 
 export interface DiscountCreateResponse {

@@ -1,14 +1,18 @@
 import { FC, useEffect, useState } from "react";
 import { CaretDoubleRight, Check, X } from "phosphor-react";
-import "./moldalnoveltydetail.scss";
 import { Button, message, Typography } from "antd";
+
+import { approveIncident, rejectIncident } from "@/services/resolveNovelty/resolveNovelty";
+
 import { InfoSection } from "./components/infoSection/InfoSection";
 import { InfoInvoice } from "./components/infoInvoice/InfoInvoice";
 import { EvidenceSection } from "./components/EvidenceSection/EvidenceSection";
 import { EventSection } from "./components/EventSection/EventSection";
 import { IIncidentDetail, useIncidentDetail } from "@/hooks/useNoveltyDetail";
 import ResolveNoveltyModal from "../ResolveNoveltyModal/ResolveNoveltyModal";
-import { approveIncident, rejectIncident } from "@/services/resolveNovelty/resolveNovelty";
+
+import "./moldalnoveltydetail.scss";
+import { useInvoices } from "@/hooks/useInvoices";
 const { Title } = Typography;
 
 interface MoldalNoveltyDetailProps {
@@ -19,6 +23,7 @@ interface MoldalNoveltyDetailProps {
 
 const MoldalNoveltyDetail: FC<MoldalNoveltyDetailProps> = ({ onClose, noveltyId }) => {
   const { data, isLoading, mutate: mutateIncident } = useIncidentDetail({ incidentId: noveltyId }); // TODO CAMBIAR ESTO
+  const { mutate: mutateWallet } = useInvoices({});
   const [incidentData, setIncidentData] = useState<IIncidentDetail | null>(null);
   const [openResolveModal, setOpenResolveModal] = useState(false);
   const [isResolving, setIsResolving] = useState(true);
@@ -52,6 +57,7 @@ const MoldalNoveltyDetail: FC<MoldalNoveltyDetailProps> = ({ onClose, noveltyId 
         messageShow.success("Incidente rechazado exitosamente");
       }
       setOpenResolveModal(false);
+      mutateWallet();
       mutateIncident();
       onClose(); // Cierra el modal principal después de resolver/rechazar
     } catch (error) {

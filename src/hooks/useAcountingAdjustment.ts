@@ -1,7 +1,8 @@
 import useSWR from "swr";
 import { fetcher } from "@/utils/api/api";
+import { GenericResponse } from "@/types/global/IGlobal";
 
-interface FinancialDiscount {
+export interface IFinancialDiscount {
   id: number;
   sucursal_id: number | null;
   line_id: number | null;
@@ -39,26 +40,21 @@ interface StatusGroup {
   status_name: string;
   color: string;
   count: number;
-  financial_discounts: FinancialDiscount[];
+  financial_discounts: IFinancialDiscount[];
   total: number;
   legalized: boolean;
 }
 
-interface GetFinancialDiscountsResponse {
-  status: number;
-  message: string;
-  data: StatusGroup[];
-}
-
 export const useAcountingAdjustment = (clientId: string, projectId: string, type: number) => {
-  const { data, error } = useSWR<GetFinancialDiscountsResponse>(
+  const { data, isLoading, error, mutate } = useSWR<GenericResponse<StatusGroup[]>>(
     `/financial-discount/project/${projectId}/client/${clientId}?type=${type}`,
     fetcher
   );
 
   return {
     data: data?.data,
-    isLoading: !error && !data,
-    isError: !!error
+    isLoading,
+    isError: !!error,
+    mutate
   };
 };

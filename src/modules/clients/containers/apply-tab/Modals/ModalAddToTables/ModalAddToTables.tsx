@@ -18,7 +18,8 @@ import { IInvoice } from "@/types/invoices/IInvoices";
 import "./modalAddToTables.scss";
 interface ModalAddToTablesProps {
   onCancel: () => void;
-  onAdd: () => void;
+  // eslint-disable-next-line no-unused-vars
+  onAdd: (adding_type: "invoices" | "payments", selectedIds: number[]) => Promise<void>;
   isModalAddToTableOpen: IModalAddToTableOpen;
 }
 
@@ -32,6 +33,7 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
   const [loadingData, setLoadingData] = useState(true);
+  const [loadingAddToTable, setLoadingAddToTable] = useState(false);
   const ITEMS_PER_PAGE = 5;
 
   const { data: invoicesByState, isLoading: loadingInvoices } = useInvoices({});
@@ -63,7 +65,7 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
       setSearchQuery("");
       setCurrentPage(1);
     };
-  }, [isModalAddToTableOpen.adding, allInvoices, allPayments]);
+  }, [isModalAddToTableOpen.adding]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -155,11 +157,19 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
     );
   };
 
+  const handleAddToTable = async () => {
+    if (!isModalAddToTableOpen.adding) return console.error("No adding type selected");
+    setLoadingAddToTable(true);
+    await onAdd(
+      isModalAddToTableOpen.adding,
+      selectedRows.map((row) => row.id)
+    );
+    setLoadingAddToTable(false);
+  };
+
   const isAllChecked =
     paginatedRows.length > 0 &&
     paginatedRows.every((row) => selectedRows.some((selected) => selected.id === row.id));
-
-  const isLoading = false;
 
   return (
     <Modal
@@ -272,7 +282,7 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
             current={currentPage}
             onChange={handlePageChange}
             total={filteredData.length}
-            pageSize={ITEMS_PER_PAGE}
+            showSizeChanger={false}
             style={{ textAlign: "right", margin: ".5rem 0" }}
           />
         </>
@@ -283,15 +293,8 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
           Cancelar
         </SecondaryButton>
 
-        <PrincipalButton
-          fullWidth
-          // onClick={onAdd}
-        >
-          {isLoading ? (
-            <Spin size="small" />
-          ) : (
-            `Agregar ${isModalAddToTableOpen.adding === "invoices" ? "facturas" : "pagos"}`
-          )}
+        <PrincipalButton fullWidth loading={loadingAddToTable} onClick={handleAddToTable}>
+          {`Agregar ${isModalAddToTableOpen.adding === "invoices" ? "facturas" : "pagos"}`}
         </PrincipalButton>
       </div>
     </Modal>

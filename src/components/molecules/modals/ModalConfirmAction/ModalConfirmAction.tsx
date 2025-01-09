@@ -11,6 +11,7 @@ interface Props {
   content?: React.ReactNode;
   okText?: string;
   cancelText?: string;
+  okLoading?: boolean;
 }
 export const ModalConfirmAction = ({
   isOpen,
@@ -19,7 +20,8 @@ export const ModalConfirmAction = ({
   title,
   content,
   okText = "Aceptar",
-  cancelText = "Cancelar"
+  cancelText = "Cancelar",
+  okLoading
 }: Props) => {
   return (
     <Modal
@@ -27,7 +29,7 @@ export const ModalConfirmAction = ({
       width={"50%"}
       open={isOpen}
       onCancel={onClose}
-      okButtonProps={{ className: "acceptButton" }}
+      okButtonProps={{ className: "acceptButton", loading: okLoading }}
       okText={okText}
       cancelButtonProps={{
         className: "cancelButton"

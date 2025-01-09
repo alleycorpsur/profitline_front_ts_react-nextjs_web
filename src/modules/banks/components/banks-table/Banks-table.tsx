@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Button, Flex, Table, TableProps, Typography } from "antd";
 import { Eye, Receipt } from "phosphor-react";
 
-import { formatDateDMY, formatMoney } from "@/utils/utils";
+import { formatDate, formatDateDMY, formatMoney } from "@/utils/utils";
 import InvoiceDownloadModal from "@/modules/clients/components/invoice-download-modal";
 import { ISingleBank } from "@/types/banks/IBanks";
 
@@ -133,10 +133,10 @@ export const BanksTable = ({
     },
     {
       title: "Fecha",
-      dataIndex: "created_at",
-      key: "created_at",
-      render: (text) => <Text>{formatDateDMY(text)}</Text>,
-      sorter: (a, b) => Date.parse(a.created_at) - Date.parse(b.created_at),
+      dataIndex: "payment_date",
+      key: "payment_date",
+      render: (text) => <Text>{formatDate(text)}</Text>,
+      sorter: (a, b) => Date.parse(a.payment_date) - Date.parse(b.payment_date),
       showSorterTooltip: false,
       width: 110
     },
@@ -144,7 +144,8 @@ export const BanksTable = ({
       title: "Monto",
       key: "current_value",
       dataIndex: "current_value",
-      render: (text) => <Text>{formatMoney(text)}</Text>,
+      align: "right",
+      render: (text) => <Text>{formatMoney(text, undefined, undefined, true)}</Text>,
       sorter: (a, b) => (a.current_value ?? 0) - (b.current_value ?? 0),
       showSorterTooltip: false,
       width: 130

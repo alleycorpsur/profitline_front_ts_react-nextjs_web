@@ -16,18 +16,19 @@ import SelectOuterTags from "@/components/ui/select-outer-tags";
 import InputClickable from "@/components/ui/input-clickable";
 import { ModalPeriodicity } from "@/components/molecules/modals/ModalPeriodicity/ModalPeriodicity";
 import {
+  ICommunicationDetail,
   ICommunicationForm,
-  IPeriodicityModalForm,
-  ISingleCommunication
+  IPeriodicityModalForm
 } from "@/types/communications/ICommunications";
 import { InputExpirationNoticeDays } from "@/components/atoms/inputs/InputExpirationNoticeDays/InputExpirationNoticeDays";
 import { OptionType } from "@/components/ui/select-outer-tags/select-outer-tags";
 import { CustomTextArea } from "@/components/atoms/CustomTextArea/CustomTextArea";
 import {
   createCommunication,
+  getActions,
   getCommunicationById,
   getForwardEvents,
-  getForwardToEmails,
+  getSubActions,
   getTemplateTags
 } from "@/services/communications/communications";
 import { useAppStore } from "@/lib/store/store";
@@ -35,9 +36,19 @@ import { capitalize, stringFromArrayOfSelect } from "@/utils/utils";
 import { useMessageApi } from "@/context/MessageContext";
 import dayjs from "dayjs";
 import { selectDayOptions } from "@/components/atoms/SelectDay/SelectDay";
+import { getAllRoles } from "@/services/roles/roles";
+import { getContactOptions } from "@/services/contacts/contacts";
 
 const { Title } = Typography;
 
+interface ICommunicationDatatState {
+  data: ICommunicationDetail | undefined;
+  isLoading: boolean;
+}
+interface ISelect {
+  value: number;
+  label: string;
+}
 interface Props {
   showCommunicationDetails: {
     communicationId: number;
@@ -59,8 +70,8 @@ export const CommunicationProjectForm = ({
   const [selectedBusinessRules, setSelectedBusinessRules] = useState<ISelectedBussinessRules>(
     initDatSelectedBusinessRules
   );
-  const [communicationData, setCommunicationData] = useState({
-    data: {} as ISingleCommunication,
+  const [communicationData, setCommunicationData] = useState<ICommunicationDatatState>({
+    data: undefined,
     isLoading: false
   });
   const [customFieldsError, setCustomFieldsError] = useState({
@@ -70,9 +81,16 @@ export const CommunicationProjectForm = ({
   });
   const [assignedGroups, setAssignedGroups] = useState<number[]>([]);
   const [isFrequencyModalOpen, setIsFrequencyModalOpen] = useState(false);
-  const [events, setEvents] = useState<string[]>([]);
-  const [templateTags, setTemplateTags] = useState<string[]>([]);
-  const [forwardToEmails, setForwardToEmails] = useState<string[]>([]);
+  const [events, setEvents] = useState<ISelect[]>([]);
+  const [actions, setActions] = useState<ISelect[]>([]);
+  const [subActions, setSubActions] = useState<ISelect[]>([]);
+  const [templateTags, setTemplateTags] = useState<ISelect[]>([]);
+  const [forwardTo, setForwardTo] = useState<
+    {
+      value: string;
+      label: string;
+    }[]
+  >([]);
   const { ID: projectId } = useAppStore((state) => state.selectedProject);
 
   const { showMessage } = useMessageApi();
@@ -93,57 +111,92 @@ export const CommunicationProjectForm = ({
     setValue,
     getValues
   } = useForm<ICommunicationForm>({
-    values: showCommunicationDetails.active ? dataToDataForm(communicationData.data) : undefined
+    values:
+      showCommunicationDetails.active && communicationData.data
+        ? dataToDataForm(communicationData.data)
+        : undefined
   });
-  const watchTemplateTagsLabels = watch("template.tags")?.map((tag) => `\[${tag.label}\]`);
+  const watchTemplateTagsLabels = watch("template.tags")?.map((tag) => `\{{${tag.label}\}}`);
+  const watchSelectedAction = watch("trigger.settings.actions");
 
   useEffect(() => {
     //set values for selects
     const fecthEvents = async () => {
       const events = await getForwardEvents();
-      setEvents(events);
+      setEvents(events.map((event) => ({ value: event.id, label: event.name })));
     };
     fecthEvents();
+    const fetchActions = async () => {
+      const actions = await getActions();
+      setActions(actions.map((action) => ({ value: action.id, label: action.name })));
+    };
+    fetchActions();
     const fetchTemplateTags = async () => {
       const tags = await getTemplateTags();
-      setTemplateTags(tags);
+      setTemplateTags(tags.map((tag) => ({ value: tag.id, label: tag.name })));
     };
     fetchTemplateTags();
-    const fetchEmails = async () => {
-      const emails = await getForwardToEmails();
-      setForwardToEmails(emails);
+    const fetchForwardOptions = async () => {
+      // const rolesData = await getAllRoles();
+      // const roles = rolesData.data.data.map((role) => ({
+      //   value: `1_${role.ID}`,
+      //   label: `Rol - ${role.ROL_NAME}`
+      // }));
+
+      const contactPositionsData = await getContactOptions();
+      const contactPositions = contactPositionsData.contact_position.map((position) => ({
+        value: `0_${position.id}`,
+        label: `Cliente - ${position.name}`
+      }));
+      setForwardTo([...contactPositions]);
     };
-    fetchEmails();
+    fetchForwardOptions();
 
     // set values for communication detail
     const fetchSingleCommunication = async () => {
       if (!showCommunicationDetails.communicationId) return;
-      setCommunicationData({ data: {} as ISingleCommunication, isLoading: true });
+      setCommunicationData({ data: undefined, isLoading: true });
       const res = await getCommunicationById(showCommunicationDetails.communicationId);
+
       if (res) {
         setCommunicationData({ data: res, isLoading: false });
-        setRadioValue(res.type);
-        setSelectedBusinessRules({
-          channels: res.rules.channel,
-          lines: res.rules.line,
-          sublines: res.rules.subline
-        });
-        setZones(res.rules.zone);
-        setAssignedGroups(res.rules.groups_id);
+        setRadioValue(res.id_comunication_type.id);
+        // setSelectedBusinessRules({
+        //   channels: res.rules.channel,
+        //   lines: res.rules.line,
+        //   sublines: res.rules.subline
+        // });
+        // setZones(res.rules.zone);
+        setAssignedGroups(res.client_group_id.map((group) => group.id));
+
+        const { repeat, end_date, start_date } = res.JSON_frecuency;
+        if (Object.keys(res.JSON_frecuency).length === 0) return;
         setSelectedPeriodicity({
-          init_date: dayjs(new Date(res.date_init_frequency)).add(1, "day"),
-          frequency_number: res.repeats,
-          frequency: { value: capitalize(res.frequency), label: capitalize(res.frequency) },
-          days: res.frequency_days.map((day) => ({
-            value: capitalize(day),
-            label: dayToLabel(day)
-          })),
-          end_date: dayjs(new Date(res.date_end_frequency)).add(1, "day")
+          init_date: dayjs(new Date(start_date)).add(1, "day"),
+          frequency_number: repeat.interval,
+          frequency: { value: capitalize(repeat.frequency), label: capitalize(repeat.frequency) },
+          days: [{ value: repeat.day, label: dayToLabel(repeat.day) }],
+          end_date: dayjs(new Date(end_date)).add(1, "day")
         });
       }
     };
     fetchSingleCommunication();
   }, [showCommunicationDetails.communicationId]);
+
+  useEffect(() => {
+    const action_ids = watchSelectedAction?.map((action) => action.value);
+    if (!action_ids) return;
+
+    if (action_ids.length === 0) {
+      setSubActions([]);
+      return;
+    }
+    const fetchSubActions = async () => {
+      const subActions = await getSubActions(action_ids);
+      setSubActions(subActions.map((action) => ({ value: action.id, label: action.name })));
+    };
+    fetchSubActions();
+  }, [watchSelectedAction]);
 
   const dayToLabel = (day: string) => {
     const dayObj = selectDayOptions.find((option) => option.value === day);
@@ -151,18 +204,23 @@ export const CommunicationProjectForm = ({
     return dayObj.label;
   };
 
-  const handleAddTagToBody = (value: OptionType[], deletedValue: OptionType[]) => {
+  const handleAddTagToBodyAndSubject = (value: OptionType[], deletedValue: OptionType[]) => {
     const valueBody = getValues("template.message");
+    //  SubjectAdding tags commented because it is not being used
+    const valueSubject = getValues("template.subject");
 
     if (deletedValue.length > 0) {
       const deletedTag = deletedValue[0].label;
-      setValue("template.message", valueBody.replace(`[${deletedTag}]`, ""));
+      setValue("template.message", valueBody.replace(`{{${deletedTag}}}`, ""));
+      setValue("template.subject", valueSubject.replace(`{{${deletedTag}}}`, ""));
+
       return;
     }
 
     const lastAddedTag = value.length > 0 ? value[value.length - 1] : undefined;
 
-    setValue("template.message", `${valueBody ? valueBody : ""}[${lastAddedTag?.label}]`);
+    setValue("template.message", `${valueBody ? valueBody : ""}{{${lastAddedTag?.label}}}`);
+    // setValue("template.subject", `${valueSubject ? valueSubject : ""}{{${lastAddedTag?.label}}}`);
   };
 
   const handleCreateCommunication = async (data: any) => {
@@ -186,17 +244,21 @@ export const CommunicationProjectForm = ({
       frequency: false
     });
 
-    await createCommunication({
-      data,
-      selectedPeriodicity,
-      zones,
-      selectedBusinessRules,
-      assignedGroups,
-      projectId,
-      showMessage
-    });
+    try {
+      await createCommunication({
+        data,
+        selectedPeriodicity,
+        zones,
+        selectedBusinessRules,
+        assignedGroups,
+        projectId,
+        showMessage
+      });
 
-    setIsCreateCommunication(false);
+      setIsCreateCommunication(false);
+    } catch (error) {
+      console.error(error);
+    }
     setLoadingRequest(false);
   };
 
@@ -204,14 +266,14 @@ export const CommunicationProjectForm = ({
     //useEffect to clean values from otherRadioButtons when clicked
     if (radioValue === "frecuencia") {
       setValue("trigger.settings.days", undefined);
-      setValue("trigger.settings.values", undefined);
-      setValue("trigger.settings.subValues", undefined);
+      setValue("trigger.settings.actions", undefined);
+      setValue("trigger.settings.subActions", undefined);
       setValue("trigger.settings.event_type", undefined);
       setValue("trigger.settings.noticeDaysEvent", undefined);
     } else if (radioValue === "evento") {
       setValue("trigger.settings.days", undefined);
-      setValue("trigger.settings.values", undefined);
-      setValue("trigger.settings.subValues", undefined);
+      setValue("trigger.settings.actions", undefined);
+      setValue("trigger.settings.subActions", undefined);
       setValue("trigger.settings.noticeDaysEvent", undefined);
       setSelectedPeriodicity(undefined);
     } else if (radioValue === "accion") {
@@ -280,16 +342,16 @@ export const CommunicationProjectForm = ({
                 <div className={styles.radioGroup}>
                   <div className={styles.radioGroup__frequency}>
                     <Radio
-                      checked={radioValue === "frecuencia"}
-                      onChange={() => handleChangeRadio("frecuencia", field)}
+                      checked={radioValue === 1}
+                      onChange={() => handleChangeRadio(1, field)}
                       className={styles.radioGroup__frequency__radio}
-                      value={"frecuencia"}
+                      value={1}
                       disabled={!!showCommunicationDetails.communicationId && !isEditAvailable}
                     >
                       <InputClickable
                         title="Frecuencia"
                         error={customFieldsError.frequency}
-                        disabled={radioValue !== "frecuencia"}
+                        disabled={radioValue !== 1}
                         callBackFunction={() => setIsFrequencyModalOpen(true)}
                         customStyles={
                           customFieldsError.frequency ? { border: "1px dashed red" } : undefined
@@ -309,21 +371,21 @@ export const CommunicationProjectForm = ({
                   <div className={styles.radioGroup__event}>
                     <div className={styles.radioGroup__event__left}>
                       <Radio
-                        checked={radioValue === "evento"}
-                        onChange={() => handleChangeRadio("evento", field)}
+                        checked={radioValue === 2}
+                        onChange={() => handleChangeRadio(2, field)}
                         name="test"
                         className={styles.radioGroup__event__radio}
-                        value={"evento"}
+                        value={2}
                         disabled={!!showCommunicationDetails.communicationId && !isEditAvailable}
                       />
                       <Controller
                         disabled={
-                          radioValue !== "evento" ||
+                          radioValue !== 2 ||
                           (!isEditAvailable && !!showCommunicationDetails.communicationId)
                         }
                         name="trigger.settings.event_type"
                         control={control}
-                        rules={{ required: radioValue === "evento" }}
+                        rules={{ required: radioValue === 2 }}
                         render={({ field }) => (
                           <GeneralSelect
                             errors={errors.trigger?.settings?.event_type}
@@ -336,7 +398,7 @@ export const CommunicationProjectForm = ({
                         )}
                       />
                     </div>
-                    {radioValue === "evento" && (
+                    {radioValue === 2 && (
                       <Controller
                         name="trigger.settings.noticeDaysEvent"
                         control={control}
@@ -347,7 +409,10 @@ export const CommunicationProjectForm = ({
                             setValue={setValue}
                             error={errors.trigger?.settings?.noticeDaysEvent}
                             field={field}
-                            event_days_before={communicationData.data.event_days_before}
+                            // Event days before is a prop that comes from the backend to set the value when showing the communication details
+                            event_days_before={
+                              showCommunicationDetails.communicationId ? 0 : undefined
+                            }
                             disabled={
                               !isEditAvailable && !!showCommunicationDetails.communicationId
                             }
@@ -361,22 +426,22 @@ export const CommunicationProjectForm = ({
                     <div className={styles.radioGroup__actions__left}>
                       <Radio
                         className={styles.radioGroup__actions__radio}
-                        checked={radioValue === "accion"}
-                        onChange={() => handleChangeRadio("accion", field)}
-                        value={"accion"}
+                        checked={radioValue === 3}
+                        onChange={() => handleChangeRadio(3, field)}
+                        value={3}
                         disabled={!!showCommunicationDetails.communicationId && !isEditAvailable}
                       />
                       <Controller
-                        disabled={radioValue !== "accion" && !isEditAvailable}
-                        name="trigger.settings.values"
+                        disabled={radioValue !== 3 && !isEditAvailable}
+                        name="trigger.settings.actions"
                         control={control}
-                        rules={{ required: radioValue === "accion" }}
+                        rules={{ required: radioValue === 3 }}
                         render={({ field }) => (
                           <SelectOuterTags
                             title="Tipo de acción"
                             placeholder="Seleccionar tipo de acción"
-                            options={actionsOptions}
-                            errors={errors.trigger?.settings?.values}
+                            options={actions}
+                            errors={errors.trigger?.settings?.actions}
                             field={field}
                             titleAbsolute
                           />
@@ -385,16 +450,16 @@ export const CommunicationProjectForm = ({
                     </div>
 
                     <Controller
-                      disabled={radioValue !== "accion" && !isEditAvailable}
-                      name="trigger.settings.subValues"
+                      disabled={radioValue !== 3 && !isEditAvailable}
+                      name="trigger.settings.subActions"
                       control={control}
-                      rules={{ required: radioValue === "accion" }}
+                      rules={{ required: radioValue === 3 }}
                       render={({ field }) => (
                         <SelectOuterTags
                           title="Subtipo de acción"
                           placeholder="Seleccionar subtipo de acción"
-                          options={subActionsOptions}
-                          errors={errors.trigger?.settings?.subValues}
+                          options={subActions}
+                          errors={errors.trigger?.settings?.subActions}
                           field={field}
                           titleAbsolute
                         />
@@ -486,7 +551,7 @@ export const CommunicationProjectForm = ({
                   field={field}
                   title="Para"
                   placeholder="Enviar a"
-                  options={forwardToEmails}
+                  options={forwardTo}
                   suffixIcon={null}
                   disabled={!isEditAvailable && !!showCommunicationDetails.communicationId}
                 />
@@ -502,7 +567,7 @@ export const CommunicationProjectForm = ({
                   field={field}
                   title="Copia"
                   placeholder="Copia a"
-                  options={forwardToEmails}
+                  options={forwardTo}
                   suffixIcon={null}
                   disabled={!isEditAvailable && !!showCommunicationDetails.communicationId}
                 />
@@ -524,17 +589,45 @@ export const CommunicationProjectForm = ({
                     field={field}
                     customStyleContainer={{ width: "25%" }}
                     hiddenTags
-                    addedOnchangeBehaviour={handleAddTagToBody}
+                    addedOnchangeBehaviour={handleAddTagToBodyAndSubject}
                   />
                 )}
               />
-              <InputForm
+              {/* <InputForm
                 customStyle={{ width: "75%" }}
                 titleInput="Asunto"
                 control={control}
                 nameInput="template.subject"
                 error={errors.template?.subject}
                 readOnly={!isEditAvailable && !!showCommunicationDetails.communicationId}
+              /> */}
+              <Controller
+                name="template.subject"
+                control={control}
+                rules={{ required: true }}
+                disabled={!isEditAvailable && !!showCommunicationDetails.communicationId}
+                render={({ field }) => (
+                  <div className={styles.textArea}>
+                    <p className={styles.textArea__label}>Asunto</p>
+                    <CustomTextArea
+                      {...field}
+                      onChange={field.onChange}
+                      placeholder="Asunto"
+                      customStyles={
+                        errors.template?.subject ? { borderColor: "red" } : { height: "48px" }
+                      }
+                      customStyleTextArea={{
+                        height: "48px",
+                        minHeight: "48px",
+                        padding: "12px 1rem",
+                        scrollbarWidth: "none"
+                      }}
+                      value={field.value}
+                      highlightWords={watchTemplateTagsLabels}
+                      disabled={!isEditAvailable && !!showCommunicationDetails.communicationId}
+                    />
+                  </div>
+                )}
               />
             </Flex>
             <Controller
@@ -601,19 +694,6 @@ export const CommunicationProjectForm = ({
   );
 };
 
-const actionsOptions = [
-  "Novedad",
-  "Aplicación de pago",
-  "Generación nota crédito",
-  "Cambio estado de factura"
-];
-
-const subActionsOptions = [
-  "Error en facturación",
-  "Diferencia en precios",
-  "Devolución",
-  "No radicado"
-];
 const viasSelectOption = ["Email", "SMS", "WhatsApp"];
 
 const mockAttachments = ["PDF Estado de cuenta", "Excel cartera", "PDF Factura"];
@@ -624,28 +704,44 @@ const initDatSelectedBusinessRules: ISelectedBussinessRules = {
   sublines: []
 };
 
-const dataToDataForm = (data: ISingleCommunication): ICommunicationForm => {
+const dataToDataForm = (data: ICommunicationDetail | undefined): ICommunicationForm | undefined => {
+  if (!data || Object.keys(data).length === 0) return undefined;
+  const roles = data.user_roles?.map((role) => ({
+    value: `1_${role.id}`,
+    label: `Rol - ${role.name}`
+  }));
+
+  const contactPositions = data.contact_roles?.map((position) => ({
+    value: `0_${position.id}`,
+    label: `Cliente - ${position.name}`
+  }));
+  const send_to = [...roles, ...contactPositions];
+
   return {
-    name: data.COMUNICATION_NAME,
-    description: data.reason,
+    name: data.name,
+    description: data.description,
     trigger: {
-      type: data.type,
+      type: data.id_comunication_type.id,
       settings: {
         days: ["test"],
-        values: undefined,
-        subValues: undefined,
-        event_type: data.EVENT_TYPE ? { value: data.EVENT_TYPE, label: data.EVENT_TYPE } : undefined
+        actions: data.action_type_ids.map((action) => ({
+          value: action.id.toString(),
+          label: action.name
+        })),
+        subActions: data.sub_action_type_ids.map((action) => ({
+          value: action.id.toString(),
+          label: action.name
+        })),
+        event_type: undefined
       }
     },
     template: {
       via: { value: data.via, label: data.via },
-      send_to: data.send_to?.map((mail) => ({ value: mail, label: mail })),
-      copy_to: data.copy_to?.map((mail) => ({ value: mail, label: mail })),
-      tags: data.tags?.map((tag) => ({ value: tag, label: tag })),
-      time: data.updated_at,
-      message: data.BODY,
-      title: data.TITLE,
-      subject: data.TEMPLATE_SUBJECT,
+      send_to: send_to,
+      copy_to: [],
+      tags: [{ value: "1", label: "Quemado" }],
+      message: data.message,
+      subject: data.subject,
       files: []
     }
   };

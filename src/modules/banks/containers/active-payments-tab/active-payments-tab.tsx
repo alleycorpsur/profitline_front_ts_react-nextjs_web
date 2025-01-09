@@ -1,15 +1,15 @@
 import { FC, useState, useEffect } from "react";
-import { Button, Flex, MenuProps, Spin } from "antd";
-import { Bank } from "phosphor-react";
+import { Button, Flex, Spin } from "antd";
+import { Bank, DotsThree } from "phosphor-react";
 
 import { useModalDetail } from "@/context/ModalContext";
 import { useMessageApi } from "@/context/MessageContext";
 import { useAppStore } from "@/lib/store/store";
 import { useBankPayments } from "@/hooks/useBankPayments";
+import { approvePayment } from "@/services/banksPayments/banksPayments";
 
 import UiSearchInput from "@/components/ui/search-input";
 import FilterDiscounts from "@/components/atoms/Filters/FilterDiscounts/FilterDiscounts";
-import { DotsDropdown } from "@/components/atoms/DotsDropdown/DotsDropdown";
 import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
 import Collapse from "@/components/ui/collapse";
 import LabelCollapse from "@/components/ui/label-collapse";
@@ -20,6 +20,8 @@ import ModalActionsEditClient from "../../components/modal-actions-edit-client";
 import ModalActionsUploadEvidence from "../../components/modal-actions-upload-evidence";
 import ModalActionsAssignClient from "../../components/modal-actions-assign-client";
 import ModalActionsSplitPayment from "../../components/modal-actions-split-payment";
+import ModalActionsChangeStatus from "../../components/modal-actions-change-status";
+import { ModalConfirmAction } from "@/components/molecules/modals/ModalConfirmAction/ModalConfirmAction";
 
 import { ISingleBank } from "@/types/banks/IBanks";
 import { IClientPayment } from "@/types/clientPayments/IClientPayments";
@@ -35,6 +37,7 @@ export const ActivePaymentsTab: FC = () => {
   const [mutatedPaymentDetail, mutatePaymentDetail] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [paymentMaps, setPaymentMaps] = useState<Map<number, Map<string, ISingleBank>>>(new Map());
+  const [loadingApprove, setLoadingApprove] = useState(false);
 
   const { ID } = useAppStore((state) => state.selectedProject);
   const { showMessage } = useMessageApi();
@@ -103,30 +106,29 @@ export const ActivePaymentsTab: FC = () => {
     });
   };
 
-  const filteredData = data?.map((status) => ({
-    ...status,
-    payments: searchPayments(status.payments_status_id, searchQuery)
-  }));
+  const handleApproveAssignment = async () => {
+    setLoadingApprove(true);
+    try {
+      await approvePayment({
+        payments: selectedRows?.map((row) => row.id) || [],
+        project_id: ID,
+        client_id: selectedRows?.[0]?.id_client || 0
+      });
 
-  const items: MenuProps["items"] = [
-    {
-      key: "1",
-      label: (
-        <Button
-          className="buttonOutlined"
-          onClick={() => {
-            if (!selectedRows || selectedRows.length === 0) {
-              showMessage("error", "Seleccione al menos un pago");
-              return;
-            }
-            setisGenerateActionOpen(true);
-          }}
-        >
-          Generar acción
-        </Button>
-      )
+      showMessage("success", "Asignación aprobada correctamente");
+      onCloseModal();
+    } catch (error) {
+      showMessage("error", "Error al aprobar la asignación");
     }
-  ];
+    setLoadingApprove(false);
+  };
+
+  const filteredData = data
+    ?.map((status) => ({
+      ...status,
+      payments: searchPayments(status.payments_status_id, searchQuery)
+    }))
+    .filter((status) => status.payments.length > 0);
 
   return (
     <>
@@ -144,7 +146,19 @@ export const ActivePaymentsTab: FC = () => {
               onChange={(event) => setSearchQuery(event.target.value)}
             />
             <FilterDiscounts />
-            <DotsDropdown items={items} />
+            <Button
+              className={styles.button__actions}
+              icon={<DotsThree size={"1.5rem"} />}
+              onClick={() => {
+                if (!selectedRows || selectedRows.length === 0) {
+                  showMessage("error", "Seleccione al menos un pago");
+                  return;
+                }
+                setisGenerateActionOpen(true);
+              }}
+            >
+              Generar acción
+            </Button>
             <PrincipalButton onClick={handleOpenBankRules} customStyles={{ marginLeft: "auto" }}>
               Reglas de bancos
               <Bank size={16} />
@@ -183,10 +197,28 @@ export const ActivePaymentsTab: FC = () => {
             onClose={() => setisGenerateActionOpen(false)}
             setSelectOpen={(e) => {
               const { selected } = e;
-              if (selected !== 2 && selectedRows && selectedRows.length > 1) {
-                showMessage("error", "Solo puedes seleccionar un pago para esta acción");
+              if (
+                selected !== 2 &&
+                selected !== 3 &&
+                selected !== 6 &&
+                selectedRows &&
+                selectedRows.length > 1
+              ) {
+                showMessage("info", "Solo puedes seleccionar un pago para esta acción");
                 return;
               }
+
+              if ((selected === 6 || selected === 3) && selectedRows && selectedRows.length > 1) {
+                const clientId = selectedRows[0].id_client;
+                if (!selectedRows.every((row) => row.id_client === clientId)) {
+                  showMessage(
+                    "info",
+                    "Solo puedes seleccionar pagos del mismo cliente para esta acción"
+                  );
+                  return;
+                }
+              }
+
               setisGenerateActionOpen((prev) => !prev);
               setIsSelectOpen(e);
             }}
@@ -202,6 +234,14 @@ export const ActivePaymentsTab: FC = () => {
             onClose={onCloseModal}
             selectedRows={selectedRows}
           />
+          <ModalConfirmAction
+            isOpen={isSelectOpen.selected === 3}
+            onClose={onCloseModal}
+            onOk={handleApproveAssignment}
+            title="¿Está seguro de aprobar la asignación?"
+            okText="Aprobar"
+            okLoading={loadingApprove}
+          />
           <ModalActionsSplitPayment
             isOpen={isSelectOpen.selected === 4}
             onClose={onCloseModal}
@@ -209,6 +249,11 @@ export const ActivePaymentsTab: FC = () => {
           />
           <ModalActionsUploadEvidence
             isOpen={isSelectOpen.selected === 5}
+            onClose={onCloseModal}
+            selectedRows={selectedRows}
+          />
+          <ModalActionsChangeStatus
+            isOpen={isSelectOpen.selected === 6}
             onClose={onCloseModal}
             selectedRows={selectedRows}
           />

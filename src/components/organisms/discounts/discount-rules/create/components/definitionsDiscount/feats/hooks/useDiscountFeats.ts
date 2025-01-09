@@ -29,7 +29,7 @@ export default function useDiscountFeats({ setValue }: UseDiscountFeatsProps) {
         acc.push({
           id: product.id_line,
           name: product.description_line,
-          products: []
+          products: [product]
         });
       }
       return acc;

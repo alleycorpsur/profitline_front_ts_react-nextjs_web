@@ -1,58 +1,161 @@
-import React from "react";
-import { Table } from "antd";
-import { InvoiceData } from "./Types";
+import React, { ReactNode, useState } from "react";
+import { Button, Dropdown, Table, TableProps } from "antd";
+import { Eye, Trash, DotsThreeVertical } from "phosphor-react";
+
+import { formatMoney } from "@/utils/utils";
+import { ModalRemove } from "@/components/molecules/modals/ModalRemove/ModalRemove";
+
+import { IApplyTabRecord } from "@/types/applyTabClients/IApplyTabClients";
 
 interface DiscountTableProps {
-  data: InvoiceData[];
+  data?: IApplyTabRecord[];
+  // eslint-disable-next-line no-unused-vars
+  handleDeleteRow?: (id: number) => void;
+  // eslint-disable-next-line no-unused-vars
+  handleEditRow: (row_id: number) => void;
 }
 
-const DiscountTable: React.FC<DiscountTableProps> = ({ data }) => {
-  const columns = [
-    { 
-      title: "ID ajuste", 
-      dataIndex: "adjustmentId", 
-      key: "adjustmentId",
-      sorter: (a: InvoiceData, b: InvoiceData) => a.adjustmentId! - b.adjustmentId!
+const DiscountTable: React.FC<DiscountTableProps> = ({ data, handleDeleteRow, handleEditRow }) => {
+  const [activeRow, setActiveRow] = useState<IApplyTabRecord | null>(null);
+  const [removeModal, setRemoveModal] = useState(false);
+
+  const columns: TableProps<IApplyTabRecord>["columns"] = [
+    {
+      title: "ID ajuste",
+      dataIndex: "financial_discount_id",
+      key: "financial_discount_id",
+      render: (id) => <p className="sectionContainerTable__id">{id}</p>,
+      sorter: (a, b) => {
+        if (a.financial_discount_id && b.financial_discount_id) {
+          return a.financial_discount_id - b.financial_discount_id;
+        }
+        return 0;
+      }
     },
-    { 
-      title: "Tipo de ajuste", 
-      dataIndex: "adjustmentType", 
+    {
+      title: "Tipo de ajuste",
+      dataIndex: "adjustmentType",
       key: "adjustmentType",
-      sorter: (a: InvoiceData, b: InvoiceData) => a.adjustmentType!.localeCompare(b.adjustmentType!)
+      render: () => <p>Nota credito</p>
     },
-    { 
-      title: "Facturas", 
-      dataIndex: "invoices", 
-      key: "invoices",
-      sorter: (a: InvoiceData, b: InvoiceData) => a.invoices! - b.invoices!
+    {
+      title: "Facturas",
+      dataIndex: "invoices",
+      key: "invoices"
     },
-    { 
-      title: "Monto", 
-      dataIndex: "amount", 
+    {
+      title: "Monto",
+      dataIndex: "amount",
       key: "amount",
-      sorter: (a: InvoiceData, b: InvoiceData) => a.amount! - b.amount!
+      render: (amount) => <p>{formatMoney(amount)}</p>,
+      sorter: (a, b) => a.amount - b.amount,
+      showSorterTooltip: false
     },
-    { 
-      title: "Monto aplicado", 
-      dataIndex: "appliedAmount", 
-      key: "appliedAmount",
-      sorter: (a: InvoiceData, b: InvoiceData) => a.appliedAmount - b.appliedAmount
+    {
+      title: "Monto aplicado",
+      dataIndex: "applied_amount",
+      key: "applied_amount",
+      render: (applied_amount) => <p>{formatMoney(applied_amount)}</p>,
+      sorter: (a, b) => a.applied_amount - b.applied_amount,
+      showSorterTooltip: false
     },
-    { 
-      title: "Saldo", 
-      dataIndex: "balance", 
-      key: "balance",
-      sorter: (a: InvoiceData, b: InvoiceData) => a.balance - b.balance
+    {
+      title: "Saldo",
+      dataIndex: "current_value",
+      key: "current_value",
+      render: (current_value) => <p>{formatMoney(current_value)}</p>,
+      sorter: (a, b) => a.current_value - b.current_value,
+      showSorterTooltip: false
+    },
+    {
+      title: "Detalle",
+      width: 75,
+      render: (_, row) => {
+        const items = [
+          {
+            key: "1",
+            label: (
+              <Button
+                icon={<Eye size={20} />}
+                className="buttonNoBorder"
+                onClick={() =>
+                  row.financial_discount_id &&
+                  handleEditRow &&
+                  handleEditRow(row.financial_discount_id)
+                }
+              >
+                Ver
+              </Button>
+            )
+          },
+          {
+            key: "2",
+            label: (
+              <Button
+                icon={<Trash size={20} />}
+                className="buttonNoBorder"
+                onClick={() => {
+                  setActiveRow(row);
+                  setRemoveModal(true);
+                }}
+              >
+                Eliminar
+              </Button>
+            )
+          },
+          {
+            key: "3",
+            label: (
+              <Button icon={<Eye size={20} />} className="buttonNoBorder">
+                Marcar como abono
+              </Button>
+            )
+          }
+        ];
+
+        const customDropdown = (menu: ReactNode) => (
+          <div className="dropdownApplicationTable">{menu}</div>
+        );
+
+        return (
+          <Dropdown
+            dropdownRender={customDropdown}
+            menu={{ items }}
+            placement="bottomLeft"
+            trigger={["click"]}
+          >
+            <Button className="dotsBtn">
+              <DotsThreeVertical size={16} />
+            </Button>
+          </Dropdown>
+        );
+      }
     }
   ];
 
   return (
-    <Table
-      columns={columns}
-      dataSource={data}
-      className="sectionContainerTable"
-      pagination={false}
-    />
+    <>
+      <Table
+        columns={columns}
+        dataSource={data}
+        className="sectionContainerTable"
+        pagination={false}
+      />
+
+      <ModalRemove
+        name="elemento"
+        isOpen={removeModal}
+        onClose={() => {
+          setActiveRow(null);
+          setRemoveModal(false);
+        }}
+        onRemove={() => {
+          setActiveRow(null);
+          setRemoveModal(false);
+          handleDeleteRow && activeRow && handleDeleteRow(activeRow.id);
+        }}
+      />
+    </>
   );
 };
 

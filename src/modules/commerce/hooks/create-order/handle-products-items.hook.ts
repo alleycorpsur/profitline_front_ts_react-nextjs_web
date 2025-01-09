@@ -30,7 +30,8 @@ export const useHandleProductsItems = (product: ISelectedProduct, categoryName: 
       image: product.image,
       category_id: product.category_id,
       SKU: product.SKU,
-      stock: product.stock
+      stock: product.stock,
+      category_name: product.category_name
     };
 
     if (categoryIndex === -1) {
