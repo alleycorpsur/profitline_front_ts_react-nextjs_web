@@ -20,6 +20,7 @@ import ModalActionsUploadEvidence from "../../components/modal-actions-upload-ev
 import ModalActionsAssignClient from "../../components/modal-actions-assign-client";
 import ModalActionsSplitPayment from "../../components/modal-actions-split-payment";
 import ModalActionsChangeStatus from "../../components/modal-actions-change-status";
+import { ModalConfirmAction } from "@/components/molecules/modals/ModalConfirmAction/ModalConfirmAction";
 
 import { ISingleBank } from "@/types/banks/IBanks";
 import { IClientPayment } from "@/types/clientPayments/IClientPayments";
@@ -35,6 +36,7 @@ export const ActivePaymentsTab: FC = () => {
   const [mutatedPaymentDetail, mutatePaymentDetail] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [paymentMaps, setPaymentMaps] = useState<Map<number, Map<string, ISingleBank>>>(new Map());
+  const [loadingApprove, setLoadingApprove] = useState(false);
 
   const { ID } = useAppStore((state) => state.selectedProject);
   const { showMessage } = useMessageApi();
@@ -103,6 +105,9 @@ export const ActivePaymentsTab: FC = () => {
     });
   };
 
+  const handleApproveAssignment = () => {
+    console.log("OKKK");
+  };
   const filteredData = data
     ?.map((status) => ({
       ...status,
@@ -207,6 +212,14 @@ export const ActivePaymentsTab: FC = () => {
             isOpen={isSelectOpen.selected === 2}
             onClose={onCloseModal}
             selectedRows={selectedRows}
+          />
+          <ModalConfirmAction
+            isOpen={isSelectOpen.selected === 3}
+            onClose={onCloseModal}
+            onOk={handleApproveAssignment}
+            title="¿Está seguro de quere aprobar la asignación?"
+            okText="Aprobar"
+            okLoading={loadingApprove}
           />
           <ModalActionsSplitPayment
             isOpen={isSelectOpen.selected === 4}
