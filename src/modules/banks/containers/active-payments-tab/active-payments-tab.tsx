@@ -6,6 +6,7 @@ import { useModalDetail } from "@/context/ModalContext";
 import { useMessageApi } from "@/context/MessageContext";
 import { useAppStore } from "@/lib/store/store";
 import { useBankPayments } from "@/hooks/useBankPayments";
+import { approvePayment } from "@/services/banksPayments/banksPayments";
 
 import UiSearchInput from "@/components/ui/search-input";
 import FilterDiscounts from "@/components/atoms/Filters/FilterDiscounts/FilterDiscounts";
@@ -105,9 +106,23 @@ export const ActivePaymentsTab: FC = () => {
     });
   };
 
-  const handleApproveAssignment = () => {
-    console.log("OKKK");
+  const handleApproveAssignment = async () => {
+    setLoadingApprove(true);
+    try {
+      await approvePayment({
+        payments: selectedRows?.map((row) => row.id) || [],
+        project_id: ID,
+        client_id: selectedRows?.[0]?.id_client || 0
+      });
+
+      showMessage("success", "Asignación aprobada correctamente");
+      onCloseModal();
+    } catch (error) {
+      showMessage("error", "Error al aprobar la asignación");
+    }
+    setLoadingApprove(false);
   };
+
   const filteredData = data
     ?.map((status) => ({
       ...status,
@@ -182,12 +197,18 @@ export const ActivePaymentsTab: FC = () => {
             onClose={() => setisGenerateActionOpen(false)}
             setSelectOpen={(e) => {
               const { selected } = e;
-              if (selected !== 2 && selected !== 6 && selectedRows && selectedRows.length > 1) {
+              if (
+                selected !== 2 &&
+                selected !== 3 &&
+                selected !== 6 &&
+                selectedRows &&
+                selectedRows.length > 1
+              ) {
                 showMessage("info", "Solo puedes seleccionar un pago para esta acción");
                 return;
               }
 
-              if (selected === 6 && selectedRows && selectedRows.length > 1) {
+              if ((selected === 6 || selected === 3) && selectedRows && selectedRows.length > 1) {
                 const clientId = selectedRows[0].id_client;
                 if (!selectedRows.every((row) => row.id_client === clientId)) {
                   showMessage(
@@ -217,7 +238,7 @@ export const ActivePaymentsTab: FC = () => {
             isOpen={isSelectOpen.selected === 3}
             onClose={onCloseModal}
             onOk={handleApproveAssignment}
-            title="¿Está seguro de quere aprobar la asignación?"
+            title="¿Está seguro de aprobar la asignación?"
             okText="Aprobar"
             okLoading={loadingApprove}
           />
