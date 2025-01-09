@@ -237,3 +237,25 @@ export const changePaymentStatus = async ({
     throw error;
   }
 };
+
+interface IApprovePayment {
+  payments: number[];
+  project_id: number;
+  client_id: number;
+}
+
+export const approvePayment = async ({ payments, project_id, client_id }: IApprovePayment) => {
+  const modelData = {
+    payments,
+    project_id,
+    client_id
+  };
+
+  try {
+    const response: GenericResponse<any> = await API.post("/bank/approve-assigment", modelData);
+    return response.data;
+  } catch (error) {
+    console.error("Error al aprobar el pago:", error);
+    throw error;
+  }
+};
