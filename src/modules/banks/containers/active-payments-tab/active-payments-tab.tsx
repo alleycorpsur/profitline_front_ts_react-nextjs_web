@@ -6,6 +6,7 @@ import { useModalDetail } from "@/context/ModalContext";
 import { useMessageApi } from "@/context/MessageContext";
 import { useAppStore } from "@/lib/store/store";
 import { useBankPayments } from "@/hooks/useBankPayments";
+import { approvePayment } from "@/services/banksPayments/banksPayments";
 
 import UiSearchInput from "@/components/ui/search-input";
 import FilterDiscounts from "@/components/atoms/Filters/FilterDiscounts/FilterDiscounts";
@@ -20,6 +21,7 @@ import ModalActionsUploadEvidence from "../../components/modal-actions-upload-ev
 import ModalActionsAssignClient from "../../components/modal-actions-assign-client";
 import ModalActionsSplitPayment from "../../components/modal-actions-split-payment";
 import ModalActionsChangeStatus from "../../components/modal-actions-change-status";
+import { ModalConfirmAction } from "@/components/molecules/modals/ModalConfirmAction/ModalConfirmAction";
 
 import { ISingleBank } from "@/types/banks/IBanks";
 import { IClientPayment } from "@/types/clientPayments/IClientPayments";
@@ -35,6 +37,7 @@ export const ActivePaymentsTab: FC = () => {
   const [mutatedPaymentDetail, mutatePaymentDetail] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [paymentMaps, setPaymentMaps] = useState<Map<number, Map<string, ISingleBank>>>(new Map());
+  const [loadingApprove, setLoadingApprove] = useState(false);
 
   const { ID } = useAppStore((state) => state.selectedProject);
   const { showMessage } = useMessageApi();
@@ -101,6 +104,23 @@ export const ActivePaymentsTab: FC = () => {
       handleOpenPaymentDetail,
       mutatedPaymentDetail: !mutatedPaymentDetail
     });
+  };
+
+  const handleApproveAssignment = async () => {
+    setLoadingApprove(true);
+    try {
+      await approvePayment({
+        payments: selectedRows?.map((row) => row.id) || [],
+        project_id: ID,
+        client_id: selectedRows?.[0]?.id_client || 0
+      });
+
+      showMessage("success", "Asignación aprobada correctamente");
+      onCloseModal();
+    } catch (error) {
+      showMessage("error", "Error al aprobar la asignación");
+    }
+    setLoadingApprove(false);
   };
 
   const filteredData = data
@@ -177,12 +197,18 @@ export const ActivePaymentsTab: FC = () => {
             onClose={() => setisGenerateActionOpen(false)}
             setSelectOpen={(e) => {
               const { selected } = e;
-              if (selected !== 2 && selected !== 6 && selectedRows && selectedRows.length > 1) {
+              if (
+                selected !== 2 &&
+                selected !== 3 &&
+                selected !== 6 &&
+                selectedRows &&
+                selectedRows.length > 1
+              ) {
                 showMessage("info", "Solo puedes seleccionar un pago para esta acción");
                 return;
               }
 
-              if (selected === 6 && selectedRows && selectedRows.length > 1) {
+              if ((selected === 6 || selected === 3) && selectedRows && selectedRows.length > 1) {
                 const clientId = selectedRows[0].id_client;
                 if (!selectedRows.every((row) => row.id_client === clientId)) {
                   showMessage(
@@ -207,6 +233,14 @@ export const ActivePaymentsTab: FC = () => {
             isOpen={isSelectOpen.selected === 2}
             onClose={onCloseModal}
             selectedRows={selectedRows}
+          />
+          <ModalConfirmAction
+            isOpen={isSelectOpen.selected === 3}
+            onClose={onCloseModal}
+            onOk={handleApproveAssignment}
+            title="¿Está seguro de aprobar la asignación?"
+            okText="Aprobar"
+            okLoading={loadingApprove}
           />
           <ModalActionsSplitPayment
             isOpen={isSelectOpen.selected === 4}
