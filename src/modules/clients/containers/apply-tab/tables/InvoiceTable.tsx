@@ -13,9 +13,20 @@ interface InvoiceTableProps {
   handleDeleteRow?: (id: number) => void;
   // eslint-disable-next-line no-unused-vars
   handleEditRow: (row_id: number) => void;
+  // eslint-disable-next-line no-unused-vars
+  rowSelection: {
+    selectedRowKeys: React.Key[];
+    // eslint-disable-next-line no-unused-vars
+    onChange: (newSelectedRowKeys: React.Key[], selectedRows: any[]) => void;
+  };
 }
 
-const InvoiceTable: React.FC<InvoiceTableProps> = ({ data, handleDeleteRow, handleEditRow }) => {
+const InvoiceTable: React.FC<InvoiceTableProps> = ({
+  data,
+  handleDeleteRow,
+  handleEditRow,
+  rowSelection
+}) => {
   const [activeRow, setActiveRow] = useState<IApplyTabRecord | null>(null);
   const [removeModal, setRemoveModal] = useState(false);
 
@@ -134,9 +145,10 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ data, handleDeleteRow, hand
     <>
       <Table
         columns={columns}
-        dataSource={data}
+        dataSource={data?.map((data) => ({ ...data, key: data.id }))}
         className="sectionContainerTable"
         pagination={false}
+        rowSelection={rowSelection}
       />
 
       <ModalRemove

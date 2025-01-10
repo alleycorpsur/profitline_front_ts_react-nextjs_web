@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from "react";
-import { Plus } from "phosphor-react";
+import React, { useCallback, useMemo, useState } from "react";
+import { DotsThree, Plus } from "phosphor-react";
 import { Button, Flex, Spin } from "antd";
 
 import { useApplicationTable } from "@/hooks/useApplicationTable";
@@ -25,6 +25,12 @@ import ModalCreateAdjustment from "./Modals/ModalCreateAdjustment/ModalCreateAdj
 import ModalEditRow from "./Modals/ModalEditRow/ModalEditRow";
 
 import "./apply-tab.scss";
+
+interface ISelectedRowKeys {
+  invoices: React.Key[];
+  payments: React.Key[];
+  discounts: React.Key[];
+}
 
 export interface IModalAddToTableOpen {
   isOpen: boolean;
@@ -52,8 +58,12 @@ const ApplyTab: React.FC = () => {
   );
 
   const [modalAdjustmentsState, setModalAdjustmentsState] = useState({} as IModalAdjustmentsState);
-
   const [editingRow, setEditingRow] = useState<boolean>(false);
+  const [selectedRowKeys, setSelectedRowKeys] = useState<ISelectedRowKeys>({
+    invoices: [],
+    payments: [],
+    discounts: []
+  });
 
   const { data: applicationData, isLoading, mutate } = useApplicationTable();
   const showModal = (adding_type: "invoices" | "payments") => {
@@ -112,6 +122,39 @@ const ApplyTab: React.FC = () => {
     setEditingRow(true);
   };
 
+  const handleSelectChange = useCallback(
+    (tableKey: keyof ISelectedRowKeys, newSelectedRowKeys: React.Key[]) => {
+      setSelectedRowKeys(() => {
+        const updatedSelectedRowKeys: ISelectedRowKeys = {
+          payments: [],
+          invoices: [],
+          discounts: []
+        };
+        updatedSelectedRowKeys[tableKey] = newSelectedRowKeys;
+        return updatedSelectedRowKeys;
+      });
+    },
+    []
+  );
+
+  const rowSelection = (tableKey: keyof ISelectedRowKeys) => ({
+    selectedRowKeys: selectedRowKeys[tableKey],
+    onChange: (newSelectedRowKeys: React.Key[]) => handleSelectChange(tableKey, newSelectedRowKeys)
+  });
+
+  const handlePrintSelectedRows = () => {
+    // I leave this here for future use
+    for (const key in selectedRowKeys) {
+      if (selectedRowKeys.hasOwnProperty(key)) {
+        const typedKey = key as keyof ISelectedRowKeys; // Type assertion to avoid TS error
+        const selectedRows = selectedRowKeys[typedKey];
+        if (selectedRows.length > 0) {
+          console.info(`Selected ${key}:`, selectedRows);
+        }
+      }
+    }
+  };
+
   const dataForCollapse = useMemo(() => {
     const invoices = {
       statusName: "facturas",
@@ -161,6 +204,14 @@ const ApplyTab: React.FC = () => {
                 setSearch(event.target.value);
               }}
             />
+            <Button
+              className={"button__actions"}
+              size="large"
+              icon={<DotsThree size={"1.5rem"} />}
+              onClick={handlePrintSelectedRows}
+            >
+              Generar acción
+            </Button>
           </Flex>
           <Button
             type="primary"
@@ -218,6 +269,7 @@ const ApplyTab: React.FC = () => {
                       data={section.itemsList}
                       handleDeleteRow={handleRemoveRow}
                       handleEditRow={handleEditRow}
+                      rowSelection={rowSelection("invoices")}
                     />
                   )}
                   {section.statusName === "pagos" && (
@@ -225,6 +277,7 @@ const ApplyTab: React.FC = () => {
                       data={section.itemsList}
                       handleDeleteRow={handleRemoveRow}
                       handleEditRow={handleEditRow}
+                      rowSelection={rowSelection("payments")}
                     />
                   )}
                   {section.statusName === "ajustes" && (
@@ -232,6 +285,7 @@ const ApplyTab: React.FC = () => {
                       data={section.itemsList}
                       handleDeleteRow={handleRemoveRow}
                       handleEditRow={handleEditRow}
+                      rowSelection={rowSelection("discounts")}
                     />
                   )}
                 </div>

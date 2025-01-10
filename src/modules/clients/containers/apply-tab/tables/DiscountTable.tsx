@@ -13,9 +13,19 @@ interface DiscountTableProps {
   handleDeleteRow?: (id: number) => void;
   // eslint-disable-next-line no-unused-vars
   handleEditRow: (row_id: number) => void;
+  rowSelection: {
+    selectedRowKeys: React.Key[];
+    // eslint-disable-next-line no-unused-vars
+    onChange: (newSelectedRowKeys: React.Key[], selectedRows: any[]) => void;
+  };
 }
 
-const DiscountTable: React.FC<DiscountTableProps> = ({ data, handleDeleteRow, handleEditRow }) => {
+const DiscountTable: React.FC<DiscountTableProps> = ({
+  data,
+  handleDeleteRow,
+  handleEditRow,
+  rowSelection
+}) => {
   const [activeRow, setActiveRow] = useState<IApplyTabRecord | null>(null);
   const [removeModal, setRemoveModal] = useState(false);
 
@@ -30,7 +40,8 @@ const DiscountTable: React.FC<DiscountTableProps> = ({ data, handleDeleteRow, ha
           return a.financial_discount_id - b.financial_discount_id;
         }
         return 0;
-      }
+      },
+      showSorterTooltip: false
     },
     {
       title: "Tipo de ajuste",
@@ -137,9 +148,10 @@ const DiscountTable: React.FC<DiscountTableProps> = ({ data, handleDeleteRow, ha
     <>
       <Table
         columns={columns}
-        dataSource={data}
+        dataSource={data?.map((data) => ({ ...data, key: data.financial_discount_id }))}
         className="sectionContainerTable"
         pagination={false}
+        rowSelection={rowSelection}
       />
 
       <ModalRemove

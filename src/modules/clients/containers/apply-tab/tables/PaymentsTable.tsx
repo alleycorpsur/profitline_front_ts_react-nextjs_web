@@ -13,10 +13,21 @@ interface PaymentsTableProps {
   handleDeleteRow?: (id: number) => void;
   // eslint-disable-next-line no-unused-vars
   handleEditRow: (row_id: number) => void;
+  rowSelection: {
+    selectedRowKeys: React.Key[];
+    // eslint-disable-next-line no-unused-vars
+    onChange: (newSelectedRowKeys: React.Key[], selectedRows: any[]) => void;
+  };
 }
 
-const PaymentsTable: React.FC<PaymentsTableProps> = ({ data, handleDeleteRow, handleEditRow }) => {
+const PaymentsTable: React.FC<PaymentsTableProps> = ({
+  data,
+  handleDeleteRow,
+  handleEditRow,
+  rowSelection
+}) => {
   const [activeRow, setActiveRow] = useState<IApplyTabRecord | null>(null);
+
   const [removeModal, setRemoveModal] = useState(false);
 
   const columns: TableProps<IApplyTabRecord>["columns"] = [
@@ -25,7 +36,8 @@ const PaymentsTable: React.FC<PaymentsTableProps> = ({ data, handleDeleteRow, ha
       dataIndex: "payment_id",
       key: "payment_id",
       render: (id) => <p className="sectionContainerTable__id">{id}</p>,
-      sorter: (a, b) => a.payment_id - b.payment_id
+      sorter: (a, b) => a.payment_id - b.payment_id,
+      showSorterTooltip: false
     },
     {
       title: "Fecha",
@@ -128,9 +140,10 @@ const PaymentsTable: React.FC<PaymentsTableProps> = ({ data, handleDeleteRow, ha
     <>
       <Table
         columns={columns}
-        dataSource={data}
+        dataSource={data?.map((data) => ({ ...data, key: data.payment_id }))}
         className="sectionContainerTable"
         pagination={false}
+        rowSelection={rowSelection}
       />
 
       <ModalRemove
