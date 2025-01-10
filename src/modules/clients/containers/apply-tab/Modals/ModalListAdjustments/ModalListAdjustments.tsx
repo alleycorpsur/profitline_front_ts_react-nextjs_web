@@ -15,6 +15,8 @@ import CheckboxColoredValues from "@/components/ui/checkbox-colored-values/check
 import { IModalAdjustmentsState } from "../../apply-tab";
 
 import "./modalListAdjustments.scss";
+import ApplyAdjustmentModal from "../ModalApplySpecificAdjustment/ModalApplySpecificAdjustment";
+import ModalApplySpecificAdjustment from "../ModalApplySpecificAdjustment/ModalApplySpecificAdjustment";
 
 interface ModalListAdjustmentsProps {
   visible: boolean;
@@ -45,6 +47,8 @@ const ModalListAdjustments: React.FC<ModalListAdjustmentsProps> = ({
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 7;
+
+  const [isApplyingSpecificAdjustment, setIsApplyingSpecificAdjustment] = useState(false);
 
   const { data, isLoading } = useAcountingAdjustment(clientId, projectId.toString(), 2);
 
@@ -85,6 +89,7 @@ const ModalListAdjustments: React.FC<ModalListAdjustmentsProps> = ({
       );
     } else if (modalAdjustmentsState.adjustmentType === "byInvoice") {
       console.info("by invoice");
+      setIsApplyingSpecificAdjustment(true);
     }
     setLoading(false);
   };
@@ -105,85 +110,105 @@ const ModalListAdjustments: React.FC<ModalListAdjustmentsProps> = ({
   };
 
   return (
-    <Modal
-      open={visible}
-      onCancel={onCancel}
-      footer={null}
-      width={700}
-      className="modal-list-adjustments"
-    >
-      <div onClick={onCancel} className="header">
-        <CaretLeft size={24} onClick={onCancel} />
-        <h2>Agregar ajuste</h2>
-      </div>
-      <h2 className="modal-subtitle">Selecciona los ajustes a aplicar</h2>
-      <div className="search-container">
-        <UiSearchInputLong
-          placeholder="Buscar"
-          className={"custom-input"}
-          value={searchQuery}
-          onChange={(event) => setSearchQuery(event.target.value)}
-        />
-      </div>
-
-      {isLoading ? (
-        <Flex justify="center" style={{ width: "100%", margin: "2rem 0" }}>
-          <Spin />
-        </Flex>
-      ) : (
-        <>
-          <div className="adjustments-list">
-            {paginatedRows?.map((row) => (
-              <CheckboxColoredValues
-                customStyles={{ height: "76px" }}
-                customStyleDivider={{ width: "6px", height: "44px", alignSelf: "center" }}
-                key={row.id}
-                onChangeCheckbox={(e) => {
-                  handleSelectOne(e.target.checked, row);
-                }}
-                checked={selectedRows.some((selected) => selected.id === row.id)}
-                content={
-                  <Flex style={{ width: "100%" }} justify="space-between" align="center">
-                    <Flex vertical>
-                      <h4 className="adjustments-list__title">Nota crédito {row.id}</h4>
-                      <p className="adjustments-list__subtitle">Volumen</p>
-                    </Flex>
-
-                    <Flex vertical>
-                      <h3 className="adjustments-list__amount">{formatMoney(row.current_value)}</h3>
-                      <p className="adjustments-list__subvalue">{formatMoney(row.initial_value)}</p>
-                    </Flex>
-                  </Flex>
-                }
-              />
-            ))}
+    <>
+      {!isApplyingSpecificAdjustment ? (
+        <Modal
+          open={visible}
+          onCancel={onCancel}
+          footer={null}
+          width={700}
+          className="modal-list-adjustments"
+        >
+          <div onClick={onCancel} className="header">
+            <CaretLeft size={24} onClick={onCancel} />
+            <h2>Agregar ajuste</h2>
           </div>
-          <Pagination
-            pageSize={ITEMS_PER_PAGE}
-            current={currentPage}
-            onChange={handlePageChange}
-            total={filteredData?.length}
-            showSizeChanger={false}
-            style={{ textAlign: "right", margin: ".5rem 0" }}
-          />
-        </>
-      )}
-      <div className="create-adjustment">
-        <button onClick={handleCreateAdjustments} className="create-adjustment-btn">
-          <Plus size={20} />
-          Crear ajuste
-        </button>
-      </div>
+          <h2 className="modal-subtitle">Selecciona los ajustes a aplicar</h2>
+          <div className="search-container">
+            <UiSearchInputLong
+              placeholder="Buscar"
+              className={"custom-input"}
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+            />
+          </div>
 
-      <div className="modal-footer">
-        <SecondaryButton fullWidth onClick={onCancel}>
-          Cancelar
-        </SecondaryButton>
-        <PrincipalButton fullWidth onClick={handleAddAdjustments} loading={loading}>
-          Agregar
-        </PrincipalButton>
-      </div>
-    </Modal>
+          {isLoading ? (
+            <Flex justify="center" style={{ width: "100%", margin: "2rem 0" }}>
+              <Spin />
+            </Flex>
+          ) : (
+            <>
+              <div className="adjustments-list">
+                {paginatedRows?.map((row) => (
+                  <CheckboxColoredValues
+                    customStyles={{ height: "76px" }}
+                    customStyleDivider={{ width: "6px", height: "44px", alignSelf: "center" }}
+                    key={row.id}
+                    onChangeCheckbox={(e) => {
+                      handleSelectOne(e.target.checked, row);
+                    }}
+                    checked={selectedRows.some((selected) => selected.id === row.id)}
+                    content={
+                      <Flex style={{ width: "100%" }} justify="space-between" align="center">
+                        <Flex vertical>
+                          <h4 className="adjustments-list__title">Nota crédito {row.id}</h4>
+                          <p className="adjustments-list__subtitle">Volumen</p>
+                        </Flex>
+
+                        <Flex vertical>
+                          <h3 className="adjustments-list__amount">
+                            {formatMoney(row.current_value)}
+                          </h3>
+                          <p className="adjustments-list__subvalue">
+                            {formatMoney(row.initial_value)}
+                          </p>
+                        </Flex>
+                      </Flex>
+                    }
+                  />
+                ))}
+              </div>
+              <Pagination
+                pageSize={ITEMS_PER_PAGE}
+                current={currentPage}
+                onChange={handlePageChange}
+                total={filteredData?.length}
+                showSizeChanger={false}
+                style={{ textAlign: "right", margin: ".5rem 0" }}
+              />
+            </>
+          )}
+          <div className="create-adjustment">
+            <button onClick={handleCreateAdjustments} className="create-adjustment-btn">
+              <Plus size={20} />
+              Crear ajuste
+            </button>
+          </div>
+
+          <div className="modal-footer">
+            <SecondaryButton fullWidth onClick={onCancel}>
+              Cancelar
+            </SecondaryButton>
+            <PrincipalButton
+              fullWidth
+              onClick={handleAddAdjustments}
+              loading={loading}
+              disabled={!selectedRows.length}
+            >
+              Agregar
+            </PrincipalButton>
+          </div>
+        </Modal>
+      ) : (
+        <ModalApplySpecificAdjustment
+          open={isApplyingSpecificAdjustment}
+          onCancel={() => setIsApplyingSpecificAdjustment(false)}
+          selectedAdjustments={selectedRows}
+          setIsOpen={setIsApplyingSpecificAdjustment}
+        />
+      )}
+    </>
   );
 };
 

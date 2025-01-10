@@ -1,0 +1,112 @@
+@import "@styles/variables.scss";
+
+.modalApplySpecificAdjustment {
+    .ant-modal-body {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        gap: 1rem;
+    }
+
+    .header {
+        display: flex;
+        justify-content: left;
+        align-items: center;
+        gap: 0.25rem;
+        transition: all 0.1s;
+        width: fit-content;
+        h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        &:hover {
+            cursor: pointer;
+            opacity: 0.7;
+        }
+    }
+
+    .modal-subtitle {
+        font-size: 1rem;
+        font-weight: 300;
+    }
+
+    .ant-table-thead .ant-table-cell {
+        // padding: 0 0 0.5rem 0;
+        // text-align: center;
+        border: none;
+    }
+
+    .modal-footer {
+        display: grid;
+        margin-top: 16px;
+        gap: 1rem;
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.scrollableTabs {
+    display: flex;
+    overflow-x: auto;
+    white-space: nowrap; // Evita el salto de línea
+
+    &::-webkit-scrollbar {
+        height: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: darkgrey;
+        border-radius: 10px;
+    }
+
+    .tab {
+        flex-shrink: 0;
+        padding: 10px 20px; // Ajusta el padding según la necesidad
+        cursor: pointer; // Hace que el ratón cambie a mano cuando se pasa sobre las pestañas
+        box-sizing: border-box; // Incluye el padding en el cálculo del ancho del elemento
+        border: 1px solid transparent;
+
+        &:hover {
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+    }
+}
+
+.button__number__adjustment {
+    background-color: $background !important;
+    border-radius: 0;
+    border-radius: 0.25rem;
+    font-size: 1rem;
+
+    .ant-input-number-handler-wrap {
+        display: none !important;
+    }
+
+    input {
+        &::placeholder {
+            color: $dark-gray !important;
+        }
+
+        &::-webkit-input-placeholder {
+            color: $dark-gray !important;
+        }
+
+        &:-moz-placeholder {
+            color: $dark-gray !important;
+        }
+
+        &::-moz-placeholder {
+            color: $dark-gray !important;
+        }
+
+        &:-ms-input-placeholder {
+            color: $dark-gray !important;
+        }
+    }
+}
+
+.column__apply__value {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

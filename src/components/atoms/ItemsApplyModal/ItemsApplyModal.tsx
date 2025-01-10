@@ -16,6 +16,7 @@ interface ItemsApplyModalProps {
 }
 
 const ItemApplyModal: FC<ItemsApplyModalProps> = ({ item, type, availableValue }) => {
+  console.log("item", item);
   return (
     <div className="item__apply__modal">
       <div className="head">
