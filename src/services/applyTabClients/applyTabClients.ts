@@ -57,3 +57,33 @@ export const removeItemsFromTable = async (row_id: number) => {
     throw error;
   }
 };
+
+interface ICreateGlobalAdjustment {
+  amount: number;
+  motive: number;
+  description: string;
+}
+
+export const createGlobalAdjustment = async (
+  project_id: number,
+  client_id: number,
+  adjustments: ICreateGlobalAdjustment[]
+) => {
+  const modelData = {
+    project_id,
+    client_id,
+    discounts: adjustments
+  };
+
+  try {
+    const response: GenericResponse<{ applications: number[] }> = await API.post(
+      `${config.API_HOST}/paymentApplication/applications/bulk-discounts`,
+      modelData
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("error addItemsToTable", error);
+    throw error;
+  }
+};
