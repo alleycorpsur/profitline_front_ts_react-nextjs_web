@@ -4,6 +4,7 @@ import { Flex, Modal, Pagination, Spin } from "antd";
 import { CaretLeft, Plus } from "phosphor-react";
 
 import { IFinancialDiscount, useAcountingAdjustment } from "@/hooks/useAcountingAdjustment";
+import { useMessageApi } from "@/context/MessageContext";
 import { useAppStore } from "@/lib/store/store";
 import { extractSingleParam, formatMoney } from "@/utils/utils";
 
@@ -11,12 +12,12 @@ import UiSearchInputLong from "@/components/ui/search-input-long";
 import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
 import SecondaryButton from "@/components/atoms/buttons/secondaryButton/SecondaryButton";
 import CheckboxColoredValues from "@/components/ui/checkbox-colored-values/checkbox-colored-values";
-
+import ModalApplySpecificAdjustment from "../ModalApplySpecificAdjustment/ModalApplySpecificAdjustment";
 import { IModalAdjustmentsState } from "../../apply-tab";
 
+import { IApplyTabRecord } from "@/types/applyTabClients/IApplyTabClients";
+
 import "./modalListAdjustments.scss";
-import ApplyAdjustmentModal from "../ModalApplySpecificAdjustment/ModalApplySpecificAdjustment";
-import ModalApplySpecificAdjustment from "../ModalApplySpecificAdjustment/ModalApplySpecificAdjustment";
 
 interface ModalListAdjustmentsProps {
   visible: boolean;
@@ -30,6 +31,7 @@ interface ModalListAdjustmentsProps {
     selectedIds: number[]
   ) => Promise<void>;
   modalAdjustmentsState: IModalAdjustmentsState;
+  selectedInvoices?: IApplyTabRecord[];
 }
 
 const ModalListAdjustments: React.FC<ModalListAdjustmentsProps> = ({
@@ -37,11 +39,13 @@ const ModalListAdjustments: React.FC<ModalListAdjustmentsProps> = ({
   onCancel,
   setModalAction,
   addGlobalAdjustment,
-  modalAdjustmentsState
+  modalAdjustmentsState,
+  selectedInvoices
 }) => {
   const params = useParams();
   const clientId = extractSingleParam(params.clientId) || "";
   const { ID: projectId } = useAppStore((state) => state.selectedProject);
+  const { showMessage } = useMessageApi();
   const [selectedRows, setSelectedRows] = useState<IFinancialDiscount[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -88,7 +92,13 @@ const ModalListAdjustments: React.FC<ModalListAdjustmentsProps> = ({
         selectedRows.map((row) => row.id)
       );
     } else if (modalAdjustmentsState.adjustmentType === "byInvoice") {
-      console.info("by invoice");
+      // rectify there are invoices selected
+      if (!selectedInvoices?.length || !selectedInvoices[0].id_erp) {
+        showMessage("error", "No hay facturas seleccionadas");
+        setLoading(false);
+        return;
+      }
+
       setIsApplyingSpecificAdjustment(true);
     }
     setLoading(false);
@@ -206,6 +216,7 @@ const ModalListAdjustments: React.FC<ModalListAdjustmentsProps> = ({
           onCancel={() => setIsApplyingSpecificAdjustment(false)}
           selectedAdjustments={selectedRows}
           setIsOpen={setIsApplyingSpecificAdjustment}
+          selectedInvoices={selectedInvoices}
         />
       )}
     </>

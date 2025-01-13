@@ -11,6 +11,8 @@ import ItemApplyModal from "@/components/atoms/ItemsApplyModal/ItemsApplyModal";
 import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
 import SecondaryButton from "@/components/atoms/buttons/secondaryButton/SecondaryButton";
 
+import { IApplyTabRecord } from "@/types/applyTabClients/IApplyTabClients";
+
 import "./modalApplySpecificAdjustment.scss";
 
 interface Props {
@@ -18,6 +20,7 @@ interface Props {
   onCancel: () => void;
   selectedAdjustments: IFinancialDiscount[];
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  selectedInvoices?: IApplyTabRecord[];
 }
 
 interface ICurrentInvoice {
@@ -31,10 +34,19 @@ const ModalApplySpecificAdjustment = ({
   open,
   onCancel,
   selectedAdjustments,
-  setIsOpen
+  setIsOpen,
+  selectedInvoices
 }: Props) => {
   const [selectTab, setSelectTab] = useState(0);
-  const [currentInvoices, setCurrentInvoices] = useState<ICurrentInvoice[]>(mockInvoices);
+  console.log("selectedInvoices", selectedInvoices);
+  const [currentInvoices, setCurrentInvoices] = useState<ICurrentInvoice[]>(
+    selectedInvoices?.map((invoice) => ({
+      id: invoice.id,
+      id_erp: invoice.id_erp,
+      current_value: invoice.current_value,
+      new_balance: invoice.current_value
+    })) ?? []
+  );
   const [currentAdjustment, setCurrentAdjustment] = useState<number[]>(
     selectedAdjustments.map((note) => note.current_value)
   );
@@ -134,8 +146,8 @@ const ModalApplySpecificAdjustment = ({
   const columns: ColumnsType<ICurrentInvoice> = [
     {
       title: "ID Factura",
-      dataIndex: "id",
-      key: "id"
+      dataIndex: "id_erp",
+      key: "id_erp"
     },
     {
       title: "Pendiente",
@@ -176,6 +188,8 @@ const ModalApplySpecificAdjustment = ({
             handleApplyValueChange(isNaN(parsedValue) ? 0 : parsedValue, record);
           }}
           className="button__number__adjustment"
+          placeholder="Ingresar valor"
+          style={{ textAlign: "right" }}
         />
       )
     }
@@ -235,24 +249,3 @@ const ModalApplySpecificAdjustment = ({
 };
 
 export default ModalApplySpecificAdjustment;
-
-const mockInvoices = [
-  {
-    id: 1,
-    id_erp: "123456",
-    current_value: 1000000,
-    new_balance: 1000000
-  },
-  {
-    id: 2,
-    id_erp: "123457",
-    current_value: 2000000,
-    new_balance: 2000000
-  },
-  {
-    id: 3,
-    id_erp: "123458",
-    current_value: 300000,
-    new_balance: 300000
-  }
-];

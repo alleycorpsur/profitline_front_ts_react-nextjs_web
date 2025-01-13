@@ -24,6 +24,8 @@ import ModalListAdjustments from "./Modals/ModalListAdjustments/ModalListAdjustm
 import ModalCreateAdjustment from "./Modals/ModalCreateAdjustment/ModalCreateAdjustment";
 import ModalEditRow from "./Modals/ModalEditRow/ModalEditRow";
 
+import { IApplyTabRecord } from "@/types/applyTabClients/IApplyTabClients";
+
 import "./apply-tab.scss";
 
 interface ISelectedRowKeys {
@@ -64,6 +66,7 @@ const ApplyTab: React.FC = () => {
     payments: [],
     discounts: []
   });
+  const [selectedRows, setSelectedRows] = useState<IApplyTabRecord[]>();
 
   const { data: applicationData, isLoading, mutate } = useApplicationTable();
   const showModal = (adding_type: "invoices" | "payments") => {
@@ -139,7 +142,10 @@ const ApplyTab: React.FC = () => {
 
   const rowSelection = (tableKey: keyof ISelectedRowKeys) => ({
     selectedRowKeys: selectedRowKeys[tableKey],
-    onChange: (newSelectedRowKeys: React.Key[]) => handleSelectChange(tableKey, newSelectedRowKeys)
+    onChange: (newSelectedRowKeys: React.Key[], newSelectedRows: any) => {
+      setSelectedRows(newSelectedRows);
+      return handleSelectChange(tableKey, newSelectedRowKeys);
+    }
   });
 
   const handlePrintSelectedRows = () => {
@@ -336,6 +342,7 @@ const ApplyTab: React.FC = () => {
         }}
         addGlobalAdjustment={handleAdd}
         modalAdjustmentsState={modalAdjustmentsState}
+        selectedInvoices={selectedRows}
       />
       <ModalCreateAdjustment
         isOpen={

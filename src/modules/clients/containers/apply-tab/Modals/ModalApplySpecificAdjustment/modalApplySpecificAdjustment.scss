@@ -77,12 +77,14 @@
     border-radius: 0;
     border-radius: 0.25rem;
     font-size: 1rem;
+    min-width: 130px !important;
 
     .ant-input-number-handler-wrap {
         display: none !important;
     }
 
     input {
+        text-align: right !important;
         &::placeholder {
             color: $dark-gray !important;
         }
