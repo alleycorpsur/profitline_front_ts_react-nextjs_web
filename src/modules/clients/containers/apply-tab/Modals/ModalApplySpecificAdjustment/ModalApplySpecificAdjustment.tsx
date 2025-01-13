@@ -1,18 +1,17 @@
-import React, { useState, Dispatch, SetStateAction } from "react";
-import { Modal, Table, InputNumber, Button } from "antd";
+import React, { useState } from "react";
+import { Modal, Table, InputNumber } from "antd";
 import { ColumnsType } from "antd/es/table";
+import { CaretLeft, CopySimple } from "phosphor-react";
 
 import { IFinancialDiscount } from "@/hooks/useAcountingAdjustment";
+import { formatMoney } from "@/utils/utils";
 
 import UiTabs from "@/components/ui/ui-tabs";
 import ItemApplyModal from "@/components/atoms/ItemsApplyModal/ItemsApplyModal";
-
-import "./modalApplySpecificAdjustment.scss";
-import loading from "@/app/banco/loading";
 import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
 import SecondaryButton from "@/components/atoms/buttons/secondaryButton/SecondaryButton";
-import { CaretLeft, CopySimple } from "phosphor-react";
-import { formatMoney } from "@/utils/utils";
+
+import "./modalApplySpecificAdjustment.scss";
 
 interface Props {
   open: boolean;
@@ -39,7 +38,6 @@ const ModalApplySpecificAdjustment = ({
   const [currentAdjustment, setCurrentAdjustment] = useState<number[]>(
     selectedAdjustments.map((note) => note.current_value)
   );
-  console.log("selectedAdjustments", selectedAdjustments);
   const [applyValues, setApplyValues] = useState<{
     [key: string]: {
       balanceToApply: number;
@@ -54,13 +52,20 @@ const ModalApplySpecificAdjustment = ({
           (apply) => apply.idAdjustment === selectedAdjustments[index].id
         )?.balanceToApply ?? 0;
 
-      let newValue: number;
-      if (record.new_balance < valueApplied) {
-        newValue = prev[index] - record.new_balance;
-      } else {
-        newValue = prev[index] + previousValue - valueApplied;
+      // set the new value to the current adjustment
+      let newValue = prev[index];
+      if (valueApplied > previousValue) {
+        // If the new value is greater than the previous value, decrease the adjustment
+        newValue = prev[index] - (valueApplied - previousValue);
+      } else if (valueApplied < previousValue) {
+        // If the new value is less, increase the adjustment
+        newValue = prev[index] + (previousValue - valueApplied);
       }
-      return prev.map((value, i) => (i === index ? Math.max(0, newValue) : value));
+
+      // Ensure the new value doesn't go below zero
+      newValue = Math.max(0, newValue);
+
+      return prev.map((value, i) => (i === index ? newValue : value));
     });
   };
 
@@ -69,6 +74,7 @@ const ModalApplySpecificAdjustment = ({
       applyValues[record.id]?.find(
         (apply) => apply.idAdjustment === selectedAdjustments[selectTab].id
       )?.balanceToApply ?? 0;
+
     if (value && value > currentAdjustment[selectTab] && previousValue <= 0) {
       value = 0;
     }
@@ -96,7 +102,7 @@ const ModalApplySpecificAdjustment = ({
           const difference = maxApplicableValue - previousValue;
           return {
             ...invoice,
-            newBalance: invoice.new_balance - difference
+            new_balance: invoice.new_balance - difference
           };
         }
         return invoice;
@@ -158,8 +164,13 @@ const ModalApplySpecificAdjustment = ({
               (apply) => apply.idAdjustment === selectedAdjustments[selectTab]?.id
             )?.balanceToApply
           }
-          formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ".")}
+          formatter={(value) => {
+            if (!value) return ""; // Prevent formatting null/undefined values
+            return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "."); // Format properly for thousands separators
+          }}
+          parser={(value) => Number(value?.replace(/\./g, "") || 0)}
           onBlur={(event) => {
+            console.log("target", event.target.value);
             const rawValue = event.target.value.replace(/\./g, "");
             const parsedValue = parseFloat(rawValue);
             handleApplyValueChange(isNaN(parsedValue) ? 0 : parsedValue, record);
@@ -209,7 +220,7 @@ const ModalApplySpecificAdjustment = ({
         Pegar desde excel
       </div>
 
-      <Table dataSource={mockInvoices} columns={columns} pagination={false} rowKey="id" />
+      <Table dataSource={currentInvoices} columns={columns} pagination={false} rowKey="id" />
 
       <div className="modal-footer">
         <SecondaryButton fullWidth onClick={onCancel}>
@@ -229,19 +240,19 @@ const mockInvoices = [
   {
     id: 1,
     id_erp: "123456",
-    current_value: 1000,
-    new_balance: 1000
+    current_value: 1000000,
+    new_balance: 1000000
   },
   {
     id: 2,
     id_erp: "123457",
-    current_value: 2000,
-    new_balance: 2000
+    current_value: 2000000,
+    new_balance: 2000000
   },
   {
     id: 3,
     id_erp: "123458",
-    current_value: 3000,
-    new_balance: 3000
+    current_value: 300000,
+    new_balance: 300000
   }
 ];
