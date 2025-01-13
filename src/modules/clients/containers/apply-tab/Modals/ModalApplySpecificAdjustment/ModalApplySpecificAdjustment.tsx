@@ -1,10 +1,14 @@
 import React, { useState } from "react";
+import { useParams } from "next/navigation";
 import { Modal, Table, InputNumber } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { CaretLeft, CopySimple } from "phosphor-react";
 
+import { useMessageApi } from "@/context/MessageContext";
+import { useAppStore } from "@/lib/store/store";
 import { IFinancialDiscount } from "@/hooks/useAcountingAdjustment";
-import { formatMoney } from "@/utils/utils";
+import { extractSingleParam, formatMoney } from "@/utils/utils";
+import { addSpecificAdjustments } from "@/services/applyTabClients/applyTabClients";
 
 import UiTabs from "@/components/ui/ui-tabs";
 import ItemApplyModal from "@/components/atoms/ItemsApplyModal/ItemsApplyModal";
@@ -17,9 +21,9 @@ import "./modalApplySpecificAdjustment.scss";
 
 interface Props {
   open: boolean;
-  onCancel: () => void;
+  // eslint-disable-next-line no-unused-vars
+  onCancel: (succesfullyApplied?: boolean) => void;
   selectedAdjustments: IFinancialDiscount[];
-  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   selectedInvoices?: IApplyTabRecord[];
 }
 
@@ -34,19 +38,22 @@ const ModalApplySpecificAdjustment = ({
   open,
   onCancel,
   selectedAdjustments,
-  setIsOpen,
   selectedInvoices
 }: Props) => {
+  const params = useParams();
+  const clientId = extractSingleParam(params.clientId) || "";
+  const { ID: projectId } = useAppStore((state) => state.selectedProject);
+  const { showMessage } = useMessageApi();
   const [selectTab, setSelectTab] = useState(0);
-  console.log("selectedInvoices", selectedInvoices);
   const [currentInvoices, setCurrentInvoices] = useState<ICurrentInvoice[]>(
     selectedInvoices?.map((invoice) => ({
-      id: invoice.id,
+      id: invoice.financial_record_id ?? 0,
       id_erp: invoice.id_erp,
       current_value: invoice.current_value,
       new_balance: invoice.current_value
     })) ?? []
   );
+
   const [currentAdjustment, setCurrentAdjustment] = useState<number[]>(
     selectedAdjustments.map((note) => note.current_value)
   );
@@ -56,6 +63,7 @@ const ModalApplySpecificAdjustment = ({
       idAdjustment: number;
     }[];
   }>({});
+  const [loadingRequest, setLoadingRequest] = useState(false);
 
   const handleValueChange = (valueApplied: number, index: number, record: ICurrentInvoice) => {
     setCurrentAdjustment((prev) => {
@@ -123,14 +131,26 @@ const ModalApplySpecificAdjustment = ({
     handleValueChange(value ?? 0, selectTab, record);
   };
 
-  const handleApplyAdjustment = () => {
-    console.log(selectedAdjustments);
-    const data = selectedAdjustments.map((note, index) => ({
-      id: note.id,
-      valueApplied: currentAdjustment[index]
-    }));
-    console.log(data);
-    // onApply(data);
+  const handleApplyAdjustment = async () => {
+    setLoadingRequest(true);
+    try {
+      await addSpecificAdjustments(projectId, clientId, {
+        adjustment_data: currentInvoices.map((invoice) => ({
+          invoice_id: invoice.id,
+          discounts: applyValues[invoice.id]?.map((apply) => ({
+            id: apply.idAdjustment,
+            balanceToApply: apply.balanceToApply
+          }))
+        })),
+        type: 11
+      });
+
+      showMessage("success", "Ajuste aplicado correctamente");
+      onCancel(true);
+    } catch (error) {
+      showMessage("error", "Error al aplicar el ajuste");
+    }
+    setLoadingRequest(false);
   };
 
   const handlePasteInvoices = async () => {
@@ -182,7 +202,6 @@ const ModalApplySpecificAdjustment = ({
           }}
           parser={(value) => Number(value?.replace(/\./g, "") || 0)}
           onBlur={(event) => {
-            console.log("target", event.target.value);
             const rawValue = event.target.value.replace(/\./g, "");
             const parsedValue = parseFloat(rawValue);
             handleApplyValueChange(isNaN(parsedValue) ? 0 : parsedValue, record);
@@ -200,11 +219,11 @@ const ModalApplySpecificAdjustment = ({
       className="modalApplySpecificAdjustment"
       width={680}
       open={open}
-      onCancel={onCancel}
+      onCancel={() => onCancel()}
       footer={null}
     >
-      <div onClick={onCancel} className="header">
-        <CaretLeft size={24} onClick={onCancel} />
+      <div onClick={() => onCancel()} className="header">
+        <CaretLeft size={24} onClick={() => onCancel()} />
         <h2>Aplicar ajuste</h2>
       </div>
       <h2 className="modal-subtitle">Define el monto a aplicar a cada factura</h2>
@@ -237,10 +256,10 @@ const ModalApplySpecificAdjustment = ({
       <Table dataSource={currentInvoices} columns={columns} pagination={false} rowKey="id" />
 
       <div className="modal-footer">
-        <SecondaryButton fullWidth onClick={onCancel}>
+        <SecondaryButton fullWidth onClick={() => onCancel()}>
           Cancelar
         </SecondaryButton>
-        <PrincipalButton fullWidth onClick={handleApplyAdjustment} loading={false}>
+        <PrincipalButton fullWidth onClick={handleApplyAdjustment} loading={loadingRequest}>
           Agregar
         </PrincipalButton>
       </div>

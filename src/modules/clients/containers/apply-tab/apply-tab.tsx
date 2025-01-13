@@ -327,13 +327,22 @@ const ApplyTab: React.FC = () => {
         visible={
           modalAdjustmentsState && modalAdjustmentsState.isOpen && modalAdjustmentsState.modal === 2
         }
-        onCancel={() =>
-          setModalAdjustmentsState({
-            isOpen: true,
-            modal: 1,
-            adjustmentType: undefined
-          })
-        }
+        onCancel={(succesfullyApplied) => {
+          if (succesfullyApplied) {
+            mutate();
+            setModalAdjustmentsState({
+              isOpen: false,
+              modal: 0,
+              adjustmentType: undefined
+            });
+          } else {
+            setModalAdjustmentsState({
+              isOpen: true,
+              modal: 1,
+              adjustmentType: undefined
+            });
+          }
+        }}
         setModalAction={(e: number) => {
           setModalAdjustmentsState({
             isOpen: true,

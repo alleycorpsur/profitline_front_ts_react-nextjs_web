@@ -21,7 +21,8 @@ import "./modalListAdjustments.scss";
 
 interface ModalListAdjustmentsProps {
   visible: boolean;
-  onCancel: () => void;
+  // eslint-disable-next-line no-unused-vars
+  onCancel: (actionAplied?: boolean) => void;
   // eslint-disable-next-line no-unused-vars
   setModalAction: (modalAction: number) => void;
   addGlobalAdjustment: (
@@ -124,13 +125,13 @@ const ModalListAdjustments: React.FC<ModalListAdjustmentsProps> = ({
       {!isApplyingSpecificAdjustment ? (
         <Modal
           open={visible}
-          onCancel={onCancel}
+          onCancel={() => onCancel()}
           footer={null}
           width={700}
           className="modal-list-adjustments"
         >
-          <div onClick={onCancel} className="header">
-            <CaretLeft size={24} onClick={onCancel} />
+          <div onClick={() => onCancel()} className="header">
+            <CaretLeft size={24} />
             <h2>Agregar ajuste</h2>
           </div>
           <h2 className="modal-subtitle">Selecciona los ajustes a aplicar</h2>
@@ -197,7 +198,7 @@ const ModalListAdjustments: React.FC<ModalListAdjustmentsProps> = ({
           </div>
 
           <div className="modal-footer">
-            <SecondaryButton fullWidth onClick={onCancel}>
+            <SecondaryButton fullWidth onClick={() => onCancel()}>
               Cancelar
             </SecondaryButton>
             <PrincipalButton
@@ -213,9 +214,13 @@ const ModalListAdjustments: React.FC<ModalListAdjustmentsProps> = ({
       ) : (
         <ModalApplySpecificAdjustment
           open={isApplyingSpecificAdjustment}
-          onCancel={() => setIsApplyingSpecificAdjustment(false)}
+          onCancel={(succesfullyApplied?: boolean) => {
+            setIsApplyingSpecificAdjustment(false);
+            if (succesfullyApplied) {
+              onCancel(true);
+            }
+          }}
           selectedAdjustments={selectedRows}
-          setIsOpen={setIsApplyingSpecificAdjustment}
           selectedInvoices={selectedInvoices}
         />
       )}
