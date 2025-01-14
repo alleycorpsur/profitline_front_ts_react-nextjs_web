@@ -13,9 +13,20 @@ interface InvoiceTableProps {
   handleDeleteRow?: (id: number) => void;
   // eslint-disable-next-line no-unused-vars
   handleEditRow: (row_id: number) => void;
+  // eslint-disable-next-line no-unused-vars
+  rowSelection: {
+    selectedRowKeys: React.Key[];
+    // eslint-disable-next-line no-unused-vars
+    onChange: (newSelectedRowKeys: React.Key[], selectedRows: any[]) => void;
+  };
 }
 
-const InvoiceTable: React.FC<InvoiceTableProps> = ({ data, handleDeleteRow, handleEditRow }) => {
+const InvoiceTable: React.FC<InvoiceTableProps> = ({
+  data,
+  handleDeleteRow,
+  handleEditRow,
+  rowSelection
+}) => {
   const [activeRow, setActiveRow] = useState<IApplyTabRecord | null>(null);
   const [removeModal, setRemoveModal] = useState(false);
 
@@ -42,7 +53,8 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ data, handleDeleteRow, hand
       key: "initial_value",
       render: (initial_value) => <p>{formatMoney(initial_value)}</p>,
       sorter: (a, b) => a.initial_value - b.initial_value,
-      showSorterTooltip: false
+      showSorterTooltip: false,
+      align: "right"
     },
     {
       title: "Pago",
@@ -50,7 +62,8 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ data, handleDeleteRow, hand
       key: "amount",
       render: (amount) => <p>{formatMoney(amount)}</p>,
       sorter: (a, b) => a.amount - b.amount,
-      showSorterTooltip: false
+      showSorterTooltip: false,
+      align: "right"
     },
     {
       title: "Ajuste",
@@ -63,7 +76,8 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ data, handleDeleteRow, hand
       key: "current_value",
       render: (current_value) => <p>{formatMoney(current_value)}</p>,
       sorter: (a, b) => a.current_value - b.current_value,
-      showSorterTooltip: false
+      showSorterTooltip: false,
+      align: "right"
     },
     {
       title: "Detalle",
@@ -134,9 +148,10 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ data, handleDeleteRow, hand
     <>
       <Table
         columns={columns}
-        dataSource={data}
+        dataSource={data?.map((data) => ({ ...data, key: data.id }))}
         className="sectionContainerTable"
         pagination={false}
+        rowSelection={rowSelection}
       />
 
       <ModalRemove

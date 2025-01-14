@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from "react";
-import { Plus } from "phosphor-react";
+import React, { useCallback, useMemo, useState } from "react";
+import { DotsThree, Plus } from "phosphor-react";
 import { Button, Flex, Spin } from "antd";
 
 import { useApplicationTable } from "@/hooks/useApplicationTable";
@@ -24,7 +24,15 @@ import ModalListAdjustments from "./Modals/ModalListAdjustments/ModalListAdjustm
 import ModalCreateAdjustment from "./Modals/ModalCreateAdjustment/ModalCreateAdjustment";
 import ModalEditRow from "./Modals/ModalEditRow/ModalEditRow";
 
+import { IApplyTabRecord } from "@/types/applyTabClients/IApplyTabClients";
+
 import "./apply-tab.scss";
+
+interface ISelectedRowKeys {
+  invoices: React.Key[];
+  payments: React.Key[];
+  discounts: React.Key[];
+}
 
 export interface IModalAddToTableOpen {
   isOpen: boolean;
@@ -52,8 +60,13 @@ const ApplyTab: React.FC = () => {
   );
 
   const [modalAdjustmentsState, setModalAdjustmentsState] = useState({} as IModalAdjustmentsState);
-
   const [editingRow, setEditingRow] = useState<boolean>(false);
+  const [selectedRowKeys, setSelectedRowKeys] = useState<ISelectedRowKeys>({
+    invoices: [],
+    payments: [],
+    discounts: []
+  });
+  const [selectedRows, setSelectedRows] = useState<IApplyTabRecord[]>();
 
   const { data: applicationData, isLoading, mutate } = useApplicationTable();
   const showModal = (adding_type: "invoices" | "payments") => {
@@ -112,6 +125,42 @@ const ApplyTab: React.FC = () => {
     setEditingRow(true);
   };
 
+  const handleSelectChange = useCallback(
+    (tableKey: keyof ISelectedRowKeys, newSelectedRowKeys: React.Key[]) => {
+      setSelectedRowKeys(() => {
+        const updatedSelectedRowKeys: ISelectedRowKeys = {
+          payments: [],
+          invoices: [],
+          discounts: []
+        };
+        updatedSelectedRowKeys[tableKey] = newSelectedRowKeys;
+        return updatedSelectedRowKeys;
+      });
+    },
+    []
+  );
+
+  const rowSelection = (tableKey: keyof ISelectedRowKeys) => ({
+    selectedRowKeys: selectedRowKeys[tableKey],
+    onChange: (newSelectedRowKeys: React.Key[], newSelectedRows: any) => {
+      setSelectedRows(newSelectedRows);
+      return handleSelectChange(tableKey, newSelectedRowKeys);
+    }
+  });
+
+  const handlePrintSelectedRows = () => {
+    // I leave this here for future use
+    for (const key in selectedRowKeys) {
+      if (selectedRowKeys.hasOwnProperty(key)) {
+        const typedKey = key as keyof ISelectedRowKeys; // Type assertion to avoid TS error
+        const selectedRows = selectedRowKeys[typedKey];
+        if (selectedRows.length > 0) {
+          console.info(`Selected ${key}:`, selectedRows);
+        }
+      }
+    }
+  };
+
   const dataForCollapse = useMemo(() => {
     const invoices = {
       statusName: "facturas",
@@ -152,7 +201,7 @@ const ApplyTab: React.FC = () => {
         total={applicationData?.summary.total_balance}
       />
       <div className="applyContainerTab">
-        <Flex justify="space-between" className="accountingAdjustmentsTab__header">
+        <Flex justify="space-between" className="applyContainerTab__header">
           <Flex gap={"0.5rem"}>
             <UiSearchInput
               className="search"
@@ -161,10 +210,18 @@ const ApplyTab: React.FC = () => {
                 setSearch(event.target.value);
               }}
             />
+            <Button
+              className="button__actions"
+              size="large"
+              icon={<DotsThree size={"1.5rem"} />}
+              onClick={handlePrintSelectedRows}
+            >
+              Generar acción
+            </Button>
           </Flex>
           <Button
             type="primary"
-            className="availableAdjustments"
+            className="save-btn"
             onClick={() => console.log("click ajustes disponibles")}
           >
             Guardar
@@ -218,6 +275,7 @@ const ApplyTab: React.FC = () => {
                       data={section.itemsList}
                       handleDeleteRow={handleRemoveRow}
                       handleEditRow={handleEditRow}
+                      rowSelection={rowSelection("invoices")}
                     />
                   )}
                   {section.statusName === "pagos" && (
@@ -225,6 +283,7 @@ const ApplyTab: React.FC = () => {
                       data={section.itemsList}
                       handleDeleteRow={handleRemoveRow}
                       handleEditRow={handleEditRow}
+                      rowSelection={rowSelection("payments")}
                     />
                   )}
                   {section.statusName === "ajustes" && (
@@ -232,6 +291,7 @@ const ApplyTab: React.FC = () => {
                       data={section.itemsList}
                       handleDeleteRow={handleRemoveRow}
                       handleEditRow={handleEditRow}
+                      rowSelection={rowSelection("discounts")}
                     />
                   )}
                 </div>
@@ -267,13 +327,22 @@ const ApplyTab: React.FC = () => {
         visible={
           modalAdjustmentsState && modalAdjustmentsState.isOpen && modalAdjustmentsState.modal === 2
         }
-        onCancel={() =>
-          setModalAdjustmentsState({
-            isOpen: true,
-            modal: 1,
-            adjustmentType: undefined
-          })
-        }
+        onCancel={(succesfullyApplied) => {
+          if (succesfullyApplied) {
+            mutate();
+            setModalAdjustmentsState({
+              isOpen: false,
+              modal: 0,
+              adjustmentType: undefined
+            });
+          } else {
+            setModalAdjustmentsState({
+              isOpen: true,
+              modal: 1,
+              adjustmentType: undefined
+            });
+          }
+        }}
         setModalAction={(e: number) => {
           setModalAdjustmentsState({
             isOpen: true,
@@ -282,6 +351,7 @@ const ApplyTab: React.FC = () => {
         }}
         addGlobalAdjustment={handleAdd}
         modalAdjustmentsState={modalAdjustmentsState}
+        selectedInvoices={selectedRows}
       />
       <ModalCreateAdjustment
         isOpen={

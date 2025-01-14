@@ -1,23 +1,7 @@
-import { GenericResponse } from "@/types/global/IGlobal";
+import axios from "axios";
 import config from "@/config";
-import { API } from "@/utils/api/api";
-import { IApplyTabClients } from "@/types/applyTabClients/IApplyTabClients";
-
-// Hacerlo en SWR para poder usar mutate
-export const getApplication = async (
-  project_id: number,
-  client_id: number
-): Promise<IApplyTabClients> => {
-  try {
-    const response: GenericResponse<IApplyTabClients> = await API.get(
-      `${config.API_HOST}/paymentApplication/applications/?project_id=${project_id}&client_id=${client_id}`
-    );
-
-    return response.data;
-  } catch (error) {
-    return Promise.reject(error);
-  }
-};
+import { API, getIdToken } from "@/utils/api/api";
+import { GenericResponse } from "@/types/global/IGlobal";
 
 export const addItemsToTable = async (
   project_id: number,
@@ -84,6 +68,53 @@ export const createGlobalAdjustment = async (
     return response.data;
   } catch (error) {
     console.error("error addItemsToTable", error);
+    throw error;
+  }
+};
+
+interface IDiscount {
+  id: number;
+  balanceToApply: number;
+}
+
+interface IAdjustmentData {
+  invoice_id: number;
+  discounts: IDiscount[];
+}
+
+interface ISpecificAdjustment {
+  adjustment_data: IAdjustmentData[];
+  type: number;
+}
+
+export const addSpecificAdjustments = async (
+  project_id: number,
+  client_id: string,
+  data: ISpecificAdjustment
+) => {
+  const token = await getIdToken();
+  const formData = new FormData();
+
+  for (const key in data) {
+    formData.append(key, JSON.stringify(data[key as keyof ISpecificAdjustment]));
+  }
+
+  try {
+    const response: GenericResponse<{ applications: number[] }> = await axios.post(
+      `${config.API_HOST}/paymentApplication/projects/${project_id}/clients/${client_id}/adjustments`,
+      formData,
+      {
+        headers: {
+          Accept: "application/json, text/plain, */*",
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("error addSpecificAdjustments", error);
     throw error;
   }
 };

@@ -13,9 +13,19 @@ interface DiscountTableProps {
   handleDeleteRow?: (id: number) => void;
   // eslint-disable-next-line no-unused-vars
   handleEditRow: (row_id: number) => void;
+  rowSelection: {
+    selectedRowKeys: React.Key[];
+    // eslint-disable-next-line no-unused-vars
+    onChange: (newSelectedRowKeys: React.Key[], selectedRows: any[]) => void;
+  };
 }
 
-const DiscountTable: React.FC<DiscountTableProps> = ({ data, handleDeleteRow, handleEditRow }) => {
+const DiscountTable: React.FC<DiscountTableProps> = ({
+  data,
+  handleDeleteRow,
+  handleEditRow,
+  rowSelection
+}) => {
   const [activeRow, setActiveRow] = useState<IApplyTabRecord | null>(null);
   const [removeModal, setRemoveModal] = useState(false);
 
@@ -30,7 +40,8 @@ const DiscountTable: React.FC<DiscountTableProps> = ({ data, handleDeleteRow, ha
           return a.financial_discount_id - b.financial_discount_id;
         }
         return 0;
-      }
+      },
+      showSorterTooltip: false
     },
     {
       title: "Tipo de ajuste",
@@ -49,7 +60,8 @@ const DiscountTable: React.FC<DiscountTableProps> = ({ data, handleDeleteRow, ha
       key: "amount",
       render: (amount) => <p>{formatMoney(amount)}</p>,
       sorter: (a, b) => a.amount - b.amount,
-      showSorterTooltip: false
+      showSorterTooltip: false,
+      align: "right"
     },
     {
       title: "Monto aplicado",
@@ -57,7 +69,8 @@ const DiscountTable: React.FC<DiscountTableProps> = ({ data, handleDeleteRow, ha
       key: "applied_amount",
       render: (applied_amount) => <p>{formatMoney(applied_amount)}</p>,
       sorter: (a, b) => a.applied_amount - b.applied_amount,
-      showSorterTooltip: false
+      showSorterTooltip: false,
+      align: "right"
     },
     {
       title: "Saldo",
@@ -65,7 +78,8 @@ const DiscountTable: React.FC<DiscountTableProps> = ({ data, handleDeleteRow, ha
       key: "current_value",
       render: (current_value) => <p>{formatMoney(current_value)}</p>,
       sorter: (a, b) => a.current_value - b.current_value,
-      showSorterTooltip: false
+      showSorterTooltip: false,
+      align: "right"
     },
     {
       title: "Detalle",
@@ -137,9 +151,10 @@ const DiscountTable: React.FC<DiscountTableProps> = ({ data, handleDeleteRow, ha
     <>
       <Table
         columns={columns}
-        dataSource={data}
+        dataSource={data?.map((data) => ({ ...data, key: data.financial_discount_id }))}
         className="sectionContainerTable"
         pagination={false}
+        rowSelection={rowSelection}
       />
 
       <ModalRemove
