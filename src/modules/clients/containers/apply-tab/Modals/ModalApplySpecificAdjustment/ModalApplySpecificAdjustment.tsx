@@ -167,7 +167,8 @@ const ModalApplySpecificAdjustment = ({
     {
       title: "ID Factura",
       dataIndex: "id_erp",
-      key: "id_erp"
+      key: "id_erp",
+      render: (id_erp) => <p className="sectionContainerTable__id">{id_erp}</p>
     },
     {
       title: "Pendiente",

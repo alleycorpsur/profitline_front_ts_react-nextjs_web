@@ -201,7 +201,7 @@ const ApplyTab: React.FC = () => {
         total={applicationData?.summary.total_balance}
       />
       <div className="applyContainerTab">
-        <Flex justify="space-between" className="accountingAdjustmentsTab__header">
+        <Flex justify="space-between" className="applyContainerTab__header">
           <Flex gap={"0.5rem"}>
             <UiSearchInput
               className="search"
@@ -211,7 +211,7 @@ const ApplyTab: React.FC = () => {
               }}
             />
             <Button
-              className={"button__actions"}
+              className="button__actions"
               size="large"
               icon={<DotsThree size={"1.5rem"} />}
               onClick={handlePrintSelectedRows}
@@ -221,7 +221,7 @@ const ApplyTab: React.FC = () => {
           </Flex>
           <Button
             type="primary"
-            className="availableAdjustments"
+            className="save-btn"
             onClick={() => console.log("click ajustes disponibles")}
           >
             Guardar

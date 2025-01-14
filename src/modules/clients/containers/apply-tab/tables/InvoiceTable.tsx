@@ -53,7 +53,8 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
       key: "initial_value",
       render: (initial_value) => <p>{formatMoney(initial_value)}</p>,
       sorter: (a, b) => a.initial_value - b.initial_value,
-      showSorterTooltip: false
+      showSorterTooltip: false,
+      align: "right"
     },
     {
       title: "Pago",
@@ -61,7 +62,8 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
       key: "amount",
       render: (amount) => <p>{formatMoney(amount)}</p>,
       sorter: (a, b) => a.amount - b.amount,
-      showSorterTooltip: false
+      showSorterTooltip: false,
+      align: "right"
     },
     {
       title: "Ajuste",
@@ -74,7 +76,8 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
       key: "current_value",
       render: (current_value) => <p>{formatMoney(current_value)}</p>,
       sorter: (a, b) => a.current_value - b.current_value,
-      showSorterTooltip: false
+      showSorterTooltip: false,
+      align: "right"
     },
     {
       title: "Detalle",

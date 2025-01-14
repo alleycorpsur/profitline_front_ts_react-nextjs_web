@@ -60,7 +60,8 @@ const DiscountTable: React.FC<DiscountTableProps> = ({
       key: "amount",
       render: (amount) => <p>{formatMoney(amount)}</p>,
       sorter: (a, b) => a.amount - b.amount,
-      showSorterTooltip: false
+      showSorterTooltip: false,
+      align: "right"
     },
     {
       title: "Monto aplicado",
@@ -68,7 +69,8 @@ const DiscountTable: React.FC<DiscountTableProps> = ({
       key: "applied_amount",
       render: (applied_amount) => <p>{formatMoney(applied_amount)}</p>,
       sorter: (a, b) => a.applied_amount - b.applied_amount,
-      showSorterTooltip: false
+      showSorterTooltip: false,
+      align: "right"
     },
     {
       title: "Saldo",
@@ -76,7 +78,8 @@ const DiscountTable: React.FC<DiscountTableProps> = ({
       key: "current_value",
       render: (current_value) => <p>{formatMoney(current_value)}</p>,
       sorter: (a, b) => a.current_value - b.current_value,
-      showSorterTooltip: false
+      showSorterTooltip: false,
+      align: "right"
     },
     {
       title: "Detalle",
