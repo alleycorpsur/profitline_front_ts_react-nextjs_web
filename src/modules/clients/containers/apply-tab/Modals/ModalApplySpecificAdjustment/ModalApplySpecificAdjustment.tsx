@@ -61,6 +61,7 @@ const ModalApplySpecificAdjustment = ({
     [key: string]: {
       balanceToApply: number;
       idAdjustment: number;
+      id_erp: string;
     }[];
   }>({});
   const [loadingRequest, setLoadingRequest] = useState(false);
@@ -112,7 +113,11 @@ const ModalApplySpecificAdjustment = ({
         ...(prev[record.id] ?? []).filter(
           (apply) => apply.idAdjustment !== selectedAdjustments[selectTab].id
         ),
-        { balanceToApply: maxApplicableValue, idAdjustment: selectedAdjustments[selectTab].id }
+        {
+          balanceToApply: maxApplicableValue,
+          idAdjustment: selectedAdjustments[selectTab].id,
+          id_erp: record.id_erp
+        }
       ]
     }));
 
@@ -156,8 +161,27 @@ const ModalApplySpecificAdjustment = ({
   const handlePasteInvoices = async () => {
     try {
       const text = await navigator.clipboard.readText();
+      const rows = text.split("\n");
 
-      console.info(text);
+      // create an array of objects with the values of the excel
+      const objectRows = rows.map((row) => {
+        const columns = row.split("\t");
+        return {
+          id_erp: columns[0],
+          applied_amount: columns[1]
+        };
+      });
+
+      objectRows.forEach((row) => {
+        const invoice = currentInvoices.find((invoice) => invoice.id_erp === row.id_erp);
+        if (!invoice) return;
+
+        const applyValue = parseFloat(row.applied_amount.replace(/\./g, ""));
+
+        if (isNaN(applyValue)) return;
+
+        handleApplyValueChange(applyValue, invoice);
+      });
     } catch (err) {
       console.error("Error pasting invoices:", err);
     }
