@@ -55,7 +55,7 @@ const ApplyTab: React.FC = () => {
   const clientId = Number(extractSingleParam(params.clientId)) || 0;
   const [searchQuery, setSearchQuery] = useState("");
   const { showMessage } = useMessageApi();
-
+  const [loadingSave, setLoadingSave] = useState(false);
   //TODO this is the context that is not being used
   // const { selectedPayments } = useSelectedPayments();
 
@@ -166,13 +166,14 @@ const ApplyTab: React.FC = () => {
   };
 
   const handleSave = async () => {
+    setLoadingSave(true);
     try {
-      const res = await saveApplication(projectId, clientId);
-      console.log(res);
+      await saveApplication(projectId, clientId);
       showMessage("success", "Se ha guardado la aplicación correctamente");
     } catch (error) {
       showMessage("error", "Ha ocurrido un error al guardar la aplicación");
     }
+    setLoadingSave(false);
   };
 
   const filteredData = useMemo(() => {
@@ -181,7 +182,6 @@ const ApplyTab: React.FC = () => {
     const filteredInvoices = applicationData.invoices.filter((invoice) =>
       invoice?.id_erp?.toString().toLowerCase().includes(searchQuery)
     );
-    console.log("filteredInvoices", filteredInvoices);
 
     const filteredPayments = applicationData.payments.filter((payment) =>
       payment?.payment_id?.toString().toLowerCase().includes(searchQuery)
@@ -256,7 +256,7 @@ const ApplyTab: React.FC = () => {
               Generar acción
             </Button>
           </Flex>
-          <Button type="primary" className="save-btn" onClick={handleSave}>
+          <Button type="primary" className="save-btn" onClick={handleSave} loading={loadingSave}>
             Guardar
           </Button>
         </Flex>
