@@ -67,8 +67,12 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
     },
     {
       title: "Ajuste",
-      dataIndex: "adjustment",
-      key: "adjustment"
+      dataIndex: "total_adjustments",
+      key: "total_adjustments",
+      render: (total_adjustments) => <p>{formatMoney(total_adjustments)}</p>,
+      sorter: (a, b) => (a.total_adjustments ?? 0) - (b.total_adjustments ?? 0),
+      showSorterTooltip: false,
+      align: "right"
     },
     {
       title: "Saldo",
