@@ -118,3 +118,21 @@ export const addSpecificAdjustments = async (
     throw error;
   }
 };
+
+export const saveApplication = async (project_id: number, client_id: number) => {
+  const modelData = {
+    project_id,
+    client_id
+  };
+  try {
+    const response: GenericResponse<{ applications: number[] }> = await API.post(
+      `${config.API_HOST}/paymentApplication/save-current-application`,
+      modelData
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("error saveApplication", error);
+    throw error;
+  }
+};

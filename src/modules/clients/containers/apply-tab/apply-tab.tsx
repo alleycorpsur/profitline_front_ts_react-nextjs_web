@@ -9,7 +9,11 @@ import { useParams } from "next/navigation";
 
 import { useAppStore } from "@/lib/store/store";
 import { extractSingleParam } from "@/utils/utils";
-import { addItemsToTable, removeItemsFromTable } from "@/services/applyTabClients/applyTabClients";
+import {
+  addItemsToTable,
+  removeItemsFromTable,
+  saveApplication
+} from "@/services/applyTabClients/applyTabClients";
 import { useMessageApi } from "@/context/MessageContext";
 import { useSelectedPayments } from "@/context/SelectedPaymentsContext";
 
@@ -49,7 +53,7 @@ const ApplyTab: React.FC = () => {
   const { ID: projectId } = useAppStore((state) => state.selectedProject);
   const params = useParams();
   const clientId = Number(extractSingleParam(params.clientId)) || 0;
-  const [search, setSearch] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const { showMessage } = useMessageApi();
 
   //TODO this is the context that is not being used
@@ -161,36 +165,69 @@ const ApplyTab: React.FC = () => {
     }
   };
 
+  const handleSave = async () => {
+    try {
+      const res = await saveApplication(projectId, clientId);
+      console.log(res);
+      showMessage("success", "Se ha guardado la aplicación correctamente");
+    } catch (error) {
+      showMessage("error", "Ha ocurrido un error al guardar la aplicación");
+    }
+  };
+
+  const filteredData = useMemo(() => {
+    if (!applicationData) return { invoices: [], payments: [], discounts: [] };
+
+    const filteredInvoices = applicationData.invoices.filter((invoice) =>
+      invoice?.id_erp?.toString().toLowerCase().includes(searchQuery)
+    );
+    console.log("filteredInvoices", filteredInvoices);
+
+    const filteredPayments = applicationData.payments.filter((payment) =>
+      payment?.payment_id?.toString().toLowerCase().includes(searchQuery)
+    );
+
+    const filteredDiscounts = applicationData.discounts.filter((discount) =>
+      discount?.financial_discount_id?.toString().toLowerCase().includes(searchQuery)
+    );
+
+    return {
+      invoices: filteredInvoices,
+      payments: filteredPayments,
+      discounts: filteredDiscounts
+    };
+  }, [applicationData, searchQuery]);
+
   const dataForCollapse = useMemo(() => {
     const invoices = {
       statusName: "facturas",
       color: "#FF7A00",
       statusId: 1,
-      itemsList: applicationData?.invoices,
-      total: applicationData?.summary.total_invoices,
-      count: applicationData?.invoices.length
+      itemsList: filteredData?.invoices,
+      total: filteredData?.invoices.length && applicationData?.summary.total_invoices,
+      count: filteredData?.invoices.length
     };
 
     const payments = {
       statusName: "pagos",
       color: "#0085FF",
       statusId: 2,
-      itemsList: applicationData?.payments,
-      total: applicationData?.summary.total_payments,
-      count: applicationData?.payments.length
+      itemsList: filteredData?.payments,
+      total: filteredData?.payments.length && applicationData?.summary.total_payments,
+      count: filteredData?.payments.length
     };
 
     const discounts = {
       statusName: "ajustes",
       color: "#E53261",
       statusId: 3,
-      itemsList: applicationData?.discounts,
-      total: applicationData?.summary.total_discounts,
-      count: applicationData?.discounts.length
+      itemsList: filteredData?.discounts,
+      total: filteredData?.discounts.length && applicationData?.summary.total_discounts,
+      count: filteredData?.discounts.length
     };
 
     return [invoices, payments, discounts];
-  }, [applicationData]);
+  }, [filteredData]);
 
   return (
     <>
@@ -207,7 +244,7 @@ const ApplyTab: React.FC = () => {
               className="search"
               placeholder="Buscar"
               onChange={(event) => {
-                setSearch(event.target.value);
+                setSearchQuery(event.target.value.toLowerCase());
               }}
             />
             <Button
@@ -219,11 +256,7 @@ const ApplyTab: React.FC = () => {
               Generar acción
             </Button>
           </Flex>
-          <Button
-            type="primary"
-            className="save-btn"
-            onClick={() => console.log("click ajustes disponibles")}
-          >
+          <Button type="primary" className="save-btn" onClick={handleSave}>
             Guardar
           </Button>
         </Flex>
