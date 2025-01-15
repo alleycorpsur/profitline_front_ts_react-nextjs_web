@@ -21,6 +21,7 @@ export interface IApplyTabRecord {
   current_value: number;
   created_by_name: string | null;
   applied_amount: number;
+  total_adjustments: number | null;
 }
 
 export interface IApplyTabClients {
