@@ -53,7 +53,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
       title: "Monto",
       dataIndex: "initial_value",
       key: "initial_value",
-      render: (initial_value) => <p>{formatMoney(initial_value)}</p>,
+      render: (initial_value) => <p>{formatMoney(initial_value, { scale: 1 })}</p>,
       sorter: (a, b) => a.initial_value - b.initial_value,
       showSorterTooltip: false,
       align: "right"
