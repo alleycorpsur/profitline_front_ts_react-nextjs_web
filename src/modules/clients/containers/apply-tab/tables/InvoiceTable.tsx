@@ -2,7 +2,8 @@ import React, { ReactNode, useState } from "react";
 import { Button, Dropdown, Table, TableProps } from "antd";
 import { DotsThreeVertical, Eye, Trash } from "phosphor-react";
 
-import { formatDate, formatMoney } from "@/utils/utils";
+import { formatDate } from "@/utils/utils";
+import { useAppStore } from "@/lib/store/store";
 import { ModalRemove } from "@/components/molecules/modals/ModalRemove/ModalRemove";
 
 import { IApplyTabRecord } from "@/types/applyTabClients/IApplyTabClients";
@@ -29,6 +30,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
 }) => {
   const [activeRow, setActiveRow] = useState<IApplyTabRecord | null>(null);
   const [removeModal, setRemoveModal] = useState(false);
+  const formatMoney = useAppStore((state) => state.formatMoney);
 
   const columns: TableProps<IApplyTabRecord>["columns"] = [
     {
