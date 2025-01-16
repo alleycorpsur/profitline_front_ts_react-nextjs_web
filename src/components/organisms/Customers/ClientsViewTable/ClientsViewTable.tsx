@@ -51,7 +51,7 @@ export const ClientsViewTable = () => {
   });
 
   const fetchPortfolios = async ({ pageParam = 1 }) => {
-    const limit = 50;
+    const limit = 25;
     const holdingQuery = filters.holding.length > 0 ? `&holding=${filters.holding.join(",")}` : "";
     const searchQueryParam = debouncedSearchQuery
       ? `&searchQuery=${encodeURIComponent(debouncedSearchQuery.toLowerCase().trim())}`
