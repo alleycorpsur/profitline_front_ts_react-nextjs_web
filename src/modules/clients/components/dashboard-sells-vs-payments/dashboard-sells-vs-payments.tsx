@@ -11,7 +11,8 @@ import {
 import dayjs from "dayjs";
 import utcPlugin from "dayjs/plugin/utc";
 
-import { capitalize, formatMillionNumber, formatMoney } from "@/utils/utils";
+import { useAppStore } from "@/lib/store/store";
+import { capitalize } from "@/utils/utils";
 
 import styles from "./dashboard-sells-vs-payments.module.scss";
 
@@ -27,6 +28,8 @@ interface DashboardSellsVsPaymentsProps {
 dayjs.extend(utcPlugin);
 
 const DashboardSellsVsPayments: FC<DashboardSellsVsPaymentsProps> = ({ chartData, className }) => {
+  const formatMoney = useAppStore((state) => state.formatMoney);
+
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
@@ -34,7 +37,7 @@ const DashboardSellsVsPayments: FC<DashboardSellsVsPaymentsProps> = ({ chartData
           <p>{label}</p>
           {payload.map((item: any) => (
             <p key={item.dataKey} style={{ color: item.color }}>
-              {capitalize(item.name)}: {formatMoney(item.value, true)}
+              {capitalize(item.name)}: {formatMoney(item.value, { hideCurrencySymbol: true })}
             </p>
           ))}
         </div>
@@ -70,7 +73,9 @@ const DashboardSellsVsPayments: FC<DashboardSellsVsPaymentsProps> = ({ chartData
             <XAxis padding={{ left: 20, right: 20 }} dataKey="name" scale="point" />
             <YAxis
               padding={{ top: 10 }}
-              tickFormatter={(value) => formatMoney(formatMillionNumber(value), true) + "M"}
+              tickFormatter={(value) =>
+                formatMoney(value, { hideCurrencySymbol: true, scale: 6 }) + "M"
+              }
             />
             <Tooltip content={<CustomTooltip />} />
             <CartesianGrid strokeDasharray="3 3" />

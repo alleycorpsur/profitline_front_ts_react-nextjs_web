@@ -33,7 +33,7 @@ export const formatMoneySlice = (set: any, get: any): IFormatMoneyStore => ({
       currency,
       hideCurrencySymbol = false,
       hideDecimals = false,
-      scale = 0
+      scale
     } = options || {};
 
     const finalLocale = locale || get().locale;
@@ -48,12 +48,18 @@ export const formatMoneySlice = (set: any, get: any): IFormatMoneyStore => ({
     });
 
     if (!amount) {
+      if (finalHideCurrencySymbol) {
+        return formatter.format(0).replace(/[^\d.,]/g, "");
+      }
       return formatter.format(0);
     }
 
     const parsedNum = typeof amount === "string" ? parseFloat(amount) : amount;
 
-    const number = parsedNum * Math.pow(10, scaleFactor);
+    let number = parsedNum;
+    for (let i = 0; i < scaleFactor; i++) {
+      number /= 10; // divides
+    }
 
     if (finalHideCurrencySymbol) {
       return formatter.format(number).replace(/[^\d.,]/g, "");

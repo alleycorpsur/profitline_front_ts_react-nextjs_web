@@ -2,7 +2,8 @@ import { FC, useState } from "react";
 import { ArrowLineDown, CaretDoubleRight, DotsThree } from "phosphor-react";
 import { Button, Flex, Spin } from "antd";
 
-import { formatDatePlane, formatMoney } from "@/utils/utils";
+import { useAppStore } from "@/lib/store/store";
+import { formatDatePlane } from "@/utils/utils";
 import { useModalDetail } from "@/context/ModalContext";
 import { FileDownloadModal } from "../FileDownloadModal/FileDownloadModal";
 import { IInvoices, useFinancialDiscountDetail } from "@/hooks/useDetailAdjustment";
@@ -31,6 +32,8 @@ const ModalDetailAdjustment: FC<ModalDetailAdjustmentProps> = ({
   adjusmentId = 1,
   legalized = false
 }) => {
+  const formatMoney = useAppStore((state) => state.formatMoney);
+
   const { data: adjusmentData, isLoading } = useFinancialDiscountDetail({
     financialDiscountId: selectAdjusment?.id ?? adjusmentId,
     projectId,

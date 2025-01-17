@@ -1,16 +1,16 @@
 import { Flex, message, Modal, Spin } from "antd";
 import { CaretRight, Pencil, Trash } from "phosphor-react";
 import React, { useState } from "react";
-import "./modalActionAdjusment.scss";
 import { Gavel } from "@phosphor-icons/react";
 import ItemsModalLegalize from "@/components/atoms/ItemsModalLegalize/ItemsModalLegalize";
-import { formatMoney } from "@/utils/utils";
 import { useAppStore } from "@/lib/store/store";
 import {
   LegalizedFinancialDiscount,
   useLegalizedFinancialDiscount
 } from "@/hooks/useLegalizedFinancialDiscount";
 import { legalizeFinancialDiscount } from "@/services/accountingAdjustment/accountingAdjustment";
+
+import "./modalActionAdjusment.scss";
 
 interface Props {
   isOpen: boolean;
@@ -37,6 +37,8 @@ export const ModalActionAdjusment = ({ isOpen, onClose, adjustment, clientId }: 
   const [currentView, setCurrentView] = useState<string>("selectAccountingAdjustment");
   const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
   const { ID: projectId } = useAppStore((state) => state.selectedProject);
+  const formatMoney = useAppStore((state) => state.formatMoney);
+
   const [selectIsLoading, setSelectIsLoading] = useState<boolean>(false);
 
   const [messageApi, contextHolder] = message.useMessage();

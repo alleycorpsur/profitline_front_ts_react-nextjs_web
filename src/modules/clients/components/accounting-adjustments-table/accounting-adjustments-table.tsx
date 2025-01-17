@@ -1,9 +1,12 @@
 import { Dispatch, SetStateAction, useState } from "react";
 import { Button, Table, TableProps, Typography } from "antd";
-
 import { Eye } from "phosphor-react";
-import { formatDate, formatMoney } from "@/utils/utils";
+
+import { useAppStore } from "@/lib/store/store";
+import { formatDate } from "@/utils/utils";
+
 import { FinancialDiscount } from "@/types/financialDiscounts/IFinancialDiscounts";
+
 import "./accounting-adjustments-table.scss";
 
 const { Text } = Typography;
@@ -23,6 +26,8 @@ const AccountingAdjustmentsTable = ({
   financialStatusId,
   legalized
 }: PropsInvoicesTable) => {
+  const formatMoney = useAppStore((state) => state.formatMoney);
+
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
 
   const handleOpenDetail = (adjustment: FinancialDiscount) => {

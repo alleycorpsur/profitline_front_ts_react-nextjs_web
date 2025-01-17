@@ -1,8 +1,12 @@
-import { IDataSection } from "@/types/portfolios/IPortfolios";
-import { formatMillionNumber, formatMoney, capitalize } from "@/utils/utils";
 import dayjs from "dayjs";
 
+import { useAppStore } from "@/lib/store/store";
+import { formatMillionNumber, capitalize } from "@/utils/utils";
+
+import { IDataSection } from "@/types/portfolios/IPortfolios";
+
 export const useDashboardInfo = (portfolioData: IDataSection | undefined) => {
+  const formatMoney = useAppStore((state) => state.formatMoney);
   // Total Portfolio
   const formattedTotalWallet = formatMillionNumber(portfolioData?.total_wallet);
   const totalWallet = formatMoney(formattedTotalWallet);

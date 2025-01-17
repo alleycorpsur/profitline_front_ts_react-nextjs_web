@@ -3,7 +3,7 @@ import { Button, Flex, Modal, Spin, Table, TableProps } from "antd";
 import { PencilLine, Plus, Trash } from "phosphor-react";
 import { useForm } from "react-hook-form";
 
-import { formatMoney } from "@/utils/utils";
+import { useAppStore } from "@/lib/store/store";
 
 import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
 import SecondaryButton from "@/components/atoms/buttons/secondaryButton/SecondaryButton";
@@ -27,6 +27,7 @@ interface ModalEditRowProps {
 }
 
 const ModalEditRow: React.FC<ModalEditRowProps> = ({ visible, onCancel }) => {
+  const formatMoney = useAppStore((state) => state.formatMoney);
   const [isEditing, setIsEditing] = useState(false);
   const {
     control,
