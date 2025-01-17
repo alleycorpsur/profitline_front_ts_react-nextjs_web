@@ -134,13 +134,13 @@ export const ClientsGroupsTable = ({ setShowGroupDetails }: PropsClientsGroupsTa
       title: "Clientes",
       dataIndex: "clients_count",
       key: "clients_count",
-      sorter: (a, b) => (a.clients?.length || 0) - (b.clients?.length || 0),
-      render: (clients, row) => <Text>{row?.clients?.length}</Text>
+      sorter: (a, b) => (a.clients_count || 0) - (b.clients_count || 0),
+      render: (clients, row) => <Text>{row?.clients_count}</Text>
     },
     {
       title: "Suscritos",
-      key: "subcribers",
-      dataIndex: "subcribers",
+      key: "subscribers",
+      dataIndex: "subscribers",
       sorter: (a, b) => (a.subscribers || 0) - (b.subscribers || 0),
       render: (text) => <Text>{text ? text : 0}</Text>
     },
