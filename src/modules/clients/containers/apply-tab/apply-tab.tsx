@@ -390,7 +390,14 @@ const ApplyTab: React.FC = () => {
         isOpen={
           modalAdjustmentsState && modalAdjustmentsState.isOpen && modalAdjustmentsState.modal === 3
         }
-        onCancel={() => setModalAdjustmentsState({ isOpen: true, modal: 2 })}
+        onCancel={(created?: Boolean) => {
+          if (created) {
+            setModalAdjustmentsState({ isOpen: false, modal: 0 });
+            mutate();
+          } else {
+            setModalAdjustmentsState({ isOpen: true, modal: 2 });
+          }
+        }}
       />
       <ModalEditRow visible={editingRow} onCancel={() => setEditingRow(false)} />
     </>
