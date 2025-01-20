@@ -12,7 +12,8 @@ import {
   Bank,
   SquaresFour,
   Storefront,
-  UsersFour
+  UsersFour,
+  Stack
 } from "phosphor-react";
 
 import { logOut } from "../../../../firebase-utils";
@@ -196,6 +197,16 @@ export const SideBar = () => {
             size="large"
             icon={<UsersFour size={26} />}
             className={path === "/proveedores" ? "buttonIcon" : "buttonIconActive"}
+          >
+            {isSideBarLarge && "Ajustes"}
+          </Button>
+        </Link>
+        <Link href="/client-management" passHref legacyBehavior>
+          <Button
+            type="primary"
+            size="large"
+            icon={<Stack size={26} />}
+            className={path === "/client-management" ? "buttonIcon" : "buttonIconActive"}
           >
             {isSideBarLarge && "Ajustes"}
           </Button>

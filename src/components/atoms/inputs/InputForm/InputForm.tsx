@@ -4,6 +4,8 @@ import { Control, Controller, FieldError, RegisterOptions } from "react-hook-for
 
 import "./inputform.scss";
 
+const { TextArea } = Input;
+
 interface Props {
   titleInput?: string;
   nameInput: string;
@@ -19,6 +21,8 @@ interface Props {
   readOnly?: boolean;
   suffix?: React.ReactNode;
   defaultValue?: string;
+  isTextArea?: boolean; // Nueva propiedad para manejar TextArea
+  rows?: number; // Para definir la cantidad de filas en el TextArea
   // eslint-disable-next-line no-unused-vars
   changeInterceptor?: (value: any) => void;
 }
@@ -38,6 +42,8 @@ export const InputForm = ({
   readOnly,
   suffix,
   defaultValue,
+  isTextArea = false,
+  rows = 4, // Número de filas por defecto para TextArea
   changeInterceptor
 }: Props) => {
   return (
@@ -53,21 +59,35 @@ export const InputForm = ({
         rules={{ required: true, maxLength: 123, ...validationRules }}
         control={control}
         disabled={disabled}
-        render={({ field: { onChange, ...field } }) => (
-          <Input
-            readOnly={readOnly}
-            type={typeInput}
-            className={!error ? `inputForm ${readOnly && "-readOnly"}` : "inputFormError"}
-            variant="borderless"
-            placeholder={placeholder?.length > 0 ? placeholder : titleInput}
-            onChange={(e) => {
-              onChange(e);
-              changeInterceptor?.(e.target.value);
-            }}
-            suffix={suffix}
-            {...field}
-          />
-        )}
+        render={({ field: { onChange, ...field } }) =>
+          isTextArea ? (
+            <TextArea
+              readOnly={readOnly}
+              className={!error ? `textArea ${readOnly && "-readOnly"}` : "inputFormError"}
+              placeholder={placeholder?.length > 0 ? placeholder : titleInput}
+              onChange={(e) => {
+                onChange(e);
+                changeInterceptor?.(e.target.value);
+              }}
+              rows={rows}
+              {...field}
+            />
+          ) : (
+            <Input
+              readOnly={readOnly}
+              type={typeInput}
+              className={!error ? `inputForm ${readOnly && "-readOnly"}` : "inputFormError"}
+              variant="borderless"
+              placeholder={placeholder?.length > 0 ? placeholder : titleInput}
+              onChange={(e) => {
+                onChange(e);
+                changeInterceptor?.(e.target.value);
+              }}
+              suffix={suffix}
+              {...field}
+            />
+          )
+        }
       />
       <Typography.Text className="textError">
         {error ? (error.message ? ` ${error.message}` : `${titleInput} es obligatorio *`) : ""}
