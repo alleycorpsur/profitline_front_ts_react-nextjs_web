@@ -366,7 +366,7 @@ const InvoiceDetailModal: FC<InvoiceDetailModalProps> = ({
                                       }}
                                     >
                                       {" "}
-                                      {`${item.id}`}
+                                      {`${item.payment_agreement_id}`}
                                     </div>
                                   </div>
                                 </div>
