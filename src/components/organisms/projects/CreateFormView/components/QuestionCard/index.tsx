@@ -1,12 +1,12 @@
-import React, { useState } from "react";
-import { Card, Input, Select, Button, Space, Switch, Flex, Typography } from "antd";
+import React from "react";
+import { Card, Button, Space, Switch, Flex, Typography } from "antd";
 import { ArrowLineUp, Trash } from "phosphor-react";
 import { InputForm } from "@/components/atoms/inputs/InputForm/InputForm";
 import { FormValues, QuestionType } from "../../controllers/formSchema";
-import { Control, UseFormWatch } from "react-hook-form";
+import { Control } from "react-hook-form";
 import ReusableList from "../ReusableList";
 import { InputDateForm } from "@/components/atoms/inputs/InputDate/InputDateForm";
-
+import "./questioncard.scss";
 const { Text } = Typography;
 // Define the props for the reusable component
 interface QuestionCardProps {
@@ -28,22 +28,6 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
   onChangeIsMandatory,
   isRequired
 }) => {
-  const [options, setOptions] = useState<string[]>([]);
-
-  const handleAddOption = () => {
-    setOptions([...options, ""]);
-  };
-
-  const handleOptionChange = (value: string, index: number) => {
-    const newOptions = [...options];
-    newOptions[index] = value;
-    setOptions(newOptions);
-  };
-
-  const handleRemoveOption = (index: number) => {
-    const newOptions = options.filter((_, i) => i !== index);
-    setOptions(newOptions);
-  };
   const renderAnswer = (questionType: QuestionType) => {
     switch (questionType) {
       case QuestionType.MULTIPLE_CHOICE:
@@ -51,7 +35,6 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
           <ReusableList
             control={control}
             name={`questions[${index}].options`}
-            onAdd={handleAddOption}
             type={QuestionType.MULTIPLE_CHOICE}
           />
         );
@@ -60,7 +43,6 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
           <ReusableList
             control={control}
             name={`questions[${index}].options`}
-            onAdd={handleAddOption}
             type={QuestionType.SINGLE_CHOICE}
           />
         );
@@ -85,6 +67,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
             error={undefined}
             placeholder="Ingresar número"
             typeInput="number"
+            readOnly={true}
           />
         );
       case QuestionType.FILE:
@@ -116,6 +99,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
             hiddenTitle
             control={control}
             nameInput="answer"
+            readOnly={true}
             error={undefined}
             placeholder="Ingresar texto"
           />
@@ -124,14 +108,10 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
         return <></>;
     }
   };
-  return (
-    <Card
-      style={{ marginBottom: 16, border: "1px solid #DDDDDD" }}
-      title={`${order}.`}
-      extra={<Button type="text" icon={<Trash size={20} />} onClick={onDelete} />}
-      key={order}
-    >
-      <Space direction="vertical" style={{ width: "100%" }} size="middle">
+
+  const renderQuestion = () => {
+    return (
+      <>
         {/* Question Name */}
         <InputForm
           hiddenTitle
@@ -148,16 +128,30 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
           error={undefined}
           placeholder="Descripción de la pregunta"
         />
-        <hr style={{ borderTop: "1px solid #f7f7f7" }} />
+      </>
+    );
+  };
 
+  return (
+    <Card
+      className="custom-card"
+      title={`${order}.`}
+      extra={<Button type="text" icon={<Trash size={20} />} onClick={onDelete} />}
+      key={order}
+    >
+      <Space direction="vertical" style={{ width: "100%" }} size="middle">
+        {renderQuestion()}
+        <hr style={{ borderTop: "1px solid #f7f7f7" }} />
         {/* Options for multiple/single choice */}
         {renderAnswer(questionType)}
-
         {/* Required Switch */}
+        <hr style={{ borderTop: "1px solid #f7f7f7" }} />
         <Flex justify="flex-end">
           <Switch
             checked={isRequired}
-            onChange={(e) => onChangeIsMandatory(e)}
+            onChange={(e) => {
+              onChangeIsMandatory(e);
+            }}
             style={{ marginRight: "0.5rem" }}
           />
           <Text>Obligatorio</Text>
