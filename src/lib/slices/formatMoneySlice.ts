@@ -38,8 +38,8 @@ export const formatMoneySlice = (set: any, get: any): IFormatMoneyStore => ({
 
     const finalLocale = locale || get().locale;
     const finalCurrency = currency || get().currency;
-    const finalHideCurrencySymbol = hideCurrencySymbol || false;
-    const scaleFactor = scale ?? 1;
+    const finalHideCurrencySymbol = hideCurrencySymbol;
+    const scaleFactor = scale ?? 0;
 
     const formatter = new Intl.NumberFormat(finalLocale, {
       style: "currency",

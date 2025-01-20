@@ -30,7 +30,8 @@ interface IAdjustment {
   amount?: number;
 }
 interface ModalCreateAdjustmentProps {
-  onCancel: () => void;
+  // eslint-disable-next-line no-unused-vars
+  onCancel: (created?: Boolean) => void;
   isOpen: boolean;
 }
 
@@ -77,7 +78,7 @@ const ModalCreateAdjustment: React.FC<ModalCreateAdjustmentProps> = ({ isOpen, o
       await createGlobalAdjustment(projectId, clientId, adjustments);
       showMessage("success", "Ajuste(s) creado correctamente");
       mutate();
-      onCancel();
+      onCancel(true);
     } catch (error) {
       showMessage("error", "Error al crear el ajuste(s)");
     }
@@ -91,11 +92,11 @@ const ModalCreateAdjustment: React.FC<ModalCreateAdjustmentProps> = ({ isOpen, o
         width={"60%"}
         open={isOpen}
         closeIcon={false}
-        onCancel={onCancel}
+        onCancel={() => onCancel()}
         footer={null}
       >
-        <div onClick={onCancel} className="header">
-          <CaretLeft size={24} onClick={onCancel} />
+        <div onClick={() => onCancel()} className="header">
+          <CaretLeft size={24} />
           <h2>Crear ajuste</h2>
         </div>
 
@@ -154,7 +155,7 @@ const ModalCreateAdjustment: React.FC<ModalCreateAdjustmentProps> = ({ isOpen, o
         </button>
 
         <div className="modal-footer">
-          <SecondaryButton fullWidth onClick={onCancel}>
+          <SecondaryButton fullWidth onClick={() => onCancel()}>
             Cancelar
           </SecondaryButton>
 
@@ -173,8 +174,3 @@ const ModalCreateAdjustment: React.FC<ModalCreateAdjustmentProps> = ({ isOpen, o
 };
 
 export default ModalCreateAdjustment;
-
-const mockInputs = [
-  { value: "1", label: "Cliente 1" },
-  { value: "2", label: "Cliente 2" }
-];
