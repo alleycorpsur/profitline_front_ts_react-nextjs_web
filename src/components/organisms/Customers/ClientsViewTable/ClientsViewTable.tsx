@@ -17,7 +17,6 @@ import {
 import CardsClients from "../../../molecules/modals/CardsClients/CardsClients";
 
 import { IClientsPortfolio } from "@/types/clients/IViewClientsTable";
-import { formatMoney } from "@/utils/utils";
 
 import { useDebounce } from "@/hooks/useDeabouce";
 import {
@@ -34,6 +33,7 @@ import "./ClientsViewTable.scss";
 const { Text } = Typography;
 
 export const ClientsViewTable = () => {
+  const formatMoney = useAppStore((state) => state.formatMoney);
   const PAGINATION_LIMIT = 25;
   const [searchQuery, setSearchQuery] = useState<string>("");
   const debouncedSearchQuery = useDebounce(searchQuery, 300);

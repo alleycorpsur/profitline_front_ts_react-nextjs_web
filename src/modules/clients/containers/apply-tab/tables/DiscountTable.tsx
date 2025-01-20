@@ -2,7 +2,8 @@ import React, { ReactNode, useState } from "react";
 import { Button, Dropdown, Table, TableProps } from "antd";
 import { Eye, Trash, DotsThreeVertical } from "phosphor-react";
 
-import { formatMoney } from "@/utils/utils";
+import { useAppStore } from "@/lib/store/store";
+
 import { ModalRemove } from "@/components/molecules/modals/ModalRemove/ModalRemove";
 
 import { IApplyTabRecord } from "@/types/applyTabClients/IApplyTabClients";
@@ -26,6 +27,7 @@ const DiscountTable: React.FC<DiscountTableProps> = ({
   handleEditRow,
   rowSelection
 }) => {
+  const formatMoney = useAppStore((state) => state.formatMoney);
   const [activeRow, setActiveRow] = useState<IApplyTabRecord | null>(null);
   const [removeModal, setRemoveModal] = useState(false);
 

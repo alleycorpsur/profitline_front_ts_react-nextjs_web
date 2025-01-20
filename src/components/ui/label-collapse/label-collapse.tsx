@@ -1,6 +1,7 @@
 import { Flex } from "antd";
 import { Files, Money } from "phosphor-react";
-import { capitalize, formatMoney } from "@/utils/utils";
+import { useAppStore } from "@/lib/store/store";
+import { capitalize } from "@/utils/utils";
 import styles from "./label-collapse.module.scss";
 
 interface PropsLabelCollapseInvoice {
@@ -31,6 +32,8 @@ const LabelCollapse = ({
   color,
   removeIcons
 }: PropsLabelCollapseInvoice) => {
+  const formatMoney = useAppStore((state) => state.formatMoney);
+
   const randomColor = randomColors[Math.floor(Math.random() * randomColors.length)];
 
   return (

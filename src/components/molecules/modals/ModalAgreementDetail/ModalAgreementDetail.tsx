@@ -4,12 +4,12 @@ import { useForm, Controller } from "react-hook-form";
 import { Paperclip } from "phosphor-react";
 import dayjs from "dayjs";
 
+import { useAppStore } from "@/lib/store/store";
 import {
   cancelPaymentAgreement,
   getDetailPaymentAgreement
 } from "@/services/accountingAdjustment/accountingAdjustment";
 import { useMessageApi } from "@/context/MessageContext";
-import { formatMoney } from "@/utils/utils";
 
 import { InputForm } from "@/components/atoms/inputs/InputForm/InputForm";
 import { InputFormMoney } from "@/components/atoms/inputs/InputFormMoney/InputFormMoney";
@@ -41,6 +41,8 @@ interface FormData {
 }
 
 export const ModalAgreementDetail: React.FC<Props> = ({ isModalPaymentAgreementOpen, onClose }) => {
+  const formatMoney = useAppStore((state) => state.formatMoney);
+
   const [paymentAgreementData, setPaymentAgreementData] = useState<IPaymentDetail>();
   const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
   const [downloadUrl, setDownloadUrl] = useState("");

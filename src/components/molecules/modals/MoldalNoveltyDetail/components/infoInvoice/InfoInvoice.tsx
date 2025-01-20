@@ -3,7 +3,6 @@ import { NewspaperClipping, Coins } from "phosphor-react";
 import { Typography } from "antd";
 
 import { useAppStore } from "@/lib/store/store";
-import { formatMoney } from "@/utils/utils";
 import { useModalDetail } from "@/context/ModalContext";
 import { IIncidentDetail } from "@/hooks/useNoveltyDetail";
 
@@ -17,6 +16,7 @@ interface InfoInvoiceProps {
 }
 
 export const InfoInvoice: React.FC<InfoInvoiceProps> = ({ incidentData }) => {
+  const formatMoney = useAppStore((state) => state.formatMoney);
   const {
     invoice_cashport_value,
     invoice_amount_difference,

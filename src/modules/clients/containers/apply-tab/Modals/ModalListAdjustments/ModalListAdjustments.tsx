@@ -6,7 +6,7 @@ import { CaretLeft, Plus } from "phosphor-react";
 import { IFinancialDiscount, useAcountingAdjustment } from "@/hooks/useAcountingAdjustment";
 import { useMessageApi } from "@/context/MessageContext";
 import { useAppStore } from "@/lib/store/store";
-import { extractSingleParam, formatMoney } from "@/utils/utils";
+import { extractSingleParam } from "@/utils/utils";
 
 import UiSearchInputLong from "@/components/ui/search-input-long";
 import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
@@ -46,6 +46,7 @@ const ModalListAdjustments: React.FC<ModalListAdjustmentsProps> = ({
   const params = useParams();
   const clientId = extractSingleParam(params.clientId) || "";
   const { ID: projectId } = useAppStore((state) => state.selectedProject);
+  const formatMoney = useAppStore((state) => state.formatMoney);
   const { showMessage } = useMessageApi();
   const [selectedRows, setSelectedRows] = useState<IFinancialDiscount[]>([]);
   const [loading, setLoading] = useState(false);

@@ -1,8 +1,10 @@
 import { FC } from "react";
-import "./itemsModalLegalize.scss";
 import { Radio } from "antd";
-import { formatMoney } from "@/utils/utils";
+
+import { useAppStore } from "@/lib/store/store";
 import { DividerVerticalModal } from "../DividerVertical/DividerVerticalModal";
+
+import "./itemsModalLegalize.scss";
 
 interface ItemsModalLegalizeProps {
   onHeaderClick: () => void;
@@ -24,6 +26,8 @@ const ItemsModalLegalize: FC<ItemsModalLegalizeProps> = ({
   type,
   selectedItemId
 }) => {
+  const formatMoney = useAppStore((state) => state.formatMoney);
+
   return (
     <div className="item">
       <div className="head">

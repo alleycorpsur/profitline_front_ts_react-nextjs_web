@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { Button, Table, TableProps, Typography } from "antd";
 import { Eye } from "phosphor-react";
 
-import { formatDate, formatMoney } from "@/utils/utils";
+import { useAppStore } from "@/lib/store/store";
+import { formatDate } from "@/utils/utils";
 import { useSelectedPayments } from "@/context/SelectedPaymentsContext";
 
 import { IClientPayment } from "@/types/clientPayments/IClientPayments";
@@ -23,6 +24,8 @@ const PaymentsTable = ({
   paymentStatusId,
   handleOpenPaymentDetail
 }: PropsInvoicesTable) => {
+  const formatMoney = useAppStore((state) => state.formatMoney);
+
   const { selectedPayments, setSelectedPayments } = useSelectedPayments();
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
 

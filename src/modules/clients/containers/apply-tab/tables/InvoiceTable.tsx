@@ -2,7 +2,8 @@ import React, { ReactNode, useState } from "react";
 import { Button, Dropdown, Table, TableProps } from "antd";
 import { DotsThreeVertical, Eye, Trash } from "phosphor-react";
 
-import { formatDate, formatMoney } from "@/utils/utils";
+import { formatDate } from "@/utils/utils";
+import { useAppStore } from "@/lib/store/store";
 import { ModalRemove } from "@/components/molecules/modals/ModalRemove/ModalRemove";
 
 import { IApplyTabRecord } from "@/types/applyTabClients/IApplyTabClients";
@@ -29,6 +30,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
 }) => {
   const [activeRow, setActiveRow] = useState<IApplyTabRecord | null>(null);
   const [removeModal, setRemoveModal] = useState(false);
+  const formatMoney = useAppStore((state) => state.formatMoney);
 
   const columns: TableProps<IApplyTabRecord>["columns"] = [
     {
@@ -51,7 +53,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
       title: "Monto",
       dataIndex: "initial_value",
       key: "initial_value",
-      render: (initial_value) => <p>{formatMoney(initial_value)}</p>,
+      render: (initial_value) => <p>{formatMoney(initial_value, { scale: 1 })}</p>,
       sorter: (a, b) => a.initial_value - b.initial_value,
       showSorterTooltip: false,
       align: "right"
