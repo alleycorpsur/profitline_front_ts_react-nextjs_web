@@ -1,13 +1,34 @@
-import React from "react";
-import { Table, TableProps } from "antd";
-import { IApplyTabRecord } from "@/types/applyTabClients/IApplyTabClients";
+import React, { ReactNode, useState } from "react";
+import { Button, Dropdown, Table, TableProps } from "antd";
+import { Eye, Trash, DotsThreeVertical } from "phosphor-react";
+
 import { formatMoney } from "@/utils/utils";
+import { ModalRemove } from "@/components/molecules/modals/ModalRemove/ModalRemove";
+
+import { IApplyTabRecord } from "@/types/applyTabClients/IApplyTabClients";
 
 interface DiscountTableProps {
   data?: IApplyTabRecord[];
+  // eslint-disable-next-line no-unused-vars
+  handleDeleteRow?: (id: number) => void;
+  // eslint-disable-next-line no-unused-vars
+  handleEditRow: (row_id: number) => void;
+  rowSelection: {
+    selectedRowKeys: React.Key[];
+    // eslint-disable-next-line no-unused-vars
+    onChange: (newSelectedRowKeys: React.Key[], selectedRows: any[]) => void;
+  };
 }
 
-const DiscountTable: React.FC<DiscountTableProps> = ({ data }) => {
+const DiscountTable: React.FC<DiscountTableProps> = ({
+  data,
+  handleDeleteRow,
+  handleEditRow,
+  rowSelection
+}) => {
+  const [activeRow, setActiveRow] = useState<IApplyTabRecord | null>(null);
+  const [removeModal, setRemoveModal] = useState(false);
+
   const columns: TableProps<IApplyTabRecord>["columns"] = [
     {
       title: "ID ajuste",
@@ -19,7 +40,8 @@ const DiscountTable: React.FC<DiscountTableProps> = ({ data }) => {
           return a.financial_discount_id - b.financial_discount_id;
         }
         return 0;
-      }
+      },
+      showSorterTooltip: false
     },
     {
       title: "Tipo de ajuste",
@@ -38,7 +60,8 @@ const DiscountTable: React.FC<DiscountTableProps> = ({ data }) => {
       key: "amount",
       render: (amount) => <p>{formatMoney(amount)}</p>,
       sorter: (a, b) => a.amount - b.amount,
-      showSorterTooltip: false
+      showSorterTooltip: false,
+      align: "right"
     },
     {
       title: "Monto aplicado",
@@ -46,7 +69,8 @@ const DiscountTable: React.FC<DiscountTableProps> = ({ data }) => {
       key: "applied_amount",
       render: (applied_amount) => <p>{formatMoney(applied_amount)}</p>,
       sorter: (a, b) => a.applied_amount - b.applied_amount,
-      showSorterTooltip: false
+      showSorterTooltip: false,
+      align: "right"
     },
     {
       title: "Saldo",
@@ -54,17 +78,99 @@ const DiscountTable: React.FC<DiscountTableProps> = ({ data }) => {
       key: "current_value",
       render: (current_value) => <p>{formatMoney(current_value)}</p>,
       sorter: (a, b) => a.current_value - b.current_value,
-      showSorterTooltip: false
+      showSorterTooltip: false,
+      align: "right"
+    },
+    {
+      title: "Detalle",
+      width: 75,
+      render: (_, row) => {
+        const items = [
+          {
+            key: "1",
+            label: (
+              <Button
+                icon={<Eye size={20} />}
+                className="buttonNoBorder"
+                onClick={() =>
+                  row.financial_discount_id &&
+                  handleEditRow &&
+                  handleEditRow(row.financial_discount_id)
+                }
+              >
+                Ver
+              </Button>
+            )
+          },
+          {
+            key: "2",
+            label: (
+              <Button
+                icon={<Trash size={20} />}
+                className="buttonNoBorder"
+                onClick={() => {
+                  setActiveRow(row);
+                  setRemoveModal(true);
+                }}
+              >
+                Eliminar
+              </Button>
+            )
+          },
+          {
+            key: "3",
+            label: (
+              <Button icon={<Eye size={20} />} className="buttonNoBorder">
+                Marcar como abono
+              </Button>
+            )
+          }
+        ];
+
+        const customDropdown = (menu: ReactNode) => (
+          <div className="dropdownApplicationTable">{menu}</div>
+        );
+
+        return (
+          <Dropdown
+            dropdownRender={customDropdown}
+            menu={{ items }}
+            placement="bottomLeft"
+            trigger={["click"]}
+          >
+            <Button className="dotsBtn">
+              <DotsThreeVertical size={16} />
+            </Button>
+          </Dropdown>
+        );
+      }
     }
   ];
 
   return (
-    <Table
-      columns={columns}
-      dataSource={data}
-      className="sectionContainerTable"
-      pagination={false}
-    />
+    <>
+      <Table
+        columns={columns}
+        dataSource={data?.map((data) => ({ ...data, key: data.financial_discount_id }))}
+        className="sectionContainerTable"
+        pagination={false}
+        rowSelection={rowSelection}
+      />
+
+      <ModalRemove
+        name="elemento"
+        isOpen={removeModal}
+        onClose={() => {
+          setActiveRow(null);
+          setRemoveModal(false);
+        }}
+        onRemove={() => {
+          setActiveRow(null);
+          setRemoveModal(false);
+          handleDeleteRow && activeRow && handleDeleteRow(activeRow.id);
+        }}
+      />
+    </>
   );
 };
 

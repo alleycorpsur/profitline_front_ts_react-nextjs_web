@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from "react";
-import { Plus } from "phosphor-react";
+import React, { useCallback, useMemo, useState } from "react";
+import { DotsThree, Plus } from "phosphor-react";
 import { Button, Flex, Spin } from "antd";
 
 import { useApplicationTable } from "@/hooks/useApplicationTable";
@@ -9,7 +9,11 @@ import { useParams } from "next/navigation";
 
 import { useAppStore } from "@/lib/store/store";
 import { extractSingleParam } from "@/utils/utils";
-import { addItemsToTable } from "@/services/applyTabClients/applyTabClients";
+import {
+  addItemsToTable,
+  removeItemsFromTable,
+  saveApplication
+} from "@/services/applyTabClients/applyTabClients";
 import { useMessageApi } from "@/context/MessageContext";
 import { useSelectedPayments } from "@/context/SelectedPaymentsContext";
 
@@ -22,8 +26,17 @@ import ModalAddToTables from "./Modals/ModalAddToTables/ModalAddToTables";
 import { ModalSelectAjustements } from "./Modals/ModalSelectAjustements/ModalSelectAjustements";
 import ModalListAdjustments from "./Modals/ModalListAdjustments/ModalListAdjustments";
 import ModalCreateAdjustment from "./Modals/ModalCreateAdjustment/ModalCreateAdjustment";
+import ModalEditRow from "./Modals/ModalEditRow/ModalEditRow";
+
+import { IApplyTabRecord } from "@/types/applyTabClients/IApplyTabClients";
 
 import "./apply-tab.scss";
+
+interface ISelectedRowKeys {
+  invoices: React.Key[];
+  payments: React.Key[];
+  discounts: React.Key[];
+}
 
 export interface IModalAddToTableOpen {
   isOpen: boolean;
@@ -40,9 +53,9 @@ const ApplyTab: React.FC = () => {
   const { ID: projectId } = useAppStore((state) => state.selectedProject);
   const params = useParams();
   const clientId = Number(extractSingleParam(params.clientId)) || 0;
-  const [search, setSearch] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const { showMessage } = useMessageApi();
-
+  const [loadingSave, setLoadingSave] = useState(false);
   //TODO this is the context that is not being used
   // const { selectedPayments } = useSelectedPayments();
 
@@ -51,6 +64,13 @@ const ApplyTab: React.FC = () => {
   );
 
   const [modalAdjustmentsState, setModalAdjustmentsState] = useState({} as IModalAdjustmentsState);
+  const [editingRow, setEditingRow] = useState<boolean>(false);
+  const [selectedRowKeys, setSelectedRowKeys] = useState<ISelectedRowKeys>({
+    invoices: [],
+    payments: [],
+    discounts: []
+  });
+  const [selectedRows, setSelectedRows] = useState<IApplyTabRecord[]>();
 
   const { data: applicationData, isLoading, mutate } = useApplicationTable();
   const showModal = (adding_type: "invoices" | "payments") => {
@@ -93,36 +113,121 @@ const ApplyTab: React.FC = () => {
     }
   };
 
+  const handleRemoveRow = async (row_id: number) => {
+    // Handle removing selected
+    try {
+      await removeItemsFromTable(row_id);
+      showMessage("success", `Se ha eliminado el elemento correctamente ${row_id}`);
+      mutate();
+    } catch (error) {
+      showMessage("error", "Ha ocurrido un error al eliminar el elemento");
+    }
+  };
+
+  const handleEditRow = (row_id: number) => {
+    console.info("Edit row", row_id);
+    setEditingRow(true);
+  };
+
+  const handleSelectChange = useCallback(
+    (tableKey: keyof ISelectedRowKeys, newSelectedRowKeys: React.Key[]) => {
+      setSelectedRowKeys(() => {
+        const updatedSelectedRowKeys: ISelectedRowKeys = {
+          payments: [],
+          invoices: [],
+          discounts: []
+        };
+        updatedSelectedRowKeys[tableKey] = newSelectedRowKeys;
+        return updatedSelectedRowKeys;
+      });
+    },
+    []
+  );
+
+  const rowSelection = (tableKey: keyof ISelectedRowKeys) => ({
+    selectedRowKeys: selectedRowKeys[tableKey],
+    onChange: (newSelectedRowKeys: React.Key[], newSelectedRows: any) => {
+      setSelectedRows(newSelectedRows);
+      return handleSelectChange(tableKey, newSelectedRowKeys);
+    }
+  });
+
+  const handlePrintSelectedRows = () => {
+    // I leave this here for future use
+    for (const key in selectedRowKeys) {
+      if (selectedRowKeys.hasOwnProperty(key)) {
+        const typedKey = key as keyof ISelectedRowKeys; // Type assertion to avoid TS error
+        const selectedRows = selectedRowKeys[typedKey];
+        if (selectedRows.length > 0) {
+          console.info(`Selected ${key}:`, selectedRows);
+        }
+      }
+    }
+  };
+
+  const handleSave = async () => {
+    setLoadingSave(true);
+    try {
+      await saveApplication(projectId, clientId);
+      showMessage("success", "Se ha guardado la aplicación correctamente");
+    } catch (error) {
+      showMessage("error", "Ha ocurrido un error al guardar la aplicación");
+    }
+    setLoadingSave(false);
+  };
+
+  const filteredData = useMemo(() => {
+    if (!applicationData) return { invoices: [], payments: [], discounts: [] };
+
+    const filteredInvoices = applicationData.invoices.filter((invoice) =>
+      invoice?.id_erp?.toString().toLowerCase().includes(searchQuery)
+    );
+
+    const filteredPayments = applicationData.payments.filter((payment) =>
+      payment?.payment_id?.toString().toLowerCase().includes(searchQuery)
+    );
+
+    const filteredDiscounts = applicationData.discounts.filter((discount) =>
+      discount?.financial_discount_id?.toString().toLowerCase().includes(searchQuery)
+    );
+
+    return {
+      invoices: filteredInvoices,
+      payments: filteredPayments,
+      discounts: filteredDiscounts
+    };
+  }, [applicationData, searchQuery]);
+
   const dataForCollapse = useMemo(() => {
     const invoices = {
       statusName: "facturas",
       color: "#FF7A00",
       statusId: 1,
-      itemsList: applicationData?.invoices,
-      total: applicationData?.summary.total_invoices,
-      count: applicationData?.invoices.length
+      itemsList: filteredData?.invoices,
+      total: filteredData?.invoices.length && applicationData?.summary.total_invoices,
+      count: filteredData?.invoices.length
     };
 
     const payments = {
       statusName: "pagos",
       color: "#0085FF",
       statusId: 2,
-      itemsList: applicationData?.payments,
-      total: applicationData?.summary.total_payments,
-      count: applicationData?.payments.length
+      itemsList: filteredData?.payments,
+      total: filteredData?.payments.length && applicationData?.summary.total_payments,
+      count: filteredData?.payments.length
     };
 
     const discounts = {
       statusName: "ajustes",
       color: "#E53261",
       statusId: 3,
-      itemsList: applicationData?.discounts,
-      total: applicationData?.summary.total_discounts,
-      count: applicationData?.discounts.length
+      itemsList: filteredData?.discounts,
+      total: filteredData?.discounts.length && applicationData?.summary.total_discounts,
+      count: filteredData?.discounts.length
     };
 
     return [invoices, payments, discounts];
-  }, [applicationData]);
+  }, [filteredData]);
 
   return (
     <>
@@ -133,21 +238,25 @@ const ApplyTab: React.FC = () => {
         total={applicationData?.summary.total_balance}
       />
       <div className="applyContainerTab">
-        <Flex justify="space-between" className="accountingAdjustmentsTab__header">
+        <Flex justify="space-between" className="applyContainerTab__header">
           <Flex gap={"0.5rem"}>
             <UiSearchInput
               className="search"
               placeholder="Buscar"
               onChange={(event) => {
-                setSearch(event.target.value);
+                setSearchQuery(event.target.value.toLowerCase());
               }}
             />
+            <Button
+              className="button__actions"
+              size="large"
+              icon={<DotsThree size={"1.5rem"} />}
+              onClick={handlePrintSelectedRows}
+            >
+              Generar acción
+            </Button>
           </Flex>
-          <Button
-            type="primary"
-            className="availableAdjustments"
-            onClick={() => console.log("click ajustes disponibles")}
-          >
+          <Button type="primary" className="save-btn" onClick={handleSave} loading={loadingSave}>
             Guardar
           </Button>
         </Flex>
@@ -194,9 +303,30 @@ const ApplyTab: React.FC = () => {
               ),
               children: (
                 <div>
-                  {section.statusName === "facturas" && <InvoiceTable data={section.itemsList} />}
-                  {section.statusName === "pagos" && <PaymentsTable data={section.itemsList} />}
-                  {section.statusName === "ajustes" && <DiscountTable data={section.itemsList} />}
+                  {section.statusName === "facturas" && (
+                    <InvoiceTable
+                      data={section.itemsList}
+                      handleDeleteRow={handleRemoveRow}
+                      handleEditRow={handleEditRow}
+                      rowSelection={rowSelection("invoices")}
+                    />
+                  )}
+                  {section.statusName === "pagos" && (
+                    <PaymentsTable
+                      data={section.itemsList}
+                      handleDeleteRow={handleRemoveRow}
+                      handleEditRow={handleEditRow}
+                      rowSelection={rowSelection("payments")}
+                    />
+                  )}
+                  {section.statusName === "ajustes" && (
+                    <DiscountTable
+                      data={section.itemsList}
+                      handleDeleteRow={handleRemoveRow}
+                      handleEditRow={handleEditRow}
+                      rowSelection={rowSelection("discounts")}
+                    />
+                  )}
                 </div>
               )
             }))}
@@ -230,13 +360,22 @@ const ApplyTab: React.FC = () => {
         visible={
           modalAdjustmentsState && modalAdjustmentsState.isOpen && modalAdjustmentsState.modal === 2
         }
-        onCancel={() =>
-          setModalAdjustmentsState({
-            isOpen: true,
-            modal: 1,
-            adjustmentType: undefined
-          })
-        }
+        onCancel={(succesfullyApplied) => {
+          if (succesfullyApplied) {
+            mutate();
+            setModalAdjustmentsState({
+              isOpen: false,
+              modal: 0,
+              adjustmentType: undefined
+            });
+          } else {
+            setModalAdjustmentsState({
+              isOpen: true,
+              modal: 1,
+              adjustmentType: undefined
+            });
+          }
+        }}
         setModalAction={(e: number) => {
           setModalAdjustmentsState({
             isOpen: true,
@@ -245,6 +384,7 @@ const ApplyTab: React.FC = () => {
         }}
         addGlobalAdjustment={handleAdd}
         modalAdjustmentsState={modalAdjustmentsState}
+        selectedInvoices={selectedRows}
       />
       <ModalCreateAdjustment
         isOpen={
@@ -252,6 +392,7 @@ const ApplyTab: React.FC = () => {
         }
         onCancel={() => setModalAdjustmentsState({ isOpen: true, modal: 2 })}
       />
+      <ModalEditRow visible={editingRow} onCancel={() => setEditingRow(false)} />
     </>
   );
 };

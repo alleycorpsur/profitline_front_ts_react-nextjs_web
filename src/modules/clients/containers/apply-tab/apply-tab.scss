@@ -1,17 +1,39 @@
 @import "@styles/variables.scss";
 
-.applyContainerApp {
+.applyContainerTab {
     display: flex;
     flex-direction: column;
-    width: 100%;
-    height: 100%;
-    overflow-y: auto;
-    overflow-x: hidden;
-    background-color: #ffffff;
-    padding: 1rem 1rem;
-    margin-top: 0.2rem;
-    border-radius: 8px;
-    gap: 0.5rem;
+
+    &__header {
+        // background-color: yellow !important;
+
+        .save-btn {
+            background-color: $secondary;
+            box-shadow: none;
+            color: $black;
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+            font-weight: 600;
+            height: 3rem;
+
+            &:hover {
+                color: $white;
+                background-color: $secondary !important;
+            }
+        }
+
+        .button__actions {
+            padding: 0.75rem 1rem;
+            background-color: $background;
+            border: solid 1px transparent;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            height: 3rem !important;
+            font-size: 1rem;
+        }
+    }
 }
 
 .buttonActionApply {
@@ -62,6 +84,7 @@
         border: 1px solid #dddddd !important;
         border-radius: 0 !important;
         font-size: 1rem;
+        text-align: center !important;
     }
 
     .ant-table-tbody > tr > td {
@@ -86,38 +109,43 @@
     .ant-collapse-item {
         border: none !important;
     }
-}
 
-.toolTip {
-    color: $black;
-    font-weight: 300;
-    padding: 0.3rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+    .dotsBtn {
+        background-color: $background;
+        border: 1px solid transparent;
+        width: 24px;
+        height: 24px;
+        padding: 0;
+        border-radius: 4px;
+        margin-left: 1rem;
 
-    strong {
-        font-weight: 600;
+        &:hover {
+            border: 1px solid $black;
+            background-color: $background !important;
+        }
     }
 }
 
-.logosWrapper {
-    padding-right: 0.3rem !important;
+.dropdownApplicationTable {
+    ul {
+        background-color: $white !important;
+    }
 
-    .logos {
-        display: flex;
-        gap: 0.25rem;
-        justify-content: flex-end;
+    li {
+        &:hover {
+            background-color: inherit !important;
+            cursor: default !important;
+        }
+    }
 
-        button {
-            background-color: $background;
-            padding: 0;
+    .buttonNoBorder {
+        background-color: $background !important;
+        border: none;
+        width: 100%;
+        justify-content: flex-start;
 
-            border: none;
-
-            &:hover {
-                border: 1px solid $black;
-            }
+        &:hover {
+            outline: 1px solid $black;
         }
     }
 }
