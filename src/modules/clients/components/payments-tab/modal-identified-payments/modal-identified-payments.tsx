@@ -3,8 +3,9 @@ import { Radio } from "antd";
 import { CaretLeft } from "phosphor-react";
 import { useParams } from "next/navigation";
 
+import { useAppStore } from "@/lib/store/store";
 import { useMessageApi } from "@/context/MessageContext";
-import { extractSingleParam, formatDateDMY, formatMoney } from "@/utils/utils";
+import { extractSingleParam, formatDateDMY } from "@/utils/utils";
 import { matchPayment } from "@/services/clientsPayments/clientsPayments";
 
 import SecondaryButton from "@/components/atoms/buttons/secondaryButton/SecondaryButton";
@@ -38,6 +39,7 @@ const ModalIdentifiedPayment: FC<ModalIdentifiedPaymentProps> = ({
   identifiedPayments,
   onClose
 }) => {
+  const formatMoney = useAppStore((state) => state.formatMoney);
   const { showMessage } = useMessageApi();
   const params = useParams();
   const clientId = extractSingleParam(params.clientId);

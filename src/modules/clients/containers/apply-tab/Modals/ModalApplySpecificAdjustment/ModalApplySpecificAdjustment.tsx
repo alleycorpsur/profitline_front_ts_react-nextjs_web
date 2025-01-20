@@ -7,7 +7,7 @@ import { CaretLeft, CopySimple } from "phosphor-react";
 import { useMessageApi } from "@/context/MessageContext";
 import { useAppStore } from "@/lib/store/store";
 import { IFinancialDiscount } from "@/hooks/useAcountingAdjustment";
-import { extractSingleParam, formatMoney } from "@/utils/utils";
+import { extractSingleParam } from "@/utils/utils";
 import { addSpecificAdjustments } from "@/services/applyTabClients/applyTabClients";
 
 import UiTabs from "@/components/ui/ui-tabs";
@@ -43,6 +43,7 @@ const ModalApplySpecificAdjustment = ({
   const params = useParams();
   const clientId = extractSingleParam(params.clientId) || "";
   const { ID: projectId } = useAppStore((state) => state.selectedProject);
+  const formatMoney = useAppStore((state) => state.formatMoney);
   const { showMessage } = useMessageApi();
   const [selectTab, setSelectTab] = useState(0);
   const [currentInvoices, setCurrentInvoices] = useState<ICurrentInvoice[]>(
