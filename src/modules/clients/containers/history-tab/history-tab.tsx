@@ -32,6 +32,10 @@ const HistoryTab = () => {
     setOpenModal({ selected: 0 });
   };
 
+  const handleOpenDetail = (row: IHistoryRow) => {
+    console.log("Ver detalle", row);
+  };
+
   return (
     <>
       {isLoading ? (
@@ -62,7 +66,11 @@ const HistoryTab = () => {
               </Button>
             </Flex>
           </Flex>
-          <HistoryTable dataAllRecords={data} setSelectedRows={setSelectedRows} />
+          <HistoryTable
+            dataAllRecords={data}
+            setSelectedRows={setSelectedRows}
+            handleOpenDetail={handleOpenDetail}
+          />
 
           <ModalActionsHistoryTab
             isOpen={openModal.selected === 1}
