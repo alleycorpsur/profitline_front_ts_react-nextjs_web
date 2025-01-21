@@ -8,9 +8,10 @@ import { useClientHistory } from "@/hooks/useClientHistory";
 
 import UiSearchInput from "@/components/ui/search-input";
 import UiFilterDropdown from "@/components/ui/ui-filter-dropdown";
-import HistoryTable from "../../components/history-tab-table";
-import ModalActionsHistoryTab from "../../components/history-tab-modal-generate-action";
+import HistoryTable from "../../components/history-tab/history-tab-table";
+import ModalActionsHistoryTab from "../../components/history-tab/history-tab-modal-generate-action";
 import { ModalConfirmAction } from "@/components/molecules/modals/ModalConfirmAction/ModalConfirmAction";
+import ModalCommunicationDetail from "../../components/history-tab/history-tab-modal-communication-detail/History-tab-modal-communication-detail";
 
 import { IHistoryRow } from "@/types/clientHistory/IClientHistory";
 
@@ -34,6 +35,7 @@ const HistoryTab = () => {
 
   const handleOpenDetail = (row: IHistoryRow) => {
     console.log("Ver detalle", row);
+    setOpenModal({ selected: 3 });
   };
 
   return (
@@ -81,10 +83,19 @@ const HistoryTab = () => {
           <ModalConfirmAction
             isOpen={openModal.selected === 2}
             onClose={() => setOpenModal({ selected: 0 })}
-            title="¿Estás seguro que deseas anular esta apliación?"
+            title="¿Estás seguro que deseas anular esta aplicación de pago?"
             content="Esta acción es definitiva"
             onOk={handleCancelApplication}
             okText="Anular aplicación"
+          />
+
+          <ModalCommunicationDetail
+            isOpen={openModal.selected === 3}
+            onClose={() => {
+              setOpenModal({ selected: 0 });
+
+              console.log("cerrar modal");
+            }}
           />
         </div>
       )}
