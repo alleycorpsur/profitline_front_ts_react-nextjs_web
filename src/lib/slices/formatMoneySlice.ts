@@ -41,35 +41,40 @@ export const formatMoneySlice = (set: any, get: any): IFormatMoneyStore => ({
     const finalHideCurrencySymbol = hideCurrencySymbol;
     const scaleFactor = scale ?? 0;
 
-    const formatter = new Intl.NumberFormat(finalLocale, {
-      style: "currency",
-      currency: finalCurrency,
-      minimumFractionDigits: 0
-    });
+    try {
+      const formatter = new Intl.NumberFormat(finalLocale, {
+        style: "currency",
+        currency: finalCurrency,
+        minimumFractionDigits: 0
+      });
 
-    if (!amount) {
-      if (finalHideCurrencySymbol) {
-        return formatter.format(0).replace(/[^\d.,]/g, "");
+      if (!amount) {
+        if (finalHideCurrencySymbol) {
+          return formatter.format(0).replace(/[^\d.,]/g, "");
+        }
+        return formatter.format(0);
       }
-      return formatter.format(0);
+
+      const parsedNum = typeof amount === "string" ? parseFloat(amount) : amount;
+
+      let number = parsedNum;
+      for (let i = 0; i < scaleFactor; i++) {
+        number /= 10; // divides
+      }
+
+      if (finalHideCurrencySymbol) {
+        return formatter.format(number).replace(/[^\d.,]/g, "");
+      }
+
+      if (hideDecimals) {
+        const noDecimalNumber = Math.floor(number);
+        return formatter.format(noDecimalNumber);
+      }
+
+      return formatter.format(number);
+    } catch (error) {
+      console.error("Error formatting money", error);
+      return amount?.toString() || "0";
     }
-
-    const parsedNum = typeof amount === "string" ? parseFloat(amount) : amount;
-
-    let number = parsedNum;
-    for (let i = 0; i < scaleFactor; i++) {
-      number /= 10; // divides
-    }
-
-    if (finalHideCurrencySymbol) {
-      return formatter.format(number).replace(/[^\d.,]/g, "");
-    }
-
-    if (hideDecimals) {
-      const noDecimalNumber = Math.floor(number);
-      return formatter.format(noDecimalNumber);
-    }
-
-    return formatter.format(number);
   }
 });
