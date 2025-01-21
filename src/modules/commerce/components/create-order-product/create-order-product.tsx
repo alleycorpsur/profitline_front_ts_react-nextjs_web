@@ -3,7 +3,8 @@ import Image from "next/image";
 import { Flex } from "antd";
 import { Minus, Plus } from "phosphor-react";
 
-import { formatMoney } from "@/utils/utils";
+import { useAppStore } from "@/lib/store/store";
+
 import { useHandleProductsItems } from "../../hooks/create-order/handle-products-items.hook";
 
 import SecondaryButton from "@/components/atoms/buttons/secondaryButton/SecondaryButton";
@@ -20,6 +21,7 @@ export interface CreateOrderProductProps {
 }
 
 const CreateOrderProduct: FC<CreateOrderProductProps> = ({ product, categoryName }) => {
+  const formatMoney = useAppStore((state) => state.formatMoney);
   const {
     alreadySelectedProduct,
     handleAddToCart,

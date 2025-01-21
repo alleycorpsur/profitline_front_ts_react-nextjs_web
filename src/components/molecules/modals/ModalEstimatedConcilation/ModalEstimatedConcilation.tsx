@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import Draggable, { DraggableData, DraggableEvent } from "react-draggable";
 import { Collapse, Flex } from "antd";
+
+import { useAppStore } from "@/lib/store/store";
+
 import "./modalEstimatedConcilation.scss";
-import { formatMoney } from "@/utils/utils";
 
 const { Panel } = Collapse;
 
@@ -22,6 +24,7 @@ export const ModalEstimatedConcilation = ({
   notFoundInvoices,
   differenceInvoices
 }: Props) => {
+  const formatMoney = useAppStore((state) => state.formatMoney);
   const updateDefaultPosition = () => {
     const modalWidth = draggleRef.current?.offsetWidth || 240;
     setDefaultPosition({ x: window.innerWidth - modalWidth - 20, y: 0 });

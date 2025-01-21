@@ -6,7 +6,12 @@ export enum QuestionType {
   NUMBER = "number",
   DATE = "date"
 }
-
+export enum FormMode {
+  CREATE = "create",
+  EDIT = "edit",
+  PREVIEW = "preview",
+  ANSWER = "answer"
+}
 export interface Option {
   value: string;
   label: string;

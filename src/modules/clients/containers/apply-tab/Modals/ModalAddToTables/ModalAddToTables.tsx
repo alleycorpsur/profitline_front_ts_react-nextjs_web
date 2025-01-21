@@ -2,9 +2,10 @@ import React, { useState, useMemo, useEffect } from "react";
 import { Modal, Checkbox, Spin, message, Flex, Pagination } from "antd";
 import { CaretLeft, CopySimple, X } from "phosphor-react";
 
+import { useAppStore } from "@/lib/store/store";
 import { useInvoices } from "@/hooks/useInvoices";
 import { useClientsPayments } from "@/hooks/useClientsPayments";
-import { formatDate, formatMoney } from "@/utils/utils";
+import { formatDate } from "@/utils/utils";
 
 import UiSearchInputLong from "@/components/ui/search-input-long";
 import { IModalAddToTableOpen } from "../../apply-tab";
@@ -28,6 +29,8 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
   onAdd,
   isModalAddToTableOpen
 }) => {
+  const formatMoney = useAppStore((state) => state.formatMoney);
+
   const [rows, setRows] = useState<(IInvoice | IClientPayment)[]>([]);
   const [selectedRows, setSelectedRows] = useState<(IInvoice | IClientPayment)[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -72,7 +75,7 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
   }, [searchQuery]);
 
   const [notFoundInvoices, setNotFoundInvoices] = useState<number[]>([]);
-  const [adjustments, setAdjustments] = useState(15000000);
+  const [adjustments] = useState(15000000);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);

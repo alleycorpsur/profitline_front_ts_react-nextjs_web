@@ -1,14 +1,23 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 import { Modal } from "antd";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
+import { CaretLeft, Plus } from "phosphor-react";
+
+import { useAppStore } from "@/lib/store/store";
+import { createGlobalAdjustment } from "@/services/applyTabClients/applyTabClients";
+import { useFinancialDiscountMotives } from "@/hooks/useFinancialDiscountMotives";
+import { useAcountingAdjustment } from "@/hooks/useAcountingAdjustment";
+import { extractSingleParam } from "@/utils/utils";
+import { useMessageApi } from "@/context/MessageContext";
+
+import { InputForm } from "@/components/atoms/inputs/InputForm/InputForm";
 import SecondaryButton from "@/components/atoms/buttons/secondaryButton/SecondaryButton";
 import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
-import { CaretLeft, Plus } from "phosphor-react";
-import { Controller, useFieldArray, useForm } from "react-hook-form";
 import GeneralSelect from "@/components/ui/general-select";
+import { InputFormMoney } from "@/components/atoms/inputs/InputFormMoney/InputFormMoney";
 
 import "./modalCreateAdjustment.scss";
-import { InputFormMoney } from "@/components/atoms/inputs/InputFormMoney/InputFormMoney";
-import { InputForm } from "@/components/atoms/inputs/InputForm/InputForm";
 
 interface ISelect {
   value: string;
@@ -21,11 +30,21 @@ interface IAdjustment {
   amount?: number;
 }
 interface ModalCreateAdjustmentProps {
-  onCancel: () => void;
+  // eslint-disable-next-line no-unused-vars
+  onCancel: (created?: Boolean) => void;
   isOpen: boolean;
 }
 
 const ModalCreateAdjustment: React.FC<ModalCreateAdjustmentProps> = ({ isOpen, onCancel }) => {
+  const { ID: projectId } = useAppStore((state) => state.selectedProject);
+  const params = useParams();
+  const clientId = Number(extractSingleParam(params.clientId)) || 0;
+  const { showMessage } = useMessageApi();
+  const { mutate } = useAcountingAdjustment(clientId.toString(), projectId.toString(), 2);
+  const { data: motives } = useFinancialDiscountMotives();
+
+  const [loadingCreate, setLoadingCreate] = useState(false);
+
   const {
     control,
     handleSubmit,
@@ -48,8 +67,22 @@ const ModalCreateAdjustment: React.FC<ModalCreateAdjustmentProps> = ({ isOpen, o
     }
   }, [isOpen, append, reset]);
 
-  const onSubmit = (data: { adjustments: IAdjustment[] }) => {
-    console.log("ajustes: ", data);
+  const onSubmit = async (data: { adjustments: IAdjustment[] }) => {
+    setLoadingCreate(true);
+    const adjustments = data.adjustments.map((adjustment) => ({
+      motive: parseInt(adjustment?.motive?.value || "0"),
+      amount: adjustment.amount || 0,
+      description: adjustment.detail || ""
+    }));
+    try {
+      await createGlobalAdjustment(projectId, clientId, adjustments);
+      showMessage("success", "Ajuste(s) creado correctamente");
+      mutate();
+      onCancel(true);
+    } catch (error) {
+      showMessage("error", "Error al crear el ajuste(s)");
+    }
+    setLoadingCreate(false);
   };
 
   return (
@@ -59,11 +92,11 @@ const ModalCreateAdjustment: React.FC<ModalCreateAdjustmentProps> = ({ isOpen, o
         width={"60%"}
         open={isOpen}
         closeIcon={false}
-        onCancel={onCancel}
+        onCancel={() => onCancel()}
         footer={null}
       >
-        <div onClick={onCancel} className="header">
-          <CaretLeft size={24} onClick={onCancel} />
+        <div onClick={() => onCancel()} className="header">
+          <CaretLeft size={24} />
           <h2>Crear ajuste</h2>
         </div>
 
@@ -73,14 +106,16 @@ const ModalCreateAdjustment: React.FC<ModalCreateAdjustmentProps> = ({ isOpen, o
               <Controller
                 name={`adjustments.${index}.motive`}
                 control={control}
-                rules={{ required: "Cliente es obligatorio" }}
+                rules={{ required: "Motivo es obligatorio" }}
                 render={({ field }) => (
                   <GeneralSelect
                     errors={errors?.adjustments?.[index]?.motive}
                     field={field}
-                    title="Cliente"
-                    placeholder="Ingresar cliente"
-                    options={mockInputs}
+                    title="Motivo"
+                    placeholder="Ingresar Motivo"
+                    options={
+                      motives?.map((motive) => ({ value: motive.id, label: motive.name })) || []
+                    }
                     showSearch
                     customStyleContainer={{ width: "100%" }}
                     customStyleTitle={{ marginBottom: "4px" }}
@@ -120,11 +155,16 @@ const ModalCreateAdjustment: React.FC<ModalCreateAdjustmentProps> = ({ isOpen, o
         </button>
 
         <div className="modal-footer">
-          <SecondaryButton fullWidth onClick={onCancel}>
+          <SecondaryButton fullWidth onClick={() => onCancel()}>
             Cancelar
           </SecondaryButton>
 
-          <PrincipalButton disabled={!isValid} onClick={handleSubmit(onSubmit)} fullWidth>
+          <PrincipalButton
+            disabled={!isValid}
+            onClick={handleSubmit(onSubmit)}
+            fullWidth
+            loading={loadingCreate}
+          >
             Crear ajuste
           </PrincipalButton>
         </div>
@@ -134,8 +174,3 @@ const ModalCreateAdjustment: React.FC<ModalCreateAdjustmentProps> = ({ isOpen, o
 };
 
 export default ModalCreateAdjustment;
-
-const mockInputs = [
-  { value: "1", label: "Cliente 1" },
-  { value: "2", label: "Cliente 2" }
-];

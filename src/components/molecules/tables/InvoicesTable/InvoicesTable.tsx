@@ -1,13 +1,15 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Button, Table, TableProps, Tooltip, Typography } from "antd";
-
-import { IInvoice } from "@/types/invoices/IInvoices";
 import { CheckCircle, Eye, Handshake, Warning, WarningCircle } from "phosphor-react";
-import "./invoicestable.scss";
-import { calculateDaysDifference, daysLeft, formatDate, formatMoney } from "@/utils/utils";
 import dayjs from "dayjs";
 
+import { useAppStore } from "@/lib/store/store";
+import { calculateDaysDifference, daysLeft, formatDate } from "@/utils/utils";
+
+import { IInvoice } from "@/types/invoices/IInvoices";
+
 const { Text } = Typography;
+import "./invoicestable.scss";
 
 interface PropsInvoicesTable {
   stateId: number;
@@ -25,6 +27,8 @@ export const InvoicesTable = ({
   selectedRows,
   openInvoiceDetail
 }: PropsInvoicesTable) => {
+  const formatMoney = useAppStore((state) => state.formatMoney);
+
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
 
   useEffect(() => {

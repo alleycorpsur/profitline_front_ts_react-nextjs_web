@@ -1,12 +1,15 @@
 import { Button, Select, Table, TableProps, Tooltip, Typography } from "antd";
+import { useState } from "react";
 import { CheckCircle, Eye } from "phosphor-react";
-import "./concilationTable.scss";
-import { formatDate, formatDateBars, formatMoney } from "@/utils/utils";
-import { IInvoiceConcilation } from "@/types/concilation/concilation";
+
+import { useAppStore } from "@/lib/store/store";
+import { formatDate, formatDateBars } from "@/utils/utils";
 import { useInvoiceIncidentMotives } from "@/hooks/useInvoiceIncidentMotives";
-import { useEffect, useState } from "react";
+
+import { IInvoiceConcilation } from "@/types/concilation/concilation";
 
 const { Text } = Typography;
+import "./concilationTable.scss";
 
 interface PropsInvoicesTable {
   dataSingleInvoice: IInvoiceConcilation[];
@@ -25,6 +28,8 @@ export const ConcilationTable = ({
   onRowSelection,
   selectedRowKeys
 }: PropsInvoicesTable) => {
+  const formatMoney = useAppStore((state) => state.formatMoney);
+
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
 

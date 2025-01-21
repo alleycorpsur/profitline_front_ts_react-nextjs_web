@@ -17,7 +17,6 @@ import {
 import CardsClients from "../../../molecules/modals/CardsClients/CardsClients";
 
 import { IClientsPortfolio } from "@/types/clients/IViewClientsTable";
-import { formatMoney } from "@/utils/utils";
 
 import { useDebounce } from "@/hooks/useDeabouce";
 import {
@@ -34,6 +33,8 @@ import "./ClientsViewTable.scss";
 const { Text } = Typography;
 
 export const ClientsViewTable = () => {
+  const formatMoney = useAppStore((state) => state.formatMoney);
+  const PAGINATION_LIMIT = 25;
   const [searchQuery, setSearchQuery] = useState<string>("");
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
   const [filters, setFilters] = useState<SelectedFilters>({
@@ -51,7 +52,6 @@ export const ClientsViewTable = () => {
   });
 
   const fetchPortfolios = async ({ pageParam = 1 }) => {
-    const limit = 50;
     const holdingQuery = filters.holding.length > 0 ? `&holding=${filters.holding.join(",")}` : "";
     const searchQueryParam = debouncedSearchQuery
       ? `&searchQuery=${encodeURIComponent(debouncedSearchQuery.toLowerCase().trim())}`
@@ -59,7 +59,7 @@ export const ClientsViewTable = () => {
     const clientGroupQuery =
       filters.clientGroup.length > 0 ? `&client_group=${filters.clientGroup.join(",")}` : "";
 
-    const pathKey = `/portfolio/client/project/${ID}?page=${pageParam}&limit=${limit}${holdingQuery}${searchQueryParam}${clientGroupQuery}`;
+    const pathKey = `/portfolio/client/project/${ID}?page=${pageParam}&limit=${PAGINATION_LIMIT}${holdingQuery}${searchQueryParam}${clientGroupQuery}`;
 
     return fetcher(pathKey);
   };
@@ -69,7 +69,10 @@ export const ClientsViewTable = () => {
     fetchPortfolios,
     {
       getNextPageParam: (lastPage, pages) => {
-        if (lastPage.message === "no rows" || lastPage?.data?.clientsPortfolio?.length < 50)
+        if (
+          lastPage.message === "no rows" ||
+          lastPage?.data?.clientsPortfolio?.length < PAGINATION_LIMIT
+        )
           return undefined;
         return pages.length + 1;
       }

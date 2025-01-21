@@ -1,7 +1,7 @@
-import SupplierForm from "@/components/organisms/proveedores";
+import ThirdPartiesView from "@/components/organisms/proveedores/ThirdPartiesView";
 
 function Page() {
-  return <SupplierForm />;
+  return <ThirdPartiesView />;
 }
 
 export default Page;

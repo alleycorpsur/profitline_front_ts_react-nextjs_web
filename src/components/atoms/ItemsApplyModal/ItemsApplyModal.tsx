@@ -1,8 +1,8 @@
 import { FC } from "react";
-import "./itemsApplyModal.scss";
-import { formatMoney } from "@/utils/utils";
+import { useAppStore } from "@/lib/store/store";
 import { DividerVerticalModal } from "../DividerVertical/DividerVerticalModal";
 
+import "./itemsApplyModal.scss";
 interface ItemsApplyModalProps {
   type: number;
   item: {
@@ -16,6 +16,8 @@ interface ItemsApplyModalProps {
 }
 
 const ItemApplyModal: FC<ItemsApplyModalProps> = ({ item, type, availableValue }) => {
+  const formatMoney = useAppStore((state) => state.formatMoney);
+
   return (
     <div className="item__apply__modal">
       <div className="head">

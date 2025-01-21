@@ -12,7 +12,8 @@ import {
   Bank,
   SquaresFour,
   Storefront,
-  UsersFour
+  UsersFour,
+  Stack
 } from "phosphor-react";
 
 import { logOut } from "../../../../firebase-utils";
@@ -33,9 +34,8 @@ export const SideBar = () => {
   const router = useRouter();
   const path = usePathname();
   const project = useStore(useAppStore, (state) => state.selectedProject);
-  const setProjectsBasicInfo = useAppStore((state) => state.setProjectsBasicInfo);
-  const setSelectedProject = useAppStore((state) => state.setSelectedProject);
-  const setUserId = useAppStore((state) => state.setUserId);
+  const { setProjectsBasicInfo, setSelectedProject, setUserId, setCurrency, setLocale } =
+    useAppStore((state) => state);
 
   const LOGO = project?.LOGO;
 
@@ -67,6 +67,8 @@ export const SideBar = () => {
       );
 
       setUserId(response?.data.id_user);
+      setCurrency(response?.data.preferences.currency);
+      setLocale(response?.data.preferences.id);
 
       if (response?.data?.permissions?.length === 1) {
         setSelectedProject({
@@ -196,6 +198,16 @@ export const SideBar = () => {
             size="large"
             icon={<UsersFour size={26} />}
             className={path === "/proveedores" ? "buttonIcon" : "buttonIconActive"}
+          >
+            {isSideBarLarge && "Ajustes"}
+          </Button>
+        </Link>
+        <Link href="/client-management" passHref legacyBehavior>
+          <Button
+            type="primary"
+            size="large"
+            icon={<Stack size={26} />}
+            className={path === "/client-management" ? "buttonIcon" : "buttonIconActive"}
           >
             {isSideBarLarge && "Ajustes"}
           </Button>
