@@ -34,9 +34,8 @@ export const SideBar = () => {
   const router = useRouter();
   const path = usePathname();
   const project = useStore(useAppStore, (state) => state.selectedProject);
-  const setProjectsBasicInfo = useAppStore((state) => state.setProjectsBasicInfo);
-  const setSelectedProject = useAppStore((state) => state.setSelectedProject);
-  const setUserId = useAppStore((state) => state.setUserId);
+  const { setProjectsBasicInfo, setSelectedProject, setUserId, setCurrency, setLocale } =
+    useAppStore((state) => state);
 
   const LOGO = project?.LOGO;
 
@@ -68,6 +67,8 @@ export const SideBar = () => {
       );
 
       setUserId(response?.data.id_user);
+      setCurrency(response?.data.preferences.currency);
+      setLocale(response?.data.preferences.id);
 
       if (response?.data?.permissions?.length === 1) {
         setSelectedProject({
