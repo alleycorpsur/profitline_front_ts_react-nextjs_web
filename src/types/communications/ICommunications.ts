@@ -109,6 +109,11 @@ export interface ICommunication {
   JSON_frecuency: Frequency;
 }
 
+export interface Iattachments {
+  id: number;
+  name: string;
+}
+
 export interface ICommunicationDetail {
   id: number;
   id_project: number;
