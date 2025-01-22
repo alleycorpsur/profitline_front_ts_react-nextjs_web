@@ -104,7 +104,8 @@ const PaymentsTable = ({
       title: "Monto",
       key: "initial_value",
       dataIndex: "initial_value",
-      render: (initial_value) => <p className="cell robotoMono ">{formatMoney(initial_value)}</p>,
+      align: "right",
+      render: (initial_value) => <p className="cell robotoMono">{formatMoney(initial_value)}</p>,
       sorter: (a, b) => a.initial_value - b.initial_value,
       showSorterTooltip: false
     },
@@ -112,6 +113,7 @@ const PaymentsTable = ({
       title: "Disponible",
       key: "current_value",
       dataIndex: "current_value",
+      align: "right",
       render: (current_value) => <p className="cell robotoMono">{formatMoney(current_value)}</p>,
       sorter: (a, b) => a.current_value - b.current_value,
       showSorterTooltip: false

@@ -39,6 +39,9 @@
 
         &__description {
             max-width: 400px;
+            max-height: 65px;
+            overflow: scroll;
+            scrollbar-width: none;
         }
     }
 

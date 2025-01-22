@@ -5,7 +5,7 @@ import { StateConcilationTable } from "@/components/molecules/tables/Concilation
 import { InfoConcilation } from "@/types/concilation/concilation";
 import { extractSingleParam } from "@/utils/utils";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export const MassConcilationView = () => {
   const [currentView, setCurrentView] = useState<"paste" | "state">("paste");
