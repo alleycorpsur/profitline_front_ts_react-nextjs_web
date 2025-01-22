@@ -8,9 +8,10 @@ import { useClientHistory } from "@/hooks/useClientHistory";
 
 import UiSearchInput from "@/components/ui/search-input";
 import UiFilterDropdown from "@/components/ui/ui-filter-dropdown";
-import HistoryTable from "../../components/history-tab-table";
-import ModalActionsHistoryTab from "../../components/history-tab-modal-generate-action";
+import HistoryTable from "../../components/history-tab/history-tab-table";
+import ModalActionsHistoryTab from "../../components/history-tab/history-tab-modal-generate-action";
 import { ModalConfirmAction } from "@/components/molecules/modals/ModalConfirmAction/ModalConfirmAction";
+import ModalCommunicationDetail from "../../components/history-tab/history-tab-modal-communication-detail/History-tab-modal-communication-detail";
 
 import { IHistoryRow } from "@/types/clientHistory/IClientHistory";
 
@@ -27,9 +28,14 @@ const HistoryTab = () => {
   const { data } = useClientHistory({ clientId: Number(clientIdParam) });
 
   const handleCancelApplication = () => {
-    console.log("Anular aplicación");
-    console.log(selectedRows);
+    console.info("Anular aplicación");
+    console.info(selectedRows);
     setOpenModal({ selected: 0 });
+  };
+
+  const handleOpenDetail = (row: IHistoryRow) => {
+    console.info("Ver detalle", row);
+    setOpenModal({ selected: 3 });
   };
 
   return (
@@ -62,7 +68,11 @@ const HistoryTab = () => {
               </Button>
             </Flex>
           </Flex>
-          <HistoryTable dataAllRecords={data} setSelectedRows={setSelectedRows} />
+          <HistoryTable
+            dataAllRecords={data}
+            setSelectedRows={setSelectedRows}
+            handleOpenDetail={handleOpenDetail}
+          />
 
           <ModalActionsHistoryTab
             isOpen={openModal.selected === 1}
@@ -73,10 +83,15 @@ const HistoryTab = () => {
           <ModalConfirmAction
             isOpen={openModal.selected === 2}
             onClose={() => setOpenModal({ selected: 0 })}
-            title="¿Estás seguro que deseas anular esta apliación?"
+            title="¿Estás seguro que deseas anular esta aplicación de pago?"
             content="Esta acción es definitiva"
             onOk={handleCancelApplication}
             okText="Anular aplicación"
+          />
+
+          <ModalCommunicationDetail
+            isOpen={openModal.selected === 3}
+            onClose={() => setOpenModal({ selected: 0 })}
           />
         </div>
       )}

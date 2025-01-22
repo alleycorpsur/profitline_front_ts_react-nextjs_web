@@ -15,9 +15,15 @@ const { Text } = Typography;
 interface PropsHistoryTable {
   dataAllRecords?: IHistoryRow[];
   setSelectedRows: Dispatch<SetStateAction<IHistoryRow[] | undefined>>;
+  // eslint-disable-next-line no-unused-vars
+  handleOpenDetail: (row: IHistoryRow) => void;
 }
 
-const HistoryTable = ({ dataAllRecords: data, setSelectedRows }: PropsHistoryTable) => {
+const HistoryTable = ({
+  dataAllRecords: data,
+  setSelectedRows,
+  handleOpenDetail
+}: PropsHistoryTable) => {
   const [page, setPage] = useState(1);
   const height = useScreenHeight();
 
@@ -70,11 +76,11 @@ const HistoryTable = ({ dataAllRecords: data, setSelectedRows }: PropsHistoryTab
     },
     {
       title: "",
-      render: () => (
+      render: (_, row) => (
         <Flex gap="0.5rem">
           <Button
             className="eyeButton"
-            onClick={() => console.info("Ver detalle")}
+            onClick={() => handleOpenDetail(row)}
             icon={<Eye size={"1.2rem"} />}
           />
         </Flex>
