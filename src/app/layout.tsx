@@ -2,7 +2,7 @@
 import { ConfigProvider } from "antd";
 import theme from "@/theme/themeConfig";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
-import { Poppins } from "next/font/google";
+import { Poppins, Roboto_Mono } from "next/font/google";
 import { ModalProvider } from "@/context/ModalContext";
 import "../styles/globals.scss";
 import { useEffect, useState } from "react";
@@ -15,7 +15,14 @@ const queryClient = new QueryClient();
 
 const poppins = Poppins({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800", "900"]
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
+  variable: "--font-poppins" // Define a CSS variable for Poppins
+});
+
+const robotoMono = Roboto_Mono({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"], // Adjust weights as needed
+  variable: "--font-roboto-mono" // Define a CSS variable for Roboto Mono
 });
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -31,9 +38,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
 
   return (
     <ConfigProvider theme={theme}>
-      <html lang="es" className={poppins.className}>
+      <html lang="es" className={`${poppins.variable} ${robotoMono.variable}`}>
         <QueryClientProvider client={queryClient}>
-          <body>
+          <body className={poppins.className}>
             <AntdRegistry>
               {loading ? (
                 <Loader />
