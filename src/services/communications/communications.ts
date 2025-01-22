@@ -10,13 +10,19 @@ import {
   ICommunicationDetail,
   ICommunicationForm,
   ICreateCommunication,
-  IPeriodicityModalForm
+  IPeriodicityModalForm,
+  Iattachments
 } from "@/types/communications/ICommunications";
 import { GenericResponse } from "@/types/global/IGlobal";
 
 interface IGetSelect {
   id: number;
   name: string;
+}
+
+export const getAllAtachments = async () => {
+  const response: Iattachments[] = await API.get(`${config.API_HOST}/comunication/attachments`);
+  return response;
 }
 
 export const getAllCommunications = async (projectId: number) => {
@@ -144,6 +150,7 @@ export const createCommunication = async ({
     // Where does invoice should come from?
     project_id: projectId,
     name: data.name,
+    attachment_ids: data.attachment_ids,
     description: data.description,
     subject: data.template.subject,
     message: data.template.message,

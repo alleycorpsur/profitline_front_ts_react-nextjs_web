@@ -16,6 +16,7 @@ import SelectOuterTags from "@/components/ui/select-outer-tags";
 import InputClickable from "@/components/ui/input-clickable";
 import { ModalPeriodicity } from "@/components/molecules/modals/ModalPeriodicity/ModalPeriodicity";
 import {
+  Iattachments,
   ICommunicationDetail,
   ICommunicationForm,
   IPeriodicityModalForm
@@ -29,7 +30,8 @@ import {
   getCommunicationById,
   getForwardEvents,
   getSubActions,
-  getTemplateTags
+  getTemplateTags,
+  getAllAtachments
 } from "@/services/communications/communications";
 import { useAppStore } from "@/lib/store/store";
 import { capitalize, stringFromArrayOfSelect } from "@/utils/utils";
@@ -85,6 +87,7 @@ export const CommunicationProjectForm = ({
   const [actions, setActions] = useState<ISelect[]>([]);
   const [subActions, setSubActions] = useState<ISelect[]>([]);
   const [templateTags, setTemplateTags] = useState<ISelect[]>([]);
+  const [attachments, setAttachments] = useState<{ value: number; label: string }[]>([]);
   const [forwardTo, setForwardTo] = useState<
     {
       value: string;
@@ -103,22 +106,16 @@ export const CommunicationProjectForm = ({
     field.onChange(value);
   };
 
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-    watch,
-    setValue,
-    getValues
-  } = useForm<ICommunicationForm>({
+
+  const { control, handleSubmit, formState: { errors }, watch, setValue, getValues } = useForm<ICommunicationForm>({
     values:
       showCommunicationDetails.active && communicationData.data
         ? dataToDataForm(communicationData.data)
         : undefined
   });
+
   const watchTemplateTagsLabels = watch("template.tags")?.map((tag) => `\{{${tag.label}\}}`);
   const watchSelectedAction = watch("trigger.settings.actions");
-
   useEffect(() => {
     //set values for selects
     const fecthEvents = async () => {
@@ -149,6 +146,7 @@ export const CommunicationProjectForm = ({
         label: `Cliente - ${position.name}`
       }));
       setForwardTo([...contactPositions]);
+
     };
     fetchForwardOptions();
 
@@ -161,6 +159,15 @@ export const CommunicationProjectForm = ({
       if (res) {
         setCommunicationData({ data: res, isLoading: false });
         setRadioValue(res.id_comunication_type.id);
+
+        setAttachments(
+          res.attachment_ids.map((attachment: { id: number; name: string }) => ({
+            value: attachment.id,
+            label: attachment.name
+          }))
+        );
+
+
         // setSelectedBusinessRules({
         //   channels: res.rules.channel,
         //   lines: res.rules.line,
@@ -178,6 +185,8 @@ export const CommunicationProjectForm = ({
           days: [{ value: repeat.day, label: dayToLabel(repeat.day) }],
           end_date: dayjs(new Date(end_date)).add(1, "day")
         });
+
+
       }
     };
     fetchSingleCommunication();
@@ -203,6 +212,7 @@ export const CommunicationProjectForm = ({
     if (!dayObj) return day;
     return dayObj.label;
   };
+
 
   const handleAddTagToBodyAndSubject = (value: OptionType[], deletedValue: OptionType[]) => {
     const valueBody = getValues("template.message");
@@ -245,6 +255,9 @@ export const CommunicationProjectForm = ({
     });
 
     try {
+
+      data.attachment_ids = data.template.files.map((file: { value: number; label: string }) => file.value);
+
       await createCommunication({
         data,
         selectedPeriodicity,
@@ -283,6 +296,26 @@ export const CommunicationProjectForm = ({
       setSelectedPeriodicity(undefined);
     }
   }, [radioValue]);
+
+  useEffect(() => {
+    fetchAttachments();
+  }, []);
+
+
+
+  const fetchAttachments = async () => {
+    try {
+      const response = await getAllAtachments(); // Llamada al servicio
+      const formattedAttachments = response.map((attachment: { id: number; name: string }) => ({
+        value: attachment.id, // Mapeo de `id` a `value`
+        label: attachment.name // Mapeo de `name` a `label`
+      }));
+      setAttachments(formattedAttachments); // Actualizar el estado con los datos formateados
+    } catch (error) {
+      console.error("Error fetching attachments", error);
+    }
+  };
+
 
   return (
     <main className={styles.communicationProjectForm}>
@@ -659,7 +692,7 @@ export const CommunicationProjectForm = ({
                 <SelectOuterTags
                   title="Adjunto"
                   placeholder="Seleccionar adjunto"
-                  options={mockAttachments}
+                  options={attachments}
                   errors={errors.template?.files}
                   field={field}
                   customStyleContainer={{ marginTop: "1rem" }}
@@ -696,7 +729,6 @@ export const CommunicationProjectForm = ({
 
 const viasSelectOption = ["Email", "SMS", "WhatsApp"];
 
-const mockAttachments = ["PDF Estado de cuenta", "Excel cartera", "PDF Factura"];
 
 const initDatSelectedBusinessRules: ISelectedBussinessRules = {
   channels: [],
@@ -706,6 +738,9 @@ const initDatSelectedBusinessRules: ISelectedBussinessRules = {
 
 const dataToDataForm = (data: ICommunicationDetail | undefined): ICommunicationForm | undefined => {
   if (!data || Object.keys(data).length === 0) return undefined;
+
+
+  
   const roles = data.user_roles?.map((role) => ({
     value: `1_${role.id}`,
     label: `Rol - ${role.name}`
@@ -717,9 +752,15 @@ const dataToDataForm = (data: ICommunicationDetail | undefined): ICommunicationF
   }));
   const send_to = [...roles, ...contactPositions];
 
+  const files = data.attachment_ids.map((attachment: { id: number; name: string }) => ({
+    value: attachment.id,
+    label: attachment.name
+  }));
+
   return {
     name: data.name,
     description: data.description,
+    attachment_ids: data.attachment_ids,
     trigger: {
       type: data.id_comunication_type.id,
       settings: {
@@ -742,7 +783,7 @@ const dataToDataForm = (data: ICommunicationDetail | undefined): ICommunicationF
       tags: [{ value: "1", label: "Quemado" }],
       message: data.message,
       subject: data.subject,
-      files: []
+      files: files
     }
   };
 };
