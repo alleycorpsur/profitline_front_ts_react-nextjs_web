@@ -107,19 +107,13 @@ export const CommunicationProjectForm = ({
   };
 
 
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-    watch,
-    setValue,
-    getValues
-  } = useForm<ICommunicationForm>({
+  const { control, handleSubmit, formState: { errors }, watch, setValue, getValues } = useForm<ICommunicationForm>({
     values:
       showCommunicationDetails.active && communicationData.data
         ? dataToDataForm(communicationData.data)
         : undefined
   });
+
   const watchTemplateTagsLabels = watch("template.tags")?.map((tag) => `\{{${tag.label}\}}`);
   const watchSelectedAction = watch("trigger.settings.actions");
   useEffect(() => {
@@ -165,6 +159,15 @@ export const CommunicationProjectForm = ({
       if (res) {
         setCommunicationData({ data: res, isLoading: false });
         setRadioValue(res.id_comunication_type.id);
+
+        setAttachments(
+          res.attachment_ids.map((attachment: { id: number; name: string }) => ({
+            value: attachment.id,
+            label: attachment.name
+          }))
+        );
+
+
         // setSelectedBusinessRules({
         //   channels: res.rules.channel,
         //   lines: res.rules.line,
@@ -182,6 +185,8 @@ export const CommunicationProjectForm = ({
           days: [{ value: repeat.day, label: dayToLabel(repeat.day) }],
           end_date: dayjs(new Date(end_date)).add(1, "day")
         });
+
+
       }
     };
     fetchSingleCommunication();
@@ -250,6 +255,9 @@ export const CommunicationProjectForm = ({
     });
 
     try {
+
+      data.attachment_ids = data.template.files.map((file: { value: number; label: string }) => file.value);
+
       await createCommunication({
         data,
         selectedPeriodicity,
@@ -290,8 +298,8 @@ export const CommunicationProjectForm = ({
   }, [radioValue]);
 
   useEffect(() => {
-    fetchAttachments(); 
-  }, []); 
+    fetchAttachments();
+  }, []);
 
 
 
@@ -730,6 +738,9 @@ const initDatSelectedBusinessRules: ISelectedBussinessRules = {
 
 const dataToDataForm = (data: ICommunicationDetail | undefined): ICommunicationForm | undefined => {
   if (!data || Object.keys(data).length === 0) return undefined;
+
+
+  
   const roles = data.user_roles?.map((role) => ({
     value: `1_${role.id}`,
     label: `Rol - ${role.name}`
@@ -741,9 +752,15 @@ const dataToDataForm = (data: ICommunicationDetail | undefined): ICommunicationF
   }));
   const send_to = [...roles, ...contactPositions];
 
+  const files = data.attachment_ids.map((attachment: { id: number; name: string }) => ({
+    value: attachment.id,
+    label: attachment.name
+  }));
+
   return {
     name: data.name,
     description: data.description,
+    attachment_ids: data.attachment_ids,
     trigger: {
       type: data.id_comunication_type.id,
       settings: {
@@ -766,7 +783,7 @@ const dataToDataForm = (data: ICommunicationDetail | undefined): ICommunicationF
       tags: [{ value: "1", label: "Quemado" }],
       message: data.message,
       subject: data.subject,
-      files: []
+      files: files
     }
   };
 };

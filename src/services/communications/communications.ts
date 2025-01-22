@@ -22,7 +22,6 @@ interface IGetSelect {
 
 export const getAllAtachments = async () => {
   const response: Iattachments[] = await API.get(`${config.API_HOST}/comunication/attachments`);
-  console.log("response", response);
   return response;
 }
 
@@ -151,6 +150,7 @@ export const createCommunication = async ({
     // Where does invoice should come from?
     project_id: projectId,
     name: data.name,
+    attachment_ids: data.attachment_ids,
     description: data.description,
     subject: data.template.subject,
     message: data.template.message,
