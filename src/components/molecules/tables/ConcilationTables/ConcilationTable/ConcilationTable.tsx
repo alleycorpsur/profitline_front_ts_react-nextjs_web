@@ -13,9 +13,13 @@ import "./concilationTable.scss";
 
 interface PropsInvoicesTable {
   dataSingleInvoice: IInvoiceConcilation[];
+  // eslint-disable-next-line no-unused-vars
   setShowInvoiceDetailModal: (params: { isOpen: boolean; invoiceId: number }) => void;
+  // eslint-disable-next-line no-unused-vars
   setIderp: (id: string) => void;
+  // eslint-disable-next-line no-unused-vars
   addSelectMotive: (invoiceId: number, motiveId: number) => void;
+  // eslint-disable-next-line no-unused-vars
   onRowSelection: (selectedRowKeys: React.Key[], selectedRows: IInvoiceConcilation[]) => void;
   selectedRowKeys: React.Key[];
 }
@@ -117,7 +121,7 @@ export const ConcilationTable = ({
       title: "Monto cp",
       key: "current_value",
       dataIndex: "current_value",
-      render: (amount) => <Text className="cell -alignRight">{formatMoney(amount)}</Text>,
+      render: (amount) => <p className="cell -alignRight robotoMono">{formatMoney(amount)}</p>,
       sorter: (a, b) => a.current_value - b.current_value,
       showSorterTooltip: false,
       align: "right",
@@ -136,7 +140,9 @@ export const ConcilationTable = ({
       title: "Diferencia",
       key: "difference_amount",
       dataIndex: "difference_amount",
-      render: (amount) => <p className="text__red__concilation">{formatMoney(amount)}</p>,
+      render: (amount) => (
+        <p className="text__red__concilation robotoMono">{formatMoney(amount)}</p>
+      ),
       sorter: (a, b) => a.current_value - b.current_value,
       showSorterTooltip: false,
       align: "right"
