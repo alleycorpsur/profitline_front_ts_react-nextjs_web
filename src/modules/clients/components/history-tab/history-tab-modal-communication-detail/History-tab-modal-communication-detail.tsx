@@ -1,10 +1,9 @@
 import React, { useEffect } from "react";
-import { Flex, Modal } from "antd";
-
-import { DocumentButton } from "@/components/atoms/DocumentButton/DocumentButton";
 import { useForm, Controller } from "react-hook-form";
-import { InputForm } from "@/components/atoms/inputs/InputForm/InputForm";
+import { Flex, Modal } from "antd";
+import { FileArrowUp } from "phosphor-react";
 
+import { InputForm } from "@/components/atoms/inputs/InputForm/InputForm";
 import GeneralSearchSelect from "@/components/ui/general-search-select";
 
 import "./history-tab-modal-communication-detail.scss";
@@ -59,14 +58,23 @@ const ModalCommunicationDetail = ({ isOpen, onClose }: DigitalRecordModalProps) 
           ],
           subject: "Solicitud de información",
           body: "Caliquet lacus aliquam quis. Maecenas pretium dapibus dolor, vitae convallis risus suscipit vel. Curabitur et maximus leo. Vivamus lacinia rhoncus ante, eu semper sapien luctus eget. Cras feugiat in nunc vel rhoncus. Etiam quam mauris, luctus eget felis in, porttitor tempor mauris. Cras quam purus, accumsan eget consectetur in, dapibus vitae enim. Ut mattis ex in dui elementum scelerisque. Praesent lobortis tempor dapibus.",
-          attachments: []
+          attachments: [
+            {
+              name: "example-document-1.pdf",
+              size: "2.5MB"
+            },
+            {
+              name: "example-image-1.pngexample-image-1.pngexample-image-1.pngexample-image-1.pngexample-image-1.png",
+              size: "1.8MB"
+            }
+          ]
         };
 
         setValue("forward_to", response.forward_to);
         setValue("copy_to", response.copy_to);
         setValue("subject", response.subject);
         setValue("body", response.body);
-        setValue("attachments", response.attachments);
+        setValue("attachments", response.attachments as unknown as File[]);
       } catch (error) {
         console.error("Error getting digital record form info2", error);
       }
@@ -92,7 +100,7 @@ const ModalCommunicationDetail = ({ isOpen, onClose }: DigitalRecordModalProps) 
     >
       <h2 className="modalCommunicationDetail__title">Correo enviado</h2>
 
-      <Flex vertical gap="0.5rem">
+      <Flex vertical gap="1.5rem">
         <Controller
           name="forward_to"
           control={control}
@@ -139,26 +147,21 @@ const ModalCommunicationDetail = ({ isOpen, onClose }: DigitalRecordModalProps) 
           disabled
           render={({ field }) => (
             <div className="modalCommunicationDetail__textArea">
-              <p className="modalCommunicationDetail__textArea__label">Observaciones</p>
               <textarea {...field} placeholder="" />
             </div>
           )}
         />
 
         <div>
-          <Flex className="modalCommunicationDetail__files" vertical gap="0.7rem">
-            {attachments.map((file, index) => (
-              <DocumentButton
-                key={file.name}
-                className={index > 0 ? "documentButton" : ""}
-                title={file.name}
-                // handleOnChange={handleOnChangeDocument}
-                // handleOnDelete={() => handleOnDeleteDocument(file.name)}
-                fileName={file.name}
-                fileSize={file.size}
-              />
+          <div className="modalCommunicationDetail__files">
+            {attachments.map((file) => (
+              <div className="modalCommunicationDetail__files__file" key={file.name}>
+                <FileArrowUp size={"25px"} />
+                <p className="nameFile">{file.name}</p>
+                <p className="sizeFile">{file.size}</p>
+              </div>
             ))}
-          </Flex>
+          </div>
         </div>
       </Flex>
     </Modal>

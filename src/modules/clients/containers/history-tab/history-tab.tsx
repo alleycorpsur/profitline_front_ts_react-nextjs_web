@@ -28,13 +28,13 @@ const HistoryTab = () => {
   const { data } = useClientHistory({ clientId: Number(clientIdParam) });
 
   const handleCancelApplication = () => {
-    console.log("Anular aplicación");
-    console.log(selectedRows);
+    console.info("Anular aplicación");
+    console.info(selectedRows);
     setOpenModal({ selected: 0 });
   };
 
   const handleOpenDetail = (row: IHistoryRow) => {
-    console.log("Ver detalle", row);
+    console.info("Ver detalle", row);
     setOpenModal({ selected: 3 });
   };
 
@@ -91,11 +91,7 @@ const HistoryTab = () => {
 
           <ModalCommunicationDetail
             isOpen={openModal.selected === 3}
-            onClose={() => {
-              setOpenModal({ selected: 0 });
-
-              console.log("cerrar modal");
-            }}
+            onClose={() => setOpenModal({ selected: 0 })}
           />
         </div>
       )}
