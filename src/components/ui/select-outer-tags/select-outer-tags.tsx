@@ -31,6 +31,7 @@ interface PropsGeneralSelect<T extends FieldValues> {
   titleAbsolute?: boolean;
   // eslint-disable-next-line no-unused-vars
   addedOnchangeBehaviour?: (value: OptionType[], deletedValue: OptionType[]) => void;
+  disableValueRetention?: boolean;
 }
 
 const SelectOuterTags = <T extends FieldValues>({
@@ -43,7 +44,8 @@ const SelectOuterTags = <T extends FieldValues>({
   customStyleContainer,
   hiddenTags,
   titleAbsolute,
-  addedOnchangeBehaviour
+  addedOnchangeBehaviour,
+  disableValueRetention
 }: PropsGeneralSelect<T>) => {
   const [selectedOptions, setSelectedOptions] = useState<OptionType[]>([]);
   const [usedOptions, setUsedOptions] = useState<
@@ -59,8 +61,11 @@ const SelectOuterTags = <T extends FieldValues>({
       (prevOption) => !value.some((option) => option.value === prevOption.value)
     );
 
-    setSelectedOptions(value);
-    field.onChange(value);
+    // Skip state update if retention is disabled
+    if (!disableValueRetention) {
+      setSelectedOptions(value);
+      field.onChange(value);
+    }
 
     if (addedOnchangeBehaviour) addedOnchangeBehaviour(value, deletedValue);
   };
@@ -88,17 +93,19 @@ const SelectOuterTags = <T extends FieldValues>({
   }, [options, field.value]);
 
   useEffect(() => {
-    if (field.value) {
+    if (!disableValueRetention && field.value) {
       setSelectedOptions(field.value);
     }
-  }, [field.value]);
+  }, [field.value, disableValueRetention]);
 
   const handleDeleteSelected = (option: OptionType) => {
     const newSelectedOptions = selectedOptions.filter(
       (selectedOption) => selectedOption.value !== option.value
     );
-    setSelectedOptions(newSelectedOptions);
-    field.onChange(newSelectedOptions);
+    if (!disableValueRetention) {
+      setSelectedOptions(newSelectedOptions);
+      field.onChange(newSelectedOptions);
+    }
   };
 
   return (
@@ -115,7 +122,7 @@ const SelectOuterTags = <T extends FieldValues>({
         popupClassName="selectDrop"
         loading={loading}
         optionLabelProp="label"
-        value={selectedOptions}
+        value={disableValueRetention ? [] : selectedOptions}
         onChange={handleChange}
         options={usedOptions}
         labelInValue

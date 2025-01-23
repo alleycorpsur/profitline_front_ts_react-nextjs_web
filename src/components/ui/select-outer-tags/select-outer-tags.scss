@@ -1,4 +1,7 @@
 @import "@styles/variables.scss";
+// Styles for the dropdown are applied in
+// src/components/molecules/selects/clients/commonInputStyles.scss
+// As the component mount outside the parent component, the styles are applied in the global scope
 
 .selectOuterTags {
     width: 100%;
@@ -78,19 +81,6 @@
         &.-absolute {
             left: 0.7rem;
             top: 0.7rem;
-        }
-    }
-
-    .selectDrop {
-        background-color: $background !important;
-        font-size: 1rem;
-
-        .selectOptions {
-            background-color: $background !important;
-            border-top: 1px solid $white;
-            padding: 0.7rem !important;
-            font-size: 1rem !important;
-            font-size: 1rem;
         }
     }
 
