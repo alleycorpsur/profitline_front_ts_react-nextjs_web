@@ -23,7 +23,7 @@ interface IGetSelect {
 export const getAllAtachments = async () => {
   const response: Iattachments[] = await API.get(`${config.API_HOST}/comunication/attachments`);
   return response;
-}
+};
 
 export const getAllCommunications = async (projectId: number) => {
   const response: ICommunication[] = await API.get(
@@ -48,13 +48,23 @@ export const getCommunicationById = async (
 };
 
 export const getForwardEvents = async (): Promise<IGetSelect[]> => {
-  const response: IGetSelect[] = await API.get(`${config.API_HOST}/comunication/events`);
-  return response;
+  try {
+    const response: IGetSelect[] = await API.get(`${config.API_HOST}/comunication/forward-events`);
+    return response;
+  } catch (error) {
+    console.error("Error getting forward events", error);
+    return [];
+  }
 };
 
 export const getActions = async (): Promise<IGetSelect[]> => {
-  const response: IGetSelect[] = await API.get(`${config.API_HOST}/comunication/actions`);
-  return response;
+  try {
+    const response: IGetSelect[] = await API.get(`${config.API_HOST}/comunication/actions`);
+    return response;
+  } catch (error) {
+    console.error("Error getting actions", error);
+    return [];
+  }
 };
 
 export const getSubActions = async (action_ids: string[]): Promise<IGetSelect[]> => {

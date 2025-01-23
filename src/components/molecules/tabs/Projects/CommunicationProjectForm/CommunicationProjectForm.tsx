@@ -106,15 +106,21 @@ export const CommunicationProjectForm = ({
     field.onChange(value);
   };
 
-
-  const { control, handleSubmit, formState: { errors }, watch, setValue, getValues } = useForm<ICommunicationForm>({
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+    watch,
+    setValue,
+    getValues
+  } = useForm<ICommunicationForm>({
     values:
       showCommunicationDetails.active && communicationData.data
         ? dataToDataForm(communicationData.data)
         : undefined
   });
 
-  const watchTemplateTagsLabels = watch("template.tags")?.map((tag) => `\{{${tag.label}\}}`);
+  const watchTemplateTagsLabels = templateTags?.map((tag) => `\{{${tag.label}\}}`);
   const watchSelectedAction = watch("trigger.settings.actions");
   useEffect(() => {
     //set values for selects
@@ -146,7 +152,6 @@ export const CommunicationProjectForm = ({
         label: `Cliente - ${position.name}`
       }));
       setForwardTo([...contactPositions]);
-
     };
     fetchForwardOptions();
 
@@ -167,7 +172,6 @@ export const CommunicationProjectForm = ({
           }))
         );
 
-
         // setSelectedBusinessRules({
         //   channels: res.rules.channel,
         //   lines: res.rules.line,
@@ -185,8 +189,6 @@ export const CommunicationProjectForm = ({
           days: [{ value: repeat.day, label: dayToLabel(repeat.day) }],
           end_date: dayjs(new Date(end_date)).add(1, "day")
         });
-
-
       }
     };
     fetchSingleCommunication();
@@ -213,19 +215,12 @@ export const CommunicationProjectForm = ({
     return dayObj.label;
   };
 
-
-  const handleAddTagToBodyAndSubject = (value: OptionType[], deletedValue: OptionType[]) => {
+  const handleAddTagToBodyAndSubject = (value: OptionType[]) => {
     const valueBody = getValues("template.message");
     //  SubjectAdding tags commented because it is not being used
-    const valueSubject = getValues("template.subject");
+    // const valueSubject = getValues("template.subject");
 
-    if (deletedValue.length > 0) {
-      const deletedTag = deletedValue[0].label;
-      setValue("template.message", valueBody.replace(`{{${deletedTag}}}`, ""));
-      setValue("template.subject", valueSubject.replace(`{{${deletedTag}}}`, ""));
-
-      return;
-    }
+    if (value.length === 0) return;
 
     const lastAddedTag = value.length > 0 ? value[value.length - 1] : undefined;
 
@@ -255,8 +250,9 @@ export const CommunicationProjectForm = ({
     });
 
     try {
-
-      data.attachment_ids = data.template.files.map((file: { value: number; label: string }) => file.value);
+      data.attachment_ids = data.template.files.map(
+        (file: { value: number; label: string }) => file.value
+      );
 
       await createCommunication({
         data,
@@ -301,8 +297,6 @@ export const CommunicationProjectForm = ({
     fetchAttachments();
   }, []);
 
-
-
   const fetchAttachments = async () => {
     try {
       const response = await getAllAtachments(); // Llamada al servicio
@@ -315,7 +309,6 @@ export const CommunicationProjectForm = ({
       console.error("Error fetching attachments", error);
     }
   };
-
 
   return (
     <main className={styles.communicationProjectForm}>
@@ -623,6 +616,7 @@ export const CommunicationProjectForm = ({
                     customStyleContainer={{ width: "25%" }}
                     hiddenTags
                     addedOnchangeBehaviour={handleAddTagToBodyAndSubject}
+                    disableValueRetention
                   />
                 )}
               />
@@ -656,7 +650,7 @@ export const CommunicationProjectForm = ({
                         scrollbarWidth: "none"
                       }}
                       value={field.value}
-                      highlightWords={watchTemplateTagsLabels}
+                      highlightWords={templateTags?.map((tag) => `\{{${tag.label}\}}`)}
                       disabled={!isEditAvailable && !!showCommunicationDetails.communicationId}
                     />
                   </div>
@@ -729,7 +723,6 @@ export const CommunicationProjectForm = ({
 
 const viasSelectOption = ["Email", "SMS", "WhatsApp"];
 
-
 const initDatSelectedBusinessRules: ISelectedBussinessRules = {
   channels: [],
   lines: [],
@@ -739,8 +732,6 @@ const initDatSelectedBusinessRules: ISelectedBussinessRules = {
 const dataToDataForm = (data: ICommunicationDetail | undefined): ICommunicationForm | undefined => {
   if (!data || Object.keys(data).length === 0) return undefined;
 
-
-  
   const roles = data.user_roles?.map((role) => ({
     value: `1_${role.id}`,
     label: `Rol - ${role.name}`
