@@ -131,7 +131,7 @@ export const WalletTab = () => {
         <ModalEstimateTotalInvoices selectedInvoices={selectedRows} />
       )}
       <div className="walletTab">
-        <Flex justify="space-between" className="walletTab__header">
+        <div className="walletTab__header">
           <Flex gap={"0.5rem"}>
             <UiSearchInput
               className="search"
@@ -158,13 +158,14 @@ export const WalletTab = () => {
             Ajustes contables
             <CaretDoubleRight size={16} style={{ marginLeft: "0.5rem" }} />
           </Button>
-        </Flex>
+        </div>
         {isLoading ? (
           <Flex justify="center" align="center" style={{ height: "3rem" }}>
             <Spin />
           </Flex>
         ) : (
           <Collapse
+            stickyLabel
             items={invoices?.map((invoiceState) => ({
               key: invoiceState.status_id,
               label: (

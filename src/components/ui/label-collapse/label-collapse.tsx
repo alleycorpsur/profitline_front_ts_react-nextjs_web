@@ -4,14 +4,12 @@ import { useAppStore } from "@/lib/store/store";
 import { capitalize } from "@/utils/utils";
 import styles from "./label-collapse.module.scss";
 
-interface PropsLabelCollapseInvoice {
+interface PropsLabelCollapseInvoice extends React.HTMLAttributes<HTMLDivElement> {
   status: string;
   total?: number;
   quantity?: number;
   color?: string;
   removeIcons?: boolean;
-  onAction?: () => void;
-  titleAction?: string;
 }
 
 const randomColors = [
@@ -30,14 +28,15 @@ const LabelCollapse = ({
   total,
   quantity,
   color,
-  removeIcons
+  removeIcons,
+  ...rest
 }: PropsLabelCollapseInvoice) => {
   const formatMoney = useAppStore((state) => state.formatMoney);
 
   const randomColor = randomColors[Math.floor(Math.random() * randomColors.length)];
 
   return (
-    <Flex className={styles.labelCollapse}>
+    <Flex className={styles.labelCollapse} {...rest}>
       <h5
         className={styles.labelCollapse__status}
         style={{ background: color ? color : randomColor }}
