@@ -1,5 +1,5 @@
 import { Dispatch, FC, SetStateAction, useContext, useEffect, useState } from "react";
-import { Radio, RadioChangeEvent, Spin } from "antd";
+import { Spin } from "antd";
 import { WarningDiamond, X } from "@phosphor-icons/react";
 import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
 import InputRadioRightSide from "@/components/ui/input-radio-right-side";
@@ -17,7 +17,7 @@ const CreateOrderDiscountsModal: FC<CreateOrderDiscountsModalProps> = ({
   setOpenDiscountsModal
 }) => {
   const { ID: projectId } = useAppStore((state) => state.selectedProject);
-  const [radioValue, setRadioValue] = useState(0);
+  const [radioValue, setRadioValue] = useState<number>(0);
   const [discounts, setDiscounts] = useState<IDiscountPackageAvailable[]>([]);
   const { client, discountId, setDiscountId } = useContext(OrderViewContext);
   const [loading, setLoading] = useState(false);
@@ -43,8 +43,8 @@ const CreateOrderDiscountsModal: FC<CreateOrderDiscountsModalProps> = ({
     setOpenDiscountsModal(false);
   };
 
-  const handleChangeRadio = (e: RadioChangeEvent) => {
-    setRadioValue(parseInt(e.target.value));
+  const handleRadioClick = (value: number) => {
+    setRadioValue((prevValue) => (prevValue === value ? 0 : value));
   };
 
   const styleRadio = {
@@ -69,18 +69,24 @@ const CreateOrderDiscountsModal: FC<CreateOrderDiscountsModalProps> = ({
       {loading ? (
         <Spin size="small" />
       ) : (
-        <Radio.Group className={styles.radioGroup} onChange={handleChangeRadio} value={radioValue}>
+        <div className={styles.radioGroup}>
           {discounts.map((discount) => (
-            <InputRadioRightSide key={discount.id} value={discount.id} customStyles={styleRadio}>
+            <InputRadioRightSide
+              key={discount.id}
+              value={discount.id}
+              customStyles={styleRadio}
+              onClick={() => handleRadioClick(discount.id)}
+              checked={radioValue === discount.id}
+            >
               <div className={styles.radioGroup__label}>
                 <p>{discount.name}</p>
               </div>
             </InputRadioRightSide>
           ))}
-        </Radio.Group>
+        </div>
       )}
 
-      <PrincipalButton disabled={!radioValue} onClick={handleApplyDiscounts}>
+      <PrincipalButton disabled={false} onClick={handleApplyDiscounts}>
         Aplicar
       </PrincipalButton>
     </div>
