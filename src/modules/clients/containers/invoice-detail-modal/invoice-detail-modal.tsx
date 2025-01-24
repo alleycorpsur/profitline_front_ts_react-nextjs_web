@@ -489,7 +489,22 @@ const InvoiceDetailModal: FC<InvoiceDetailModalProps> = ({
                               )}
 
                               {item.event_type_name === "Factura conciliada" ? (
-                                <div className={styles.name}>{`Acción: ${item.user_name}`}</div>
+                                <div>
+                                  <div
+                                    className={styles.icons}
+                                    onClick={() => {
+                                      handleDocumentClick(item?.files[0] || "");
+                                    }}
+                                  >
+                                    <ArrowLineDown
+                                      size={14}
+                                      onClick={() => {
+                                        setIsModalOpen;
+                                      }}
+                                    />
+                                  </div>
+                                  <div className={styles.name}>{`Acción: ${item.user_name}`}</div>
+                                </div>
                               ) : null}
 
                               {item.comments && (
