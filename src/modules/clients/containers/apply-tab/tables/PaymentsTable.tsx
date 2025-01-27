@@ -78,7 +78,7 @@ const PaymentsTable: React.FC<PaymentsTableProps> = ({
     },
     {
       title: "Detalle",
-      width: 75,
+      width: 76,
       render: (_, row) => {
         const items = [
           {
@@ -146,9 +146,12 @@ const PaymentsTable: React.FC<PaymentsTableProps> = ({
       <Table
         columns={columns}
         dataSource={data?.map((data) => ({ ...data, key: data.payment_id }))}
-        className="sectionContainerTable"
+        className="sectionContainerTable customSticky"
         pagination={false}
         rowSelection={rowSelection}
+        sticky={{
+          offsetHeader: 160
+        }}
       />
 
       <ModalRemove
