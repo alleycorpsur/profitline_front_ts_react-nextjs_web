@@ -5,12 +5,12 @@
     flex-direction: column;
     gap: 0.5rem;
     width: 100%;
-    background-color: $white;
+    height: 100vh;
     padding: 1.625rem 1.5rem;
-    overflow-x: scroll;
-    scrollbar-width: none;
     border-radius: 1rem;
     border: 1px solid $dark-gray;
+    overflow-y: auto;
+    background-color: $white;
 
     .buttonGoBack {
         display: flex;
