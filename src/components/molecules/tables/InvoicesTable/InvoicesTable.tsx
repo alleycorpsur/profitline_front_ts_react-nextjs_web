@@ -290,6 +290,11 @@ export const InvoicesTable = ({
           showSizeChanger: false
         }}
         size="small"
+        sticky={
+          {
+            offsetHeader: 160
+          } as any
+        }
       />
     </>
   );

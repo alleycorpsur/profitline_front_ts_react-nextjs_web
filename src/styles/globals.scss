@@ -132,3 +132,14 @@ a {
     font-family: $font-mono-space;
     letter-spacing: -0.2px;
 }
+
+//for sticky header in tables
+.ant-table-sticky-holder {
+    // this leaves a blank space when the header is sticky
+    // so the scrollable content is not seen behind the header
+    // between the header and the label or top content
+    padding-top: 0.5rem;
+    margin-top: -0.5rem;
+    background-color: $white !important;
+    z-index: 1 !important;
+}
