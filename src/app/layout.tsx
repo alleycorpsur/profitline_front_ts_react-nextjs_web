@@ -2,7 +2,8 @@
 import { ConfigProvider } from "antd";
 import theme from "@/theme/themeConfig";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
-import { Poppins, IBM_Plex_Mono } from "next/font/google";
+import { Poppins } from "next/font/google";
+import localFont from "next/font/local"; // Import localFont from next/font/local
 import { ModalProvider } from "@/context/ModalContext";
 import "../styles/globals.scss";
 import { useEffect, useState } from "react";
@@ -19,10 +20,9 @@ const poppins = Poppins({
   variable: "--font-poppins" // Define a CSS variable for Poppins
 });
 
-const ibmPlexMono = IBM_Plex_Mono({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"], // Adjust weights as needed
-  variable: "--mono-space-font" // Define a CSS variable for IBM Plex Mono
+const aptosNarrow = localFont({
+  src: "../../public/fonts/aptos-narrow.woff2", // Adjust the path to your font file
+  variable: "--mono-space-font" // Define a CSS variable for aptosNarrow
 });
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -38,7 +38,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
 
   return (
     <ConfigProvider theme={theme}>
-      <html lang="es" className={`${poppins.variable} ${ibmPlexMono.variable}`}>
+      <html lang="es" className={`${poppins.variable} ${aptosNarrow.variable}`}>
         <QueryClientProvider client={queryClient}>
           <body className={poppins.className}>
             <AntdRegistry>
