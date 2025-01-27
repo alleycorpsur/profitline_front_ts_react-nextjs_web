@@ -111,7 +111,9 @@ export const ClientsViewTable = () => {
       title: "Cartera",
       dataIndex: "total_portfolio",
       key: "total_portfolio",
-      render: (text) => <p className="fontMonoSpace">{formatMoney(text)}</p>,
+      render: (text) => (
+        <p className="fontMonoSpace">{formatMoney(text, { hideDecimals: true })}</p>
+      ),
       width: "10%",
       sorter: (a, b) => a.total_portfolio - b.total_portfolio
     },
@@ -120,7 +122,9 @@ export const ClientsViewTable = () => {
       title: "Vencida",
       dataIndex: "past_due_ammount",
       key: "past_due_ammount",
-      render: (text) => <p className="fontMonoSpace">{formatMoney(text)}</p>,
+      render: (text) => (
+        <p className="fontMonoSpace">{formatMoney(text, { hideDecimals: true })}</p>
+      ),
       width: "10%",
       sorter: (a, b) => a.past_due_ammount - b.past_due_ammount
     },
@@ -129,7 +133,9 @@ export const ClientsViewTable = () => {
       title: "Presupuesto",
       key: "budget_ammount",
       dataIndex: "budget_ammount",
-      render: (text) => <p className="fontMonoSpace">{formatMoney(text)}</p>,
+      render: (text) => (
+        <p className="fontMonoSpace">{formatMoney(text, { hideDecimals: true })}</p>
+      ),
       width: "10%",
       sorter: (a, b) => a.budget_ammount - b.budget_ammount
     },
@@ -138,7 +144,7 @@ export const ClientsViewTable = () => {
       title: "R. Aplicado",
       key: "applied_payments_ammount",
       dataIndex: "applied_payments_ammount",
-      render: (text) => <p className="fontMonoSpace">{formatMoney(text)}</p>
+      render: (text) => <p className="fontMonoSpace">{formatMoney(text, { hideDecimals: true })}</p>
     },
     {
       align: "center",
@@ -153,7 +159,7 @@ export const ClientsViewTable = () => {
       title: "PNA",
       key: "unapplied_payments_ammount",
       dataIndex: "unapplied_payments_ammount",
-      render: (text) => <p className="fontMonoSpace">{formatMoney(text)}</p>
+      render: (text) => <p className="fontMonoSpace">{formatMoney(text, { hideDecimals: true })}</p>
     },
     {
       align: "right",
