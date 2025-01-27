@@ -24,6 +24,7 @@ import {
 } from "@/types/commerce/ICommerce";
 import { useMessageApi } from "@/context/MessageContext";
 import { GenericResponse } from "@/types/global/IGlobal";
+import InputRadioRightSide from "@/components/ui/input-radio-right-side";
 
 interface IShippingInfoForm {
   addresses: {
@@ -94,8 +95,9 @@ const CreateOrderCheckout: FC = ({}) => {
     setCheckingOut(false);
   };
 
-  const handleChangeRadio = (e: RadioChangeEvent) => {
-    setDiscountId(parseInt(e.target.value));
+  const handleRadioClick = (value: number) => {
+    if (discountId === value) setDiscountId(0);
+    else setDiscountId(value);
   };
 
   const onSubmitSaveDraft = async (data: IShippingInfoForm) => {
@@ -249,19 +251,21 @@ const CreateOrderCheckout: FC = ({}) => {
 
         <div className={styles.discounts}>
           <h4 className={styles.discounts__title}>Seleccionar descuento a aplicar</h4>
-          <Radio.Group
-            className={styles.radioGroup}
-            onChange={handleChangeRadio}
-            value={discountId}
-          >
+          <div className={styles.radioGroup}>
             {discounts.map((discount) => (
-              <Radio className={styles.radioGroup__item} key={discount.id} value={discount.id}>
-                <div className={styles.radioGroup__item__label}>
+              <InputRadioRightSide
+                key={discount.id}
+                value={discount.id}
+                customStyles={{ border: "2px solid #e0e0e0", borderRadius: "8px", padding: "1rem" }}
+                onClick={() => handleRadioClick(discount.id)}
+                checked={discountId === discount.id}
+              >
+                <div className={styles.radioGroup__label}>
                   <p>{discount.name}</p>
                 </div>
-              </Radio>
+              </InputRadioRightSide>
             ))}
-          </Radio.Group>
+          </div>
         </div>
 
         <Flex gap={"1rem"}>
