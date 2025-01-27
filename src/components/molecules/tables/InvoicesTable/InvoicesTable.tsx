@@ -167,7 +167,7 @@ export const InvoicesTable = ({
       title: "Monto inicial",
       key: "initial_value",
       dataIndex: "initial_value",
-      render: (amount) => <p className="cell -alignRight robotoMono">{formatMoney(amount)}</p>,
+      render: (amount) => <p className="cell -alignRight fontMonoSpace">{formatMoney(amount)}</p>,
       sorter: (a, b) => a.initial_value - b.initial_value,
       showSorterTooltip: false,
       align: "right"
@@ -178,9 +178,9 @@ export const InvoicesTable = ({
       dataIndex: "ajust_value",
       render: (amount) =>
         amount === 0 ? null : amount > 0 ? (
-          <p className="cell -alignRight robotoMono">{formatMoney(amount)}</p>
+          <p className="cell -alignRight fontMonoSpace">{formatMoney(amount)}</p>
         ) : (
-          <p className="negativeAdjustment cell -alignRight robotoMono">{formatMoney(amount)}</p>
+          <p className="negativeAdjustment cell -alignRight fontMonoSpace">{formatMoney(amount)}</p>
         ),
       sorter: (a, b) => a.ajust_value - b.ajust_value,
       showSorterTooltip: false,
@@ -190,7 +190,7 @@ export const InvoicesTable = ({
       title: "Pendiente",
       key: "current_value",
       dataIndex: "current_value",
-      render: (amount) => <p className="cell -alignRight robotoMono">{formatMoney(amount)}</p>,
+      render: (amount) => <p className="cell -alignRight fontMonoSpace">{formatMoney(amount)}</p>,
       sorter: (a, b) => a.current_value - b.current_value,
       showSorterTooltip: false,
       align: "right"

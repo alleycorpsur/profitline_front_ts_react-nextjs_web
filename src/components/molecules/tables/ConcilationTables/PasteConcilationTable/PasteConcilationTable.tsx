@@ -132,7 +132,7 @@ export const PasteConcilationTable = ({
         key: "monto",
         align: "right",
         width: "20%",
-        render: (text) => <p className="robotoMono">{formatMoney(text)}</p>,
+        render: (text) => <p className="fontMonoSpace">{formatMoney(text)}</p>,
         sorter: (a, b) => a.monto - b.monto
       },
       {

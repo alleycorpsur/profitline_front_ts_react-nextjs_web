@@ -54,7 +54,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
       dataIndex: "initial_value",
       key: "initial_value",
       render: (initial_value) => (
-        <p className="robotoMono">{formatMoney(initial_value, { scale: 1 })}</p>
+        <p className="fontMonoSpace">{formatMoney(initial_value, { scale: 1 })}</p>
       ),
       sorter: (a, b) => a.initial_value - b.initial_value,
       showSorterTooltip: false,
@@ -64,7 +64,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
       title: "Pago",
       dataIndex: "amount",
       key: "amount",
-      render: (amount) => <p className="robotoMono">{formatMoney(amount)}</p>,
+      render: (amount) => <p className="fontMonoSpace">{formatMoney(amount)}</p>,
       sorter: (a, b) => a.amount - b.amount,
       showSorterTooltip: false,
       align: "right"
@@ -73,7 +73,9 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
       title: "Ajuste",
       dataIndex: "total_adjustments",
       key: "total_adjustments",
-      render: (total_adjustments) => <p className="robotoMono">{formatMoney(total_adjustments)}</p>,
+      render: (total_adjustments) => (
+        <p className="fontMonoSpace">{formatMoney(total_adjustments)}</p>
+      ),
       sorter: (a, b) => (a.total_adjustments ?? 0) - (b.total_adjustments ?? 0),
       showSorterTooltip: false,
       align: "right"
@@ -82,7 +84,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
       title: "Saldo",
       dataIndex: "current_value",
       key: "current_value",
-      render: (current_value) => <p className="robotoMono">{formatMoney(current_value)}</p>,
+      render: (current_value) => <p className="fontMonoSpace">{formatMoney(current_value)}</p>,
       sorter: (a, b) => a.current_value - b.current_value,
       showSorterTooltip: false,
       align: "right"

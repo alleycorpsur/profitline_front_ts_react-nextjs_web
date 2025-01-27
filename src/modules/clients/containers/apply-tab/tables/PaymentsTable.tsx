@@ -53,7 +53,7 @@ const PaymentsTable: React.FC<PaymentsTableProps> = ({
       title: "Monto",
       dataIndex: "amount",
       key: "amount",
-      render: (amount) => <p className="robotoMono">{formatMoney(amount)}</p>,
+      render: (amount) => <p className="fontMonoSpace">{formatMoney(amount)}</p>,
       sorter: (a, b) => a.amount - b.amount,
       showSorterTooltip: false,
       align: "right"
@@ -62,7 +62,7 @@ const PaymentsTable: React.FC<PaymentsTableProps> = ({
       title: "Monto aplicado",
       dataIndex: "applied_amount",
       key: "applied_amount",
-      render: (applied_amount) => <p className="robotoMono">{formatMoney(applied_amount)}</p>,
+      render: (applied_amount) => <p className="fontMonoSpace">{formatMoney(applied_amount)}</p>,
       sorter: (a, b) => a.applied_amount - b.applied_amount,
       showSorterTooltip: false,
       align: "right"
@@ -71,7 +71,7 @@ const PaymentsTable: React.FC<PaymentsTableProps> = ({
       title: "Saldo",
       dataIndex: "current_value",
       key: "current_value",
-      render: (current_value) => <p className="robotoMono">{formatMoney(current_value)}</p>,
+      render: (current_value) => <p className="fontMonoSpace">{formatMoney(current_value)}</p>,
       sorter: (a, b) => a.current_value - b.current_value,
       showSorterTooltip: false,
       align: "right"
