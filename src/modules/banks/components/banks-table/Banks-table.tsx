@@ -145,7 +145,7 @@ export const BanksTable = ({
       dataIndex: "current_value",
       align: "right",
       render: (text) => (
-        <p className="robotoMono money">{formatMoney(text, { hideDecimals: true })}</p>
+        <p className="fontMonoSpace money">{formatMoney(text, { hideDecimals: true })}</p>
       ),
       sorter: (a, b) => (a.current_value ?? 0) - (b.current_value ?? 0),
       showSorterTooltip: false,

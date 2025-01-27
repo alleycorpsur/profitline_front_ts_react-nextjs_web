@@ -111,7 +111,7 @@ const AccountingAdjustmentsTable = ({
       title: "Monto Inicial",
       key: "initial_value",
       dataIndex: "initial_value",
-      render: (text) => <p className="cell -alignRight robotoMono">{formatMoney(text)}</p>,
+      render: (text) => <p className="cell -alignRight fontMonoSpace">{formatMoney(text)}</p>,
       align: "right",
       sorter: (a, b) => a.initial_value - b.initial_value,
       showSorterTooltip: false
@@ -120,7 +120,7 @@ const AccountingAdjustmentsTable = ({
       title: "Monto aplicado",
       key: "missing",
       dataIndex: "missing",
-      render: (text) => <Text className="cell -alignRight robotoMono">{text}</Text>,
+      render: (text) => <Text className="cell -alignRight fontMonoSpace">{text}</Text>,
       align: "right",
       sorter: (a, b) => a.initial_value - b.initial_value,
       showSorterTooltip: false
@@ -129,7 +129,7 @@ const AccountingAdjustmentsTable = ({
       title: "Monto disponible",
       key: "current_value",
       dataIndex: "current_value",
-      render: (amount) => <p className="cell -alignRight robotoMono">{formatMoney(amount)}</p>,
+      render: (amount) => <p className="cell -alignRight fontMonoSpace">{formatMoney(amount)}</p>,
       align: "right",
       sorter: (a, b) => a.current_value - b.current_value,
       showSorterTooltip: false

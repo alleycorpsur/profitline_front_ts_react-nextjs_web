@@ -121,7 +121,7 @@ export const ConcilationTable = ({
       title: "Monto cp",
       key: "current_value",
       dataIndex: "current_value",
-      render: (amount) => <p className="cell -alignRight robotoMono">{formatMoney(amount)}</p>,
+      render: (amount) => <p className="cell -alignRight fontMonoSpace">{formatMoney(amount)}</p>,
       sorter: (a, b) => a.current_value - b.current_value,
       showSorterTooltip: false,
       align: "right",
@@ -141,7 +141,7 @@ export const ConcilationTable = ({
       key: "difference_amount",
       dataIndex: "difference_amount",
       render: (amount) => (
-        <p className="text__red__concilation robotoMono">{formatMoney(amount)}</p>
+        <p className="text__red__concilation fontMonoSpace">{formatMoney(amount)}</p>
       ),
       sorter: (a, b) => a.current_value - b.current_value,
       showSorterTooltip: false,
