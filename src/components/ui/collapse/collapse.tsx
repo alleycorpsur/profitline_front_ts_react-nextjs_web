@@ -11,10 +11,29 @@ interface ItemCollapse {
 interface CollapseProps {
   items: ItemCollapse[] | undefined;
   accordion?: boolean;
+  stickyLabel?: boolean;
+  labelStickyOffset?: number;
 }
 
-const GenericCollapse: FC<CollapseProps> = ({ items, accordion }) => {
-  return <Collapse className="genericCollapse" ghost items={items} accordion={accordion} />;
+const GenericCollapse: FC<CollapseProps> = ({
+  items,
+  accordion,
+  stickyLabel,
+  labelStickyOffset
+}) => {
+  return (
+    <Collapse
+      style={
+        {
+          "--sticky-offset": `${labelStickyOffset ? labelStickyOffset + "rem" : "8.3rem"}`
+        } as React.CSSProperties
+      }
+      className={`genericCollapse ${stickyLabel ? "sticky" : ""}`}
+      ghost
+      items={items}
+      accordion={accordion}
+    />
+  );
 };
 
 export default GenericCollapse;

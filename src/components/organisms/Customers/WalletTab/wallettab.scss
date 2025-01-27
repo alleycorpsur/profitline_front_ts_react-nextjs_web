@@ -2,6 +2,9 @@
 
 .walletTab {
     &__header {
+        display: flex;
+        justify-content: space-between;
+
         .button {
             &__actions {
                 padding: 0.75rem 1rem;

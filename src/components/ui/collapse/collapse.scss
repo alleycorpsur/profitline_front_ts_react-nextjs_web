@@ -33,4 +33,17 @@
             padding: 0.75rem 0.5rem !important;
         }
     }
+
+    &.sticky {
+        .ant-collapse-item {
+            position: relative; // Create positioning context
+        }
+
+        .ant-collapse-header {
+            position: sticky !important;
+            top: var(--sticky-offset) !important;
+            z-index: 2 !important;
+            background-color: $white;
+        }
+    }
 }

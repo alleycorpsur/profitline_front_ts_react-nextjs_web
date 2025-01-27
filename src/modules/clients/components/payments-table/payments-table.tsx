@@ -139,12 +139,13 @@ const PaymentsTable = ({
   return (
     <>
       <Table
-        className="paymentsTable"
+        className="paymentsTable customSticky"
         columns={columns}
         dataSource={data?.map((data) => ({ ...data, key: data.id }))}
         rowSelection={rowSelection}
         rowClassName={(record) => (selectedRowKeys.includes(record.id) ? "selectedRow" : "")}
         pagination={false}
+        sticky={{ offsetHeader: 160 }}
       />
     </>
   );

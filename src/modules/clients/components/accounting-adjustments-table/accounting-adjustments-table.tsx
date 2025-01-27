@@ -151,12 +151,13 @@ const AccountingAdjustmentsTable = ({
   return (
     <>
       <Table
-        className="adjustmentsTable"
+        className="adjustmentsTable customSticky"
         columns={columns}
         dataSource={data?.map((data) => ({ ...data, key: data.id }))}
         rowSelection={rowSelection}
         rowClassName={(record) => (selectedRowKeys.includes(record.id) ? "selectedRow" : "")}
         pagination={false}
+        sticky={{ offsetHeader: 160 }}
       />
     </>
   );

@@ -280,7 +280,7 @@ export const InvoicesTable = ({
   return (
     <>
       <Table
-        className="invoicesTable"
+        className="invoicesTable customSticky"
         columns={columns}
         dataSource={data.map((data) => ({ ...data, key: data.id }))}
         rowSelection={rowSelection}
@@ -290,6 +290,11 @@ export const InvoicesTable = ({
           showSizeChanger: false
         }}
         size="small"
+        sticky={
+          {
+            offsetHeader: 160
+          } as any
+        }
       />
     </>
   );
