@@ -131,7 +131,7 @@ export const WalletTab = () => {
         <ModalEstimateTotalInvoices selectedInvoices={selectedRows} />
       )}
       <div className="walletTab">
-        <div className="walletTab__header">
+        <div className="walletTab__header clientStickyHeader">
           <Flex gap={"0.5rem"}>
             <UiSearchInput
               className="search"

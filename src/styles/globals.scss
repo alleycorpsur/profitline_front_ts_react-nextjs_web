@@ -133,13 +133,27 @@ a {
     letter-spacing: -0.2px;
 }
 
-//for sticky header in tables
-.ant-table-sticky-holder {
-    // this leaves a blank space when the header is sticky
-    // so the scrollable content is not seen behind the header
-    // between the header and the label or top content
-    padding-top: 0.5rem;
-    margin-top: -0.5rem;
-    background-color: $white !important;
-    z-index: 1 !important;
+.customSticky {
+    .ant-table-sticky-holder {
+        // this leaves a blank space when the header is sticky
+        // so the scrollable content is not seen behind the header
+        // between the header and the label or top content
+        padding-top: 0.5rem;
+        margin-top: -0.5rem;
+        background-color: $white !important;
+        z-index: 1 !important;
+    }
+}
+
+// This is a custom sticky header tabs of client details module
+.clientStickyHeader {
+    background-color: $white;
+    position: -webkit-sticky;
+    position: sticky;
+    top: 3.3rem;
+    z-index: 9;
+    padding: 1rem 0;
+    padding-left: 8px;
+    margin: -1rem 0;
+    margin-left: -8px;
 }
