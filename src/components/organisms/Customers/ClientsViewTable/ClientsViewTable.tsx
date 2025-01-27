@@ -146,7 +146,7 @@ export const ClientsViewTable = () => {
       title: "Ejecutado",
       key: "executed_percentage",
       dataIndex: "executed_percentage",
-      render: (text) => <Text>{text} %</Text>
+      render: (text) => <p className="fontMonoSpace">{text} %</p>
     },
     {
       align: "right",
