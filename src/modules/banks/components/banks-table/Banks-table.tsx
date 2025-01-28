@@ -199,7 +199,7 @@ export const BanksTable = ({
   return (
     <>
       <Table
-        className="banksTable"
+        className="banksTable customSticky"
         loading={false}
         columns={columns}
         rowSelection={rowSelection}
@@ -211,6 +211,12 @@ export const BanksTable = ({
           pageSize: 15,
           showSizeChanger: false
         }}
+        sticky={
+          {
+            offsetHeader: 120,
+            offsetScroll: 0
+          } as TableProps<ISingleBank>["sticky"]
+        }
       />
       <InvoiceDownloadModal
         isModalOpen={isModalFileDetailOpen}

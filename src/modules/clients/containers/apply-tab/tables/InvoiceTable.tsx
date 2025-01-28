@@ -91,7 +91,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
     },
     {
       title: "Detalle",
-      width: 75,
+      width: 76,
       render: (_, row) => {
         const items = [
           {
@@ -159,9 +159,12 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
       <Table
         columns={columns}
         dataSource={data?.map((data) => ({ ...data, key: data.id }))}
-        className="sectionContainerTable"
+        className="sectionContainerTable customSticky"
         pagination={false}
         rowSelection={rowSelection}
+        sticky={{
+          offsetHeader: 160
+        }}
       />
 
       <ModalRemove

@@ -104,23 +104,29 @@ export const ClientsViewTable = () => {
         </Link>
       ),
       width: "20%",
-      sorter: (a, b) => a.client_name.localeCompare(b.client_name)
+      sorter: (a, b) => a.client_name.localeCompare(b.client_name),
+      showSorterTooltip: false
     },
     {
       align: "right",
       title: "Cartera",
       dataIndex: "total_portfolio",
       key: "total_portfolio",
-      render: (text) => <p className="fontMonoSpace">{formatMoney(text)}</p>,
+      render: (text) => (
+        <p className="fontMonoSpace">{formatMoney(text, { hideDecimals: true })}</p>
+      ),
       width: "10%",
-      sorter: (a, b) => a.total_portfolio - b.total_portfolio
+      sorter: (a, b) => a.total_portfolio - b.total_portfolio,
+      showSorterTooltip: false
     },
     {
       align: "right",
       title: "Vencida",
       dataIndex: "past_due_ammount",
       key: "past_due_ammount",
-      render: (text) => <p className="fontMonoSpace">{formatMoney(text)}</p>,
+      render: (text) => (
+        <p className="fontMonoSpace">{formatMoney(text, { hideDecimals: true })}</p>
+      ),
       width: "10%",
       sorter: (a, b) => a.past_due_ammount - b.past_due_ammount
     },
@@ -129,16 +135,23 @@ export const ClientsViewTable = () => {
       title: "Presupuesto",
       key: "budget_ammount",
       dataIndex: "budget_ammount",
-      render: (text) => <p className="fontMonoSpace">{formatMoney(text)}</p>,
+      render: (text) => (
+        <p className="fontMonoSpace">{formatMoney(text, { hideDecimals: true })}</p>
+      ),
       width: "10%",
-      sorter: (a, b) => a.budget_ammount - b.budget_ammount
+      sorter: (a, b) => a.budget_ammount - b.budget_ammount,
+      showSorterTooltip: false
     },
     {
       align: "right",
       title: "R. Aplicado",
       key: "applied_payments_ammount",
       dataIndex: "applied_payments_ammount",
-      render: (text) => <p className="fontMonoSpace">{formatMoney(text)}</p>
+      render: (text) => (
+        <p className="fontMonoSpace">{formatMoney(text, { hideDecimals: true })}</p>
+      ),
+      sorter: (a, b) => a.applied_payments_ammount - b.applied_payments_ammount,
+      showSorterTooltip: false
     },
     {
       align: "center",
@@ -153,7 +166,7 @@ export const ClientsViewTable = () => {
       title: "PNA",
       key: "unapplied_payments_ammount",
       dataIndex: "unapplied_payments_ammount",
-      render: (text) => <p className="fontMonoSpace">{formatMoney(text)}</p>
+      render: (text) => <p className="fontMonoSpace">{formatMoney(text, { hideDecimals: true })}</p>
     },
     {
       align: "right",
@@ -161,14 +174,16 @@ export const ClientsViewTable = () => {
       key: "total_balances",
       dataIndex: "total_balances",
       render: (text) => <p className="fontMonoSpace">{text}</p>,
-      sorter: (a, b) => a.total_balances - b.total_balances
+      sorter: (a, b) => a.total_balances - b.total_balances,
+      showSorterTooltip: false
     },
     {
       title: "Holding",
       key: "holding_name",
       dataIndex: "holding_name",
       render: (text) => <Text className="text">{text}</Text>,
-      sorter: (a, b) => a.holding_name?.localeCompare(b.holding_name)
+      sorter: (a, b) => a.holding_name?.localeCompare(b.holding_name),
+      showSorterTooltip: false
     },
     {
       title: "",
@@ -210,7 +225,7 @@ export const ClientsViewTable = () => {
 
   return (
     <main className="mainClientsTable">
-      <div>
+      <div style={{ marginBottom: "10px" }}>
         <Flex justify="space-between" className="mainClientsTable_header">
           <Flex gap={"10px"}>
             <OptimizedSearchComponent onSearch={handleSearch} />

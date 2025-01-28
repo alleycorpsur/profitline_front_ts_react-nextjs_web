@@ -9,7 +9,7 @@
     &.-sticky {
         .ant-tabs-nav {
             position: sticky !important;
-            top: 1rem;
+            top: var(--sticky-offset, 1rem); // Use CSS variable for top offset
             margin-left: -0.5rem !important;
             margin-right: -0.5rem !important;
             padding-left: 0.5rem;

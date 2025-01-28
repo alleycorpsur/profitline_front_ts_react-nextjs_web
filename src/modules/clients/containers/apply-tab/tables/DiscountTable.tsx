@@ -85,7 +85,7 @@ const DiscountTable: React.FC<DiscountTableProps> = ({
     },
     {
       title: "Detalle",
-      width: 75,
+      width: 76,
       render: (_, row) => {
         const items = [
           {
@@ -154,9 +154,12 @@ const DiscountTable: React.FC<DiscountTableProps> = ({
       <Table
         columns={columns}
         dataSource={data?.map((data) => ({ ...data, key: data.financial_discount_id }))}
-        className="sectionContainerTable"
+        className="sectionContainerTable customSticky"
         pagination={false}
         rowSelection={rowSelection}
+        sticky={{
+          offsetHeader: 160
+        }}
       />
 
       <ModalRemove

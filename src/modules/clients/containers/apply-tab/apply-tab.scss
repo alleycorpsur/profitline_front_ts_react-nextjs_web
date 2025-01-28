@@ -110,6 +110,16 @@
         border: none !important;
     }
 
+    .ant-table-measure-row {
+        visibility: hidden !important;
+        td {
+            border: none !important;
+        }
+    }
+    .ant-table-body {
+        margin-top: -2px;
+    }
+
     .dotsBtn {
         background-color: $background;
         border: 1px solid transparent;

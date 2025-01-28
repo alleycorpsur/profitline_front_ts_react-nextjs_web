@@ -238,7 +238,7 @@ const ApplyTab: React.FC = () => {
         total={applicationData?.summary.total_balance}
       />
       <div className="applyContainerTab">
-        <Flex justify="space-between" className="applyContainerTab__header">
+        <Flex justify="space-between" className="applyContainerTab__header clientStickyHeader">
           <Flex gap={"0.5rem"}>
             <UiSearchInput
               className="search"
@@ -267,6 +267,7 @@ const ApplyTab: React.FC = () => {
           </Flex>
         ) : (
           <Collapse
+            stickyLabel
             items={dataForCollapse?.map((section) => ({
               key: section.statusId,
               label: (
