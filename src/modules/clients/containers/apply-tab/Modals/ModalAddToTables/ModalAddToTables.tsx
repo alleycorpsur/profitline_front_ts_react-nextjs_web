@@ -3,7 +3,7 @@ import { Modal, Checkbox, Spin, message, Flex, Pagination } from "antd";
 import { CaretLeft, CopySimple, X } from "phosphor-react";
 
 import { useAppStore } from "@/lib/store/store";
-import { formatDate } from "@/utils/utils";
+import { extractSingleParam, formatDate } from "@/utils/utils";
 import {
   getApplicationInvoices,
   getApplicationPayments
@@ -19,6 +19,7 @@ import { IClientPayment } from "@/types/clientPayments/IClientPayments";
 import { IInvoice } from "@/types/invoices/IInvoices";
 
 import "./modalAddToTables.scss";
+import { useParams } from "next/navigation";
 interface ModalAddToTablesProps {
   onCancel: () => void;
   // eslint-disable-next-line no-unused-vars
@@ -32,6 +33,9 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
   isModalAddToTableOpen
 }) => {
   const formatMoney = useAppStore((state) => state.formatMoney);
+  const { ID: projectId } = useAppStore((state) => state.selectedProject);
+  const params = useParams();
+  const clientId = Number(extractSingleParam(params.clientId)) || 0;
   const [allInvoices, setAllInvoices] = useState<IInvoice[]>();
   const [allPayments, setAllPayments] = useState<IClientPayment[]>();
 
@@ -43,47 +47,25 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
   const [loadingAddToTable, setLoadingAddToTable] = useState(false);
   const ITEMS_PER_PAGE = 5;
 
-  const invoices = useMemo(async () => {
-    if (isModalAddToTableOpen.adding === "invoices" && !allInvoices) {
-      setLoadingData(true);
-      // Only fetch if not already fetched
-      const fetchInvoices = async () => {
-        const res = await getApplicationInvoices(162, 900156264);
+  useEffect(() => {
+    const fetchData = async () => {
+      if (isModalAddToTableOpen.adding === "invoices" && !allInvoices) {
+        setLoadingData(true);
+        const res = await getApplicationInvoices(projectId, clientId);
         const fetchedInvoices = res?.map((data) => data.invoices).flat();
-        setAllInvoices(fetchedInvoices); // Store in state
-        return fetchedInvoices; // Return for the useMemo value
-      };
-
-      await fetchInvoices();
-      setLoadingData(false);
-      return [];
-    } else if (isModalAddToTableOpen.adding === "invoices" && allInvoices) {
-      return allInvoices; // Return the stored invoices
-    } else {
-      return [];
-    }
-  }, [isModalAddToTableOpen.adding, allInvoices]);
-
-  const payments = useMemo(async () => {
-    if (isModalAddToTableOpen.adding === "payments" && !allPayments) {
-      setLoadingData(true);
-      // Only fetch if not already fetched
-      const fetchPayments = async () => {
-        const res = await getApplicationPayments(162, 900156264);
+        setAllInvoices(fetchedInvoices);
+        setLoadingData(false);
+      } else if (isModalAddToTableOpen.adding === "payments" && !allPayments) {
+        setLoadingData(true);
+        const res = await getApplicationPayments(projectId, clientId);
         const fetchedPayments = res?.map((data) => data.payments).flat();
-        setAllPayments(fetchedPayments); // Store in state
-        return fetchedPayments; // Return for the useMemo value
-      };
+        setAllPayments(fetchedPayments);
+        setLoadingData(false);
+      }
+    };
 
-      await fetchPayments();
-      setLoadingData(false);
-      return [];
-    } else if (isModalAddToTableOpen.adding === "payments" && allPayments) {
-      return allPayments; // Return the stored payments
-    } else {
-      return [];
-    }
-  }, [isModalAddToTableOpen.adding, allPayments]);
+    fetchData();
+  }, [isModalAddToTableOpen.adding, allInvoices, allPayments]);
 
   useEffect(() => {
     if (isModalAddToTableOpen.adding === "invoices" && allInvoices) {
@@ -91,7 +73,9 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
     } else if (isModalAddToTableOpen.adding === "payments" && allPayments) {
       setRows(allPayments);
     }
+  }, [isModalAddToTableOpen.adding, allInvoices, allPayments]);
 
+  useEffect(() => {
     return () => {
       setSelectedRows([]);
       setRows([]);
@@ -99,7 +83,7 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
       setSearchQuery("");
       setCurrentPage(1);
     };
-  }, [isModalAddToTableOpen.adding, invoices, payments]);
+  }, []);
 
   useEffect(() => {
     setCurrentPage(1);
