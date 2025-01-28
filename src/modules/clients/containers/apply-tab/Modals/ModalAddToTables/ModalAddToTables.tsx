@@ -83,7 +83,7 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
       setSearchQuery("");
       setCurrentPage(1);
     };
-  }, []);
+  }, [isModalAddToTableOpen.isOpen]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -178,10 +178,8 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
   const handleAddToTable = async () => {
     if (!isModalAddToTableOpen.adding) return console.error("No adding type selected");
     setLoadingAddToTable(true);
-    await onAdd(
-      isModalAddToTableOpen.adding,
-      selectedRows.map((row) => row.id)
-    );
+    const uniqueSelectedIds = Array.from(new Set(selectedRows.map((row) => row.id)));
+    await onAdd(isModalAddToTableOpen.adding, uniqueSelectedIds);
     setLoadingAddToTable(false);
   };
 
@@ -311,7 +309,12 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
           Cancelar
         </SecondaryButton>
 
-        <PrincipalButton fullWidth loading={loadingAddToTable} onClick={handleAddToTable}>
+        <PrincipalButton
+          fullWidth
+          loading={loadingAddToTable}
+          onClick={handleAddToTable}
+          disabled={!selectedRows.length}
+        >
           {`Agregar ${isModalAddToTableOpen.adding === "invoices" ? "facturas" : "pagos"}`}
         </PrincipalButton>
       </div>
