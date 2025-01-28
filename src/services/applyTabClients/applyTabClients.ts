@@ -4,6 +4,7 @@ import { API, getIdToken } from "@/utils/api/api";
 import { GenericResponse } from "@/types/global/IGlobal";
 import { InvoicesData } from "@/types/invoices/IInvoices";
 import { IClientPaymentStatus } from "@/types/clientPayments/IClientPayments";
+import { StatusGroup } from "@/hooks/useAcountingAdjustment";
 
 export const addItemsToTable = async (
   project_id: number,
@@ -161,6 +162,19 @@ export const getApplicationPayments = async (project_id: number, client_id: numb
     return response.data;
   } catch (error) {
     console.error("error getApplicationPayments", error);
+    throw error;
+  }
+};
+
+export const getApplicationAdjustments = async (project_id: number, client_id: string) => {
+  try {
+    const response: GenericResponse<StatusGroup[]> = await API.get(
+      `${config.API_HOST}/paymentApplication/project/${project_id}/client/${client_id}?type=2`
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("error getApplicationAdjustments", error);
     throw error;
   }
 };

@@ -35,7 +35,7 @@ export interface IFinancialDiscount {
   cp_id: number | null;
 }
 
-interface StatusGroup {
+export interface StatusGroup {
   status_id: number;
   status_name: string;
   color: string;
