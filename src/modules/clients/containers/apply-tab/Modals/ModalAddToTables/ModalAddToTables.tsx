@@ -49,13 +49,13 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
 
   useEffect(() => {
     const fetchData = async () => {
-      if (isModalAddToTableOpen.adding === "invoices" && !allInvoices) {
+      if (isModalAddToTableOpen.adding === "invoices") {
         setLoadingData(true);
         const res = await getApplicationInvoices(projectId, clientId);
         const fetchedInvoices = res?.map((data) => data.invoices).flat();
         setAllInvoices(fetchedInvoices);
         setLoadingData(false);
-      } else if (isModalAddToTableOpen.adding === "payments" && !allPayments) {
+      } else if (isModalAddToTableOpen.adding === "payments") {
         setLoadingData(true);
         const res = await getApplicationPayments(projectId, clientId);
         const fetchedPayments = res?.map((data) => data.payments).flat();
