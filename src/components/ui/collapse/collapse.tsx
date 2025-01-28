@@ -12,7 +12,7 @@ interface CollapseProps {
   items: ItemCollapse[] | undefined;
   accordion?: boolean;
   stickyLabel?: boolean;
-  labelStickyOffset?: number;
+  labelStickyOffset?: string;
 }
 
 const GenericCollapse: FC<CollapseProps> = ({
@@ -25,7 +25,7 @@ const GenericCollapse: FC<CollapseProps> = ({
     <Collapse
       style={
         {
-          "--sticky-offset": `${labelStickyOffset ? labelStickyOffset + "rem" : "8.3rem"}`
+          "--sticky-offset": `${labelStickyOffset ? labelStickyOffset : "8.3rem"}`
         } as React.CSSProperties
       }
       className={`genericCollapse ${stickyLabel ? "sticky" : ""}`}

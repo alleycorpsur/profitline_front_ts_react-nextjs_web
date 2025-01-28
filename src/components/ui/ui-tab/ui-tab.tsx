@@ -15,6 +15,7 @@ interface UiTabProps {
   // eslint-disable-next-line no-unused-vars
   onChangeTab?: (activeKey: string) => void;
   activeKey?: string;
+  stickyOffset?: string; // New prop for sticky offset
 }
 
 const UiTab: FC<UiTabProps> = ({
@@ -22,10 +23,14 @@ const UiTab: FC<UiTabProps> = ({
   tabBarExtraContent,
   onChangeTab,
   activeKey,
-  sticky = false
+  sticky = false,
+  stickyOffset = "1rem" // Default value for sticky offset
 }: UiTabProps) => {
   return (
-    <div className={`tabsContainer ${sticky ? "-sticky" : ""}`}>
+    <div
+      className={`tabsContainer ${sticky ? "-sticky" : ""}`}
+      style={{ "--sticky-offset": stickyOffset } as React.CSSProperties}
+    >
       <Tabs
         style={{ width: "100%", height: "100%" }}
         activeKey={activeKey}
