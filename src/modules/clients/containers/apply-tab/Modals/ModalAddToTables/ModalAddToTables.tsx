@@ -3,9 +3,9 @@ import { Modal, Checkbox, Spin, message, Flex, Pagination } from "antd";
 import { CaretLeft, CopySimple, X } from "phosphor-react";
 
 import { useAppStore } from "@/lib/store/store";
-import { useInvoices } from "@/hooks/useInvoices";
 import { useClientsPayments } from "@/hooks/useClientsPayments";
 import { formatDate } from "@/utils/utils";
+import { getApplicationInvoices } from "@/services/applyTabClients/applyTabClients";
 
 import UiSearchInputLong from "@/components/ui/search-input-long";
 import { IModalAddToTableOpen } from "../../apply-tab";
@@ -30,6 +30,7 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
   isModalAddToTableOpen
 }) => {
   const formatMoney = useAppStore((state) => state.formatMoney);
+  const [allInvoices, setAllInvoices] = useState<IInvoice[]>();
 
   const [rows, setRows] = useState<(IInvoice | IClientPayment)[]>([]);
   const [selectedRows, setSelectedRows] = useState<(IInvoice | IClientPayment)[]>([]);
@@ -39,20 +40,38 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
   const [loadingAddToTable, setLoadingAddToTable] = useState(false);
   const ITEMS_PER_PAGE = 5;
 
-  const { data: invoicesByState, isLoading: loadingInvoices } = useInvoices({});
-  const allInvoices = invoicesByState?.map((data) => data.invoices).flat();
-
   const { data: paymentsByState, isLoading: loadingPayments } = useClientsPayments();
   const allPayments = paymentsByState?.map((data) => data.payments).flat();
 
   useEffect(() => {
-    if (loadingInvoices || loadingPayments) {
+    if (loadingPayments) {
       setLoadingData(true);
     }
-    if (!loadingInvoices && !loadingPayments) {
+    if (!loadingPayments) {
       setLoadingData(false);
     }
-  }, [loadingInvoices, loadingPayments]);
+  }, [, loadingPayments]);
+
+  const invoices = useMemo(async () => {
+    if (isModalAddToTableOpen.adding === "invoices" && !allInvoices) {
+      setLoadingData(true);
+      // Only fetch if not already fetched
+      const fetchInvoices = async () => {
+        const res = await getApplicationInvoices(162, 900156264);
+        const fetchedInvoices = res?.map((data) => data.invoices).flat();
+        setAllInvoices(fetchedInvoices); // Store in state
+        return fetchedInvoices; // Return for the useMemo value
+      };
+
+      await fetchInvoices(); // Call the async function inside useMemo
+      setLoadingData(false);
+      return []; // Return an empty array while fetching, to avoid rendering issues
+    } else if (isModalAddToTableOpen.adding === "invoices" && allInvoices) {
+      return allInvoices; // Return the stored invoices
+    } else {
+      return [];
+    }
+  }, [isModalAddToTableOpen.adding, allInvoices]);
 
   useEffect(() => {
     if (isModalAddToTableOpen.adding === "invoices" && allInvoices) {
@@ -68,7 +87,7 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
       setSearchQuery("");
       setCurrentPage(1);
     };
-  }, [isModalAddToTableOpen.adding]);
+  }, [isModalAddToTableOpen.adding, invoices]);
 
   useEffect(() => {
     setCurrentPage(1);

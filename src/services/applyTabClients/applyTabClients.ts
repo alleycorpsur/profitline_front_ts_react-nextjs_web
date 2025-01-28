@@ -2,6 +2,7 @@ import axios from "axios";
 import config from "@/config";
 import { API, getIdToken } from "@/utils/api/api";
 import { GenericResponse } from "@/types/global/IGlobal";
+import { InvoicesData } from "@/types/invoices/IInvoices";
 
 export const addItemsToTable = async (
   project_id: number,
@@ -133,6 +134,19 @@ export const saveApplication = async (project_id: number, client_id: number) => 
     return response.data;
   } catch (error) {
     console.error("error saveApplication", error);
+    throw error;
+  }
+};
+
+export const getApplicationInvoices = async (project_id: number, client_id: number) => {
+  try {
+    const response: GenericResponse<InvoicesData[]> = await API.get(
+      `${config.API_HOST}/paymentApplication/client/${client_id}/project/${project_id}?page=1&limit=50`
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("error getApplicationInvoices", error);
     throw error;
   }
 };
