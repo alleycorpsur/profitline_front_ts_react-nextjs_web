@@ -71,7 +71,7 @@ const ModalListAdjustments: React.FC<ModalListAdjustmentsProps> = ({
     } catch (error) {
       console.error("error fetchDiscounts", error);
     }
-  }, [projectId, clientId]);
+  }, [projectId, clientId, visible]);
 
   useEffect(() => {
     return () => {
