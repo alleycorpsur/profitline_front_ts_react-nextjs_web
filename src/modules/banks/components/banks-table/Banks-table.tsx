@@ -137,7 +137,7 @@ export const BanksTable = ({
       render: (text) => <Text>{formatDate(text)}</Text>,
       sorter: (a, b) => Date.parse(a.payment_date) - Date.parse(b.payment_date),
       showSorterTooltip: false,
-      width: 110
+      width: 115
     },
     {
       title: "Monto",
@@ -174,7 +174,7 @@ export const BanksTable = ({
     {
       title: "",
       key: "seeProject",
-      width: "40px",
+      width: 64,
       dataIndex: "",
       render: (_, record) => (
         <Flex gap={"0.5rem"} justify="end">

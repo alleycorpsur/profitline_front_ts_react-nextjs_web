@@ -1,8 +1,9 @@
 import UiSearchInput from "@/components/ui/search-input/search-input";
 import { useDebounce } from "@/hooks/useSearch";
-import React, { useState, useCallback, useMemo, useEffect } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 
 interface OptimizedSearchComponentProps {
+  // eslint-disable-next-line no-unused-vars
   onSearch: (query: string) => void;
   title?: string;
 }
