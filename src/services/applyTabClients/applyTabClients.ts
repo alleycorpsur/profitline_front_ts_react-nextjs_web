@@ -3,6 +3,7 @@ import config from "@/config";
 import { API, getIdToken } from "@/utils/api/api";
 import { GenericResponse } from "@/types/global/IGlobal";
 import { InvoicesData } from "@/types/invoices/IInvoices";
+import { IClientPaymentStatus } from "@/types/clientPayments/IClientPayments";
 
 export const addItemsToTable = async (
   project_id: number,
@@ -147,6 +148,19 @@ export const getApplicationInvoices = async (project_id: number, client_id: numb
     return response.data;
   } catch (error) {
     console.error("error getApplicationInvoices", error);
+    throw error;
+  }
+};
+
+export const getApplicationPayments = async (project_id: number, client_id: number) => {
+  try {
+    const response: GenericResponse<IClientPaymentStatus[]> = await API.get(
+      `${config.API_HOST}/paymentApplication/get-payments/project/${project_id}/client/${client_id}`
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("error getApplicationPayments", error);
     throw error;
   }
 };
