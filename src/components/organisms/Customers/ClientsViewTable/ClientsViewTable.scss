@@ -7,14 +7,6 @@
     padding: 1rem 2rem;
     border-radius: 0.5rem;
 
-    .stickykpis {
-        position: sticky;
-        top: 0;
-        z-index: 10;
-        background-color: #fff; // Asegúrate de que esto coincida con el color de fondo de tu aplicación
-        padding-bottom: 16px; // Ajusta según sea necesario
-    }
-
     .table-container {
         flex-grow: 1;
         overflow: auto;
@@ -25,8 +17,6 @@
             .ant-table-container {
                 height: 100%;
             }
-
-
         }
     }
 

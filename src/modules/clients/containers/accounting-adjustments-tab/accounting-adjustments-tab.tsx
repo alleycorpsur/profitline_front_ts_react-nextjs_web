@@ -61,7 +61,10 @@ const AccountingAdjustmentsTab = () => {
   return (
     <>
       <div className="accountingAdjustmentsTab">
-        <Flex justify="space-between" className="accountingAdjustmentsTab__header">
+        <Flex
+          justify="space-between"
+          className="accountingAdjustmentsTab__header clientStickyHeader"
+        >
           <Flex gap={"0.5rem"}>
             <UiSearchInput
               className="search"
@@ -88,6 +91,7 @@ const AccountingAdjustmentsTab = () => {
           </Flex>
         ) : (
           <Collapse
+            stickyLabel
             items={data?.map((financialState: StatusFinancialDiscounts) => ({
               key: financialState.status_id,
               label: (

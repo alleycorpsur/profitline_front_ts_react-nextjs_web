@@ -3,6 +3,7 @@ import { ConfigProvider } from "antd";
 import theme from "@/theme/themeConfig";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import { Poppins } from "next/font/google";
+import localFont from "next/font/local"; // Import localFont from next/font/local
 import { ModalProvider } from "@/context/ModalContext";
 import "../styles/globals.scss";
 import { useEffect, useState } from "react";
@@ -15,7 +16,13 @@ const queryClient = new QueryClient();
 
 const poppins = Poppins({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800", "900"]
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
+  variable: "--font-poppins" // Define a CSS variable for Poppins
+});
+
+const aptosNarrow = localFont({
+  src: "../../public/fonts/aptos-narrow.woff2", // Adjust the path to your font file
+  variable: "--mono-space-font" // Define a CSS variable for aptosNarrow
 });
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -31,9 +38,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
 
   return (
     <ConfigProvider theme={theme}>
-      <html lang="es" className={poppins.className}>
+      <html lang="es" className={`${poppins.variable} ${aptosNarrow.variable}`}>
         <QueryClientProvider client={queryClient}>
-          <body>
+          <body className={poppins.className}>
             <AntdRegistry>
               {loading ? (
                 <Loader />

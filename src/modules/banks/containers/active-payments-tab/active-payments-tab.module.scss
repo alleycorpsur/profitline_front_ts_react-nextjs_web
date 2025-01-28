@@ -3,6 +3,7 @@
 .activePaymentsTab {
     .header {
         display: flex;
+        box-sizing: content-box;
         height: 48px;
         gap: 0.5rem;
     }

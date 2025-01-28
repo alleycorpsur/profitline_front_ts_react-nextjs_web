@@ -140,7 +140,7 @@ export const ActivePaymentsTab: FC = () => {
         </Flex>
       ) : (
         <Flex className={styles.activePaymentsTab} vertical>
-          <div className={styles.header}>
+          <div className={`${styles.header} banksStickyHeader`}>
             <UiSearchInput
               placeholder="Buscar por ID"
               onChange={(event) => setSearchQuery(event.target.value)}
@@ -166,6 +166,8 @@ export const ActivePaymentsTab: FC = () => {
           </div>
 
           <Collapse
+            stickyLabel
+            labelStickyOffset={"6rem"}
             items={filteredData?.map((status) => ({
               key: status.payments_status_id,
               label: (

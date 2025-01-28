@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { Eye } from "phosphor-react";
 
 import { useAppStore } from "@/lib/store/store";
-import { formatDateDMY, formatMoney } from "@/utils/utils";
+import { formatDateDMY } from "@/utils/utils";
 
 import { IOrder } from "@/types/commerce/ICommerce";
 import "./orders-view-table.scss";
@@ -32,6 +32,7 @@ const OrdersViewTable = ({
 }: PropsOrdersViewTable) => {
   const router = useRouter();
   const setDraftInfo = useAppStore((state) => state.setDraftInfo);
+  const formatMoney = useAppStore((state) => state.formatMoney);
 
   const [selectedOrder, setSelectedOrder] = useState<number | null>(null);
   const [currentWarehouseId, setCurrentWarehouseId] = useState<number | null>(null);

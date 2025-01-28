@@ -28,21 +28,18 @@
     }
 
     .column {
-        border-right: 1px solid #DDDDDD !important;
+        border-right: 1px solid #dddddd !important;
         border-radius: 0 !important;
-
     }
 
-    .ant-table-thead>tr>th {
-        border: 1px solid #DDDDDD !important;
+    .ant-table-thead > tr > th {
+        border: 1px solid #dddddd !important;
         border-radius: 0 !important;
-
     }
 
-    .ant-table-tbody>tr>td {
-        border: 1px solid #DDDDDD !important;
+    .ant-table-tbody > tr > td {
+        border: 1px solid #dddddd !important;
         border-radius: 0 !important;
-
     }
 
     .ant-table {
@@ -94,13 +91,13 @@
 
 .actionWrapper {
     .ant-select-selector {
-        background-color: #F7F7F7 !important;
+        background-color: #f7f7f7 !important;
         width: 100% !important;
     }
 }
 
 .text__red__concilation {
-    color: #E53261;
-    font-size: 1rem;
+    color: #e53261;
+    font-size: 0.875rem;
     margin: 0;
 }

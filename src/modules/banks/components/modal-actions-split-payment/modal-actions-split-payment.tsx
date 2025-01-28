@@ -4,7 +4,7 @@ import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { Flex, Modal, Typography } from "antd";
 import { Plus } from "phosphor-react";
 
-import { formatMoney, renameFile } from "@/utils/utils";
+import { renameFile } from "@/utils/utils";
 import { useAppStore } from "@/lib/store/store";
 import { getClientsByProject, splitPayment } from "@/services/banksPayments/banksPayments";
 
@@ -44,6 +44,7 @@ export interface PaymentForm {
 }
 
 const ModalActionsSplitPayment = ({ isOpen, onClose, selectedRows }: Props) => {
+  const formatMoney = useAppStore((state) => state.formatMoney);
   const { ID } = useAppStore((state) => state.selectedProject);
   const userId = useAppStore((state) => state.userId);
   const [availableMoney, setAvailableMoney] = useState<number>();

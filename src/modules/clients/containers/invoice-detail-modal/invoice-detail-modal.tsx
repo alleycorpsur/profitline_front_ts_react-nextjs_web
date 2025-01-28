@@ -8,15 +8,20 @@ import {
   Plus,
   Receipt
 } from "phosphor-react";
-import styles from "./invoice-detail-modal.module.scss";
-import { useInvoiceDetail } from "@/hooks/useInvoiceDetail";
-import InvoiceDownloadModal from "../../components/invoice-download-modal";
 import { Button } from "antd";
-import { IInvoice } from "@/types/invoices/IInvoices";
-import { formatDatePlane, formatMoney } from "@/utils/utils";
-import StepperContentSkeleton from "./skeleton/skeleton-invoid-detail";
+
+import { useAppStore } from "@/lib/store/store";
 import { useModalDetail } from "@/context/ModalContext";
+import { useInvoiceDetail } from "@/hooks/useInvoiceDetail";
+import { formatDatePlane } from "@/utils/utils";
+
+import InvoiceDownloadModal from "../../components/invoice-download-modal";
+import StepperContentSkeleton from "./skeleton/skeleton-invoid-detail";
 import { ModalAgreementDetail } from "@/components/molecules/modals/ModalAgreementDetail/ModalAgreementDetail";
+
+import { IInvoice } from "@/types/invoices/IInvoices";
+
+import styles from "./invoice-detail-modal.module.scss";
 
 interface InvoiceDetailModalProps {
   isOpen: boolean;
@@ -42,6 +47,8 @@ const InvoiceDetailModal: FC<InvoiceDetailModalProps> = ({
   selectInvoice,
   handleActionInDetail
 }) => {
+  const formatMoney = useAppStore((state) => state.formatMoney);
+
   const {
     data: invoiceData,
     loading,
@@ -366,7 +373,7 @@ const InvoiceDetailModal: FC<InvoiceDetailModalProps> = ({
                                       }}
                                     >
                                       {" "}
-                                      {`${item.id}`}
+                                      {`${item.payment_agreement_id}`}
                                     </div>
                                   </div>
                                 </div>
@@ -482,7 +489,22 @@ const InvoiceDetailModal: FC<InvoiceDetailModalProps> = ({
                               )}
 
                               {item.event_type_name === "Factura conciliada" ? (
-                                <div className={styles.name}>{`Acción: ${item.user_name}`}</div>
+                                <div>
+                                  <div
+                                    className={styles.icons}
+                                    onClick={() => {
+                                      handleDocumentClick(item?.files[0] || "");
+                                    }}
+                                  >
+                                    <ArrowLineDown
+                                      size={14}
+                                      onClick={() => {
+                                        setIsModalOpen;
+                                      }}
+                                    />
+                                  </div>
+                                  <div className={styles.name}>{`Acción: ${item.user_name}`}</div>
+                                </div>
                               ) : null}
 
                               {item.comments && (

@@ -21,6 +21,7 @@ interface DataType {
 
 interface Props {
   invoices?: InfoConcilation;
+  // eslint-disable-next-line no-unused-vars
   setCurrentView: (view: "paste" | "state") => void;
   setInvoices?: Dispatch<SetStateAction<InfoConcilation | undefined>>;
   clientId: number;
@@ -33,6 +34,7 @@ export const PasteConcilationTable = ({
   clientId
 }: Props) => {
   const { ID } = useAppStore((state) => state.selectedProject);
+  const formatMoney = useAppStore((state) => state.formatMoney);
   const [dataSource, setDataSource] = useState<DataType[]>([]);
   const [searchValue, setSearchValue] = useState<string>("");
   const [messageApi, contextHolder] = message.useMessage();
@@ -128,8 +130,9 @@ export const PasteConcilationTable = ({
         title: "Monto",
         dataIndex: "monto",
         key: "monto",
+        align: "right",
         width: "20%",
-        render: (text) => `$${text}`.replace(/\B(?=(\d{3})+(?!\d))/g, "."),
+        render: (text) => <p className="fontMonoSpace">{formatMoney(text)}</p>,
         sorter: (a, b) => a.monto - b.monto
       },
       {

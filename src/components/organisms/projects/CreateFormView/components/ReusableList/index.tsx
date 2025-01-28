@@ -24,7 +24,8 @@ const ReusableList: React.FC<ReusableListProps> = ({ control, name, onAdd, onRem
     control,
     name
   });
-
+  console.log("name REUSABLE LIST", name);
+  console.log("fields en REUSABLE LIST", fields);
   return (
     <Flex vertical gap={"1rem"} align="flex-start">
       {fields.map((field, index) => (
@@ -37,20 +38,20 @@ const ReusableList: React.FC<ReusableListProps> = ({ control, name, onAdd, onRem
                 return (
                   <Checkbox
                     {...field}
-                    checked={field.value}
-                    onChange={(e) => field.onChange(e.target.checked)}
+                    checked={false}
+                    onChange={() => {}}
                     style={{ marginRight: "10px" }}
-                    disabled
+                    disabled={true}
                   />
                 );
               } else
                 return (
                   <Radio
                     {...field}
-                    checked={field.value}
-                    onChange={(e) => field.onChange(e.target.checked)}
+                    checked={false}
+                    onChange={() => {}}
                     style={{ marginRight: "10px" }}
-                    disabled
+                    disabled={true}
                   />
                 );
             }}
@@ -68,7 +69,7 @@ const ReusableList: React.FC<ReusableListProps> = ({ control, name, onAdd, onRem
               {...field}
               placeholder={`Opción ${index + 1}`}
               control={control}
-              nameInput={`${name}.${index}.name`}
+              nameInput={`${name}.${index}.label`}
               customStyle={{ width: "100%" }}
             />
             <Button

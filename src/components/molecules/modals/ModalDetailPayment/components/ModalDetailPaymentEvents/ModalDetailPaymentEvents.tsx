@@ -2,7 +2,7 @@ import { FC, useState } from "react";
 import { ArrowLineDown } from "phosphor-react";
 import { Flex } from "antd";
 
-import { formatMoney } from "@/utils/utils";
+import { useAppStore } from "@/lib/store/store";
 
 import TimelineEvents from "@/components/ui/timeline-events";
 import InvoiceDownloadModal from "@/modules/clients/components/invoice-download-modal";
@@ -21,6 +21,7 @@ const ModalDetailPaymentEvents: FC<ModalDetailPaymentProps> = ({
   paymentEvents,
   handleOpenPaymentDetail
 }) => {
+  const formatMoney = useAppStore((state) => state.formatMoney);
   const [isModalFileDetailOpen, setIsModalFileDetailOpen] = useState<boolean>(false);
   const [urlStep, setUrlStep] = useState<string>("");
 

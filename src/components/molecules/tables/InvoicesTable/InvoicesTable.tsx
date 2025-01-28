@@ -1,13 +1,15 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Button, Table, TableProps, Tooltip, Typography } from "antd";
-
-import { IInvoice } from "@/types/invoices/IInvoices";
 import { CheckCircle, Eye, Handshake, Warning, WarningCircle } from "phosphor-react";
-import "./invoicestable.scss";
-import { calculateDaysDifference, daysLeft, formatDate, formatMoney } from "@/utils/utils";
 import dayjs from "dayjs";
 
+import { useAppStore } from "@/lib/store/store";
+import { calculateDaysDifference, daysLeft, formatDate } from "@/utils/utils";
+
+import { IInvoice } from "@/types/invoices/IInvoices";
+
 const { Text } = Typography;
+import "./invoicestable.scss";
 
 interface PropsInvoicesTable {
   stateId: number;
@@ -25,6 +27,8 @@ export const InvoicesTable = ({
   selectedRows,
   openInvoiceDetail
 }: PropsInvoicesTable) => {
+  const formatMoney = useAppStore((state) => state.formatMoney);
+
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
 
   useEffect(() => {
@@ -163,7 +167,7 @@ export const InvoicesTable = ({
       title: "Monto inicial",
       key: "initial_value",
       dataIndex: "initial_value",
-      render: (amount) => <Text className="cell -alignRight">{formatMoney(amount)}</Text>,
+      render: (amount) => <p className="cell -alignRight fontMonoSpace">{formatMoney(amount)}</p>,
       sorter: (a, b) => a.initial_value - b.initial_value,
       showSorterTooltip: false,
       align: "right"
@@ -174,9 +178,9 @@ export const InvoicesTable = ({
       dataIndex: "ajust_value",
       render: (amount) =>
         amount === 0 ? null : amount > 0 ? (
-          <Text className="cell -alignRight">{formatMoney(amount)}</Text>
+          <p className="cell -alignRight fontMonoSpace">{formatMoney(amount)}</p>
         ) : (
-          <Text className="negativeAdjustment cell -alignRight">{formatMoney(amount)}</Text>
+          <p className="negativeAdjustment cell -alignRight fontMonoSpace">{formatMoney(amount)}</p>
         ),
       sorter: (a, b) => a.ajust_value - b.ajust_value,
       showSorterTooltip: false,
@@ -186,7 +190,7 @@ export const InvoicesTable = ({
       title: "Pendiente",
       key: "current_value",
       dataIndex: "current_value",
-      render: (amount) => <Text className="cell -alignRight">{formatMoney(amount)}</Text>,
+      render: (amount) => <p className="cell -alignRight fontMonoSpace">{formatMoney(amount)}</p>,
       sorter: (a, b) => a.current_value - b.current_value,
       showSorterTooltip: false,
       align: "right"
@@ -276,7 +280,7 @@ export const InvoicesTable = ({
   return (
     <>
       <Table
-        className="invoicesTable"
+        className="invoicesTable customSticky"
         columns={columns}
         dataSource={data.map((data) => ({ ...data, key: data.id }))}
         rowSelection={rowSelection}
@@ -286,6 +290,11 @@ export const InvoicesTable = ({
           showSizeChanger: false
         }}
         size="small"
+        sticky={
+          {
+            offsetHeader: 160
+          } as any
+        }
       />
     </>
   );

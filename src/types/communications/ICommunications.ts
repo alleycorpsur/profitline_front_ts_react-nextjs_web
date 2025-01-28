@@ -17,13 +17,14 @@ interface ITemplateForm {
   via: ISelectStringType;
   send_to: ISelectStringType[];
   copy_to: ISelectStringType[] | undefined;
-  tags: ISelectStringType[];
+  tags?: ISelectStringType[];
   message: string;
   subject: string;
-  files: ISelectStringType[];
+  files: ISelectStringType[] | null;
 }
 
 export interface ICommunicationForm {
+  attachment_ids: number[];
   name: string;
   description: string;
   trigger: TriggerForm;
@@ -47,6 +48,7 @@ export interface ICreateCommunication {
   project_id: number;
   name: string;
   description: string;
+  attachment_ids: number[];
   subject: string;
   message: string;
   via: "email" | string;
@@ -109,7 +111,13 @@ export interface ICommunication {
   JSON_frecuency: Frequency;
 }
 
+export interface Iattachments {
+  id: number;
+  name: string;
+}
+
 export interface ICommunicationDetail {
+  attachment_ids: any;
   id: number;
   id_project: number;
   name: string;
@@ -133,6 +141,7 @@ export interface ICommunicationDetail {
     end_date: string; // e.g., "2024-11-23" (ISO 8601 date format)
     start_date: string; // e.g., "2024-11-08" (ISO 8601 date format)
   };
+  attachments_ids: Iattachments[];
 }
 
 export interface ISingleCommunication {

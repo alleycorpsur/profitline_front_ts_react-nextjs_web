@@ -1,18 +1,25 @@
 import { Button, Select, Table, TableProps, Tooltip, Typography } from "antd";
+import { useState } from "react";
 import { CheckCircle, Eye } from "phosphor-react";
-import "./concilationTable.scss";
-import { formatDate, formatDateBars, formatMoney } from "@/utils/utils";
-import { IInvoiceConcilation } from "@/types/concilation/concilation";
+
+import { useAppStore } from "@/lib/store/store";
+import { formatDate, formatDateBars } from "@/utils/utils";
 import { useInvoiceIncidentMotives } from "@/hooks/useInvoiceIncidentMotives";
-import { useEffect, useState } from "react";
+
+import { IInvoiceConcilation } from "@/types/concilation/concilation";
 
 const { Text } = Typography;
+import "./concilationTable.scss";
 
 interface PropsInvoicesTable {
   dataSingleInvoice: IInvoiceConcilation[];
+  // eslint-disable-next-line no-unused-vars
   setShowInvoiceDetailModal: (params: { isOpen: boolean; invoiceId: number }) => void;
+  // eslint-disable-next-line no-unused-vars
   setIderp: (id: string) => void;
+  // eslint-disable-next-line no-unused-vars
   addSelectMotive: (invoiceId: number, motiveId: number) => void;
+  // eslint-disable-next-line no-unused-vars
   onRowSelection: (selectedRowKeys: React.Key[], selectedRows: IInvoiceConcilation[]) => void;
   selectedRowKeys: React.Key[];
 }
@@ -25,6 +32,8 @@ export const ConcilationTable = ({
   onRowSelection,
   selectedRowKeys
 }: PropsInvoicesTable) => {
+  const formatMoney = useAppStore((state) => state.formatMoney);
+
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
 
@@ -112,7 +121,7 @@ export const ConcilationTable = ({
       title: "Monto cp",
       key: "current_value",
       dataIndex: "current_value",
-      render: (amount) => <Text className="cell -alignRight">{formatMoney(amount)}</Text>,
+      render: (amount) => <p className="cell -alignRight fontMonoSpace">{formatMoney(amount)}</p>,
       sorter: (a, b) => a.current_value - b.current_value,
       showSorterTooltip: false,
       align: "right",
@@ -131,7 +140,9 @@ export const ConcilationTable = ({
       title: "Diferencia",
       key: "difference_amount",
       dataIndex: "difference_amount",
-      render: (amount) => <p className="text__red__concilation">{formatMoney(amount)}</p>,
+      render: (amount) => (
+        <p className="text__red__concilation fontMonoSpace">{formatMoney(amount)}</p>
+      ),
       sorter: (a, b) => a.current_value - b.current_value,
       showSorterTooltip: false,
       align: "right"

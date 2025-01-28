@@ -2,7 +2,8 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Button, Flex, Table, TableProps, Typography } from "antd";
 import { Eye, Receipt } from "phosphor-react";
 
-import { formatDate, formatDateDMY, formatMoney } from "@/utils/utils";
+import { useAppStore } from "@/lib/store/store";
+import { formatDate } from "@/utils/utils";
 import InvoiceDownloadModal from "@/modules/clients/components/invoice-download-modal";
 import { ISingleBank } from "@/types/banks/IBanks";
 
@@ -31,6 +32,8 @@ export const BanksTable = ({
   bankStatusId,
   clearSelected
 }: PropsBanksTable) => {
+  const formatMoney = useAppStore((state) => state.formatMoney);
+
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [isModalFileDetailOpen, setIsModalFileDetailOpen] = useState<boolean>(false);
   const [fileURL, setFileURL] = useState<string>("");
@@ -141,7 +144,9 @@ export const BanksTable = ({
       key: "current_value",
       dataIndex: "current_value",
       align: "right",
-      render: (text) => <Text>{formatMoney(text, undefined, undefined, true)}</Text>,
+      render: (text) => (
+        <p className="fontMonoSpace money">{formatMoney(text, { hideDecimals: true })}</p>
+      ),
       sorter: (a, b) => (a.current_value ?? 0) - (b.current_value ?? 0),
       showSorterTooltip: false,
       width: 130
@@ -194,7 +199,7 @@ export const BanksTable = ({
   return (
     <>
       <Table
-        className="banksTable"
+        className="banksTable customSticky"
         loading={false}
         columns={columns}
         rowSelection={rowSelection}
@@ -206,6 +211,12 @@ export const BanksTable = ({
           pageSize: 15,
           showSizeChanger: false
         }}
+        sticky={
+          {
+            offsetHeader: 120,
+            offsetScroll: 0
+          } as TableProps<ISingleBank>["sticky"]
+        }
       />
       <InvoiceDownloadModal
         isModalOpen={isModalFileDetailOpen}

@@ -70,4 +70,26 @@
             color: $secondary-gray;
         }
     }
+
+    .textArea {
+        background-color: $background;
+        padding: 0.7rem;
+        border-radius: 0.25rem;
+        font-size: 1rem;
+        font-weight: 300;
+    
+        &::placeholder {
+            color: $dark-gray !important;
+        }
+    
+        &:disabled {
+            color: $dark-gray !important;
+        }
+    
+        &.-readOnly {
+            background-color: $dark-gray;
+            color: $darker-gray;
+        }
+    }
+
 }

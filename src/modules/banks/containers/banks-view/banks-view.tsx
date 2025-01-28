@@ -21,7 +21,7 @@ export const BanksView: FC = () => {
   return (
     <>
       <div className={styles.banksView}>
-        <UiTab tabs={items} />
+        <UiTab tabs={items} sticky stickyOffset="-1rem" />
       </div>
     </>
   );

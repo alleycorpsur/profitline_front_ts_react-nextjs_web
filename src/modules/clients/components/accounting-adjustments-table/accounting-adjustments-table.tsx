@@ -1,9 +1,12 @@
 import { Dispatch, SetStateAction, useState } from "react";
 import { Button, Table, TableProps, Typography } from "antd";
-
 import { Eye } from "phosphor-react";
-import { formatDate, formatMoney } from "@/utils/utils";
+
+import { useAppStore } from "@/lib/store/store";
+import { formatDate } from "@/utils/utils";
+
 import { FinancialDiscount } from "@/types/financialDiscounts/IFinancialDiscounts";
+
 import "./accounting-adjustments-table.scss";
 
 const { Text } = Typography;
@@ -23,6 +26,8 @@ const AccountingAdjustmentsTable = ({
   financialStatusId,
   legalized
 }: PropsInvoicesTable) => {
+  const formatMoney = useAppStore((state) => state.formatMoney);
+
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
 
   const handleOpenDetail = (adjustment: FinancialDiscount) => {
@@ -106,7 +111,7 @@ const AccountingAdjustmentsTable = ({
       title: "Monto Inicial",
       key: "initial_value",
       dataIndex: "initial_value",
-      render: (text) => <Text className="cell -alignRight">{formatMoney(text)}</Text>,
+      render: (text) => <p className="cell -alignRight fontMonoSpace">{formatMoney(text)}</p>,
       align: "right",
       sorter: (a, b) => a.initial_value - b.initial_value,
       showSorterTooltip: false
@@ -115,7 +120,7 @@ const AccountingAdjustmentsTable = ({
       title: "Monto aplicado",
       key: "missing",
       dataIndex: "missing",
-      render: (text) => <Text className="cell -alignRight">{text}</Text>,
+      render: (text) => <Text className="cell -alignRight fontMonoSpace">{text}</Text>,
       align: "right",
       sorter: (a, b) => a.initial_value - b.initial_value,
       showSorterTooltip: false
@@ -124,7 +129,7 @@ const AccountingAdjustmentsTable = ({
       title: "Monto disponible",
       key: "current_value",
       dataIndex: "current_value",
-      render: (amount) => <Text className="cell -alignRight">{formatMoney(amount)}</Text>,
+      render: (amount) => <p className="cell -alignRight fontMonoSpace">{formatMoney(amount)}</p>,
       align: "right",
       sorter: (a, b) => a.current_value - b.current_value,
       showSorterTooltip: false
@@ -146,12 +151,13 @@ const AccountingAdjustmentsTable = ({
   return (
     <>
       <Table
-        className="adjustmentsTable"
+        className="adjustmentsTable customSticky"
         columns={columns}
         dataSource={data?.map((data) => ({ ...data, key: data.id }))}
         rowSelection={rowSelection}
         rowClassName={(record) => (selectedRowKeys.includes(record.id) ? "selectedRow" : "")}
         pagination={false}
+        sticky={{ offsetHeader: 160 }}
       />
     </>
   );

@@ -17,7 +17,6 @@ import {
 import CardsClients from "../../../molecules/modals/CardsClients/CardsClients";
 
 import { IClientsPortfolio } from "@/types/clients/IViewClientsTable";
-import { formatMoney } from "@/utils/utils";
 
 import { useDebounce } from "@/hooks/useDeabouce";
 import {
@@ -34,6 +33,8 @@ import "./ClientsViewTable.scss";
 const { Text } = Typography;
 
 export const ClientsViewTable = () => {
+  const formatMoney = useAppStore((state) => state.formatMoney);
+  const PAGINATION_LIMIT = 25;
   const [searchQuery, setSearchQuery] = useState<string>("");
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
   const [filters, setFilters] = useState<SelectedFilters>({
@@ -51,7 +52,6 @@ export const ClientsViewTable = () => {
   });
 
   const fetchPortfolios = async ({ pageParam = 1 }) => {
-    const limit = 50;
     const holdingQuery = filters.holding.length > 0 ? `&holding=${filters.holding.join(",")}` : "";
     const searchQueryParam = debouncedSearchQuery
       ? `&searchQuery=${encodeURIComponent(debouncedSearchQuery.toLowerCase().trim())}`
@@ -59,7 +59,7 @@ export const ClientsViewTable = () => {
     const clientGroupQuery =
       filters.clientGroup.length > 0 ? `&client_group=${filters.clientGroup.join(",")}` : "";
 
-    const pathKey = `/portfolio/client/project/${ID}?page=${pageParam}&limit=${limit}${holdingQuery}${searchQueryParam}${clientGroupQuery}`;
+    const pathKey = `/portfolio/client/project/${ID}?page=${pageParam}&limit=${PAGINATION_LIMIT}${holdingQuery}${searchQueryParam}${clientGroupQuery}`;
 
     return fetcher(pathKey);
   };
@@ -69,7 +69,10 @@ export const ClientsViewTable = () => {
     fetchPortfolios,
     {
       getNextPageParam: (lastPage, pages) => {
-        if (lastPage.message === "no rows" || lastPage?.data?.clientsPortfolio?.length < 50)
+        if (
+          lastPage.message === "no rows" ||
+          lastPage?.data?.clientsPortfolio?.length < PAGINATION_LIMIT
+        )
           return undefined;
         return pages.length + 1;
       }
@@ -101,23 +104,29 @@ export const ClientsViewTable = () => {
         </Link>
       ),
       width: "20%",
-      sorter: (a, b) => a.client_name.localeCompare(b.client_name)
+      sorter: (a, b) => a.client_name.localeCompare(b.client_name),
+      showSorterTooltip: false
     },
     {
       align: "right",
       title: "Cartera",
       dataIndex: "total_portfolio",
       key: "total_portfolio",
-      render: (text) => <Text>{formatMoney(text)}</Text>,
+      render: (text) => (
+        <p className="fontMonoSpace">{formatMoney(text, { hideDecimals: true })}</p>
+      ),
       width: "10%",
-      sorter: (a, b) => a.total_portfolio - b.total_portfolio
+      sorter: (a, b) => a.total_portfolio - b.total_portfolio,
+      showSorterTooltip: false
     },
     {
       align: "right",
       title: "Vencida",
       dataIndex: "past_due_ammount",
       key: "past_due_ammount",
-      render: (text) => <Text>{formatMoney(text)}</Text>,
+      render: (text) => (
+        <p className="fontMonoSpace">{formatMoney(text, { hideDecimals: true })}</p>
+      ),
       width: "10%",
       sorter: (a, b) => a.past_due_ammount - b.past_due_ammount
     },
@@ -126,16 +135,23 @@ export const ClientsViewTable = () => {
       title: "Presupuesto",
       key: "budget_ammount",
       dataIndex: "budget_ammount",
-      render: (text) => <Text>{formatMoney(text)}</Text>,
+      render: (text) => (
+        <p className="fontMonoSpace">{formatMoney(text, { hideDecimals: true })}</p>
+      ),
       width: "10%",
-      sorter: (a, b) => a.budget_ammount - b.budget_ammount
+      sorter: (a, b) => a.budget_ammount - b.budget_ammount,
+      showSorterTooltip: false
     },
     {
       align: "right",
       title: "R. Aplicado",
       key: "applied_payments_ammount",
       dataIndex: "applied_payments_ammount",
-      render: (text) => <Text>{formatMoney(text)}</Text>
+      render: (text) => (
+        <p className="fontMonoSpace">{formatMoney(text, { hideDecimals: true })}</p>
+      ),
+      sorter: (a, b) => a.applied_payments_ammount - b.applied_payments_ammount,
+      showSorterTooltip: false
     },
     {
       align: "center",
@@ -143,29 +159,31 @@ export const ClientsViewTable = () => {
       title: "Ejecutado",
       key: "executed_percentage",
       dataIndex: "executed_percentage",
-      render: (text) => <Text>{text} %</Text>
+      render: (text) => <p className="fontMonoSpace">{text} %</p>
     },
     {
       align: "right",
       title: "PNA",
       key: "unapplied_payments_ammount",
       dataIndex: "unapplied_payments_ammount",
-      render: (text) => <Text>{formatMoney(text)}</Text>
+      render: (text) => <p className="fontMonoSpace">{formatMoney(text, { hideDecimals: true })}</p>
     },
     {
       align: "right",
       title: "Saldos",
       key: "total_balances",
       dataIndex: "total_balances",
-      render: (text) => <Text>{text}</Text>,
-      sorter: (a, b) => a.total_balances - b.total_balances
+      render: (text) => <p className="fontMonoSpace">{text}</p>,
+      sorter: (a, b) => a.total_balances - b.total_balances,
+      showSorterTooltip: false
     },
     {
       title: "Holding",
       key: "holding_name",
       dataIndex: "holding_name",
       render: (text) => <Text className="text">{text}</Text>,
-      sorter: (a, b) => a.holding_name?.localeCompare(b.holding_name)
+      sorter: (a, b) => a.holding_name?.localeCompare(b.holding_name),
+      showSorterTooltip: false
     },
     {
       title: "",
@@ -207,7 +225,7 @@ export const ClientsViewTable = () => {
 
   return (
     <main className="mainClientsTable">
-      <div>
+      <div style={{ marginBottom: "10px" }}>
         <Flex justify="space-between" className="mainClientsTable_header">
           <Flex gap={"10px"}>
             <OptimizedSearchComponent onSearch={handleSearch} />

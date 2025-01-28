@@ -51,6 +51,14 @@
         &.-noHolding {
             color: $gray;
         }
+
+        &:hover {
+            background-color: $light-gray !important;
+        }
+
+        &:active {
+            background-color: $gray !important;
+        }
     }
 }
 
