@@ -30,6 +30,31 @@
         max-width: 360px;
     }
 
+    &__textArea {
+        grid-column: 1 / span 2;
+        height: fit-content;
+
+        textarea {
+            background-color: $background;
+            border: none;
+            border-radius: 0.25rem;
+            padding: 0.875rem 1rem;
+            font-weight: 300;
+            width: 100%;
+            height: 220px;
+            resize: none;
+            font-family: inherit;
+            font-size: 1rem;
+            scrollbar-width: thin;
+        }
+    }
+
+    &__files {
+        max-height: 120px;
+        overflow-y: scroll;
+        scrollbar-width: none;
+    }
+
     &__footer {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -53,6 +78,22 @@
         &:hover {
             cursor: pointer;
             opacity: 0.7;
+        }
+    }
+
+    &__addDocument {
+        display: flex;
+        grid-column-start: 2;
+        align-items: center;
+        border: none !important;
+        box-shadow: none !important;
+        font-size: 0.75rem;
+        padding: 0 !important;
+        margin-top: 0rem;
+        width: fit-content;
+
+        &:hover {
+            opacity: 0.8;
         }
     }
 }

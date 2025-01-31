@@ -8,6 +8,8 @@ import {
   createDigitalRecord,
   getDigitalRecordFormInfo
 } from "@/services/accountingAdjustment/accountingAdjustment";
+import useFileHandlers from "@/components/hooks/useFIleHandlers";
+
 import { DocumentButton } from "@/components/atoms/DocumentButton/DocumentButton";
 import { useForm, Controller, FieldError } from "react-hook-form";
 import { InputForm } from "@/components/atoms/inputs/InputForm/InputForm";
@@ -26,11 +28,6 @@ interface DigitalRecordModalProps {
   clientId: number;
   invoiceSelected: IInvoice[] | undefined;
   messageShow: MessageInstance;
-}
-
-interface infoObject {
-  file: File;
-  fileList: File[];
 }
 
 interface ISelect {
@@ -96,42 +93,11 @@ const DigitalRecordModal = ({
   }, [isOpen, reset]);
   const attachments = watch("attachments");
 
-  const handleOnChangeDocument: any = (info: infoObject) => {
-    const { file: rawFile } = info;
-    if (rawFile) {
-      const fileSizeInMB = rawFile.size / (1024 * 1024);
-      if (fileSizeInMB > 30) {
-        messageShow.error(
-          "El archivo es demasiado grande. Por favor, sube un archivo de menos de 30 MB."
-        );
-        return;
-      }
-      setValue("attachments", [...attachments, rawFile]);
-      trigger("attachments");
-    }
-  };
-
-  const handleOnDeleteDocument = (fileName: string) => {
-    const updatedFiles = attachments.filter((file: any) => file.name !== fileName);
-    setValue("attachments", updatedFiles);
-    trigger("attachments");
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files && files.length > 0) {
-      const file = files[0];
-      const fileSizeInMB = file.size / (1024 * 1024);
-      if (fileSizeInMB > 30) {
-        messageShow.error(
-          "El archivo es demasiado grande. Por favor, sube un archivo de menos de 30 MB."
-        );
-        return;
-      }
-      setValue("attachments", [...attachments, file]);
-      trigger("attachments");
-    }
-  };
+  const { handleOnChangeDocument, handleOnDeleteDocument, handleFileChange } = useFileHandlers({
+    setValue,
+    trigger,
+    attachments
+  });
 
   const onSubmit = async (data: IFormDigitalRecordModal) => {
     setIsSubmitting(true);

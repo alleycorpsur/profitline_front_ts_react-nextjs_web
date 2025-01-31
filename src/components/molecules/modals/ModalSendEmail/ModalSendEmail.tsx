@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Flex, Modal } from "antd";
+import { Button, Flex, Modal } from "antd";
 import { useParams } from "next/navigation";
-import { CaretLeft } from "phosphor-react";
+import { CaretLeft, Plus } from "phosphor-react";
 
 import { useAppStore } from "@/lib/store/store";
 import { getDigitalRecordFormInfo } from "@/services/accountingAdjustment/accountingAdjustment";
 import { extractSingleParam } from "@/utils/utils";
+import useFileHandlers from "@/components/hooks/useFIleHandlers";
 
 import SecondaryButton from "@/components/atoms/buttons/secondaryButton/SecondaryButton";
 import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
 import { InputForm } from "@/components/atoms/inputs/InputForm/InputForm";
 import GeneralSearchSelect from "@/components/ui/general-search-select";
+import { DocumentButton } from "@/components/atoms/DocumentButton/DocumentButton";
 
 import "./modalSendEmail.scss";
 
@@ -48,10 +50,21 @@ export const ModalSendEmail = ({ isOpen, onClose }: Props) => {
     }[]
   >([]);
 
-  const { control, setValue, watch, reset } = useForm<IFormEmailNotification>({
-    defaultValues: {
-      attachments: []
-    }
+  const { control, handleSubmit, setValue, watch, trigger, reset } =
+    useForm<IFormEmailNotification>({
+      defaultValues: {
+        attachments: []
+      }
+    });
+
+  const forwards = watch("forward_to");
+  const copyTo = watch("copy_to");
+  const attachments = watch("attachments");
+
+  const { handleOnChangeDocument, handleOnDeleteDocument, handleFileChange } = useFileHandlers({
+    setValue,
+    trigger,
+    attachments
   });
 
   //reset form when modal is closed
@@ -66,7 +79,6 @@ export const ModalSendEmail = ({ isOpen, onClose }: Props) => {
     const fetchFormInfo = async () => {
       try {
         const response = await getDigitalRecordFormInfo(projectId, clientId);
-        console.log("response", response);
         setRecipients(response.usuarios);
       } catch (error) {
         console.error("Error getting digital record form info2", error);
@@ -82,10 +94,8 @@ export const ModalSendEmail = ({ isOpen, onClose }: Props) => {
     // if a template its returned assign values to form with response
   };
 
-  const handleSendEmail = () => {
-    // send email
-    console.log("Send email");
-    //if success change view to success
+  const onSubmit = (data: IFormEmailNotification) => {
+    console.log("Send email", data);
     setCurrentView("success");
   };
 
@@ -96,6 +106,7 @@ export const ModalSendEmail = ({ isOpen, onClose }: Props) => {
       open={isOpen}
       onCancel={onClose}
       footer={null}
+      centered
     >
       {currentView === "sendEmail" && (
         <>
@@ -124,6 +135,7 @@ export const ModalSendEmail = ({ isOpen, onClose }: Props) => {
             <Controller
               name="forward_to"
               control={control}
+              rules={{ required: true }}
               render={({ field }) => (
                 <GeneralSearchSelect
                   field={field}
@@ -165,18 +177,71 @@ export const ModalSendEmail = ({ isOpen, onClose }: Props) => {
               control={control}
               rules={{ required: true }}
               render={({ field }) => (
-                <div className="modalCommunicationDetail__textArea">
+                <div className="modalSendEmail__textArea">
                   <textarea {...field} placeholder="" />
                 </div>
               )}
             />
+
+            <div>
+              <Flex className="modalSendEmail__files" vertical gap="0.7rem">
+                <DocumentButton
+                  key={attachments[0]?.name}
+                  title={attachments[0]?.name}
+                  handleOnChange={handleOnChangeDocument}
+                  handleOnDelete={() => handleOnDeleteDocument(attachments[0]?.name)}
+                  fileName={attachments[0]?.name}
+                  fileSize={attachments[0]?.size}
+                />
+                {attachments.slice(1).map((file, index) => (
+                  <DocumentButton
+                    key={file.name}
+                    className={index > 0 ? "documentButton" : ""}
+                    title={file.name}
+                    handleOnChange={handleOnChangeDocument}
+                    handleOnDelete={() => handleOnDeleteDocument(file.name)}
+                    fileName={file.name}
+                    fileSize={file.size}
+                  />
+                ))}
+                {/* {errors.attachments && (
+                  <p className="error">{(errors.attachments as FieldError).message}</p>
+                )} */}
+              </Flex>
+              {attachments.length > 0 && (
+                <>
+                  <Button
+                    onClick={() => {
+                      console.log("click");
+                      const fileInput = document.getElementById("fileInputSendEmailModal");
+                      if (fileInput) {
+                        fileInput.click();
+                      }
+                    }}
+                    className="modalSendEmail__addDocument"
+                    icon={<Plus size={"1rem"} />}
+                  >
+                    Cargar otro documento
+                  </Button>
+                  <input
+                    type="file"
+                    id="fileInputSendEmailModal"
+                    style={{ display: "none" }}
+                    onChange={handleFileChange}
+                    accept=".pdf,.png,.doc,.docx, .xls, .xlsx, .msg,  .eml"
+                  />
+                </>
+              )}
+            </div>
           </Flex>
           <div className="modalSendEmail__footer">
             <SecondaryButton onClick={() => onClose()}>
               {templateConstants.cancelText}
             </SecondaryButton>
 
-            <PrincipalButton onClick={handleSendEmail}>{templateConstants.okText}</PrincipalButton>
+            <PrincipalButton onClick={handleSubmit(onSubmit)}>
+              {templateConstants.okText}
+            </PrincipalButton>
           </div>
         </>
       )}
@@ -188,9 +253,12 @@ export const ModalSendEmail = ({ isOpen, onClose }: Props) => {
           <div className="modalSendEmail__description" style={{ maxWidth: "90%" }}>
             <p>{successConstants.description}</p>
             <p>
-              {recipients
-                .map((recipient, index) =>
-                  index === recipients.length - 1 ? `y ${recipient}` : `${recipient},`
+              {forwards
+                .concat(copyTo || []) // Concatenate forwards and copys
+                .map((recipient, index, combinedArray) =>
+                  index === combinedArray.length - 1
+                    ? `y ${recipient.label}` // Add "y" before the last recipient
+                    : `${recipient.label},`
                 )
                 .join(" ")}
             </p>
