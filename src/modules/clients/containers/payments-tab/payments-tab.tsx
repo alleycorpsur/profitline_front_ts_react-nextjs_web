@@ -73,7 +73,7 @@ const PaymentsTab: React.FC<PaymentProd> = ({ onChangeTab }) => {
   return (
     <>
       <div className="paymentsTab">
-        <Flex justify="space-between" className="paymentsTab__header">
+        <Flex justify="space-between" className="paymentsTab__header clientStickyHeader">
           <Flex gap={"0.5rem"}>
             <UiSearchInput
               className="search"
@@ -108,6 +108,7 @@ const PaymentsTab: React.FC<PaymentProd> = ({ onChangeTab }) => {
           </Flex>
         ) : (
           <Collapse
+            stickyLabel
             items={data?.map((PaymentStatus) => ({
               key: PaymentStatus.payments_status_id,
               label: (

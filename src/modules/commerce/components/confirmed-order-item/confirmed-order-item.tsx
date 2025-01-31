@@ -1,6 +1,6 @@
 import { FC } from "react";
 import Image from "next/image";
-import { formatMoney, formatNumber } from "@/utils/utils";
+import { formatNumber } from "@/utils/utils";
 
 import styles from "./confirmed-order-item.module.scss";
 import { Flex } from "antd";

@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { Button, Table, TableProps, Typography } from "antd";
 import { Eye } from "phosphor-react";
 
-import { formatDate, formatMoney } from "@/utils/utils";
+import { useAppStore } from "@/lib/store/store";
+import { formatDate } from "@/utils/utils";
 import { useSelectedPayments } from "@/context/SelectedPaymentsContext";
 
 import { IClientPayment } from "@/types/clientPayments/IClientPayments";
@@ -23,6 +24,8 @@ const PaymentsTable = ({
   paymentStatusId,
   handleOpenPaymentDetail
 }: PropsInvoicesTable) => {
+  const formatMoney = useAppStore((state) => state.formatMoney);
+
   const { selectedPayments, setSelectedPayments } = useSelectedPayments();
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
 
@@ -101,7 +104,8 @@ const PaymentsTable = ({
       title: "Monto",
       key: "initial_value",
       dataIndex: "initial_value",
-      render: (initial_value) => <Text className="cell">{formatMoney(initial_value)}</Text>,
+      align: "right",
+      render: (initial_value) => <p className="cell fontMonoSpace">{formatMoney(initial_value)}</p>,
       sorter: (a, b) => a.initial_value - b.initial_value,
       showSorterTooltip: false
     },
@@ -109,7 +113,8 @@ const PaymentsTable = ({
       title: "Disponible",
       key: "current_value",
       dataIndex: "current_value",
-      render: (current_value) => <Text className="cell">{formatMoney(current_value)}</Text>,
+      align: "right",
+      render: (current_value) => <p className="cell fontMonoSpace">{formatMoney(current_value)}</p>,
       sorter: (a, b) => a.current_value - b.current_value,
       showSorterTooltip: false
     },
@@ -134,12 +139,13 @@ const PaymentsTable = ({
   return (
     <>
       <Table
-        className="paymentsTable"
+        className="paymentsTable customSticky"
         columns={columns}
         dataSource={data?.map((data) => ({ ...data, key: data.id }))}
         rowSelection={rowSelection}
         rowClassName={(record) => (selectedRowKeys.includes(record.id) ? "selectedRow" : "")}
         pagination={false}
+        sticky={{ offsetHeader: 160 }}
       />
     </>
   );

@@ -1,7 +1,10 @@
 import React from "react";
-import "./cardsClients.scss";
 import { Flex, Skeleton } from "antd";
-import { formatMillionNumber, formatMoney } from "@/utils/utils";
+
+import { useAppStore } from "@/lib/store/store";
+import { formatMillionNumber } from "@/utils/utils";
+
+import "./cardsClients.scss";
 
 interface Props {
   total: number;
@@ -13,6 +16,8 @@ interface Props {
 }
 
 const CardsClients = ({ total, icon, title, notAMoneyValue, customStyles, loading }: Props) => {
+  const formatMoney = useAppStore((state) => state.formatMoney);
+
   if (loading) {
     return (
       <Flex className="wrapperCardsClient" style={customStyles}>

@@ -1,8 +1,10 @@
 import { FC } from "react";
-import "./itemsActionsModalInvoiceStyle.scss";
 import { Checkbox } from "antd";
-import { formatMoney } from "@/utils/utils";
+
+import { useAppStore } from "@/lib/store/store";
 import { DividerVerticalModal } from "../DividerVertical/DividerVerticalModal";
+
+import "./itemsActionsModalInvoiceStyle.scss";
 
 interface ItemsActionsModalProps {
   onHeaderClick: () => void;
@@ -16,6 +18,8 @@ interface ItemsActionsModalProps {
 }
 
 const ItemsActionsModalInvoice: FC<ItemsActionsModalProps> = ({ onHeaderClick, item, type }) => {
+  const formatMoney = useAppStore((state) => state.formatMoney);
+
   return (
     <div className="item">
       <div className="head">

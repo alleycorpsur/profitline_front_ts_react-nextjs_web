@@ -202,49 +202,6 @@ export const insertPeriodEveryThreeDigits = (number: number) => {
   return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 };
 
-export function formatMoney(
-  amount: string | number | undefined | null,
-  hideCurrencySymbol?: boolean,
-  countryCode?: CountryCode,
-  hideDecimals?: boolean
-): string {
-  if (!amount) {
-    return "$0";
-  }
-  const { currency, id } = countryFormater(countryCode);
-  const number = typeof amount === "string" ? parseFloat(amount) : amount;
-  const formatter = new Intl.NumberFormat(id, {
-    style: "currency",
-    currency,
-    minimumFractionDigits: 0
-  });
-
-  if (hideCurrencySymbol) {
-    return formatter.format(number).replace(/[^\d.,]/g, "");
-  }
-
-  if (hideDecimals) {
-    const noDecimalNumber = Math.floor(number);
-    return formatter.format(noDecimalNumber);
-  }
-
-  return formatter.format(number);
-}
-
-const countryFormater = (currency: CountryCode = "co") => {
-  return intFormat[currency];
-};
-
-const intFormat = {
-  en: { currency: "USD", id: "en-US" },
-  eur: { currency: "EUR", id: "en-DE" },
-  jpn: { currency: "JPY", id: "ja-JP" },
-  ch: { currency: "CNY", id: "zh-CN" },
-  kr: { currency: "KRW", id: "ko-KR" },
-  es: { currency: "EUR", id: "es-ES" },
-  co: { currency: "COP", id: "es-CO" }
-};
-
 export const getCityName = (id: number) => {
   const city = locations.find((location) => location.id === id);
   return city?.city;

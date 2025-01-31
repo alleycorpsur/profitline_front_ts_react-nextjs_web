@@ -1,15 +1,19 @@
 import { useEffect, useRef, useState } from "react";
 import Draggable, { DraggableData, DraggableEvent } from "react-draggable";
-import styles from "./modal-estimate-total-invoices.module.scss";
 import { NewspaperClipping } from "phosphor-react";
+
+import { useAppStore } from "@/lib/store/store";
 import { IInvoice } from "@/types/invoices/IInvoices";
-import { formatMoney } from "@/utils/utils";
+
+import styles from "./modal-estimate-total-invoices.module.scss";
 
 interface Props {
   selectedInvoices: IInvoice[];
 }
 
 export const ModalEstimateTotalInvoices = ({ selectedInvoices }: Props) => {
+  const formatMoney = useAppStore((state) => state.formatMoney);
+
   const totalInfo = {
     total: selectedInvoices?.reduce((acc, invoice) => acc + invoice.current_value, 0),
     selectedInvoices: selectedInvoices?.length

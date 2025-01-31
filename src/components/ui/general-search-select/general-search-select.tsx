@@ -18,11 +18,11 @@ type ExtendedFieldError =
   | Merge<OriginalFieldError, FieldErrorsImpl<{ value: number; label: string }>>;
 
 interface PropsGeneralSelect<T extends FieldValues> {
-  errors: ExtendedFieldError | undefined;
+  errors?: ExtendedFieldError;
   field: ControllerRenderProps<T, any>;
   title?: string;
   placeholder: string;
-  options: { value: number | string; label: string }[] | string[] | undefined;
+  options?: { value: number | string; label: string }[] | string[];
   loading?: boolean;
   customStyleContainer?: React.CSSProperties;
   disabled?: boolean;

@@ -1,17 +1,18 @@
-import React, { useState } from "react";
-import { Button, Row, Col, Select, Flex, Typography } from "antd";
+import React, { useEffect, useState } from "react";
+import { Button, Row, Col, Select, Flex, Typography, Form } from "antd";
 import { CloseOutlined } from "@ant-design/icons";
 import { Plus } from "phosphor-react";
 import style from "./form.module.scss";
 import QuestionCard from "./components/QuestionCard";
 import { SelectType } from "./components/SelectType";
-import { FormValues, Question, QuestionType } from "./controllers/formSchema";
-import { useFieldArray, useForm } from "react-hook-form";
+import { FormMode, FormValues, Question, QuestionType } from "./controllers/formSchema";
+import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { InputForm } from "@/components/atoms/inputs/InputForm/InputForm";
 import { InputSelect } from "@/components/atoms/inputs/InputSelect/InputSelect";
 import { FooterButtons } from "@/components/molecules/FooterButtons/FooterButtons";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { mockData } from "./mocked-data";
 
 const { Text, Title } = Typography;
 const { Option } = Select;
@@ -26,7 +27,8 @@ const defaultQuestion = {
 };
 
 const CreateFormView: React.FC = () => {
-  const { control, register, handleSubmit, watch } = useForm<FormValues>({
+  const formId = 1;
+  const { control, register, handleSubmit, watch, reset, formState } = useForm<FormValues>({
     defaultValues: {
       formName: "",
       formDescription: "",
@@ -34,15 +36,42 @@ const CreateFormView: React.FC = () => {
       questions: [defaultQuestion]
     }
   });
-  const formNow = watch();
-  console.log("formNow", formNow);
+  const formName = useWatch({ control, name: "formName" });
+  console.log("formState", formState);
+  const [mode, setMode] = useState<FormMode>(FormMode.CREATE);
+  const [loading, setLoading] = useState(false);
   const { fields, append, remove, update } = useFieldArray({
     control,
     name: "questions",
     keyName: "id"
   });
+  // Simulación de carga de datos desde la API
+  useEffect(() => {
+    if (mode === FormMode.EDIT) {
+      setLoading(true);
+      setTimeout(() => {
+        reset(mockData);
+        setLoading(false);
+      }, 1000);
+      // fetch("/api/form-data") // Cambiar a tu endpoint real
+      //   .then((res) => res.json())
+      //   .then((data) => {
+      //     // Mapea los datos de la API a la estructura del formulario
+      //     reset({
+      //       formName: data.formName,
+      //       formDescription: data.formDescription,
+      //       validity: data.validity,
+      //       questions: data.questions
+      //     });
+      //   })
+      //   .finally(() => setLoading(false));
+    }
+  }, [mode, reset]);
+  const formNow = watch();
+  console.log("formNow", formNow);
+
   const onSubmit = (data: FormValues) => {
-    console.log(data);
+    console.log("SUBMIT", data);
   };
   console.log("fields", fields);
 
@@ -67,6 +96,7 @@ const CreateFormView: React.FC = () => {
   const handleGoBack = () => {
     router.back();
   };
+
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className={style.container}>
@@ -80,10 +110,19 @@ const CreateFormView: React.FC = () => {
         >
           <Row justify="space-between" align="middle">
             <Title level={4} style={{ margin: 0 }}>
-              Crear formulario
+              {mode === "create" && "Crear formulario"}
+              {mode === "edit" && "Editar formulario"}
+              {mode === "preview" && watch("formName")}
+              {mode === "answer" && watch("formName")}
             </Title>
+            <Select value={mode} onChange={(value) => setMode(value)} style={{ width: 200 }}>
+              <Option value="create">Modo creación</Option>
+              <Option value="edit">Modo edición</Option>
+              <Option value="preview">Vista previa</Option>
+              <Option value="answer">Responder</Option>
+            </Select>
           </Row>
-
+          <Link href={`/proyectos/complete-form`}> Ir a completar formulario</Link>
           <Button
             type="text"
             icon={<CloseOutlined />}
@@ -122,17 +161,22 @@ const CreateFormView: React.FC = () => {
             placeholder="Ingresar descripción"
             control={control}
           />
+
           {fields.map((question, index) => {
-            if (!question.type)
-              return (
-                <Flex vertical key={index} gap={8}>
-                  <p className={style.selectTitle}>Seleccionar tipo de pregunta</p>
-                  <SelectType
-                    typeSelected={question.type}
-                    handleTypeClick={(type: QuestionType) => handleTypeClick(index, question, type)}
-                  />
-                </Flex>
-              );
+            if (mode === FormMode.CREATE || mode === FormMode.EDIT) {
+              if (!question.type)
+                return (
+                  <Flex vertical key={`select-${question.id}`} gap={8}>
+                    <p className={style.selectTitle}>Seleccionar tipo de pregunta</p>
+                    <SelectType
+                      typeSelected={question.type}
+                      handleTypeClick={(type: QuestionType) =>
+                        handleTypeClick(index, question, type)
+                      }
+                    />
+                  </Flex>
+                );
+            }
             return (
               <QuestionCard
                 key={question.id}
@@ -141,13 +185,14 @@ const CreateFormView: React.FC = () => {
                 onChangeIsMandatory={(newState: boolean) =>
                   handleChangeIsMandatory(index, question, newState)
                 }
-                questionType={question.type}
+                questionType={question.type as QuestionType}
                 control={control}
                 index={index}
                 isRequired={question.isRequired}
               />
             );
           })}
+
           <Flex justify="flex-start">
             <Button
               type="dashed"
@@ -162,12 +207,13 @@ const CreateFormView: React.FC = () => {
               Agregar nueva pregunta
             </Button>
           </Flex>
+
           <FooterButtons
             backTitle={"Cancelar"}
-            nextTitle={`Crear formulario`}
-            handleBack={() => {}}
-            handleNext={() => {}}
-            nextDisabled={false}
+            nextTitle={"Guardar"}
+            handleBack={handleGoBack}
+            handleNext={() => handleSubmit(onSubmit)()}
+            nextDisabled={!formState.isValid}
             isSubmitting={false}
           />
         </Flex>

@@ -7,6 +7,12 @@ export interface IUserPermissions {
 interface IPermissionData {
   permissions: IPermissionsByProject[];
   id_user: number;
+  preferences: IPreferences;
+}
+
+interface IPreferences {
+  currency: string;
+  id: string;
 }
 
 interface IPermissionsByProject {

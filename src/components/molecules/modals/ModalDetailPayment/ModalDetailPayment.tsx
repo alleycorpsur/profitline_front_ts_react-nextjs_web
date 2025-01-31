@@ -2,7 +2,7 @@ import { FC, useEffect, useState } from "react";
 import { Button, Flex, Spin } from "antd";
 import { CaretDoubleRight, DotsThree, Receipt } from "phosphor-react";
 
-import { formatMoney } from "@/utils/utils";
+import { useAppStore } from "@/lib/store/store";
 import { getPaymentDetail } from "@/services/banksPayments/banksPayments";
 
 import ModalDetailPaymentEvents from "./components/ModalDetailPaymentEvents/ModalDetailPaymentEvents";
@@ -31,6 +31,7 @@ const ModalDetailPayment: FC<ModalDetailPaymentProps> = ({
   handleOpenPaymentDetail,
   mutatedPaymentDetail
 }) => {
+  const formatMoney = useAppStore((state) => state.formatMoney);
   const [paymentData, setPaymentData] = useState<IPaymentDetail>();
   const [loading, setLoading] = useState<boolean>(false);
   const [isModalFileDetailOpen, setIsModalFileDetailOpen] = useState<boolean>(false);

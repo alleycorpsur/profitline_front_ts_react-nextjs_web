@@ -1,8 +1,9 @@
 import { FC } from "react";
 import { Poppins } from "next/font/google";
 import ReactApexChart from "react-apexcharts";
-import { formatMoney } from "@/utils/utils";
 import { ApexOptions } from "apexcharts";
+
+import { useAppStore } from "@/lib/store/store";
 
 import styles from "./dashboard-porfolio-ages.module.scss";
 const poppins = Poppins({ weight: "400", style: "normal", subsets: ["latin"] });
@@ -18,6 +19,8 @@ interface DashboardPortfolioAgesProps {
 }
 
 const DashboardPortfolioAges: FC<DashboardPortfolioAgesProps> = ({ invoiceAges, className }) => {
+  const formatMoney = useAppStore((state) => state.formatMoney);
+
   const options: ApexOptions = {
     chart: {
       type: "bar",

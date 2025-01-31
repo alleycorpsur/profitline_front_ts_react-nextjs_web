@@ -2,7 +2,8 @@ import React, { ReactNode, useState } from "react";
 import { Button, Dropdown, Table, TableProps } from "antd";
 import { Eye, Trash, DotsThreeVertical } from "phosphor-react";
 
-import { formatMoney } from "@/utils/utils";
+import { useAppStore } from "@/lib/store/store";
+
 import { ModalRemove } from "@/components/molecules/modals/ModalRemove/ModalRemove";
 
 import { IApplyTabRecord } from "@/types/applyTabClients/IApplyTabClients";
@@ -13,9 +14,20 @@ interface DiscountTableProps {
   handleDeleteRow?: (id: number) => void;
   // eslint-disable-next-line no-unused-vars
   handleEditRow: (row_id: number) => void;
+  rowSelection: {
+    selectedRowKeys: React.Key[];
+    // eslint-disable-next-line no-unused-vars
+    onChange: (newSelectedRowKeys: React.Key[], selectedRows: any[]) => void;
+  };
 }
 
-const DiscountTable: React.FC<DiscountTableProps> = ({ data, handleDeleteRow, handleEditRow }) => {
+const DiscountTable: React.FC<DiscountTableProps> = ({
+  data,
+  handleDeleteRow,
+  handleEditRow,
+  rowSelection
+}) => {
+  const formatMoney = useAppStore((state) => state.formatMoney);
   const [activeRow, setActiveRow] = useState<IApplyTabRecord | null>(null);
   const [removeModal, setRemoveModal] = useState(false);
 
@@ -30,7 +42,8 @@ const DiscountTable: React.FC<DiscountTableProps> = ({ data, handleDeleteRow, ha
           return a.financial_discount_id - b.financial_discount_id;
         }
         return 0;
-      }
+      },
+      showSorterTooltip: false
     },
     {
       title: "Tipo de ajuste",
@@ -47,29 +60,32 @@ const DiscountTable: React.FC<DiscountTableProps> = ({ data, handleDeleteRow, ha
       title: "Monto",
       dataIndex: "amount",
       key: "amount",
-      render: (amount) => <p>{formatMoney(amount)}</p>,
+      render: (amount) => <p className="fontMonoSpace">{formatMoney(amount)}</p>,
       sorter: (a, b) => a.amount - b.amount,
-      showSorterTooltip: false
+      showSorterTooltip: false,
+      align: "right"
     },
     {
       title: "Monto aplicado",
       dataIndex: "applied_amount",
       key: "applied_amount",
-      render: (applied_amount) => <p>{formatMoney(applied_amount)}</p>,
+      render: (applied_amount) => <p className="fontMonoSpace">{formatMoney(applied_amount)}</p>,
       sorter: (a, b) => a.applied_amount - b.applied_amount,
-      showSorterTooltip: false
+      showSorterTooltip: false,
+      align: "right"
     },
     {
       title: "Saldo",
       dataIndex: "current_value",
       key: "current_value",
-      render: (current_value) => <p>{formatMoney(current_value)}</p>,
+      render: (current_value) => <p className="fontMonoSpace">{formatMoney(current_value)}</p>,
       sorter: (a, b) => a.current_value - b.current_value,
-      showSorterTooltip: false
+      showSorterTooltip: false,
+      align: "right"
     },
     {
       title: "Detalle",
-      width: 75,
+      width: 76,
       render: (_, row) => {
         const items = [
           {
@@ -137,9 +153,13 @@ const DiscountTable: React.FC<DiscountTableProps> = ({ data, handleDeleteRow, ha
     <>
       <Table
         columns={columns}
-        dataSource={data}
-        className="sectionContainerTable"
+        dataSource={data?.map((data) => ({ ...data, key: data.financial_discount_id }))}
+        className="sectionContainerTable customSticky"
         pagination={false}
+        rowSelection={rowSelection}
+        sticky={{
+          offsetHeader: 160
+        }}
       />
 
       <ModalRemove

@@ -16,6 +16,7 @@ import SelectOuterTags from "@/components/ui/select-outer-tags";
 import InputClickable from "@/components/ui/input-clickable";
 import { ModalPeriodicity } from "@/components/molecules/modals/ModalPeriodicity/ModalPeriodicity";
 import {
+  Iattachments,
   ICommunicationDetail,
   ICommunicationForm,
   IPeriodicityModalForm
@@ -29,7 +30,8 @@ import {
   getCommunicationById,
   getForwardEvents,
   getSubActions,
-  getTemplateTags
+  getTemplateTags,
+  getAllAtachments
 } from "@/services/communications/communications";
 import { useAppStore } from "@/lib/store/store";
 import { capitalize, stringFromArrayOfSelect } from "@/utils/utils";
@@ -85,6 +87,7 @@ export const CommunicationProjectForm = ({
   const [actions, setActions] = useState<ISelect[]>([]);
   const [subActions, setSubActions] = useState<ISelect[]>([]);
   const [templateTags, setTemplateTags] = useState<ISelect[]>([]);
+  const [attachments, setAttachments] = useState<{ value: number; label: string }[]>([]);
   const [forwardTo, setForwardTo] = useState<
     {
       value: string;
@@ -116,9 +119,9 @@ export const CommunicationProjectForm = ({
         ? dataToDataForm(communicationData.data)
         : undefined
   });
-  const watchTemplateTagsLabels = watch("template.tags")?.map((tag) => `\{{${tag.label}\}}`);
-  const watchSelectedAction = watch("trigger.settings.actions");
 
+  const watchTemplateTagsLabels = templateTags?.map((tag) => `\{{${tag.label}\}}`);
+  const watchSelectedAction = watch("trigger.settings.actions");
   useEffect(() => {
     //set values for selects
     const fecthEvents = async () => {
@@ -161,6 +164,14 @@ export const CommunicationProjectForm = ({
       if (res) {
         setCommunicationData({ data: res, isLoading: false });
         setRadioValue(res.id_comunication_type.id);
+
+        setAttachments(
+          res.attachment_ids.map((attachment: { id: number; name: string }) => ({
+            value: attachment.id,
+            label: attachment.name
+          }))
+        );
+
         // setSelectedBusinessRules({
         //   channels: res.rules.channel,
         //   lines: res.rules.line,
@@ -204,18 +215,12 @@ export const CommunicationProjectForm = ({
     return dayObj.label;
   };
 
-  const handleAddTagToBodyAndSubject = (value: OptionType[], deletedValue: OptionType[]) => {
+  const handleAddTagToBodyAndSubject = (value: OptionType[]) => {
     const valueBody = getValues("template.message");
     //  SubjectAdding tags commented because it is not being used
-    const valueSubject = getValues("template.subject");
+    // const valueSubject = getValues("template.subject");
 
-    if (deletedValue.length > 0) {
-      const deletedTag = deletedValue[0].label;
-      setValue("template.message", valueBody.replace(`{{${deletedTag}}}`, ""));
-      setValue("template.subject", valueSubject.replace(`{{${deletedTag}}}`, ""));
-
-      return;
-    }
+    if (value.length === 0) return;
 
     const lastAddedTag = value.length > 0 ? value[value.length - 1] : undefined;
 
@@ -245,6 +250,10 @@ export const CommunicationProjectForm = ({
     });
 
     try {
+      data.attachment_ids = data.template.files.map(
+        (file: { value: number; label: string }) => file.value
+      );
+
       await createCommunication({
         data,
         selectedPeriodicity,
@@ -283,6 +292,23 @@ export const CommunicationProjectForm = ({
       setSelectedPeriodicity(undefined);
     }
   }, [radioValue]);
+
+  useEffect(() => {
+    fetchAttachments();
+  }, []);
+
+  const fetchAttachments = async () => {
+    try {
+      const response = await getAllAtachments(); // Llamada al servicio
+      const formattedAttachments = response.map((attachment: { id: number; name: string }) => ({
+        value: attachment.id, // Mapeo de `id` a `value`
+        label: attachment.name // Mapeo de `name` a `label`
+      }));
+      setAttachments(formattedAttachments); // Actualizar el estado con los datos formateados
+    } catch (error) {
+      console.error("Error fetching attachments", error);
+    }
+  };
 
   return (
     <main className={styles.communicationProjectForm}>
@@ -590,6 +616,7 @@ export const CommunicationProjectForm = ({
                     customStyleContainer={{ width: "25%" }}
                     hiddenTags
                     addedOnchangeBehaviour={handleAddTagToBodyAndSubject}
+                    disableValueRetention
                   />
                 )}
               />
@@ -623,7 +650,7 @@ export const CommunicationProjectForm = ({
                         scrollbarWidth: "none"
                       }}
                       value={field.value}
-                      highlightWords={watchTemplateTagsLabels}
+                      highlightWords={templateTags?.map((tag) => `\{{${tag.label}\}}`)}
                       disabled={!isEditAvailable && !!showCommunicationDetails.communicationId}
                     />
                   </div>
@@ -659,7 +686,7 @@ export const CommunicationProjectForm = ({
                 <SelectOuterTags
                   title="Adjunto"
                   placeholder="Seleccionar adjunto"
-                  options={mockAttachments}
+                  options={attachments}
                   errors={errors.template?.files}
                   field={field}
                   customStyleContainer={{ marginTop: "1rem" }}
@@ -696,8 +723,6 @@ export const CommunicationProjectForm = ({
 
 const viasSelectOption = ["Email", "SMS", "WhatsApp"];
 
-const mockAttachments = ["PDF Estado de cuenta", "Excel cartera", "PDF Factura"];
-
 const initDatSelectedBusinessRules: ISelectedBussinessRules = {
   channels: [],
   lines: [],
@@ -706,6 +731,7 @@ const initDatSelectedBusinessRules: ISelectedBussinessRules = {
 
 const dataToDataForm = (data: ICommunicationDetail | undefined): ICommunicationForm | undefined => {
   if (!data || Object.keys(data).length === 0) return undefined;
+
   const roles = data.user_roles?.map((role) => ({
     value: `1_${role.id}`,
     label: `Rol - ${role.name}`
@@ -717,9 +743,15 @@ const dataToDataForm = (data: ICommunicationDetail | undefined): ICommunicationF
   }));
   const send_to = [...roles, ...contactPositions];
 
+  const files = data.attachment_ids.map((attachment: { id: number; name: string }) => ({
+    value: attachment.id,
+    label: attachment.name
+  }));
+
   return {
     name: data.name,
     description: data.description,
+    attachment_ids: data.attachment_ids,
     trigger: {
       type: data.id_comunication_type.id,
       settings: {
@@ -742,7 +774,7 @@ const dataToDataForm = (data: ICommunicationDetail | undefined): ICommunicationF
       tags: [{ value: "1", label: "Quemado" }],
       message: data.message,
       subject: data.subject,
-      files: []
+      files: files
     }
   };
 };
