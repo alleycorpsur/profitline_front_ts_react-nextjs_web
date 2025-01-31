@@ -65,7 +65,7 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
     };
 
     fetchData();
-  }, [isModalAddToTableOpen.adding, allInvoices, allPayments]);
+  }, [isModalAddToTableOpen.adding]);
 
   useEffect(() => {
     if (isModalAddToTableOpen.adding === "invoices" && allInvoices) {
