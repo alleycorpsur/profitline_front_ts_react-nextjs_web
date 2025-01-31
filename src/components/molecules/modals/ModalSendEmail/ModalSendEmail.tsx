@@ -28,6 +28,7 @@ type IView = "sendEmail" | "template" | "success";
 interface Props {
   isOpen: boolean;
   onClose: () => void;
+  event: string;
 }
 export const ModalSendEmail = ({ isOpen, onClose }: Props) => {
   const [currentView, setCurrentView] = useState<IView>("sendEmail");

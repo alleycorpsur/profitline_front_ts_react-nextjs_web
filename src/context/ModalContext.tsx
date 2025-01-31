@@ -5,13 +5,14 @@ import InvoiceDetailModal from "@/modules/clients/containers/invoice-detail-moda
 import ModalDetailAdjustment from "@/components/molecules/modals/ModalDetailAdjustment/ModalDetailAdjustment";
 import MoldalNoveltyDetail from "@/components/molecules/modals/MoldalNoveltyDetail/MoldalNoveltyDetail";
 import ModalDetailPayment from "@/components/molecules/modals/ModalDetailPayment/ModalDetailPayment";
+import { ModalSendEmail } from "@/components/molecules/modals/ModalSendEmail/ModalSendEmail";
 
 import { IInvoice } from "@/types/invoices/IInvoices";
 import { FinancialDiscount } from "@/types/financialDiscounts/IFinancialDiscounts";
 import { ISingleBank } from "@/types/banks/IBanks";
 import { IClientPayment } from "@/types/clientPayments/IClientPayments";
 
-type ModalType = "invoice" | "novelty" | "adjustment" | "payment" | null;
+type ModalType = "invoice" | "novelty" | "adjustment" | "payment" | "sendEmail" | null;
 
 interface InvoiceModalProps {
   invoiceId: number;
@@ -45,11 +46,16 @@ interface ModalDetailPaymentProps {
   mutatedPaymentDetail?: boolean;
 }
 
+interface ModalSendEmailProps {
+  event: string;
+}
+
 type ModalProps =
   | InvoiceModalProps
   | NoveltyModalProps
   | AdjustmentModalProps
-  | ModalDetailPaymentProps;
+  | ModalDetailPaymentProps
+  | ModalSendEmailProps;
 
 interface ModalContextType {
   // eslint-disable-next-line no-unused-vars
@@ -103,6 +109,13 @@ export const ModalProvider: React.FC<{ children: ReactNode }> = ({ children }) =
           isOpen={true}
           onClose={closeModal}
           {...(modalProps as ModalDetailPaymentProps)}
+        />
+      )}
+      {modalType === "sendEmail" && modalProps && (
+        <ModalSendEmail
+          isOpen={true}
+          onClose={closeModal}
+          {...(modalProps as ModalSendEmailProps)}
         />
       )}
     </ModalContext.Provider>

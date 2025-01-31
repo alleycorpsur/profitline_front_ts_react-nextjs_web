@@ -213,6 +213,9 @@ export const WalletTab = () => {
         messageShow={messageShow}
         onCloseAllModals={() => {
           closeAllModal();
+          openModal("sendEmail", {
+            event: "paymentAgreement"
+          });
         }}
       />
       <ModalActionDiscountCredit
