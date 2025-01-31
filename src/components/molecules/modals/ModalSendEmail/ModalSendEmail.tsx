@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Flex, Modal } from "antd";
+import { useParams } from "next/navigation";
 import { CaretLeft } from "phosphor-react";
+
+import { useAppStore } from "@/lib/store/store";
+import { getDigitalRecordFormInfo } from "@/services/accountingAdjustment/accountingAdjustment";
+import { extractSingleParam } from "@/utils/utils";
 
 import SecondaryButton from "@/components/atoms/buttons/secondaryButton/SecondaryButton";
 import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
@@ -31,7 +36,17 @@ interface Props {
   event: string;
 }
 export const ModalSendEmail = ({ isOpen, onClose }: Props) => {
+  const { ID: projectId } = useAppStore((state) => state.selectedProject);
+  const params = useParams();
+  const clientId = parseInt(extractSingleParam(params.clientId) || "0");
+
   const [currentView, setCurrentView] = useState<IView>("sendEmail");
+  const [recipients, setRecipients] = useState<
+    {
+      value: string;
+      label: string;
+    }[]
+  >([]);
 
   const { control, setValue, watch, reset } = useForm<IFormEmailNotification>({
     defaultValues: {
@@ -45,6 +60,20 @@ export const ModalSendEmail = ({ isOpen, onClose }: Props) => {
       reset();
     }
   }, [isOpen, reset]);
+
+  //get select info when modal is opened
+  useEffect(() => {
+    const fetchFormInfo = async () => {
+      try {
+        const response = await getDigitalRecordFormInfo(projectId, clientId);
+        console.log("response", response);
+        setRecipients(response.usuarios);
+      } catch (error) {
+        console.error("Error getting digital record form info2", error);
+      }
+    };
+    fetchFormInfo();
+  }, [projectId, clientId, isOpen]);
 
   const handleAcceptSendingEmail = () => {
     // send email request to verify template
@@ -100,6 +129,7 @@ export const ModalSendEmail = ({ isOpen, onClose }: Props) => {
                   field={field}
                   title="Para"
                   placeholder=""
+                  options={recipients}
                   suffixIcon={null}
                   showLabelAndValue
                 />
@@ -115,6 +145,7 @@ export const ModalSendEmail = ({ isOpen, onClose }: Props) => {
                   field={field}
                   title="CC"
                   placeholder=""
+                  options={recipients}
                   suffixIcon={null}
                   showLabelAndValue
                 />
@@ -194,5 +225,3 @@ const successConstants = {
   description: "Se ha enviado el correo a:",
   okText: "Entendido"
 };
-
-const recipients = ["Juan Perez", "Maria Lopez", "Pedro Ramirez", "Carlos Rodriguez"];
