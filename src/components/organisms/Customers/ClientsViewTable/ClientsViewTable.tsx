@@ -51,7 +51,6 @@ export const ClientsViewTable = () => {
     loadingId: 0
   });
 
-  const PAGINATION_LIMIT = 25;
   const fetchPortfolios = async ({ pageParam = 1 }) => {
     const holdingQuery = filters.holding.length > 0 ? `&holding=${filters.holding.join(",")}` : "";
     const searchQueryParam = debouncedSearchQuery
