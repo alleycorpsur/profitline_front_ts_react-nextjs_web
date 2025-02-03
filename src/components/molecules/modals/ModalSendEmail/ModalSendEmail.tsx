@@ -50,12 +50,19 @@ export const ModalSendEmail = ({ isOpen, onClose }: Props) => {
     }[]
   >([]);
 
-  const { control, handleSubmit, setValue, watch, trigger, reset } =
-    useForm<IFormEmailNotification>({
-      defaultValues: {
-        attachments: []
-      }
-    });
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    watch,
+    trigger,
+    reset,
+    formState: { isValid }
+  } = useForm<IFormEmailNotification>({
+    defaultValues: {
+      attachments: []
+    }
+  });
 
   const forwards = watch("forward_to");
   const copyTo = watch("copy_to");
@@ -239,7 +246,10 @@ export const ModalSendEmail = ({ isOpen, onClose }: Props) => {
               {templateConstants.cancelText}
             </SecondaryButton>
 
-            <PrincipalButton onClick={handleSubmit(onSubmit)}>
+            <PrincipalButton
+              onClick={handleSubmit(onSubmit)}
+              disabled={!isValid || attachments.length === 0}
+            >
               {templateConstants.okText}
             </PrincipalButton>
           </div>
