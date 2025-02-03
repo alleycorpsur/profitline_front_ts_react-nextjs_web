@@ -97,3 +97,13 @@
         }
     }
 }
+
+@media (max-height: 820px) {
+    .modalSendEmail {
+        .ant-modal-content {
+            max-height: 700px;
+            overflow-y: scroll;
+            scrollbar-width: thin;
+        }
+    }
+}
