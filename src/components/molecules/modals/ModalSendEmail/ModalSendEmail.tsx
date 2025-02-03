@@ -102,7 +102,7 @@ export const ModalSendEmail = ({ isOpen, onClose }: Props) => {
   };
 
   const onSubmit = (data: IFormEmailNotification) => {
-    console.log("Send email", data);
+    console.info("Send email", data);
     setCurrentView("success");
   };
 
@@ -219,7 +219,6 @@ export const ModalSendEmail = ({ isOpen, onClose }: Props) => {
                 <>
                   <Button
                     onClick={() => {
-                      console.log("click");
                       const fileInput = document.getElementById("fileInputSendEmailModal");
                       if (fileInput) {
                         fileInput.click();
