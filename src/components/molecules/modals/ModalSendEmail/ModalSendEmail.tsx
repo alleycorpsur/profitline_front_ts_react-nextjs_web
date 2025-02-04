@@ -36,8 +36,9 @@ interface Props {
   isOpen: boolean;
   onClose: () => void;
   event: string;
+  onFinalOk?: () => void;
 }
-export const ModalSendEmail = ({ isOpen, onClose }: Props) => {
+export const ModalSendEmail = ({ isOpen, onClose, onFinalOk }: Props) => {
   const { ID: projectId } = useAppStore((state) => state.selectedProject);
   const params = useParams();
   const clientId = parseInt(extractSingleParam(params.clientId) || "0");
@@ -104,6 +105,11 @@ export const ModalSendEmail = ({ isOpen, onClose }: Props) => {
   const onSubmit = (data: IFormEmailNotification) => {
     console.info("Send email", data);
     setCurrentView("success");
+  };
+
+  const handleOkSuccess = () => {
+    if (onFinalOk) return onFinalOk(), onClose();
+    () => setCurrentView("sendEmail");
   };
 
   return (
@@ -264,17 +270,20 @@ export const ModalSendEmail = ({ isOpen, onClose }: Props) => {
             <p>
               {forwards
                 .concat(copyTo || []) // Concatenate forwards and copys
-                .map((recipient, index, combinedArray) =>
-                  index === combinedArray.length - 1
+                .map((recipient, index, combinedArray) => {
+                  if (combinedArray.length === 1) {
+                    return recipient.label;
+                  }
+                  return index === combinedArray.length - 1
                     ? `y ${recipient.label}` // Add "y" before the last recipient
-                    : `${recipient.label},`
-                )
+                    : `${recipient.label},`;
+                })
                 .join(" ")}
             </p>
           </div>
 
           <Flex justify="center" style={{ alignSelf: "center", height: "3rem", width: "320px" }}>
-            <PrincipalButton fullWidth onClick={() => setCurrentView("sendEmail")}>
+            <PrincipalButton fullWidth onClick={handleOkSuccess}>
               {successConstants.okText}
             </PrincipalButton>
           </Flex>
