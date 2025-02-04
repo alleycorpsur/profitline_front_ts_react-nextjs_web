@@ -22,6 +22,7 @@ export interface IClient {
 export interface IClientsGroup {
   id: number;
   group_name: string;
+  clients_count: number;
   clients: IClient[];
   active: number;
   project_id: number;
