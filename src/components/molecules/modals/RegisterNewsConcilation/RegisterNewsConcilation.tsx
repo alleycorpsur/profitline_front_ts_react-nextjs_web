@@ -11,6 +11,7 @@ import { invoiceCreateIncident } from "@/services/concilation/concilation";
 import { useRouter } from "next/navigation";
 import { InfoConcilation } from "@/types/concilation/concilation";
 import { useAppStore } from "@/lib/store/store";
+import { useModalDetail } from "@/context/ModalContext";
 
 interface RegisterNewsProps {
   isOpen: boolean;
@@ -46,6 +47,8 @@ const RegisterNewsConcilation = ({
   messageShow
 }: RegisterNewsProps) => {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const { openModal } = useModalDetail();
+
   const {
     control,
     handleSubmit,
@@ -146,7 +149,13 @@ const RegisterNewsConcilation = ({
           clientId || 0
         );
         if (response.status == 200) {
-          router.push(`/clientes/detail/${clientId}/project/${ID}`);
+          onClose();
+          openModal("sendEmail", {
+            event: "massConciliation",
+            onFinalOk: () => {
+              router.push(`/clientes/detail/${clientId}/project/${ID}`);
+            }
+          });
         }
       } catch (error) {}
     } catch (error) {
