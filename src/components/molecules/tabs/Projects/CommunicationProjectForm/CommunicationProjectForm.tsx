@@ -218,14 +218,14 @@ export const CommunicationProjectForm = ({
   const handleAddTagToBodyAndSubject = (value: OptionType[]) => {
     const valueBody = getValues("template.message");
     //  SubjectAdding tags commented because it is not being used
-    // const valueSubject = getValues("template.subject");
+    const valueSubject = getValues("template.subject");
 
     if (value.length === 0) return;
 
     const lastAddedTag = value.length > 0 ? value[value.length - 1] : undefined;
 
     setValue("template.message", `${valueBody ? valueBody : ""}{{${lastAddedTag?.label}}}`);
-    // setValue("template.subject", `${valueSubject ? valueSubject : ""}{{${lastAddedTag?.label}}}`);
+    setValue("template.subject", `${valueSubject ? valueSubject : ""}{{${lastAddedTag?.label}}}`);
   };
 
   const handleCreateCommunication = async (data: any) => {
