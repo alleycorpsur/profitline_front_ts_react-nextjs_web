@@ -217,7 +217,6 @@ export const CommunicationProjectForm = ({
 
   const handleAddTagToBodyAndSubject = (value: OptionType[]) => {
     const valueBody = getValues("template.message");
-    //  SubjectAdding tags commented because it is not being used
     const valueSubject = getValues("template.subject");
 
     if (value.length === 0) return;
