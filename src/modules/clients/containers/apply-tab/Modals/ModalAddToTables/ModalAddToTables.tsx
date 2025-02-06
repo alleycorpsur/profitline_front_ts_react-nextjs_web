@@ -3,9 +3,11 @@ import { Modal, Checkbox, Spin, message, Flex, Pagination } from "antd";
 import { CaretLeft, CopySimple, X } from "phosphor-react";
 
 import { useAppStore } from "@/lib/store/store";
-import { useInvoices } from "@/hooks/useInvoices";
-import { useClientsPayments } from "@/hooks/useClientsPayments";
-import { formatDate } from "@/utils/utils";
+import { extractSingleParam, formatDate } from "@/utils/utils";
+import {
+  getApplicationInvoices,
+  getApplicationPayments
+} from "@/services/applyTabClients/applyTabClients";
 
 import UiSearchInputLong from "@/components/ui/search-input-long";
 import { IModalAddToTableOpen } from "../../apply-tab";
@@ -17,6 +19,7 @@ import { IClientPayment } from "@/types/clientPayments/IClientPayments";
 import { IInvoice } from "@/types/invoices/IInvoices";
 
 import "./modalAddToTables.scss";
+import { useParams } from "next/navigation";
 interface ModalAddToTablesProps {
   onCancel: () => void;
   // eslint-disable-next-line no-unused-vars
@@ -30,6 +33,11 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
   isModalAddToTableOpen
 }) => {
   const formatMoney = useAppStore((state) => state.formatMoney);
+  const { ID: projectId } = useAppStore((state) => state.selectedProject);
+  const params = useParams();
+  const clientId = Number(extractSingleParam(params.clientId)) || 0;
+  const [allInvoices, setAllInvoices] = useState<IInvoice[]>();
+  const [allPayments, setAllPayments] = useState<IClientPayment[]>();
 
   const [rows, setRows] = useState<(IInvoice | IClientPayment)[]>([]);
   const [selectedRows, setSelectedRows] = useState<(IInvoice | IClientPayment)[]>([]);
@@ -39,20 +47,25 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
   const [loadingAddToTable, setLoadingAddToTable] = useState(false);
   const ITEMS_PER_PAGE = 5;
 
-  const { data: invoicesByState, isLoading: loadingInvoices } = useInvoices({});
-  const allInvoices = invoicesByState?.map((data) => data.invoices).flat();
-
-  const { data: paymentsByState, isLoading: loadingPayments } = useClientsPayments();
-  const allPayments = paymentsByState?.map((data) => data.payments).flat();
-
   useEffect(() => {
-    if (loadingInvoices || loadingPayments) {
-      setLoadingData(true);
-    }
-    if (!loadingInvoices && !loadingPayments) {
-      setLoadingData(false);
-    }
-  }, [loadingInvoices, loadingPayments]);
+    const fetchData = async () => {
+      if (isModalAddToTableOpen.adding === "invoices") {
+        setLoadingData(true);
+        const res = await getApplicationInvoices(projectId, clientId);
+        const fetchedInvoices = res?.map((data) => data.invoices).flat();
+        setAllInvoices(fetchedInvoices);
+        setLoadingData(false);
+      } else if (isModalAddToTableOpen.adding === "payments") {
+        setLoadingData(true);
+        const res = await getApplicationPayments(projectId, clientId);
+        const fetchedPayments = res?.map((data) => data.payments).flat();
+        setAllPayments(fetchedPayments);
+        setLoadingData(false);
+      }
+    };
+
+    fetchData();
+  }, [isModalAddToTableOpen.adding]);
 
   useEffect(() => {
     if (isModalAddToTableOpen.adding === "invoices" && allInvoices) {
@@ -60,7 +73,9 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
     } else if (isModalAddToTableOpen.adding === "payments" && allPayments) {
       setRows(allPayments);
     }
+  }, [isModalAddToTableOpen.adding, allInvoices, allPayments]);
 
+  useEffect(() => {
     return () => {
       setSelectedRows([]);
       setRows([]);
@@ -68,7 +83,7 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
       setSearchQuery("");
       setCurrentPage(1);
     };
-  }, [isModalAddToTableOpen.adding]);
+  }, [isModalAddToTableOpen.isOpen]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -163,10 +178,8 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
   const handleAddToTable = async () => {
     if (!isModalAddToTableOpen.adding) return console.error("No adding type selected");
     setLoadingAddToTable(true);
-    await onAdd(
-      isModalAddToTableOpen.adding,
-      selectedRows.map((row) => row.id)
-    );
+    const uniqueSelectedIds = Array.from(new Set(selectedRows.map((row) => row.id)));
+    await onAdd(isModalAddToTableOpen.adding, uniqueSelectedIds);
     setLoadingAddToTable(false);
   };
 
@@ -296,7 +309,12 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
           Cancelar
         </SecondaryButton>
 
-        <PrincipalButton fullWidth loading={loadingAddToTable} onClick={handleAddToTable}>
+        <PrincipalButton
+          fullWidth
+          loading={loadingAddToTable}
+          onClick={handleAddToTable}
+          disabled={!selectedRows.length}
+        >
           {`Agregar ${isModalAddToTableOpen.adding === "invoices" ? "facturas" : "pagos"}`}
         </PrincipalButton>
       </div>

@@ -2,6 +2,9 @@ import axios from "axios";
 import config from "@/config";
 import { API, getIdToken } from "@/utils/api/api";
 import { GenericResponse } from "@/types/global/IGlobal";
+import { InvoicesData } from "@/types/invoices/IInvoices";
+import { IClientPaymentStatus } from "@/types/clientPayments/IClientPayments";
+import { StatusGroup } from "@/hooks/useAcountingAdjustment";
 
 export const addItemsToTable = async (
   project_id: number,
@@ -133,6 +136,45 @@ export const saveApplication = async (project_id: number, client_id: number) => 
     return response.data;
   } catch (error) {
     console.error("error saveApplication", error);
+    throw error;
+  }
+};
+
+export const getApplicationInvoices = async (project_id: number, client_id: number) => {
+  try {
+    const response: GenericResponse<InvoicesData[]> = await API.get(
+      `${config.API_HOST}/paymentApplication/client/${client_id}/project/${project_id}?page=1&limit=50`
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("error getApplicationInvoices", error);
+    throw error;
+  }
+};
+
+export const getApplicationPayments = async (project_id: number, client_id: number) => {
+  try {
+    const response: GenericResponse<IClientPaymentStatus[]> = await API.get(
+      `${config.API_HOST}/paymentApplication/get-payments/project/${project_id}/client/${client_id}`
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("error getApplicationPayments", error);
+    throw error;
+  }
+};
+
+export const getApplicationAdjustments = async (project_id: number, client_id: string) => {
+  try {
+    const response: GenericResponse<StatusGroup[]> = await API.get(
+      `${config.API_HOST}/paymentApplication/project/${project_id}/client/${client_id}?type=2`
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("error getApplicationAdjustments", error);
     throw error;
   }
 };

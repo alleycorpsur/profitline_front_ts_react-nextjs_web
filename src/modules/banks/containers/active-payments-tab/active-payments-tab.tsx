@@ -1,4 +1,4 @@
-import { FC, useState, useEffect } from "react";
+import { FC, useState } from "react";
 import { Button, Flex, Spin } from "antd";
 import { Bank, DotsThree } from "phosphor-react";
 
@@ -8,7 +8,6 @@ import { useAppStore } from "@/lib/store/store";
 import { useBankPayments } from "@/hooks/useBankPayments";
 import { approvePayment } from "@/services/banksPayments/banksPayments";
 
-import UiSearchInput from "@/components/ui/search-input";
 import FilterDiscounts from "@/components/atoms/Filters/FilterDiscounts/FilterDiscounts";
 import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
 import Collapse from "@/components/ui/collapse";
@@ -22,6 +21,7 @@ import ModalActionsAssignClient from "../../components/modal-actions-assign-clie
 import ModalActionsSplitPayment from "../../components/modal-actions-split-payment";
 import ModalActionsChangeStatus from "../../components/modal-actions-change-status";
 import { ModalConfirmAction } from "@/components/molecules/modals/ModalConfirmAction/ModalConfirmAction";
+import OptimizedSearchComponent from "@/components/atoms/inputs/OptimizedSearchComponent/OptimizedSearchComponent";
 
 import { ISingleBank } from "@/types/banks/IBanks";
 import { IClientPayment } from "@/types/clientPayments/IClientPayments";
@@ -36,38 +36,12 @@ export const ActivePaymentsTab: FC = () => {
   const [isSelectOpen, setIsSelectOpen] = useState({ selected: 0 });
   const [mutatedPaymentDetail, mutatePaymentDetail] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [paymentMaps, setPaymentMaps] = useState<Map<number, Map<string, ISingleBank>>>(new Map());
   const [loadingApprove, setLoadingApprove] = useState(false);
 
   const { ID } = useAppStore((state) => state.selectedProject);
   const { showMessage } = useMessageApi();
   const { openModal } = useModalDetail();
-  const { data, isLoading, mutate } = useBankPayments({ projectId: ID });
-
-  useEffect(() => {
-    if (data) {
-      const maps = new Map();
-      data.forEach((status) => {
-        const paymentMap = new Map();
-        status.payments.forEach((payment) => {
-          paymentMap.set(payment.id.toString(), payment);
-        });
-        maps.set(status.payments_status_id, paymentMap);
-      });
-      setPaymentMaps(maps);
-    }
-  }, [data]);
-
-  const searchPayments = (statusId: number, query: string): ISingleBank[] => {
-    if (!query) return data?.find((s) => s.payments_status_id === statusId)?.payments || [];
-
-    const paymentMap = paymentMaps.get(statusId);
-    if (!paymentMap) return [];
-
-    return Array.from(paymentMap.entries())
-      .filter(([id]) => id.includes(query))
-      .map(([, payment]) => payment);
-  };
+  const { data, isLoading, mutate } = useBankPayments({ projectId: ID, like: searchQuery });
 
   const handleOpenBankRules = () => {
     setShowBankRules(true);
@@ -123,28 +97,19 @@ export const ActivePaymentsTab: FC = () => {
     setLoadingApprove(false);
   };
 
-  const filteredData = data
-    ?.map((status) => ({
-      ...status,
-      payments: searchPayments(status.payments_status_id, searchQuery)
-    }))
-    .filter((status) => status.payments.length > 0);
+  const handleSearch = (query: string) => {
+    const searchQuery = query.trim().replaceAll(" ", ",");
+    setSearchQuery(searchQuery);
+  };
 
   return (
     <>
       {showBankRules ? (
         <BanksRules onClickBack={() => setShowBankRules(false)} />
-      ) : isLoading ? (
-        <Flex justify="center">
-          <Spin style={{ margin: "30px" }} />
-        </Flex>
       ) : (
         <Flex className={styles.activePaymentsTab} vertical>
           <div className={`${styles.header} banksStickyHeader`}>
-            <UiSearchInput
-              placeholder="Buscar por ID"
-              onChange={(event) => setSearchQuery(event.target.value)}
-            />
+            <OptimizedSearchComponent title="Buscar" onSearch={handleSearch} />
             <FilterDiscounts />
             <Button
               className={styles.button__actions}
@@ -165,34 +130,40 @@ export const ActivePaymentsTab: FC = () => {
             </PrincipalButton>
           </div>
 
-          <Collapse
-            stickyLabel
-            labelStickyOffset={"6rem"}
-            items={filteredData?.map((status) => ({
-              key: status.payments_status_id,
-              label: (
-                <LabelCollapse
-                  status={status.payments_status}
-                  color={status.color}
-                  quantity={status.payments.length}
-                  total={status.total_account || 0}
-                />
-              ),
-              children: (
-                <BanksTable
-                  clientsByStatus={status.payments.map((client) => ({
-                    ...client,
-                    client_status_id: status.payments_status_id
-                  }))}
-                  handleOpenPaymentDetail={handleOpenPaymentDetail}
-                  selectedRows={selectedRows}
-                  setSelectedRows={setSelectedRows}
-                  bankStatusId={status.payments_status_id}
-                  clearSelected={clearSelected}
-                />
-              )
-            }))}
-          />
+          {isLoading ? (
+            <Flex justify="center">
+              <Spin style={{ margin: "30px" }} />
+            </Flex>
+          ) : (
+            <Collapse
+              stickyLabel
+              labelStickyOffset={"6rem"}
+              items={data?.map((status) => ({
+                key: status.payments_status_id,
+                label: (
+                  <LabelCollapse
+                    status={status.payments_status}
+                    color={status.color}
+                    quantity={status.payments.length}
+                    total={status.total_account || 0}
+                  />
+                ),
+                children: (
+                  <BanksTable
+                    clientsByStatus={status.payments.map((client) => ({
+                      ...client,
+                      client_status_id: status.payments_status_id
+                    }))}
+                    handleOpenPaymentDetail={handleOpenPaymentDetail}
+                    selectedRows={selectedRows}
+                    setSelectedRows={setSelectedRows}
+                    bankStatusId={status.payments_status_id}
+                    clearSelected={clearSelected}
+                  />
+                )
+              }))}
+            />
+          )}
 
           <ModalActionsBanksPayments
             isOpen={isGenerateActionOpen}

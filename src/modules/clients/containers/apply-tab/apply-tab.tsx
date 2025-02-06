@@ -262,7 +262,7 @@ const ApplyTab: React.FC = () => {
         </Flex>
 
         {isLoading ? (
-          <Flex justify="center" align="center" style={{ height: "3rem" }}>
+          <Flex justify="center" align="center" style={{ height: "3rem", marginTop: "1rem" }}>
             <Spin />
           </Flex>
         ) : (
