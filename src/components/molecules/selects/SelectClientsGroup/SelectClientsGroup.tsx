@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction } from "react";
 import { Checkbox, Flex, Spin, Typography } from "antd";
-import { useClientsGroups } from "@/hooks/useClientsGroups";
+import { useClientsGroupsSimplified } from "@/hooks/useClientsGroupsSimplified";
 
 import "./selectClientsGroup.scss";
 
@@ -11,7 +11,7 @@ interface Props {
 }
 
 export const SelectClientsGroup = ({ disabled, assignedGroups, setAssignedGroups }: Props) => {
-  const { data, loading: isLoading } = useClientsGroups({});
+  const { data, loading: isLoading } = useClientsGroupsSimplified();
 
   return (
     <div className="selectClientsGroup">
@@ -21,7 +21,7 @@ export const SelectClientsGroup = ({ disabled, assignedGroups, setAssignedGroups
           <Spin />
         ) : (
           <>
-            {data?.data.map((group) => {
+            {data?.map((group) => {
               return (
                 <Flex key={group.id} justify="space-between" className="cardGroups__group">
                   <Typography.Text>{group.group_name}</Typography.Text>

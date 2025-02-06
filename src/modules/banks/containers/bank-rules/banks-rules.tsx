@@ -13,6 +13,7 @@ import BanksRulesTable from "../../components/banks-rules-table/Banks-rules-tabl
 import { BankRuleModal } from "../../components/bank-rule-modal/Bank-rule-modal";
 
 import styles from "./banks-rules.module.scss";
+
 import { deleteManyBankRules } from "@/services/banksRules/banksRules";
 import { useMessageApi } from "@/context/MessageContext";
 
