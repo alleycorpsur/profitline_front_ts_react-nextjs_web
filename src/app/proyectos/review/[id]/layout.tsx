@@ -35,7 +35,7 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
     { key: "accounts", label: "Cuentas" },
     { key: "client-groups", label: "Grupos de Clientes" },
     { key: "communications", label: "Comunicaciones" },
-    { key: "requeriments", label: "Requerimientos" }
+    { key: "requirements", label: "Requerimientos" }
   ];
 
   return (
