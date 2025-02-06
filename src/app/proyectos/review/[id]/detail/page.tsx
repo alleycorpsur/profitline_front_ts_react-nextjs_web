@@ -2,8 +2,8 @@
 
 import { DetailsProjectView } from "@/components/organisms/projects/DetailProjectView/DetailProjectView";
 
-const BusinessRulesPage = () => {
+const DetailProjectPage = () => {
   return <DetailsProjectView />;
 };
 
-export default BusinessRulesPage;
+export default DetailProjectPage;
