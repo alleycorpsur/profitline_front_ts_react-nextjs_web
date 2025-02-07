@@ -7,7 +7,7 @@ export interface InvoicesData {
   status: string;
   color: string;
   status_id: number;
-  invoices: IInvoice[];
+  invoices: IInvoice[] | IApplicationInvoice[];
   total: number;
   count: number;
 }
@@ -50,4 +50,8 @@ export interface IInvoice {
     Cumplido: string;
   } | null;
   novelty_info: { incidentAmount: number | null; incidentType: string | null } | null;
+}
+
+export interface IApplicationInvoice extends IInvoice {
+  ajust_value: number;
 }
