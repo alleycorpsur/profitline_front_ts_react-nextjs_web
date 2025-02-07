@@ -5,10 +5,12 @@ import { useParams } from "next/navigation";
 import { CaretLeft, Plus } from "phosphor-react";
 
 import { useAppStore } from "@/lib/store/store";
+import { useMessageApi } from "@/context/MessageContext";
+import { sendEmailNotification } from "@/services/communications/communications";
 import { getDigitalRecordFormInfo } from "@/services/accountingAdjustment/accountingAdjustment";
 import { extractSingleParam } from "@/utils/utils";
-import useFileHandlers from "@/components/hooks/useFIleHandlers";
 
+import useFileHandlers from "@/components/hooks/useFIleHandlers";
 import SecondaryButton from "@/components/atoms/buttons/secondaryButton/SecondaryButton";
 import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
 import { InputForm } from "@/components/atoms/inputs/InputForm/InputForm";
@@ -22,7 +24,7 @@ interface ISelect {
   label: string;
 }
 
-interface IFormEmailNotification {
+export interface IFormEmailNotification {
   forward_to: ISelect[];
   copy_to?: ISelect[];
   subject: string;
@@ -42,6 +44,7 @@ export const ModalSendEmail = ({ isOpen, onClose, onFinalOk }: Props) => {
   const { ID: projectId } = useAppStore((state) => state.selectedProject);
   const params = useParams();
   const clientId = parseInt(extractSingleParam(params.clientId) || "0");
+  const { showMessage } = useMessageApi();
 
   const [currentView, setCurrentView] = useState<IView>("sendEmail");
   const [recipients, setRecipients] = useState<
@@ -50,6 +53,7 @@ export const ModalSendEmail = ({ isOpen, onClose, onFinalOk }: Props) => {
       label: string;
     }[]
   >([]);
+  const [loading, setLoading] = useState(false);
 
   const {
     control,
@@ -89,7 +93,7 @@ export const ModalSendEmail = ({ isOpen, onClose, onFinalOk }: Props) => {
         const response = await getDigitalRecordFormInfo(projectId, clientId);
         setRecipients(response.usuarios);
       } catch (error) {
-        console.error("Error getting digital record form info2", error);
+        console.error("Error getting digital record form info", error);
       }
     };
     fetchFormInfo();
@@ -102,14 +106,21 @@ export const ModalSendEmail = ({ isOpen, onClose, onFinalOk }: Props) => {
     // if a template its returned assign values to form with response
   };
 
-  const onSubmit = (data: IFormEmailNotification) => {
-    console.info("Send email", data);
-    setCurrentView("success");
+  const onSubmit = async (data: IFormEmailNotification) => {
+    setLoading(true);
+    try {
+      await sendEmailNotification(data);
+      // change view to success view if email was sent
+      setCurrentView("success");
+    } catch (error) {
+      showMessage("error", "Ocurrió un error al enviar el correo");
+    }
+    setLoading(false);
   };
 
   const handleOkSuccess = () => {
     if (onFinalOk) return onFinalOk(), onClose();
-    () => setCurrentView("sendEmail");
+    onClose();
   };
 
   return (
@@ -254,6 +265,7 @@ export const ModalSendEmail = ({ isOpen, onClose, onFinalOk }: Props) => {
             <PrincipalButton
               onClick={handleSubmit(onSubmit)}
               disabled={!isValid || attachments.length === 0}
+              loading={loading}
             >
               {templateConstants.okText}
             </PrincipalButton>
