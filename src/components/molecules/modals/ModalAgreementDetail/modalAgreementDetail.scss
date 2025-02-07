@@ -14,6 +14,15 @@
         }
     }
 
+    &__modal-title {
+        font-size: 1.25rem;
+        color: $black;
+
+        span {
+            font-weight: 300;
+        }
+    }
+
     .agreement-form {
         display: flex;
         flex-direction: column;
@@ -43,7 +52,19 @@
     }
 
     .evidenceSection {
+        margin-bottom: 4px;
+    }
+
+    .evidenceSection {
         display: flex;
+        flex-direction: column;
+
+        &__title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: $gray;
+            margin-bottom: 6px;
+        }
         flex-direction: column;
 
         &__title {

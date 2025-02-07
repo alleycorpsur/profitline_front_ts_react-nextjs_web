@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { Flex, Tabs, Spin } from "antd";
-import { Check, Eye, X } from "phosphor-react";
+import { Eye } from "phosphor-react";
 
 import { useAppStore } from "@/lib/store/store";
 import { useModalDetail } from "@/context/ModalContext";

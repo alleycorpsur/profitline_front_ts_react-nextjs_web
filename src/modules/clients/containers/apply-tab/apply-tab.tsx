@@ -15,7 +15,7 @@ import {
   saveApplication
 } from "@/services/applyTabClients/applyTabClients";
 import { useMessageApi } from "@/context/MessageContext";
-import { useSelectedPayments } from "@/context/SelectedPaymentsContext";
+// import { useSelectedPayments } from "@/context/SelectedPaymentsContext";
 
 import UiSearchInput from "@/components/ui/search-input/search-input";
 import InvoiceTable from "./tables/InvoiceTable";
