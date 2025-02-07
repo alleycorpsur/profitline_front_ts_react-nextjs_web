@@ -2,7 +2,7 @@ import axios from "axios";
 import config from "@/config";
 import { API, getIdToken } from "@/utils/api/api";
 import { GenericResponse } from "@/types/global/IGlobal";
-import { InvoicesData } from "@/types/invoices/IInvoices";
+import { IApplicationInvoice, InvoicesData } from "@/types/invoices/IInvoices";
 import { IClientPaymentStatus } from "@/types/clientPayments/IClientPayments";
 import { StatusGroup } from "@/hooks/useAcountingAdjustment";
 
@@ -146,7 +146,9 @@ export const getApplicationInvoices = async (project_id: number, client_id: numb
       `${config.API_HOST}/paymentApplication/client/${client_id}/project/${project_id}?page=1&limit=50`
     );
 
-    return response.data;
+    const fetchedInvoices = response.data.map((data) => data.invoices).flat();
+
+    return fetchedInvoices as IApplicationInvoice[];
   } catch (error) {
     console.error("error getApplicationInvoices", error);
     throw error;
