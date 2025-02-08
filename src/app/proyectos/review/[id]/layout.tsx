@@ -1,27 +1,31 @@
 "use client";
-import { usePathname, useRouter } from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import { Tabs, Flex, Button, Skeleton, Typography, Result } from "antd";
 import { SideBar } from "@/components/molecules/SideBar/SideBar";
 import { useProject } from "@/hooks/useProject";
 
 import "./layoutProjectDetail.scss";
+import { extractSingleParam } from "@/utils/utils";
+import { useEffect, useState } from "react";
+import { getProjectDetails } from "@/services/projects/projects";
+import { IProject } from "@/types/projects/IProject";
 
 const { Title, Text } = Typography;
 
 export default function ProjectLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
+  const params = useParams();
+  const projectId = extractSingleParam(params.id) || "";
+  const { loading, data } = useProject({ id: projectId });
 
-  // Extract project ID from the URL
+  // Extract current tab from the URL path
   const pathParts = pathname.split("/");
-  const idProjectParam = pathParts[3]; // Assuming URL format: /proyectos/review/[id]/tab-name
-  const activeTab = pathParts[pathParts.length - 1] || "proyecto";
-
-  const { loading, data } = useProject({ id: idProjectParam });
+  const activeTab = pathParts[4];
 
   // Function to update URL when switching tabs
   const handleTabChange = (key: string) => {
-    router.push(`/proyectos/review/${idProjectParam}/${key}`);
+    router.push(`/proyectos/review/${projectId}/${key}`);
   };
 
   const items = [
@@ -53,7 +57,7 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
                 </>
               ) : (
                 <Title level={1} className="titleName">
-                  {data.PROJECT_DESCRIPTION ?? ""}
+                  {data?.PROJECT_DESCRIPTION ?? ""}
                 </Title>
               )}
             </Flex>
@@ -61,7 +65,7 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
         </Flex>
 
         {/* Tabs Section */}
-        {!loading && data.length === 0 ? (
+        {!loading && !data ? (
           <Flex vertical>
             <Flex align="center" gap={"2rem"}>
               <Button href="/settings">Volver</Button>

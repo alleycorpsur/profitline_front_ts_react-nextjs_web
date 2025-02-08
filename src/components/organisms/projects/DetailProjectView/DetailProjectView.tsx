@@ -30,7 +30,7 @@ export const DetailsProjectView = () => {
 
   const onUpdateProject = async (finalData: IFormProject) => {
     try {
-      const response = await updateProject(finalData, projectId, data.UUID);
+      const response = await updateProject(finalData, projectId, data?.UUID || "");
       if (response.status === SUCCESS) {
         showMessage("success", "El proyecto fue editado exitosamente.");
         window.location.reload();
@@ -65,7 +65,7 @@ export const DetailsProjectView = () => {
   return (
     <Flex vertical className="containerDetailProject">
       {/* Main Content */}
-      {!loading && data.length === 0 ? (
+      {!loading && !data ? (
         <Flex vertical>
           <Flex align="center" gap={"2rem"}>
             <Button href="/settings">Volver</Button>
