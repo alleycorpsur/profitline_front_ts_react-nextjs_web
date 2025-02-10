@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { Button, Flex, Table, TableProps, Typography, Spin, MenuProps } from "antd";
 import { Eye, Plus, Triangle } from "phosphor-react";
 
@@ -24,6 +25,7 @@ export const CommunicationsTable = ({
   showCommunicationDetails,
   onCreateCommunication
 }: PropsCommunicationsTable) => {
+  const pathname = usePathname();
   const [communications, setCommunications] = useState<ICommunication[]>([]);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -39,7 +41,7 @@ export const CommunicationsTable = ({
       setCommunications(response);
     };
     fetchCommunications();
-  }, [projectId]);
+  }, [projectId, pathname]);
 
   function handleSeeCommunicationDetails(communicationId: number) {
     showCommunicationDetails(communicationId);

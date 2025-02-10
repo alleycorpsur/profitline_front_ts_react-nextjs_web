@@ -1,8 +1,8 @@
 "use client";
-import UsersProjectView from "@/components/organisms/projects/UsersProjectVIew/UsersProjectView";
+import { UsersProjectTable } from "@/components/molecules/tables/UsersProjectTable/UsersProjectTable";
 
 const UsersProjectPage = () => {
-  return <UsersProjectView />;
+  return <UsersProjectTable />;
 };
 
 export default UsersProjectPage;
