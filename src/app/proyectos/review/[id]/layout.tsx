@@ -1,14 +1,13 @@
 "use client";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { Tabs, Flex, Button, Skeleton, Typography, Result } from "antd";
-import { SideBar } from "@/components/molecules/SideBar/SideBar";
+
+import { extractSingleParam } from "@/utils/utils";
 import { useProject } from "@/hooks/useProject";
 
+import { SideBar } from "@/components/molecules/SideBar/SideBar";
+
 import "./layoutProjectDetail.scss";
-import { extractSingleParam } from "@/utils/utils";
-import { useEffect, useState } from "react";
-import { getProjectDetails } from "@/services/projects/projects";
-import { IProject } from "@/types/projects/IProject";
 
 const { Title, Text } = Typography;
 

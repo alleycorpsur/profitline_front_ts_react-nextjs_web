@@ -5,7 +5,7 @@ import { CaretLeft } from "phosphor-react";
 import styles from "./communicationProjectForm.module.scss";
 import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
 import { InputForm } from "@/components/atoms/inputs/InputForm/InputForm";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { ISelectedBussinessRules } from "@/types/bre/IBRE";
 import { SelectZone } from "@/components/molecules/selects/SelectZone/SelectZone";
 import { SelectStructure } from "@/components/molecules/selects/SelectStructure/SelectStructure";
@@ -56,14 +56,9 @@ interface Props {
     communicationId: number;
     active: boolean;
   };
-  setIsCreateCommunication: Dispatch<SetStateAction<boolean>>;
   onGoBackTable: () => void;
 }
-export const CommunicationProjectForm = ({
-  onGoBackTable,
-  showCommunicationDetails,
-  setIsCreateCommunication
-}: Props) => {
+export const CommunicationProjectForm = ({ onGoBackTable, showCommunicationDetails }: Props) => {
   const [loadingRequest, setLoadingRequest] = useState(false);
   const [isEditAvailable] = useState(false);
   const [radioValue, setRadioValue] = useState<any>();
@@ -263,7 +258,7 @@ export const CommunicationProjectForm = ({
         showMessage
       });
 
-      setIsCreateCommunication(false);
+      onGoBackTable();
     } catch (error) {
       console.error(error);
     }
