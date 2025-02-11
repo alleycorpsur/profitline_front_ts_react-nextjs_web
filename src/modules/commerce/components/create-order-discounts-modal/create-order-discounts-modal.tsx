@@ -17,7 +17,7 @@ const CreateOrderDiscountsModal: FC<CreateOrderDiscountsModalProps> = ({
   setOpenDiscountsModal
 }) => {
   const { ID: projectId } = useAppStore((state) => state.selectedProject);
-  const [radioValue, setRadioValue] = useState<number>(0);
+  const [radioValue, setRadioValue] = useState<IDiscountPackageAvailable>();
   const [discounts, setDiscounts] = useState<IDiscountPackageAvailable[]>([]);
   const { client, discountId, setDiscountId } = useContext(OrderViewContext);
   const [loading, setLoading] = useState(false);
@@ -43,8 +43,14 @@ const CreateOrderDiscountsModal: FC<CreateOrderDiscountsModalProps> = ({
     setOpenDiscountsModal(false);
   };
 
-  const handleRadioClick = (value: number) => {
-    setRadioValue((prevValue) => (prevValue === value ? 0 : value));
+  const handleRadioClick = (value: IDiscountPackageAvailable) => {
+    setRadioValue((prevValue) =>
+      !prevValue
+        ? value
+        : prevValue.id === value.id && prevValue.idAnnualDiscount === value.idAnnualDiscount
+          ? undefined
+          : value
+    );
   };
 
   const styleRadio = {
@@ -70,16 +76,20 @@ const CreateOrderDiscountsModal: FC<CreateOrderDiscountsModalProps> = ({
         <Spin size="small" />
       ) : (
         <div className={styles.radioGroup}>
-          {discounts.map((discount) => (
+          {discounts.map((discountPackage, index) => (
             <InputRadioRightSide
-              key={discount.id}
-              value={discount.id}
+              key={`discount-${index}`}
+              value={discountPackage}
               customStyles={styleRadio}
-              onClick={() => handleRadioClick(discount.id)}
-              checked={radioValue === discount.id}
+              onClick={() => handleRadioClick(discountPackage)}
+              checked={
+                radioValue &&
+                radioValue.id === discountPackage.id &&
+                radioValue.idAnnualDiscount === discountPackage.idAnnualDiscount
+              }
             >
               <div className={styles.radioGroup__label}>
-                <p>{discount.name}</p>
+                <p>{discountPackage.name}</p>
               </div>
             </InputRadioRightSide>
           ))}
