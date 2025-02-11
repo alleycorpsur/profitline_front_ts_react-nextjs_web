@@ -39,8 +39,9 @@ interface Props {
   onClose: () => void;
   event: string;
   onFinalOk?: () => void;
+  customOnReject?: () => void;
 }
-export const ModalSendEmail = ({ isOpen, onClose, onFinalOk }: Props) => {
+export const ModalSendEmail = ({ isOpen, onClose, onFinalOk, customOnReject }: Props) => {
   const { ID: projectId } = useAppStore((state) => state.selectedProject);
   const params = useParams();
   const clientId = parseInt(extractSingleParam(params.clientId) || "0");
@@ -99,6 +100,11 @@ export const ModalSendEmail = ({ isOpen, onClose, onFinalOk }: Props) => {
     fetchFormInfo();
   }, [projectId, clientId, isOpen]);
 
+  const handleRejectSendingEmail = () => {
+    if (customOnReject) return customOnReject(), onClose();
+    onClose();
+  };
+
   const handleAcceptSendingEmail = () => {
     // send email request to verify template
     //change view to template
@@ -138,7 +144,7 @@ export const ModalSendEmail = ({ isOpen, onClose, onFinalOk }: Props) => {
 
           <p className="modalSendEmail__description">{sendEmailConstants.description}</p>
           <div className="modalSendEmail__footer">
-            <SecondaryButton onClick={() => onClose()}>
+            <SecondaryButton onClick={handleRejectSendingEmail}>
               {sendEmailConstants.cancelText}
             </SecondaryButton>
 

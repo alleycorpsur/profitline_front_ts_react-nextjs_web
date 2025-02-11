@@ -154,6 +154,9 @@ const RegisterNewsConcilation = ({
             event: "massConciliation",
             onFinalOk: () => {
               router.push(`/clientes/detail/${clientId}/project/${ID}`);
+            },
+            customOnReject: () => {
+              router.push(`/clientes/detail/${clientId}/project/${ID}`);
             }
           });
         }
