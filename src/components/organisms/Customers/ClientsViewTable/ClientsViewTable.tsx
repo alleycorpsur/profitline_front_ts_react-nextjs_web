@@ -166,7 +166,11 @@ export const ClientsViewTable = () => {
       title: "PNA",
       key: "unapplied_payments_ammount",
       dataIndex: "unapplied_payments_ammount",
-      render: (text) => <p className="fontMonoSpace">{formatMoney(text, { hideDecimals: true })}</p>
+      render: (text) => (
+        <p className="fontMonoSpace">{formatMoney(text, { hideDecimals: true })}</p>
+      ),
+      sorter: (a, b) => a.unapplied_payments_ammount - b.unapplied_payments_ammount,
+      showSorterTooltip: false
     },
     {
       align: "right",
