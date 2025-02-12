@@ -72,7 +72,7 @@ const ApplyTab: React.FC = () => {
   });
   const [selectedRows, setSelectedRows] = useState<IApplyTabRecord[]>();
 
-  const { data: applicationData, isLoading, mutate } = useApplicationTable();
+  const { data: applicationData, isLoading, mutate, isValidating } = useApplicationTable();
   const showModal = (adding_type: "invoices" | "payments") => {
     setIsModalAddToTableOpen({
       isOpen: true,
@@ -261,7 +261,7 @@ const ApplyTab: React.FC = () => {
           </Button>
         </Flex>
 
-        {isLoading ? (
+        {isLoading || isValidating ? (
           <Flex justify="center" align="center" style={{ height: "3rem", marginTop: "1rem" }}>
             <Spin />
           </Flex>

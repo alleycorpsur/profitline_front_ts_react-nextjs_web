@@ -1,4 +1,5 @@
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { Button, Flex, Table, TableProps, Typography, Spin, MenuProps } from "antd";
 import { Eye, Plus, Triangle } from "phosphor-react";
 
@@ -15,19 +16,16 @@ import { ICommunication } from "@/types/communications/ICommunications";
 const { Text, Link } = Typography;
 
 interface PropsCommunicationsTable {
-  setShowCommunicationDetails: Dispatch<
-    SetStateAction<{
-      communicationId: number;
-      active: boolean;
-    }>
-  >;
+  // eslint-disable-next-line no-unused-vars
+  showCommunicationDetails: (communicationId: number) => void;
   onCreateCommunication: () => void;
 }
 
 export const CommunicationsTable = ({
-  setShowCommunicationDetails,
+  showCommunicationDetails,
   onCreateCommunication
 }: PropsCommunicationsTable) => {
+  const pathname = usePathname();
   const [communications, setCommunications] = useState<ICommunication[]>([]);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -43,10 +41,10 @@ export const CommunicationsTable = ({
       setCommunications(response);
     };
     fetchCommunications();
-  }, [projectId]);
+  }, [projectId, pathname]);
 
   function handleSeeCommunicationDetails(communicationId: number) {
-    setShowCommunicationDetails({ communicationId, active: true });
+    showCommunicationDetails(communicationId);
   }
 
   const onSelectChange = (newSelectedRowKeys: React.Key[], newSelectedRow: any) => {

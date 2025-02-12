@@ -1,8 +1,6 @@
-import useSWR from "swr";
-
-import { fetcher } from "@/utils/api/api";
-import { IProjectById } from "@/types/projects/IProject";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
+import { getProjectDetails } from "@/services/projects/projects"; // Import your API call
+import { IProject } from "@/types/projects/IProject";
 import { useAppStore } from "@/lib/store/store";
 import { ISelectedProject } from "@/lib/slices/createProjectSlice";
 
@@ -12,12 +10,42 @@ interface Props {
 
 export const useProject = ({ id }: Props) => {
   const { projectsBasicInfo, setSelectedProject } = useAppStore((state) => state);
-  const { data, isLoading } = useSWR<IProjectById>(`/project/${id}`, fetcher);
+  const [loading, setLoading] = useState(false);
+  const [projectDetails, setProjectDetails] = useState<IProject>();
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!data?.data[0] || !projectsBasicInfo) return;
+    const fetchProject = async () => {
+      if (!id) return; // Prevent unnecessary calls
 
-    const selectedProject = projectsBasicInfo?.find((project) => project.ID === data.data[0].ID);
+      setLoading(true);
+      setError(null); // Reset error on new fetch
+
+      try {
+        const response = await getProjectDetails(id);
+
+        if (response) {
+          setProjectDetails(response);
+        } else {
+          console.warn("No data received for project:", id);
+          setError("No project found.");
+        }
+      } catch (error) {
+        console.error("Error fetching project:", error);
+        setError("Failed to load project.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProject();
+  }, [id]);
+
+  //  Ensure selected project is updated in the store
+  useEffect(() => {
+    if (!projectDetails || !projectsBasicInfo) return;
+
+    const selectedProject = projectsBasicInfo.find((project) => project.ID === projectDetails.ID);
     if (selectedProject) {
       const projectInfo: ISelectedProject = {
         ID: selectedProject.ID,
@@ -31,10 +59,11 @@ export const useProject = ({ id }: Props) => {
     } else {
       console.warn(`Project with ID: ${id} not found in fetched projects`);
     }
-  }, [data, projectsBasicInfo, setSelectedProject]);
+  }, [projectDetails, projectsBasicInfo, setSelectedProject]);
 
   return {
-    data: data?.data[0] || ([] as any),
-    loading: isLoading
+    data: projectDetails,
+    loading,
+    error
   };
 };

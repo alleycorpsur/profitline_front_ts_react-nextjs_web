@@ -1,28 +1,19 @@
-import { Dispatch, SetStateAction, useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { Button, Flex, MenuProps, message, Spin, Table, TableProps, Typography } from "antd";
 import { Eye, Plus, Triangle } from "phosphor-react";
 import { FilterClients } from "@/components/atoms/Filters/FilterClients/FilterClients";
 import { DotsDropdown } from "@/components/atoms/DotsDropdown/DotsDropdown";
 import { IClient } from "@/types/clients/IClients";
 import { useClientsTable } from "@/hooks/useClients";
-import "./clientsprojecttable.scss";
 import UiSearchInput from "@/components/ui/search-input/search-input";
 import { useDebounce } from "@/hooks/useDeabouce";
 
+import "./clientsprojecttable.scss";
 const { Text } = Typography;
 
-interface Props {
-  setIsCreateClient?: Dispatch<SetStateAction<boolean>>;
-  setIsViewDetailsClients?: Dispatch<
-    SetStateAction<{
-      active: boolean;
-      id: number;
-    }>
-  >;
-}
-
-export const ClientsProjectTable = ({ setIsCreateClient, setIsViewDetailsClients }: Props) => {
+export const ClientsProjectTable = () => {
+  const router = useRouter();
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [page, setPage] = useState(1);
   const [messageApi, contextHolder] = message.useMessage();
@@ -55,9 +46,7 @@ export const ClientsProjectTable = ({ setIsCreateClient, setIsViewDetailsClients
   };
 
   const onCreateClient = () => {
-    if (setIsCreateClient) {
-      setIsCreateClient(true);
-    }
+    router.push(`/proyectos/review/${idProject}/clients/new`);
   };
 
   useEffect(() => {
@@ -90,9 +79,12 @@ export const ClientsProjectTable = ({ setIsCreateClient, setIsViewDetailsClients
       messageApi.open({ type: "error", content: error.message });
     }
   }, [error]);
-  let columns: TableProps<IClient>["columns"] = [];
 
-  columns = [
+  const handleOpenClient = (clientId: number) => {
+    router.push(`/proyectos/review/${idProject}/clients/${clientId}`);
+  };
+
+  const columns: TableProps<IClient>["columns"] = [
     {
       title: "Name",
       dataIndex: "client_name",
@@ -102,9 +94,7 @@ export const ClientsProjectTable = ({ setIsCreateClient, setIsViewDetailsClients
           type="button"
           className="name"
           onClick={() => {
-            if (setIsViewDetailsClients) {
-              setIsViewDetailsClients({ active: true, id: nit });
-            }
+            handleOpenClient(nit);
           }}
         >
           {text}
@@ -175,9 +165,7 @@ export const ClientsProjectTable = ({ setIsCreateClient, setIsViewDetailsClients
       render: (_, { nit }) => (
         <Button
           onClick={() => {
-            if (setIsViewDetailsClients) {
-              setIsViewDetailsClients({ active: true, id: nit });
-            }
+            handleOpenClient(nit);
           }}
           icon={<Eye size={"1.3rem"} />}
         />

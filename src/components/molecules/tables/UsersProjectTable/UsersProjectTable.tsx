@@ -1,4 +1,5 @@
-import { Dispatch, SetStateAction, useState } from "react";
+import { useState } from "react";
+import { useRouter, useParams } from "next/navigation";
 import { Button, Flex, Popconfirm, Spin, Table, Typography } from "antd";
 import type { MenuProps, TableProps } from "antd";
 
@@ -22,20 +23,16 @@ import "./usersprojecttable.scss";
 import { useMessageApi } from "@/context/MessageContext";
 import { useDebounce } from "@/hooks/useDeabouce";
 import UiSearchInput from "@/components/ui/search-input/search-input";
+import { extractSingleParam } from "@/utils/utils";
 
 const { Text } = Typography;
 
-interface Props {
-  idProject: string;
-  setIsCreateUser: Dispatch<SetStateAction<boolean>>;
-  setIsViewDetails: Dispatch<SetStateAction<{ active: boolean; id: number }>>;
-}
+export const UsersProjectTable: React.FC = () => {
+  const params = useParams(); // Get project ID from the URL
+  const projectId = extractSingleParam(params.id) || "";
 
-export const UsersProjectTable: React.FC<Props> = ({
-  idProject,
-  setIsCreateUser,
-  setIsViewDetails
-}) => {
+  const router = useRouter();
+
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [selectedRows, setSelectedRows] = useState();
   const [isOpenModalRemove, setIsOpenModalRemove] = useState<boolean>(false);
@@ -51,6 +48,15 @@ export const UsersProjectTable: React.FC<Props> = ({
       showMessage("error", "Oops, hubo un error por favor intenta mas tarde.");
     }
   };
+
+  const handleSeeUserDetail = (userId: number) => {
+    router.push(`/proyectos/review/${projectId}/users/${userId}`); // Redirects to user details
+  };
+
+  const handleCreateUser = () => {
+    router.push(`/proyectos/review/${projectId}/users/new`); // Redirects to create a new user
+  };
+
   const columns: TableProps<IUserSingle>["columns"] = [
     {
       title: "Nombre",
@@ -58,11 +64,7 @@ export const UsersProjectTable: React.FC<Props> = ({
       key: "USER_NAME",
       sorter: (a, b) => a.USER_NAME?.localeCompare(b.USER_NAME),
       render: (text, { ID }) => (
-        <button
-          type="button"
-          className="name"
-          onClick={() => setIsViewDetails({ active: true, id: ID })}
-        >
+        <button type="button" className="name" onClick={() => handleSeeUserDetail(ID)}>
           {text}
         </button>
       )
@@ -183,7 +185,7 @@ export const UsersProjectTable: React.FC<Props> = ({
       render: (_, { ID }) => (
         <Button
           className="buttonSeeProject"
-          onClick={() => setIsViewDetails({ active: true, id: ID })}
+          onClick={() => handleSeeUserDetail(ID)}
           icon={<Eye size={"1.3rem"} />}
         />
       )
@@ -200,7 +202,7 @@ export const UsersProjectTable: React.FC<Props> = ({
   });
 
   const { data, loading, mutate } = useUsers({
-    idProject,
+    idProject: projectId,
     page: 1,
     rolesId: selectedUsers.roles,
     zonesId: selectedUsers.zones,
@@ -210,11 +212,6 @@ export const UsersProjectTable: React.FC<Props> = ({
     subline: selectedUsers.subline,
     searchQuery: debouncedSearchQuery
   });
-
-  const onCreateUser = async () => {
-    setIsViewDetails({ active: false, id: 0 });
-    setIsCreateUser(true);
-  };
 
   const onSelectChange = (newSelectedRowKeys: React.Key[], newSelectedRow: any) => {
     setSelectedRowKeys(newSelectedRowKeys);
@@ -227,11 +224,11 @@ export const UsersProjectTable: React.FC<Props> = ({
   };
 
   const deleteUsers = async () => {
-    const response = await deleteUsersById(selectedRowKeys as number[], idProject);
+    const response = await deleteUsersById(selectedRowKeys as number[], projectId);
 
     if (response.status === 200) {
       showMessage("success", "Los usuarios seleccionados fueron eliminados correctamente.");
-      mutate(`/user/project/${idProject}?page=1`);
+      mutate(`/user/project/${projectId}?page=1`);
     } else {
       showMessage("error", "Oops, hubo un error por favor intenta mas tarde.");
     }
@@ -277,14 +274,14 @@ export const UsersProjectTable: React.FC<Props> = ({
               placeholder="Buscar usuarios"
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-            <FilterUsers setSelectedUsers={setSelectedUsers} idProject={idProject} />
+            <FilterUsers setSelectedUsers={setSelectedUsers} idProject={projectId} />
             <DotsDropdown items={items} />
           </Flex>
           <Button
             type="primary"
             className="buttonNewProject"
             size="large"
-            onClick={onCreateUser}
+            onClick={handleCreateUser}
             icon={<Plus weight="bold" size={15} />}
           >
             Nuevo Usuario

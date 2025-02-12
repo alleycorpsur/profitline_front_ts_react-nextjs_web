@@ -15,12 +15,16 @@ export const useApplicationTable = () => {
 
   const pathKey = `/paymentApplication/applications/?project_id=${ID}&client_id=${clientId}`;
 
-  const { data, error, mutate } = useSWR<GenericResponse<IApplyTabClients>>(pathKey, fetcher);
+  const { data, error, mutate, isValidating } = useSWR<GenericResponse<IApplyTabClients>>(
+    pathKey,
+    fetcher
+  );
 
   return {
     data: data?.data,
     isLoading: !error && !data,
     error,
-    mutate
+    mutate,
+    isValidating
   };
 };

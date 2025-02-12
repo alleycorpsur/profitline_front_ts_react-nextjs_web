@@ -210,7 +210,11 @@ const columns: TableProps<IProject>["columns"] = [
     width: "54px",
     dataIndex: "",
     render: (_, { ID }) => (
-      <Button href={`/proyectos/review/${ID}`} className="icon-detail" icon={<Eye size={20} />} />
+      <Button
+        href={`/proyectos/review/${ID}/detail`}
+        className="icon-detail"
+        icon={<Eye size={20} />}
+      />
     )
   }
 ];

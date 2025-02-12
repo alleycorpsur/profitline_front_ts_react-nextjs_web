@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { Button, Flex, Input, Spin, Typography } from "antd";
 import { Controller, useForm } from "react-hook-form";
@@ -44,20 +44,8 @@ interface Props {
     id: number;
   };
   onGoBackTable: () => void;
-  setIsViewDetailsClient: Dispatch<
-    SetStateAction<{
-      active: boolean;
-      id: number;
-    }>
-  >;
-  setIsCreateClient: Dispatch<SetStateAction<boolean>>;
 }
-export const ClientProjectForm = ({
-  onGoBackTable,
-  isViewDetailsClient,
-  setIsViewDetailsClient,
-  setIsCreateClient
-}: Props) => {
+export const ClientProjectForm = ({ onGoBackTable, isViewDetailsClient }: Props) => {
   const [isUploadDocument, setIsUploadDocument] = useState(false);
   const [isBillingPeriodOpen, setIsBillingPeriodOpen] = useState(false);
   const [isModalStatus, setIsModalStatus] = useState({ status: false, remove: false });
@@ -248,7 +236,7 @@ export const ClientProjectForm = ({
           locationResponse.data.data[0],
           showMessage
         );
-        setIsCreateClient(false);
+        onGoBackTable();
       }
       setIsCreateLoading(false);
     }
@@ -257,7 +245,7 @@ export const ClientProjectForm = ({
   const onDeleteClient = async () => {
     if (isViewDetailsClient?.id) {
       await deleteClientById(isViewDetailsClient?.id, idProject, showMessage, () =>
-        setIsViewDetailsClient({ active: false, id: 0 })
+        onGoBackTable()
       );
     }
   };
