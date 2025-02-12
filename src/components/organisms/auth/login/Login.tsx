@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { FC, useState } from "react";
 import { Flex } from "antd";
 import { LogoCashport } from "@/components/atoms/logoCashport/LogoCashport";
 import { LoginForm } from "../../forms/LoginForm/LoginForm";
@@ -8,7 +8,11 @@ import { ContactUsButton } from "@/components/atoms/buttons/contactUsButton/Cont
 
 import styles from "./login.module.scss";
 
-export const LoginView = () => {
+interface ILoginView {
+  token: string | null;
+}
+
+export const LoginView: FC<ILoginView> = ({ token }) => {
   const [resetPassword, setResetPassword] = useState(false);
   return (
     <main className={styles.container}>
@@ -19,7 +23,7 @@ export const LoginView = () => {
             <LogoCashport width={370} />
           </div>
           {!resetPassword ? (
-            <LoginForm setResetPassword={setResetPassword} />
+            <LoginForm setResetPassword={setResetPassword} token={token || null} />
           ) : (
             <RestartPassword setResetPassword={setResetPassword} />
           )}
