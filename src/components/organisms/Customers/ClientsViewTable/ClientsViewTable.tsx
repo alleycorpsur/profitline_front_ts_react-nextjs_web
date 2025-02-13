@@ -177,7 +177,9 @@ export const ClientsViewTable = () => {
       title: "Saldos",
       key: "total_balances",
       dataIndex: "total_balances",
-      render: (text) => <p className="fontMonoSpace">{text}</p>,
+      render: (text) => (
+        <p className="fontMonoSpace">{formatMoney(text, { hideDecimals: true })}</p>
+      ),
       sorter: (a, b) => a.total_balances - b.total_balances,
       showSorterTooltip: false
     },
