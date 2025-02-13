@@ -473,7 +473,7 @@ export const CommunicationProjectForm = ({ onGoBackTable, showCommunicationDetai
                       disabled={radioValue !== 3 && !isEditAvailable}
                       name="trigger.settings.subActions"
                       control={control}
-                      rules={{ required: radioValue === 3 }}
+                      rules={{ required: false }}
                       render={({ field }) => (
                         <SelectOuterTags
                           title="Subtipo de acción"
