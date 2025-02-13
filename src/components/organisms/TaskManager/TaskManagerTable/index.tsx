@@ -45,7 +45,10 @@ const statusColors: Record<Task["status"], string> = {
   "Sin empezar": "#DDDDDD"
 };
 
-const TaskTable: React.FC<{ data: Task[]; modalAction: () => void }> = ({ data, modalAction }) => {
+const TaskTable: React.FC<{ data: Task[]; modalAction: (() => void)[] }> = ({
+  data,
+  modalAction
+}) => {
   const menu = (
     <Menu
       style={{
@@ -60,9 +63,14 @@ const TaskTable: React.FC<{ data: Task[]; modalAction: () => void }> = ({ data, 
         key="Enviar correo"
         icon={<MailOutlined size={12} />}
         title="Enviar correo"
-        onClick={modalAction}
+        onClick={modalAction[0]}
       />
-      <MenuItemCustom key="Llamar" icon={<PhoneOutlined size={12} />} title="Llamar" />
+      <MenuItemCustom
+        key="Llamar"
+        icon={<PhoneOutlined size={12} />}
+        title="Llamar"
+        onClick={modalAction[1]}
+      />
       <MenuItemCustom key="WhatsApp" icon={<WhatsAppOutlined size={12} />} title="WhatsApp" />
       <MenuItemCustom key="Agendar visita" icon={<Users size={12} />} title="Agendar visita" />
       <MenuItemCustom key="Conciliar" icon={<CalendarOutlined size={12} />} title="Conciliar" />

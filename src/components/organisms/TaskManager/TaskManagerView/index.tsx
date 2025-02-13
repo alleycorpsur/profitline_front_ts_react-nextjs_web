@@ -10,6 +10,7 @@ import { GenerateActionButton } from "@/components/atoms/GenerateActionButton";
 import TaskTable from "../TaskManagerTable";
 import data from "../TaskManagerTable/data-mocked";
 import SendEmailModal from "@/components/molecules/modals/SendEmailModal";
+import MakeCallModal from "@/components/molecules/modals/MakeCallModal";
 
 const TaskManagerView = () => {
   const params = useParams();
@@ -18,6 +19,8 @@ const TaskManagerView = () => {
   const isLoading = false;
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [modalSendEmailVisible, setModalSendEmailVisible] = useState(false);
+  const [modalMakeCallVisible, setModalMakeCallVisible] = useState(false);
+
   const rowSelection = {
     selectedRowKeys,
     onChange: (selectedKeys: React.Key[]) => {
@@ -34,7 +37,9 @@ const TaskManagerView = () => {
   const openSendEmailModal = () => {
     setModalSendEmailVisible(true);
   };
-
+  const openMakeCalllModal = () => {
+    setModalMakeCallVisible(true);
+  };
   return (
     <>
       {isLoading ? (
@@ -57,11 +62,16 @@ const TaskManagerView = () => {
               <UiFilterDropdown />
               <GenerateActionButton onClick={() => {}} disabled={selectedRowKeys.length === 0} />
             </Flex>
-            <TaskTable data={data} modalAction={openSendEmailModal} />
+            <TaskTable data={data} modalAction={[openSendEmailModal, openMakeCalllModal]} />
           </Flex>
           <SendEmailModal
             visible={modalSendEmailVisible}
             onClose={() => setModalSendEmailVisible(false)}
+            onSend={() => {}}
+          />
+          <MakeCallModal
+            visible={modalMakeCallVisible}
+            onClose={() => setModalMakeCallVisible(false)}
             onSend={() => {}}
           />
         </Container>
