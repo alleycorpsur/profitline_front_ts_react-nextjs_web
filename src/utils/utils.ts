@@ -375,3 +375,16 @@ export function formatNumber(num: number | string, decimals = 0) {
     ? `${formattedThousands},${Math.floor(Math.pow(10, decimals) * rest)}`
     : formattedThousands;
 }
+
+export const fetchFileFromUrl = async (fileUrl: string): Promise<File> => {
+  const response = await fetch(fileUrl);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch file from ${fileUrl}`);
+  }
+
+  const blob = await response.blob();
+  const fileName = fileUrl.split("/").pop() || "attachment"; // Extract filename from URL
+  const file = new File([blob], fileName, { type: blob.type });
+
+  return file;
+};

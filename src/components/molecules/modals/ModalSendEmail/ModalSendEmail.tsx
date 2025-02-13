@@ -11,7 +11,7 @@ import {
   sendEmailNotification
 } from "@/services/communications/communications";
 import { getDigitalRecordFormInfo } from "@/services/accountingAdjustment/accountingAdjustment";
-import { extractSingleParam } from "@/utils/utils";
+import { extractSingleParam, fetchFileFromUrl } from "@/utils/utils";
 
 import useFileHandlers from "@/components/hooks/useFIleHandlers";
 import SecondaryButton from "@/components/atoms/buttons/secondaryButton/SecondaryButton";
@@ -119,6 +119,23 @@ export const ModalSendEmail = ({ isOpen, onClose, event_id, onFinalOk, customOnR
       setValue("copy_to", response.copy_to);
       setValue("subject", response.subject);
       setValue("body", response.body);
+
+      // Handle file attachments from URLs
+      if (response.attachments && response.attachments.length > 0) {
+        try {
+          const fetchedFiles = await Promise.all(
+            response.attachments.map(async (url: string) => {
+              const file = await fetchFileFromUrl(url);
+              return file;
+            })
+          );
+
+          setValue("attachments", fetchedFiles); // Update attachments in form
+        } catch (error) {
+          console.error("Error fetching attachments:", error);
+          showMessage("error", "No se pudieron cargar algunos archivos adjuntos.");
+        }
+      }
     }
   };
 
