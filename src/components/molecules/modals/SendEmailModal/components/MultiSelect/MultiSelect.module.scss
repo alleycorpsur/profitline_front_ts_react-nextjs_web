@@ -1,0 +1,74 @@
+@import "@styles/variables.scss";
+.multiSelect {
+    .label {
+        padding: 10px 12px;
+        background-color: #f7f7f7;
+        color: #9c9c9c;
+        font-size: 16px;
+        font-weight: 300;
+    }
+
+    .select {
+        width: 100%;
+    }
+}
+
+.tooltip {
+    background-color: #dddddd;
+    color: #000;
+    .ant-tooltip .ant-tooltip-inner {
+        background-color: #dddddd;
+        color: #000;
+    }
+}
+
+.selectSearchCustomDrop {
+    background-color: $white !important;
+    padding: 0.5rem !important;
+    font-size: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    width: 300px !important;
+
+    .rc-virtual-list-holder-inner {
+        gap: 0.25rem;
+
+        .ant-select-item-option {
+            background-color: $background;
+            padding: 12px;
+            font-weight: 300;
+        }
+
+        .ant-select-item-option-selected {
+            background-color: $dark-gray !important;
+
+            .option {
+                background-color: $dark-gray !important;
+            }
+        }
+
+        .ant-select-item-option-active {
+            background-color: $dark-gray !important;
+            .option {
+                background-color: $dark-gray !important;
+            }
+        }
+    }
+
+    .option {
+        background-color: $background !important;
+        font-size: 1rem;
+        transition: all 0.19s ease-in-out;
+
+        .label {
+            font-size: 0.875rem;
+        }
+
+        .value {
+            font-weight: 300;
+            font-size: 0.625rem;
+            color: $gray;
+        }
+    }
+}

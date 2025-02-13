@@ -37,7 +37,7 @@
 .sendButton {
     background: #d9d9d9;
     color: black;
-    width: 100%;
+
     padding: 10px;
     border-radius: 6px;
     font-weight: bold;
@@ -72,8 +72,42 @@
     justify-content: space-between;
     align-items: center;
     background-color: #141414; // Cambia el color de fondo
-    // padding: 12px 16px;
+    padding: 12px 8px;
     font-size: 16px;
     font-weight: 400;
     color: #ffffff;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.customToolbarButton {
+    background-color: transparent;
+    color: #141414;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.customToolbarActiveButton {
+    background-color: gray;
+    color: #141414;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.fileButton {
+    background-color: #141414;
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+}
+
+.customToolbar {
+    border: "none";
 }
