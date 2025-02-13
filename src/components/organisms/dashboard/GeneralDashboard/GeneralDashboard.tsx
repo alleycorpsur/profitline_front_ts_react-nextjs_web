@@ -142,7 +142,9 @@ const GeneralDashboard: FC<GeneralDashboardViewProps> = ({ portfolioData }) => {
               className={`${styles.item} ${styles.historicDso}`}
               history_dso={history_dso}
               yAxisLabelFormatter={(value) =>
-                formatMoney(value, { hideCurrencySymbol: true, scale: 6 }) + "MM"
+                value > 1000000 || value < -1000000
+                  ? formatMoney(value, { hideCurrencySymbol: true, scale: 6 }) + "MM"
+                  : formatMoney(value, { hideCurrencySymbol: true })
               }
             />
           </div>
