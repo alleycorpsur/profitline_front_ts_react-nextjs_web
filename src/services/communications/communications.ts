@@ -117,14 +117,14 @@ export const createCommunication = async ({
   const sendToRoles = data.template.send_to
     .filter((role) => {
       const isRole = role.value.split("_")[0];
-      return isRole !== "0";
+      return isRole === "1";
     })
     .map((role) => Number(role.value.split("_")[1]));
   const copyToRoles =
     data.template.copy_to
       ?.filter((role) => {
         const isRole = role.value.split("_")[0];
-        return isRole !== "0";
+        return isRole === "1";
       })
       .map((role) => Number(role.value.split("_")[1])) || [];
   const roles_ids = [...sendToRoles, ...copyToRoles];
@@ -143,6 +143,13 @@ export const createCommunication = async ({
       })
       .map((role) => Number(role.value.split("_")[1])) || [];
   const contact_positions_ids = [...sendToContactPositions, ...copyToContactPositions];
+
+  const sendTo_other_emails = data.template.send_to
+    .map((email) => email.value)
+    .filter((email) => email.length >= 6);
+  const other_emails_copy =
+    data.template.copy_to?.map((email) => email.value).filter((email) => email.length >= 6) || [];
+  const other_emails = [...sendTo_other_emails, ...other_emails_copy];
 
   const jsonFreq = {
     start_date: selectedPeriodicity?.init_date?.format("YYYY-MM-DD") || "",
@@ -168,6 +175,7 @@ export const createCommunication = async ({
     via: data.template.via.value.toLowerCase(),
     user_roles: roles_ids,
     contact_roles: contact_positions_ids,
+    other_mails: other_emails,
     client_group_ids: assignedGroups,
     comunication_type: data.trigger.type,
     // Frequency-specific properties (optional)
