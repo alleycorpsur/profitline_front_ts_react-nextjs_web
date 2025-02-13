@@ -6,6 +6,8 @@ import dayjs from "dayjs";
 interface DashboardHistoricDsoProps {
   history_dso: historic_dso[] | undefined;
   className?: string;
+  // eslint-disable-next-line no-unused-vars
+  yAxisLabelFormatter?: (value: number) => string;
 }
 
 type history_chart = {
@@ -19,7 +21,11 @@ type historic_dso = {
   date: string;
 };
 
-const DashboardHistoricDso: FC<DashboardHistoricDsoProps> = ({ history_dso, className }) => {
+const DashboardHistoricDso: FC<DashboardHistoricDsoProps> = ({
+  history_dso,
+  className,
+  yAxisLabelFormatter
+}) => {
   const [data, setData] = useState([] as history_chart[]);
 
   const currentDate = new Date();
@@ -85,7 +91,7 @@ const DashboardHistoricDso: FC<DashboardHistoricDsoProps> = ({ history_dso, clas
         <ResponsiveContainer width="100%" height="100%">
           <BarChart margin={{ right: 0, left: -20 }} barCategoryGap={10} data={data} barSize={20}>
             <XAxis padding={{ left: 20, right: 20 }} dataKey="name" scale="point" color="#CBE71E" />
-            <YAxis />
+            <YAxis tickFormatter={yAxisLabelFormatter} />
             <Tooltip />
             <CartesianGrid strokeDasharray="3" vertical={false} />
             <Bar dataKey="value" fill="#CBE71E" />
