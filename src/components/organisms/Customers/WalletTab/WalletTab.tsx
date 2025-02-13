@@ -214,7 +214,7 @@ export const WalletTab = () => {
         onCloseAllModals={() => {
           closeAllModal();
           openModal("sendEmail", {
-            event: "paymentAgreement"
+            event_id: "paymentAgreement"
           });
         }}
       />
@@ -256,7 +256,7 @@ export const WalletTab = () => {
         onCloseAllModals={() => {
           closeAllModal();
           openModal("sendEmail", {
-            event: "Register_Novelty"
+            event_id: "1"
           });
         }}
       />

@@ -6,7 +6,10 @@ import { CaretLeft, Plus } from "phosphor-react";
 
 import { useAppStore } from "@/lib/store/store";
 import { useMessageApi } from "@/context/MessageContext";
-import { sendEmailNotification } from "@/services/communications/communications";
+import {
+  getTemplateByEvent,
+  sendEmailNotification
+} from "@/services/communications/communications";
 import { getDigitalRecordFormInfo } from "@/services/accountingAdjustment/accountingAdjustment";
 import { extractSingleParam } from "@/utils/utils";
 
@@ -37,11 +40,11 @@ type IView = "sendEmail" | "template" | "success";
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  event: string;
+  event_id: string;
   onFinalOk?: () => void;
   customOnReject?: () => void;
 }
-export const ModalSendEmail = ({ isOpen, onClose, onFinalOk, customOnReject }: Props) => {
+export const ModalSendEmail = ({ isOpen, onClose, event_id, onFinalOk, customOnReject }: Props) => {
   const { ID: projectId } = useAppStore((state) => state.selectedProject);
   const params = useParams();
   const clientId = parseInt(extractSingleParam(params.clientId) || "0");
@@ -105,11 +108,18 @@ export const ModalSendEmail = ({ isOpen, onClose, onFinalOk, customOnReject }: P
     onClose();
   };
 
-  const handleAcceptSendingEmail = () => {
+  const handleAcceptSendingEmail = async () => {
     // send email request to verify template
+    const response = await getTemplateByEvent(projectId, clientId, event_id);
     //change view to template
     setCurrentView("template");
     // if a template its returned assign values to form with response
+    if (response) {
+      setValue("forward_to", response.forward_to);
+      setValue("copy_to", response.copy_to);
+      setValue("subject", response.subject);
+      setValue("body", response.body);
+    }
   };
 
   const onSubmit = async (data: IFormEmailNotification) => {
