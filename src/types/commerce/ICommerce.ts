@@ -47,7 +47,7 @@ export interface IFetchedCategories {
 }
 
 export interface IConfirmOrderData {
-  discount_package_id: number | undefined;
+  discount_package: IDiscountPackageAvailable | undefined;
   order_summary: {
     product_sku: string;
     quantity: number;
@@ -111,7 +111,10 @@ export interface OrderDiscount {
 }
 
 export interface IOrderConfirmedResponse {
-  discount_package_id: number;
+  discount_package: {
+    id: number;
+    idAnnualDiscount: number;
+  };
   products?: IProductInDetail[];
   subtotal: number;
   taxes: number;
@@ -211,6 +214,7 @@ export interface IDiscount {
 
 export interface IDiscountPackageAvailable {
   id: number;
+  idAnnualDiscount: number;
   name: string;
   description: string;
 }
