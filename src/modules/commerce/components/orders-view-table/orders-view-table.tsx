@@ -42,6 +42,7 @@ const OrdersViewTable = ({
   const handleSeeDetail = (order: IOrder) => {
     const { id: orderId, order_status } = order;
 
+    console.log(order)
     if (order_status === "En proceso") {
       const url = `/comercio/pedidoConfirmado/${orderId}`;
       router.prefetch(url);

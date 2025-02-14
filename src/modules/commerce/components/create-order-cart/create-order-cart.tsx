@@ -59,12 +59,13 @@ const CreateOrderCart: FC = ({}) => {
             quantity: product.quantity
           }));
         const confirmOrderData = {
-          discount_package_id: discountId,
+          discount_package: discountId,
           order_summary: products
         };
         try {
           const response = await confirmOrder(projectId, client.id, confirmOrderData);
           if (response.status === 200) {
+            console.log("response.data", response.data);
             setConfirmOrderData(response.data);
             setInsufficientStockProducts(response.data.insufficientStockProducts);
             console.log("response.data.discounts", response.data.discounts);

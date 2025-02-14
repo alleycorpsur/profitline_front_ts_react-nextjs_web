@@ -56,6 +56,7 @@ export interface ICreateCommunication {
   contact_roles: number[];
   client_group_ids: number[];
   comunication_type: 1 | 2 | 3 | number; // Enforce valid communication types //1 frecuency, 2 event, 3 action
+  other_mails?: string[];
 
   // Frequency-specific properties (optional)
   json_frecuency?: {

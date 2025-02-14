@@ -4,6 +4,7 @@ import CreateOrderMarket from "../../components/create-order-market";
 import CreateOrderCart from "../../components/create-order-cart";
 import CreateOrderCheckout from "../../components/create-order-checkout";
 import {
+  IDiscountPackageAvailable,
   IFetchedCategories,
   IOrderConfirmedResponse,
   ISelectedProduct,
@@ -36,8 +37,8 @@ interface IOrderViewContext {
   setConfirmOrderData: Dispatch<IOrderConfirmedResponse>;
   shippingInfo: IShippingInformation | undefined;
   setShippingInfo: Dispatch<IShippingInformation>;
-  discountId: number;
-  setDiscountId: Dispatch<number>;
+  discountId: IDiscountPackageAvailable | undefined;
+  setDiscountId: Dispatch<IDiscountPackageAvailable | undefined>;
   categories: IFetchedCategories[];
   setCategories: Dispatch<IFetchedCategories[]>;
 }
@@ -51,7 +52,7 @@ export const CreateOrderView: FC = () => {
   const [checkingOut, setCheckingOut] = useState(false);
   const [confirmOrderData, setConfirmOrderData] = useState({} as IOrderConfirmedResponse);
   const [shippingInfo, setShippingInfo] = useState<IShippingInformation>();
-  const [discountId, setDiscountId] = useState(0);
+  const [discountId, setDiscountId] = useState<IDiscountPackageAvailable | undefined>(undefined);
   const { draftInfo, setDraftInfo, selectedProject } = useAppStore((state) => state);
 
   useEffect(() => {
