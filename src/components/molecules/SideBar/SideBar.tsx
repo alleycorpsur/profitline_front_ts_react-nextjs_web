@@ -191,27 +191,30 @@ export const SideBar = () => {
             </Button>
           </Link>
         )}
-
-        <Link href="/proveedores" passHref legacyBehavior>
-          <Button
-            type="primary"
-            size="large"
-            icon={<UsersFour size={26} />}
-            className={path === "/proveedores" ? "buttonIcon" : "buttonIconActive"}
-          >
-            {isSideBarLarge && "Ajustes"}
-          </Button>
-        </Link>
-        <Link href="/client-management" passHref legacyBehavior>
-          <Button
-            type="primary"
-            size="large"
-            icon={<Stack size={26} />}
-            className={path === "/client-management" ? "buttonIcon" : "buttonIconActive"}
-          >
-            {isSideBarLarge && "Ajustes"}
-          </Button>
-        </Link>
+        {checkUserViewPermissions(project, "Proveedores") && (
+          <Link href="/proveedores" passHref legacyBehavior>
+            <Button
+              type="primary"
+              size="large"
+              icon={<UsersFour size={26} />}
+              className={path === "/proveedores" ? "buttonIcon" : "buttonIconActive"}
+            >
+              {isSideBarLarge && "Ajustes"}
+            </Button>
+          </Link>
+        )}
+        {checkUserViewPermissions(project, "GestorTareas") && (
+          <Link href="/client-management" passHref legacyBehavior>
+            <Button
+              type="primary"
+              size="large"
+              icon={<Stack size={26} />}
+              className={path === "/client-management" ? "buttonIcon" : "buttonIconActive"}
+            >
+              {isSideBarLarge && "Ajustes"}
+            </Button>
+          </Link>
+        )}
       </Flex>
       <Flex className="exit">
         <Button
