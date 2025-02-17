@@ -35,11 +35,19 @@ export const InputFormMoney = ({
   defaultValue,
   changeInterceptor
 }: Props) => {
-  const formatNumber = (value: string): string => {
+  const formatNumber = (value: string | number): string => {
     if (!value) return "";
-    else if (typeof value !== "string") value = String(value);
-    const numStr = String(value).replace(/\D/g, "");
-    return numStr.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+
+    let numStr = String(value);
+
+    // Allow negative sign at the start but prevent multiple ones
+    const isNegative = numStr.startsWith("-");
+
+    numStr = numStr.replace(/[^0-9]/g, ""); // Remove all non-numeric characters
+
+    const formattedNumStr = numStr.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+
+    return isNegative ? `-${formattedNumStr}` : formattedNumStr;
   };
 
   const parseNumber = (value: string): string => {
@@ -66,7 +74,8 @@ export const InputFormMoney = ({
             placeholder={placeholder?.length > 0 ? placeholder : titleInput}
             value={formatNumber(value)}
             onChange={(e) => {
-              const formattedValue = formatNumber(e.target.value);
+              const rawValue = e.target.value;
+              const formattedValue = formatNumber(rawValue);
               const numericValue = parseNumber(formattedValue);
               onChange(numericValue);
               changeInterceptor?.(numericValue);
