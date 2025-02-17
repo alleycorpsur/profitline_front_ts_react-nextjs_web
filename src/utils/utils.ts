@@ -1,7 +1,6 @@
 import { ISelectedProject } from "@/lib/slices/createProjectSlice";
 import { IChanel } from "@/types/bre/IBRE";
 import { ISelectStringType } from "@/types/communications/ICommunications";
-import { CountryCode } from "@/types/global/IGlobal";
 import dayjs from "dayjs";
 
 interface Subline {
@@ -377,14 +376,28 @@ export function formatNumber(num: number | string, decimals = 0) {
 }
 
 export const fetchFileFromUrl = async (fileUrl: string): Promise<File> => {
-  const response = await fetch(fileUrl);
-  if (!response.ok) {
-    throw new Error(`Failed to fetch file from ${fileUrl}`);
+  try {
+    console.log("Attempting to fetch file from:", fileUrl);
+
+    const response = await fetch(fileUrl);
+
+    console.log("Response status:", response.status);
+    console.log("Response headers:", response.headers);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const blob = await response.blob();
+    console.log("Blob retrieved:", blob);
+
+    const fileName = fileUrl.split("/").pop() || "attachment";
+    const file = new File([blob], fileName, { type: blob.type });
+
+    console.log("Created file:", file);
+    return file;
+  } catch (error) {
+    console.error("Error in fetchFileFromUrl:", error);
+    throw error;
   }
-
-  const blob = await response.blob();
-  const fileName = fileUrl.split("/").pop() || "attachment"; // Extract filename from URL
-  const file = new File([blob], fileName, { type: blob.type });
-
-  return file;
 };
