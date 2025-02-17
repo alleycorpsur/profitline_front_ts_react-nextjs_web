@@ -5,7 +5,7 @@ import { CaretLeft } from "phosphor-react";
 import styles from "./communicationProjectForm.module.scss";
 import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
 import { InputForm } from "@/components/atoms/inputs/InputForm/InputForm";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { ISelectedBussinessRules } from "@/types/bre/IBRE";
 import { SelectZone } from "@/components/molecules/selects/SelectZone/SelectZone";
 import { SelectStructure } from "@/components/molecules/selects/SelectStructure/SelectStructure";
@@ -56,14 +56,9 @@ interface Props {
     communicationId: number;
     active: boolean;
   };
-  setIsCreateCommunication: Dispatch<SetStateAction<boolean>>;
   onGoBackTable: () => void;
 }
-export const CommunicationProjectForm = ({
-  onGoBackTable,
-  showCommunicationDetails,
-  setIsCreateCommunication
-}: Props) => {
+export const CommunicationProjectForm = ({ onGoBackTable, showCommunicationDetails }: Props) => {
   const [loadingRequest, setLoadingRequest] = useState(false);
   const [isEditAvailable] = useState(false);
   const [radioValue, setRadioValue] = useState<any>();
@@ -217,15 +212,14 @@ export const CommunicationProjectForm = ({
 
   const handleAddTagToBodyAndSubject = (value: OptionType[]) => {
     const valueBody = getValues("template.message");
-    //  SubjectAdding tags commented because it is not being used
-    // const valueSubject = getValues("template.subject");
+    const valueSubject = getValues("template.subject");
 
     if (value.length === 0) return;
 
     const lastAddedTag = value.length > 0 ? value[value.length - 1] : undefined;
 
     setValue("template.message", `${valueBody ? valueBody : ""}{{${lastAddedTag?.label}}}`);
-    // setValue("template.subject", `${valueSubject ? valueSubject : ""}{{${lastAddedTag?.label}}}`);
+    setValue("template.subject", `${valueSubject ? valueSubject : ""}{{${lastAddedTag?.label}}}`);
   };
 
   const handleCreateCommunication = async (data: any) => {
@@ -264,7 +258,7 @@ export const CommunicationProjectForm = ({
         showMessage
       });
 
-      setIsCreateCommunication(false);
+      onGoBackTable();
     } catch (error) {
       console.error(error);
     }
@@ -479,7 +473,7 @@ export const CommunicationProjectForm = ({
                       disabled={radioValue !== 3 && !isEditAvailable}
                       name="trigger.settings.subActions"
                       control={control}
-                      rules={{ required: radioValue === 3 }}
+                      rules={{ required: false }}
                       render={({ field }) => (
                         <SelectOuterTags
                           title="Subtipo de acción"

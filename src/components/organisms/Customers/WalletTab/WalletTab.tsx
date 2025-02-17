@@ -213,6 +213,9 @@ export const WalletTab = () => {
         messageShow={messageShow}
         onCloseAllModals={() => {
           closeAllModal();
+          openModal("sendEmail", {
+            event: "paymentAgreement"
+          });
         }}
       />
       <ModalActionDiscountCredit
@@ -250,7 +253,12 @@ export const WalletTab = () => {
         clientId={clientId}
         projectId={projectId}
         messageShow={messageShow}
-        onCloseAllModals={closeAllModal}
+        onCloseAllModals={() => {
+          closeAllModal();
+          openModal("sendEmail", {
+            event: "Register_Novelty"
+          });
+        }}
       />
       <DigitalRecordModal
         isOpen={isSelectOpen.selected === 7}

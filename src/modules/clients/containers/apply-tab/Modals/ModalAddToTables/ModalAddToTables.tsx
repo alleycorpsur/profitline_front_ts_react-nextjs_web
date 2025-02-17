@@ -1,11 +1,14 @@
 import React, { useState, useMemo, useEffect } from "react";
+import { useParams } from "next/navigation";
 import { Modal, Checkbox, Spin, message, Flex, Pagination } from "antd";
 import { CaretLeft, CopySimple, X } from "phosphor-react";
 
 import { useAppStore } from "@/lib/store/store";
-import { useInvoices } from "@/hooks/useInvoices";
-import { useClientsPayments } from "@/hooks/useClientsPayments";
-import { formatDate } from "@/utils/utils";
+import { extractSingleParam, formatDate } from "@/utils/utils";
+import {
+  getApplicationInvoices,
+  getApplicationPayments
+} from "@/services/applyTabClients/applyTabClients";
 
 import UiSearchInputLong from "@/components/ui/search-input-long";
 import { IModalAddToTableOpen } from "../../apply-tab";
@@ -14,9 +17,10 @@ import SecondaryButton from "@/components/atoms/buttons/secondaryButton/Secondar
 import CheckboxColoredValues from "@/components/ui/checkbox-colored-values/checkbox-colored-values";
 
 import { IClientPayment } from "@/types/clientPayments/IClientPayments";
-import { IInvoice } from "@/types/invoices/IInvoices";
+import { IApplicationInvoice } from "@/types/invoices/IInvoices";
 
 import "./modalAddToTables.scss";
+
 interface ModalAddToTablesProps {
   onCancel: () => void;
   // eslint-disable-next-line no-unused-vars
@@ -30,29 +34,38 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
   isModalAddToTableOpen
 }) => {
   const formatMoney = useAppStore((state) => state.formatMoney);
+  const { ID: projectId } = useAppStore((state) => state.selectedProject);
+  const params = useParams();
+  const clientId = Number(extractSingleParam(params.clientId)) || 0;
+  const [allInvoices, setAllInvoices] = useState<IApplicationInvoice[]>();
+  const [allPayments, setAllPayments] = useState<IClientPayment[]>();
 
-  const [rows, setRows] = useState<(IInvoice | IClientPayment)[]>([]);
-  const [selectedRows, setSelectedRows] = useState<(IInvoice | IClientPayment)[]>([]);
+  const [rows, setRows] = useState<(IApplicationInvoice | IClientPayment)[]>([]);
+  const [selectedRows, setSelectedRows] = useState<(IApplicationInvoice | IClientPayment)[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
   const [loadingData, setLoadingData] = useState(true);
   const [loadingAddToTable, setLoadingAddToTable] = useState(false);
   const ITEMS_PER_PAGE = 5;
 
-  const { data: invoicesByState, isLoading: loadingInvoices } = useInvoices({});
-  const allInvoices = invoicesByState?.map((data) => data.invoices).flat();
-
-  const { data: paymentsByState, isLoading: loadingPayments } = useClientsPayments();
-  const allPayments = paymentsByState?.map((data) => data.payments).flat();
-
   useEffect(() => {
-    if (loadingInvoices || loadingPayments) {
-      setLoadingData(true);
-    }
-    if (!loadingInvoices && !loadingPayments) {
-      setLoadingData(false);
-    }
-  }, [loadingInvoices, loadingPayments]);
+    const fetchData = async () => {
+      if (isModalAddToTableOpen.adding === "invoices") {
+        setLoadingData(true);
+        const res = await getApplicationInvoices(projectId, clientId);
+        setAllInvoices(res);
+        setLoadingData(false);
+      } else if (isModalAddToTableOpen.adding === "payments") {
+        setLoadingData(true);
+        const res = await getApplicationPayments(projectId, clientId);
+        const fetchedPayments = res?.map((data) => data.payments).flat();
+        setAllPayments(fetchedPayments);
+        setLoadingData(false);
+      }
+    };
+
+    fetchData();
+  }, [isModalAddToTableOpen.adding]);
 
   useEffect(() => {
     if (isModalAddToTableOpen.adding === "invoices" && allInvoices) {
@@ -60,22 +73,23 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
     } else if (isModalAddToTableOpen.adding === "payments" && allPayments) {
       setRows(allPayments);
     }
+  }, [isModalAddToTableOpen.adding, allInvoices, allPayments]);
 
+  useEffect(() => {
     return () => {
       setSelectedRows([]);
       setRows([]);
-      setNotFoundInvoices([]);
+      setNotFoundSearch([]);
       setSearchQuery("");
       setCurrentPage(1);
     };
-  }, [isModalAddToTableOpen.adding]);
+  }, [isModalAddToTableOpen.isOpen]);
 
   useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery]);
 
-  const [notFoundInvoices, setNotFoundInvoices] = useState<number[]>([]);
-  const [adjustments] = useState(15000000);
+  const [notFoundSearch, setNotFoundSearch] = useState<string[]>([]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -83,20 +97,40 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
 
   useEffect(() => {
     if (searchQuery === "") {
-      setNotFoundInvoices([]);
+      setNotFoundSearch([]);
       return;
     }
-    const searchQueryArray = searchQuery.split(",").map((query) => query.trim());
-    const notFoundInvoices = searchQueryArray.filter(
-      (query) => !rows.some((row) => row.id.toString() === query)
+    const searchQueryArray = searchQuery
+      .toLowerCase()
+      .split(",")
+      .map((query) => query.trim());
+
+    const notFoundSearch = searchQueryArray.filter(
+      (query) =>
+        !rows.some(
+          (row) =>
+            (isModalAddToTableOpen.adding === "payments"
+              ? row.id.toString()
+              : (row as IApplicationInvoice).id_erp.toLowerCase()) === query
+        )
     );
-    setNotFoundInvoices(notFoundInvoices.map(Number));
+    setNotFoundSearch(notFoundSearch.map(String));
   }, [rows, searchQuery]);
 
   const filteredData = useMemo(() => {
-    const searchQueryArray = searchQuery.split(",").map((query) => query.trim());
+    const searchQueryArray = searchQuery
+      .toLowerCase()
+      .split(",")
+      .map((query) => query.trim());
     const filtered = rows.filter((row) =>
-      searchQueryArray.some((query) => row.id.toString().toLowerCase().includes(query))
+      searchQueryArray.some((query) =>
+        (isModalAddToTableOpen.adding === "payments"
+          ? row.id.toString()
+          : (row as IApplicationInvoice).id_erp
+        )
+          .toLowerCase()
+          .includes(query)
+      )
     );
 
     const sorted = filtered.sort((a, b) => {
@@ -136,9 +170,13 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
 
   const summary = useMemo(() => {
     const total = selectedRows.reduce((sum, row) => sum + row.current_value, 0);
+    const adjustments = selectedRows.reduce(
+      (sum, row) => sum + (row as IApplicationInvoice).ajust_value,
+      0
+    );
     const pending = total - adjustments;
     return { total, adjustments, pending, count: selectedRows.length };
-  }, [selectedRows, adjustments]);
+  }, [selectedRows]);
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
@@ -150,11 +188,11 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
     }
   };
 
-  const handleSelectOne = (checked: boolean, row: IClientPayment | IInvoice) => {
+  const handleSelectOne = (checked: boolean, row: IClientPayment | IApplicationInvoice) => {
     setSelectedRows((prevSelectedRows) =>
       checked
-        ? [...(prevSelectedRows as (IInvoice | IClientPayment)[]), row]
-        : (prevSelectedRows as (IInvoice | IClientPayment)[]).filter(
+        ? [...(prevSelectedRows as (IApplicationInvoice | IClientPayment)[]), row]
+        : (prevSelectedRows as (IApplicationInvoice | IClientPayment)[]).filter(
             (selected) => selected.id !== row.id
           )
     );
@@ -163,10 +201,8 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
   const handleAddToTable = async () => {
     if (!isModalAddToTableOpen.adding) return console.error("No adding type selected");
     setLoadingAddToTable(true);
-    await onAdd(
-      isModalAddToTableOpen.adding,
-      selectedRows.map((row) => row.id)
-    );
+    const uniqueSelectedIds = Array.from(new Set(selectedRows.map((row) => row.id)));
+    await onAdd(isModalAddToTableOpen.adding, uniqueSelectedIds);
     setLoadingAddToTable(false);
   };
 
@@ -187,7 +223,7 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
         <CaretLeft size={24} onClick={onCancel} />
         <h2>{`Agregar ${isModalAddToTableOpen.adding === "invoices" ? "facturas" : "pagos"}`}</h2>
       </div>
-      {summary.count > 0 && (
+      {summary.count > 0 && isModalAddToTableOpen.adding === "invoices" && (
         <div className="summary-section">
           <div className="summary-item">
             <span>Total ({summary.count})</span>
@@ -212,14 +248,18 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
           className={"custom-input"}
         />
       </div>
-      {notFoundInvoices.length > 0 && (
+      {notFoundSearch.length > 0 && (
         <div className="not-found-invoices">
           <Flex justify="space-between">
-            <div>Facturas no encontradas</div>
+            <div>
+              {isModalAddToTableOpen.adding === "invoices"
+                ? "Facturas no encontradas"
+                : "Pagos no encontrados"}
+            </div>
             <div
               className="excel-button-container"
               onClick={() => {
-                navigator.clipboard.writeText(notFoundInvoices.join(", "));
+                navigator.clipboard.writeText(notFoundSearch.join(", "));
                 message.success("Valores copiados");
               }}
             >
@@ -229,11 +269,11 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
           </Flex>
 
           <div className="buld-text-excel-not-found">
-            <strong> {notFoundInvoices.join(", ")}</strong>
+            <strong> {notFoundSearch.join(", ")}</strong>
           </div>
         </div>
       )}
-      {!notFoundInvoices.length && (
+      {!notFoundSearch.length && (
         <div className="container-paste-invoice">
           <div className="excel-button-container" onClick={handlePasteInvoices}>
             <CopySimple size={18} />
@@ -271,7 +311,9 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
                   <Flex style={{ width: "100%" }} justify="space-between">
                     <div>
                       <h4 className="invoices-list__title">
-                        {isModalAddToTableOpen.adding === "invoices" ? "Factura" : "Pago"} {row.id}
+                        {isModalAddToTableOpen.adding === "invoices"
+                          ? `Factura ${(row as IApplicationInvoice).id_erp}`
+                          : `Pago ${(row as IClientPayment).id}`}
                       </h4>
                       <p className="invoices-list__date">{formatDate(row.updated_at)}</p>
                     </div>
@@ -296,7 +338,12 @@ const ModalAddToTables: React.FC<ModalAddToTablesProps> = ({
           Cancelar
         </SecondaryButton>
 
-        <PrincipalButton fullWidth loading={loadingAddToTable} onClick={handleAddToTable}>
+        <PrincipalButton
+          fullWidth
+          loading={loadingAddToTable}
+          onClick={handleAddToTable}
+          disabled={!selectedRows.length}
+        >
           {`Agregar ${isModalAddToTableOpen.adding === "invoices" ? "facturas" : "pagos"}`}
         </PrincipalButton>
       </div>

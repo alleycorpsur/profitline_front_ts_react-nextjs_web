@@ -5,10 +5,13 @@ import { IPaymentsByStatus } from "@/types/banks/IBanks";
 
 interface Props {
   projectId: number;
+  like?: string;
 }
 
-export const useBankPayments = ({ projectId }: Props) => {
-  const pathKey = `/bank/get-payments?project_id=${projectId}`;
+export const useBankPayments = ({ projectId, like }: Props) => {
+  const pathKey = like
+    ? `/bank/get-payments?project_id=${projectId}&like=${like}`
+    : `/bank/get-payments?project_id=${projectId}`;
 
   const { data, error, mutate } = useSWR<GenericResponse<IPaymentsByStatus[]>>(pathKey, fetcher);
 

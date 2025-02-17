@@ -3,18 +3,19 @@ import { useParams } from "next/navigation";
 import { Flex, Modal, Pagination, Spin } from "antd";
 import { CaretLeft, Plus } from "phosphor-react";
 
-import { IFinancialDiscount, useAcountingAdjustment } from "@/hooks/useAcountingAdjustment";
+import { IFinancialDiscount } from "@/hooks/useAcountingAdjustment";
 import { useMessageApi } from "@/context/MessageContext";
 import { useAppStore } from "@/lib/store/store";
 import { extractSingleParam } from "@/utils/utils";
+import { getApplicationAdjustments } from "@/services/applyTabClients/applyTabClients";
 
 import UiSearchInputLong from "@/components/ui/search-input-long";
 import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
 import SecondaryButton from "@/components/atoms/buttons/secondaryButton/SecondaryButton";
 import CheckboxColoredValues from "@/components/ui/checkbox-colored-values/checkbox-colored-values";
 import ModalApplySpecificAdjustment from "../ModalApplySpecificAdjustment/ModalApplySpecificAdjustment";
-import { IModalAdjustmentsState } from "../../apply-tab";
 
+import { IModalAdjustmentsState } from "../../apply-tab";
 import { IApplyTabRecord } from "@/types/applyTabClients/IApplyTabClients";
 
 import "./modalListAdjustments.scss";
@@ -48,15 +49,29 @@ const ModalListAdjustments: React.FC<ModalListAdjustmentsProps> = ({
   const { ID: projectId } = useAppStore((state) => state.selectedProject);
   const formatMoney = useAppStore((state) => state.formatMoney);
   const { showMessage } = useMessageApi();
+  const [adjustments, setAdjustments] = useState<IFinancialDiscount[]>();
   const [selectedRows, setSelectedRows] = useState<IFinancialDiscount[]>([]);
   const [loading, setLoading] = useState(false);
+  const [loadingData, setLoadingData] = useState(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 7;
 
   const [isApplyingSpecificAdjustment, setIsApplyingSpecificAdjustment] = useState(false);
 
-  const { data, isLoading } = useAcountingAdjustment(clientId, projectId.toString(), 2);
+  useEffect(() => {
+    const fetchDiscounts = async () => {
+      setLoadingData(true);
+      const response = await getApplicationAdjustments(projectId, clientId);
+      setAdjustments(response.map((item) => item.financial_discounts).flat());
+      setLoadingData(false);
+    };
+    try {
+      fetchDiscounts();
+    } catch (error) {
+      console.error("error fetchDiscounts", error);
+    }
+  }, [projectId, clientId, visible]);
 
   useEffect(() => {
     return () => {
@@ -107,9 +122,9 @@ const ModalListAdjustments: React.FC<ModalListAdjustmentsProps> = ({
   };
 
   const filteredData = useMemo(() => {
-    if (!data?.[0]?.financial_discounts) return [];
-    return data?.[0].financial_discounts.filter((row) => row.id.toString().includes(searchQuery));
-  }, [data, searchQuery]);
+    if (!adjustments) return [];
+    return adjustments.filter((row) => row.id.toString().includes(searchQuery));
+  }, [adjustments, searchQuery]);
 
   const paginatedRows = useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -145,7 +160,7 @@ const ModalListAdjustments: React.FC<ModalListAdjustmentsProps> = ({
             />
           </div>
 
-          {isLoading ? (
+          {loadingData ? (
             <Flex justify="center" style={{ width: "100%", margin: "2rem 0" }}>
               <Spin />
             </Flex>

@@ -104,7 +104,7 @@ const AccountingAdjustmentsTable = ({
       render: (text) => <Text className="cell -alignRight">{formatDate(text)}</Text>,
       sorter: (a, b) => Date.parse(a.create_at) - Date.parse(b.create_at),
       align: "center",
-      width: 80,
+      width: 116,
       showSorterTooltip: false
     },
     {

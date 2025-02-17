@@ -95,8 +95,8 @@ const CreateOrderCheckout: FC = ({}) => {
     setCheckingOut(false);
   };
 
-  const handleRadioClick = (value: number) => {
-    if (discountId === value) setDiscountId(0);
+  const handleRadioClick = (value: IDiscountPackageAvailable) => {
+    if (discountId === value) setDiscountId(undefined);
     else setDiscountId(value);
   };
 
@@ -252,16 +252,20 @@ const CreateOrderCheckout: FC = ({}) => {
         <div className={styles.discounts}>
           <h4 className={styles.discounts__title}>Seleccionar descuento a aplicar</h4>
           <div className={styles.radioGroup}>
-            {discounts.map((discount) => (
+            {discounts.map((discountPackage) => (
               <InputRadioRightSide
-                key={discount.id}
-                value={discount.id}
+                key={discountPackage.id}
+                value={discountPackage.id}
                 customStyles={{ border: "2px solid #e0e0e0", borderRadius: "8px", padding: "1rem" }}
-                onClick={() => handleRadioClick(discount.id)}
-                checked={discountId === discount.id}
+                onClick={() => handleRadioClick(discountPackage)}
+                checked={
+                  discountId &&
+                  discountId.id === discountPackage.id &&
+                  discountId.idAnnualDiscount === discountPackage.idAnnualDiscount
+                }
               >
                 <div className={styles.radioGroup__label}>
-                  <p>{discount.name}</p>
+                  <p>{discountPackage.name}</p>
                 </div>
               </InputRadioRightSide>
             ))}
