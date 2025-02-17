@@ -111,29 +111,46 @@ export const ModalSendEmail = ({ isOpen, onClose, event_id, onFinalOk, customOnR
   const handleAcceptSendingEmail = async () => {
     // send email request to verify template
     const response = await getTemplateByEvent(projectId, clientId, event_id);
+    console.log("response", response);
     //change view to template
     setCurrentView("template");
     // if a template its returned assign values to form with response
     if (response) {
-      setValue("forward_to", response.forward_to);
-      setValue("copy_to", response.copy_to);
+      setValue(
+        "forward_to",
+        response.recipients.map((recipient) => ({ value: recipient, label: recipient }))
+      );
       setValue("subject", response.subject);
-      setValue("body", response.body);
+      setValue("body", response.message);
 
       // Handle file attachments from URLs
-      if (response.attachments && response.attachments.length > 0) {
+      if (response.files && response.files.length > 0) {
         try {
+          console.log("Fetching attachments...");
+
           const fetchedFiles = await Promise.all(
-            response.attachments.map(async (url: string) => {
-              const file = await fetchFileFromUrl(url);
-              return file;
+            response.files.map(async (url: string) => {
+              try {
+                return await fetchFileFromUrl(url);
+              } catch (error) {
+                console.error(`Failed to fetch file from ${url}:`, error);
+                return null;
+              }
             })
           );
 
-          setValue("attachments", fetchedFiles); // Update attachments in form
+          const validFiles = fetchedFiles.filter((file) => file !== null); // Remove failed files
+
+          console.log("Successfully fetched files:", validFiles);
+
+          if (validFiles.length > 0) {
+            setValue("attachments", validFiles);
+          } else {
+            showMessage("error", "No se pudieron cargar los archivos adjuntos.");
+          }
         } catch (error) {
           console.error("Error fetching attachments:", error);
-          showMessage("error", "No se pudieron cargar algunos archivos adjuntos.");
+          showMessage("error", "Ocurrió un error al recuperar los archivos adjuntos.");
         }
       }
     }
@@ -165,6 +182,7 @@ export const ModalSendEmail = ({ isOpen, onClose, event_id, onFinalOk, customOnR
       footer={null}
       centered
     >
+      <p onClick={() => setCurrentView("sendEmail")}>test</p>
       {currentView === "sendEmail" && (
         <>
           <h2 className="modalSendEmail__title">{sendEmailConstants.title}</h2>

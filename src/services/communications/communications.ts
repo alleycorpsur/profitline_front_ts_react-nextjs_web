@@ -11,6 +11,7 @@ import {
   ICommunicationForm,
   ICreateCommunication,
   IPeriodicityModalForm,
+  ITemplateCommunication,
   Iattachments
 } from "@/types/communications/ICommunications";
 import { GenericResponse } from "@/types/global/IGlobal";
@@ -262,8 +263,8 @@ export const getTemplateByEvent = async (
   const basePath = `${config.API_HOST}/comunication/find-action-template?action=${actionId}&project_id=${projectId}&client_id=${clientId}`;
   const url = subActionId ? `${basePath}&sub_action=${subActionId}` : basePath;
   try {
-    const response: any = await API.get(url);
-    return response;
+    const response: GenericResponse<ITemplateCommunication> = await API.get(url);
+    return response.data;
   } catch (error) {
     console.error("Error getting template by event", error);
     throw error;
