@@ -10,12 +10,13 @@ import SecondaryButton from "@/components/atoms/buttons/secondaryButton/Secondar
 import { InputFormMoney } from "@/components/atoms/inputs/InputFormMoney/InputFormMoney";
 
 import "./modalEditRow.scss";
+import { IApplyTabRecord } from "@/types/applyTabClients/IApplyTabClients";
+import useScreenHeight from "@/components/hooks/useScreenHeight";
 
 interface IApplicationTabRow {
   id: number;
   adjustment: string;
   amount: number;
-  date: string;
 }
 
 interface IFormValues {
@@ -24,9 +25,11 @@ interface IFormValues {
 interface ModalEditRowProps {
   visible: boolean;
   onCancel: () => void;
+  row?: IApplyTabRecord;
 }
 
-const ModalEditRow: React.FC<ModalEditRowProps> = ({ visible, onCancel }) => {
+const ModalEditRow: React.FC<ModalEditRowProps> = ({ visible, onCancel, row }) => {
+  const height = useScreenHeight();
   const formatMoney = useAppStore((state) => state.formatMoney);
   const [isEditing, setIsEditing] = useState(false);
   const {
@@ -34,13 +37,12 @@ const ModalEditRow: React.FC<ModalEditRowProps> = ({ visible, onCancel }) => {
     formState: { errors },
     handleSubmit,
     reset
-  } = useForm<IFormValues>({
-    defaultValues: {
-      adjustments: mockData
-    }
-  });
+  } = useForm<IFormValues>();
 
   useEffect(() => {
+    if (row?.adjustments) {
+      console.info("Row adjustments", row.adjustments);
+    }
     return () => {
       setIsEditing(false);
       reset();
@@ -70,9 +72,19 @@ const ModalEditRow: React.FC<ModalEditRowProps> = ({ visible, onCancel }) => {
                 hiddenTitle
                 nameInput={`adjustments.${index}.amount`}
                 control={control}
-                error={errors?.adjustments?.[index]?.amount}
-                typeInput="number"
+                error={
+                  errors?.adjustments?.[index]?.amount && {
+                    type: "required",
+                    message: "Campo requerido"
+                  }
+                }
                 customStyle={{ width: "80%", textAlign: "center" }}
+                validationRules={{
+                  pattern: {
+                    value: /^-?[0-9]+$/,
+                    message: "Solo se permiten números"
+                  }
+                }}
               />
 
               <Button className="delete-btn" type="text">
@@ -119,10 +131,17 @@ const ModalEditRow: React.FC<ModalEditRowProps> = ({ visible, onCancel }) => {
         <Table
           className="EditRowTable"
           columns={columns}
-          dataSource={mockData}
+          dataSource={row?.adjustments?.map((adjustment) => {
+            return {
+              id: adjustment.adjustment_id,
+              adjustment: adjustment.description,
+              amount: adjustment.amount
+            };
+          })}
           pagination={false}
           rowClassName="TestRow"
           bordered
+          scroll={{ y: height - 400, x: 100 }}
         />
       )}
       <div className="create-adjustment">
@@ -145,18 +164,3 @@ const ModalEditRow: React.FC<ModalEditRowProps> = ({ visible, onCancel }) => {
 };
 
 export default ModalEditRow;
-
-const mockData = [
-  {
-    id: 1,
-    adjustment: "Factura",
-    amount: 1230,
-    date: "2021-10-10"
-  },
-  {
-    id: 2,
-    adjustment: "Retefuente",
-    amount: 4000,
-    date: "2021-10-10"
-  }
-];
