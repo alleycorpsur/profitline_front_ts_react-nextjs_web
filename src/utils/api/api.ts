@@ -17,40 +17,36 @@ export async function getIdToken(forceRefresh?: boolean) {
   }
 }
 
-const instance = (token: string) => {
-  const AxiosIntance = axios.create({
-    baseURL: config.API_HOST,
-    timeout: 10000,
-    headers: {
-      Accept: "application/json, text/plain, */*",
-      "Content-Type": "application/json; charset=utf-8",
-      Authorization: `Bearer ${token}`
-    }
-  });
+let idProject: number | null = null;
 
-  AxiosIntance.interceptors.response.use(
-    async (response) => {
-      if (!response.config.url?.includes("/notification/count")) {
-        try {
-          await useNotificationStore.getState().updateNotificationCount();
-        } catch (error) {
-          console.error("Error updating notification count:", error);
-        }
+const instance = axios.create({
+  baseURL: config.API_HOST,
+  timeout: 10000,
+  headers: {
+    Accept: "application/json, text/plain, */*",
+    "Content-Type": "application/json; charset=utf-8"
+  }
+});
+
+instance.interceptors.response.use(
+  async (response) => {
+    if (!response.config.url?.includes("/notification/count")) {
+      try {
+        await useNotificationStore.getState().updateNotificationCount();
+      } catch (error) {
+        console.error("Error updating notification count:", error);
       }
-      return response;
-    },
-    (error) => {
-      console.error("Interceptor error:", error);
-      return Promise.reject(error);
     }
-  );
-
-  return AxiosIntance;
-};
+    return response;
+  },
+  (error) => {
+    console.error("Interceptor error:", error);
+    return Promise.reject(error);
+  }
+);
 
 export const fetcher = async (url: string) => {
-  const token = (await getIdToken(false)) as string;
-  return instance(token)
+  return instance
     .get(url)
     .then((res) => {
       if (!res.data) {
@@ -74,6 +70,29 @@ export const fetcher = async (url: string) => {
 const API = axios.create({
   responseType: "json",
   baseURL: config.API_HOST
+});
+
+// set ProjectId in instance
+export const setProjectInApi = (projectId: number) => {
+  idProject = projectId;
+};
+API.interceptors.request.use((request) => {
+  console.log(idProject);
+  request.headers.set("projectId", `${idProject}`);
+  return request;
+});
+instance.interceptors.request.use((request) => {
+  console.log(idProject);
+  request.headers.set("projectId", `${idProject}`);
+  return request;
+});
+
+
+// set tokens in instance
+instance.interceptors.request.use(async (request) => {
+  const token = (await getIdToken(false)) as string;
+  request.headers.set("Authorization", `Bearer ${token}`);
+  return request;
 });
 
 API.interceptors.request.use(async (request) => {
