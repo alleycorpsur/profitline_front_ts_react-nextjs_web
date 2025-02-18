@@ -34,7 +34,6 @@ export async function POST() {
           expiresIn
         }
       );
-      console.log(COOKIE_NAME);
       const options = {
         name: COOKIE_NAME,
         value: sessionCookie,
