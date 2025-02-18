@@ -13,7 +13,7 @@ interface PaymentsTableProps {
   // eslint-disable-next-line no-unused-vars
   handleDeleteRow?: (id: number) => void;
   // eslint-disable-next-line no-unused-vars
-  handleEditRow: (row: IApplyTabRecord) => void;
+  handleEditRow: (row: IApplyTabRecord, editing_type: "invoice" | "payment" | "discount") => void;
   rowSelection: {
     selectedRowKeys: React.Key[];
     // eslint-disable-next-line no-unused-vars
@@ -89,7 +89,7 @@ const PaymentsTable: React.FC<PaymentsTableProps> = ({
                 className="buttonNoBorder"
                 onClick={() => {
                   setActiveRow(row);
-                  handleEditRow(row);
+                  handleEditRow(row, "payment");
                 }}
               >
                 Ver
