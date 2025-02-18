@@ -77,12 +77,10 @@ export const setProjectInApi = (projectId: number) => {
   idProject = projectId;
 };
 API.interceptors.request.use((request) => {
-  console.log(idProject);
   request.headers.set("projectId", `${idProject}`);
   return request;
 });
 instance.interceptors.request.use((request) => {
-  console.log(idProject);
   request.headers.set("projectId", `${idProject}`);
   return request;
 });

@@ -6,10 +6,9 @@ export async function getPermissions(token: string) {
       Authorization: `Bearer ${token}`
     }
   });
-  
+
   if (response.status === 200) {
     const data = (await response.json()) as IUserPermissions;
-    console.log(data);
     return data.data;
   }
 }

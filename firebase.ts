@@ -33,8 +33,8 @@ const app = initializeApp(firebaseConfig);
 // Initialize Firebase Authentication and get a reference to the service
 export const auth = getAuth(app);
 
-export async function customGetAuth(asd: string) {
-  const customToken = await signInWithCustomToken(auth, asd);
+export async function customGetAuth(token: string) {
+  const customToken = await signInWithCustomToken(auth, token);
   customToken.user.getIdTokenResult();
   return customToken;
 }
@@ -58,7 +58,6 @@ export const decodedClaims = async (token: string) => {
     });
   });
   claims.permissions = JSON.parse(decompressedClaims);
-  console.log(claims.permissions);
   return claims as Claims;
 };
 

@@ -20,7 +20,6 @@ export const getUserPermissions = async (): Promise<IUserPermissions> => {
       };
     }
     const decoded = await decodedClaims(token);
-    console.log(decoded);
     const response = {
       status: 200,
       message: "OK",
