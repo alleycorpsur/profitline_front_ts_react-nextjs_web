@@ -270,17 +270,9 @@ export const getDigitalRecordFormInfo = async (
   projectId: number,
   clientId: number
 ): Promise<DigitalRecordResponse> => {
-  const token = await getIdToken();
-
   try {
-    const response: AxiosResponse<DigitalRecordResponse> = await axios.get(
-      `${config.API_HOST}/client/digital-record?projectId=${projectId}&clientId=${clientId}`,
-      {
-        headers: {
-          Accept: "application/json, text/plain, */*",
-          Authorization: `Bearer ${token}`
-        }
-      }
+    const response: GenericResponse<DigitalRecordResponse> = await API.get(
+      `${config.API_HOST}/client/digital-record?projectId=${projectId}&clientId=${clientId}`
     );
 
     return response.data;
