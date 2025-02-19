@@ -56,6 +56,10 @@ export const BanksTable = ({
     }
   };
 
+  useEffect(() => {
+    setSelectedRowKeys([]);
+  }, [clearSelected]);
+
   const onSelectChange = (newSelectedRowKeys: React.Key[], newSelectedRows: ISingleBank[]) => {
     setSelectedRowKeys(newSelectedRowKeys);
     if (newSelectedRowKeys.length >= 1) {

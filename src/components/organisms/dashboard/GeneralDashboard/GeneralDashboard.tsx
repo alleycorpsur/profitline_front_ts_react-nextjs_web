@@ -1,6 +1,9 @@
 import { FC } from "react";
 import dynamic from "next/dynamic";
 
+import { useDashboardInfo } from "@/components/hooks/useDashboardInfo";
+import { useAppStore } from "@/lib/store/store";
+
 import DashboardTotalPortfolio from "@/modules/clients/components/dashboard-total-portfolio";
 import DashboardExpiredPortfolio from "@/modules/clients/components/dashboard-expired-portfolio";
 import DashboardBudget from "@/modules/clients/components/dashboard-budget";
@@ -10,10 +13,9 @@ import DashboardGenericItem from "@/modules/clients/components/dashboard-generic
 import DashboardSellsVsPayments from "@/modules/clients/components/dashboard-sells-vs-payments";
 import DashboardHistoricDso from "@/modules/clients/components/dashboard-historic-dso";
 
-import styles from "./generalDashboard.module.scss";
 import { IDataSection } from "@/types/portfolios/IPortfolios";
 
-import { useDashboardInfo } from "@/components/hooks/useDashboardInfo";
+import styles from "./generalDashboard.module.scss";
 
 const DynamicPortfoliAges = dynamic(
   () => import("../../../../modules/clients/components/dashboard-porfolio-ages"),
@@ -30,6 +32,8 @@ interface GeneralDashboardViewProps {
 }
 
 const GeneralDashboard: FC<GeneralDashboardViewProps> = ({ portfolioData }) => {
+  const formatMoney = useAppStore((state) => state.formatMoney);
+
   const {
     totalWallet,
     pastDuePortfolio,
@@ -133,7 +137,15 @@ const GeneralDashboard: FC<GeneralDashboardViewProps> = ({ portfolioData }) => {
           </div>
           <div className={styles.c}>
             <DashboardSellsVsPayments className={styles.item} chartData={sellsVsPaymentsData} />
-            <DashboardHistoricDso className={styles.item} history_dso={history_dso} />
+            <DashboardHistoricDso
+              className={`${styles.item} ${styles.historicDso}`}
+              history_dso={history_dso}
+              yAxisLabelFormatter={(value) =>
+                value > 1000000 || value < -1000000
+                  ? formatMoney(value, { hideCurrencySymbol: true, scale: 6 }) + "MM"
+                  : formatMoney(value, { hideCurrencySymbol: true })
+              }
+            />
           </div>
         </div>
       ) : null}

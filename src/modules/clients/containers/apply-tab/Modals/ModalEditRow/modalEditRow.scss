@@ -25,6 +25,12 @@
     }
 
     .EditRowTable {
+        .ant-table-cell-scrollbar {
+            display: none;
+        }
+        .ant-table-body {
+            scrollbar-width: none;
+        }
         /* row data */
         .ant-table-tbody > tr > td {
             // height: fit-content;

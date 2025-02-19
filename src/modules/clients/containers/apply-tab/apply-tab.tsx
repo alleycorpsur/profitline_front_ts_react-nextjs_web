@@ -15,7 +15,7 @@ import {
   saveApplication
 } from "@/services/applyTabClients/applyTabClients";
 import { useMessageApi } from "@/context/MessageContext";
-import { useSelectedPayments } from "@/context/SelectedPaymentsContext";
+// import { useSelectedPayments } from "@/context/SelectedPaymentsContext";
 
 import UiSearchInput from "@/components/ui/search-input/search-input";
 import InvoiceTable from "./tables/InvoiceTable";
@@ -64,7 +64,13 @@ const ApplyTab: React.FC = () => {
   );
 
   const [modalAdjustmentsState, setModalAdjustmentsState] = useState({} as IModalAdjustmentsState);
-  const [editingRow, setEditingRow] = useState<boolean>(false);
+  const [editingRow, setEditingRow] = useState<{
+    isOpen: boolean;
+    row: IApplyTabRecord | undefined;
+  }>({
+    isOpen: false,
+    row: undefined
+  });
   const [selectedRowKeys, setSelectedRowKeys] = useState<ISelectedRowKeys>({
     invoices: [],
     payments: [],
@@ -72,7 +78,7 @@ const ApplyTab: React.FC = () => {
   });
   const [selectedRows, setSelectedRows] = useState<IApplyTabRecord[]>();
 
-  const { data: applicationData, isLoading, mutate } = useApplicationTable();
+  const { data: applicationData, isLoading, mutate, isValidating } = useApplicationTable();
   const showModal = (adding_type: "invoices" | "payments") => {
     setIsModalAddToTableOpen({
       isOpen: true,
@@ -124,9 +130,11 @@ const ApplyTab: React.FC = () => {
     }
   };
 
-  const handleEditRow = (row_id: number) => {
-    console.info("Edit row", row_id);
-    setEditingRow(true);
+  const handleEditRow = (row: IApplyTabRecord) => {
+    setEditingRow({
+      isOpen: true,
+      row: row
+    });
   };
 
   const handleSelectChange = useCallback(
@@ -261,7 +269,7 @@ const ApplyTab: React.FC = () => {
           </Button>
         </Flex>
 
-        {isLoading ? (
+        {isLoading || isValidating ? (
           <Flex justify="center" align="center" style={{ height: "3rem", marginTop: "1rem" }}>
             <Spin />
           </Flex>
@@ -400,7 +408,16 @@ const ApplyTab: React.FC = () => {
           }
         }}
       />
-      <ModalEditRow visible={editingRow} onCancel={() => setEditingRow(false)} />
+      <ModalEditRow
+        visible={editingRow.isOpen}
+        row={editingRow.row}
+        onCancel={() =>
+          setEditingRow({
+            isOpen: false,
+            row: undefined
+          })
+        }
+      />
     </>
   );
 };

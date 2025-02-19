@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Flex, Spin, Typography } from "antd";
 import { Controller, useForm } from "react-hook-form";
 import { ArrowsClockwise, CaretLeft, Pencil, Plus } from "phosphor-react";
@@ -36,20 +36,8 @@ interface Props {
     id: number;
   };
   onGoBackTable: () => void;
-  setIsCreateUser: Dispatch<SetStateAction<boolean>>;
-  setIsViewDetailsUser: Dispatch<
-    SetStateAction<{
-      active: boolean;
-      id: number;
-    }>
-  >;
 }
-export const UserProjectForm = ({
-  isViewDetailsUser,
-  onGoBackTable,
-  setIsCreateUser,
-  setIsViewDetailsUser
-}: Props) => {
+export const UserProjectForm = ({ isViewDetailsUser, onGoBackTable }: Props) => {
   const { showMessage } = useMessageApi();
   const [isEditAvailable, setIsEditAvailable] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -140,7 +128,7 @@ export const UserProjectForm = ({
     if (response.status === 200 || response.status === 202) {
       const isEdit = isViewDetailsUser?.id ? "editado" : "creado";
       showMessage("success", `El usuario fue ${isEdit} exitosamente.`);
-      !isViewDetailsUser?.id && setIsCreateUser(false);
+      !isViewDetailsUser?.id && onGoBackTable();
     } else if (response.response.status === 409) {
       showMessage("error", "Este email ya esta en uso, prueba otro.");
     } else {
@@ -149,18 +137,16 @@ export const UserProjectForm = ({
     setLoading(false);
   };
   const onRemoveUser = async () =>
-    await onRemoveUserById(dataUser.data.ID, ID, showMessage, () =>
-      setIsViewDetailsUser({ active: false, id: 0 })
-    );
+    await onRemoveUserById(dataUser.data.ID, ID, showMessage, () => onGoBackTable());
   const onActiveUser = async () =>
     await onChangeStatusById(dataUser.data.ID, 1, showMessage, () => {
       setIsOpenModalStatus(initDataOpenModalStatus);
-      setIsViewDetailsUser({ active: false, id: 0 });
+      onGoBackTable();
     });
   const onInactiveUser = async () =>
     await onChangeStatusById(dataUser.data.ID, 0, showMessage, () => {
       setIsOpenModalStatus(initDataOpenModalStatus);
-      setIsViewDetailsUser({ active: false, id: 0 });
+      onGoBackTable();
     });
 
   return (

@@ -28,7 +28,7 @@ export const ModalProjectSelector = ({ isOpen, onClose }: Props) => {
     };
     setSelectedProject(projectInfo);
     if (path.startsWith("/proyectos/review")) {
-      router.push(`/proyectos/review/${project.ID}`);
+      router.push(`/proyectos/review/${project.ID}/detail`);
     } else if (path.startsWith("/clientes/all")) {
       // do nothing
     } else {

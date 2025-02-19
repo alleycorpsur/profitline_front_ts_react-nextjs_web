@@ -14,6 +14,7 @@ import {
   Iattachments
 } from "@/types/communications/ICommunications";
 import { GenericResponse } from "@/types/global/IGlobal";
+import { IFormEmailNotification } from "@/components/molecules/modals/ModalSendEmail/ModalSendEmail";
 
 interface IGetSelect {
   id: number;
@@ -116,14 +117,14 @@ export const createCommunication = async ({
   const sendToRoles = data.template.send_to
     .filter((role) => {
       const isRole = role.value.split("_")[0];
-      return isRole !== "0";
+      return isRole === "1";
     })
     .map((role) => Number(role.value.split("_")[1]));
   const copyToRoles =
     data.template.copy_to
       ?.filter((role) => {
         const isRole = role.value.split("_")[0];
-        return isRole !== "0";
+        return isRole === "1";
       })
       .map((role) => Number(role.value.split("_")[1])) || [];
   const roles_ids = [...sendToRoles, ...copyToRoles];
@@ -142,6 +143,13 @@ export const createCommunication = async ({
       })
       .map((role) => Number(role.value.split("_")[1])) || [];
   const contact_positions_ids = [...sendToContactPositions, ...copyToContactPositions];
+
+  const sendTo_other_emails = data.template.send_to
+    .map((email) => email.value)
+    .filter((email) => email.length >= 6);
+  const other_emails_copy =
+    data.template.copy_to?.map((email) => email.value).filter((email) => email.length >= 6) || [];
+  const other_emails = [...sendTo_other_emails, ...other_emails_copy];
 
   const jsonFreq = {
     start_date: selectedPeriodicity?.init_date?.format("YYYY-MM-DD") || "",
@@ -167,6 +175,7 @@ export const createCommunication = async ({
     via: data.template.via.value.toLowerCase(),
     user_roles: roles_ids,
     contact_roles: contact_positions_ids,
+    other_mails: other_emails,
     client_group_ids: assignedGroups,
     comunication_type: data.trigger.type,
     // Frequency-specific properties (optional)
@@ -200,6 +209,46 @@ export const createCommunication = async ({
   } catch (error) {
     console.error("Error creating communication", error);
     showMessage("error", "Ocurrió un error al crear la comunicación");
+    throw error;
+  }
+};
+
+export const sendEmailNotification = async (data: IFormEmailNotification) => {
+  const token = await getIdToken();
+
+  const modelData = {
+    subject: data.subject,
+    body: data.body,
+    to: data.forward_to.map((email) => email.value),
+    copy: data.copy_to?.map((email) => email.value),
+    files: data.attachments
+  };
+
+  const formData = new FormData();
+
+  // for each of the keys in the data object, append the key and value to the formData object
+  Object.entries(modelData).forEach(([key, value]) => {
+    if (key === "files" && Array.isArray(value)) {
+      value.forEach((file) => formData.append("files", file));
+    } else if (value !== undefined && value !== null && value !== "") {
+      formData.append(key, typeof value === "string" ? value : JSON.stringify(value));
+    }
+  });
+
+  try {
+    const response: GenericResponse<{ id: number }> = await axios.post(
+      `${config.API_HOST}/comunication/email`,
+      formData,
+      {
+        headers: {
+          Accept: "application/json, text/plain, */*",
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+    return response;
+  } catch (error) {
+    console.error("Error sending email notification", error);
     throw error;
   }
 };

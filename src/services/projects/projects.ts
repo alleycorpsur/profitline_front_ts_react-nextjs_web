@@ -1,6 +1,6 @@
 import axios from "axios";
 
-import { getIdToken } from "@/utils/api/api";
+import { API, getIdToken } from "@/utils/api/api";
 import config from "@/config";
 
 import {
@@ -9,6 +9,8 @@ import {
   IUpdateProjectData
 } from "@/types/projects/ICreateProject";
 import { IFormProject } from "@/types/projects/IFormProject";
+import { GenericResponse } from "@/types/global/IGlobal";
+import { IProject } from "@/types/projects/IProject";
 
 export const addProject = async (data: IFormProject): Promise<ICreateProject> => {
   const token = await getIdToken();
@@ -37,9 +39,10 @@ export const addProject = async (data: IFormProject): Promise<ICreateProject> =>
     name: data.general.name,
     position_contact: data.contact.position_contact,
     day_flag: billingPeriod.day_flag,
-    day: billingPeriod.day_flag === 'true' ? billingPeriod.day : undefined,
-    order: billingPeriod.day_flag === 'true' ? undefined : billingPeriod.order.toLowerCase(),
-    day_of_week: billingPeriod.day_flag === 'true' ? undefined : billingPeriod.day_of_week.toLowerCase()
+    day: billingPeriod.day_flag === "true" ? billingPeriod.day : undefined,
+    order: billingPeriod.day_flag === "true" ? undefined : billingPeriod.order.toLowerCase(),
+    day_of_week:
+      billingPeriod.day_flag === "true" ? undefined : billingPeriod.day_of_week.toLowerCase()
   };
   const formData = new FormData();
   formData.append("logo", finalData.logo);
@@ -210,5 +213,15 @@ export const desactiveProject = async (id: string): Promise<ICreateProject> => {
   } catch (error) {
     console.warn("error desactivating project: ", error);
     return error as any;
+  }
+};
+
+export const getProjectDetails = async (id: string) => {
+  try {
+    const response: GenericResponse<IProject[]> = await API.get(`${config.API_HOST}/project/${id}`);
+    return response.data[0];
+  } catch (error) {
+    console.warn("error getting project: ", error);
+    throw error;
   }
 };

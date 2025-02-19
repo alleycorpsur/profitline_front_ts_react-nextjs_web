@@ -13,7 +13,7 @@ interface InvoiceTableProps {
   // eslint-disable-next-line no-unused-vars
   handleDeleteRow?: (id: number) => void;
   // eslint-disable-next-line no-unused-vars
-  handleEditRow: (row_id: number) => void;
+  handleEditRow: (row: IApplyTabRecord) => void;
   // eslint-disable-next-line no-unused-vars
   rowSelection: {
     selectedRowKeys: React.Key[];
@@ -53,9 +53,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
       title: "Monto",
       dataIndex: "initial_value",
       key: "initial_value",
-      render: (initial_value) => (
-        <p className="fontMonoSpace">{formatMoney(initial_value, { scale: 1 })}</p>
-      ),
+      render: (initial_value) => <p className="fontMonoSpace">{formatMoney(initial_value)}</p>,
       sorter: (a, b) => a.initial_value - b.initial_value,
       showSorterTooltip: false,
       align: "right"
@@ -64,7 +62,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
       title: "Pago",
       dataIndex: "amount",
       key: "amount",
-      render: (amount) => <p className="fontMonoSpace">{formatMoney(amount)}</p>,
+      render: () => <p className="fontMonoSpace">{formatMoney(0)}</p>,
       sorter: (a, b) => a.amount - b.amount,
       showSorterTooltip: false,
       align: "right"
@@ -82,10 +80,10 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
     },
     {
       title: "Saldo",
-      dataIndex: "current_value",
-      key: "current_value",
-      render: (current_value) => <p className="fontMonoSpace">{formatMoney(current_value)}</p>,
-      sorter: (a, b) => a.current_value - b.current_value,
+      dataIndex: "amount",
+      key: "amount",
+      render: (amount) => <p className="fontMonoSpace">{formatMoney(amount)}</p>,
+      sorter: (a, b) => a.amount - b.amount,
       showSorterTooltip: false,
       align: "right"
     },
@@ -102,7 +100,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                 className="buttonNoBorder"
                 onClick={() => {
                   setActiveRow(row);
-                  handleEditRow(row.id);
+                  handleEditRow(row);
                 }}
               >
                 Ver
