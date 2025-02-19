@@ -2,7 +2,6 @@
 import { useState } from "react";
 import { Flex, Spin } from "antd";
 import { useParams } from "next/navigation";
-import { extractSingleParam } from "@/utils/utils";
 import UiSearchInput from "@/components/ui/search-input";
 import UiFilterDropdown from "@/components/ui/ui-filter-dropdown";
 import Container from "@/components/atoms/Container/Container";

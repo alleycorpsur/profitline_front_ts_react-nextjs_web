@@ -236,6 +236,7 @@ const SendEmailModal: React.FC<SendEmailModalProps> = ({ visible, onClose }) => 
           showMinimize={true}
           showMaximize={true}
           showRestore={true}
+          title="Correo electrónico"
         />
       </div>
     );
@@ -267,6 +268,7 @@ const SendEmailModal: React.FC<SendEmailModalProps> = ({ visible, onClose }) => 
               showMinimize={true}
               showMaximize={viewMode !== "maximized"}
               showRestore={viewMode !== "default"}
+              title="Correo electrónico"
             />
             {node}
           </div>

@@ -1,5 +1,6 @@
 @import "@styles/variables.scss";
-.multiSelect {
+.customSelect {
+    position: relative;
     .label {
         padding: 10px 12px;
         background-color: #f7f7f7;

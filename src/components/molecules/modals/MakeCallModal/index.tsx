@@ -17,18 +17,15 @@ import { stateToHTML } from "draft-js-export-html";
 import "draft-js/dist/Draft.css";
 import createToolbarPlugin from "draft-js-static-toolbar-plugin";
 import "draft-js-static-toolbar-plugin/lib/plugin.css";
-
 import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
-
 import { LineVertical, TextB } from "@phosphor-icons/react";
-
 import { EmailData } from "@/types/sendEmail";
 import { Header } from "../SendEmailModal/components/Header";
-import MultiSelect from "../SendEmailModal/components/MultiSelect";
 import AttachmentList from "../SendEmailModal/components/AttachmentList";
 import { CustomButton } from "../SendEmailModal/components/CustomButton";
 import { PhonecallData, UserPhoneOption } from "@/types/makeCall";
 import { phoneSuggestions } from "./mocked-data";
+import CustomSelect from "./components/CustomSelect";
 
 interface MakeCallModalProps {
   visible: boolean;
@@ -45,11 +42,12 @@ const MakeCallModal: React.FC<MakeCallModalProps> = ({ visible, onClose }) => {
   const [phoneCallData, setPhoneCallData] = useState<PhonecallData>({
     call_to: "",
     body: "",
-    state: "",
+    state: undefined,
     attachments: []
   });
 
-  const [recipients, setRecipients] = useState<UserPhoneOption[]>([]);
+  const [userToCall, setUserToCall] = useState<UserPhoneOption | null>(null);
+  const [callInProgress, setCallInProgress] = useState(false);
   const [textAlignment, setTextAlignment] = useState<"left" | "center" | "right">("left");
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [editorState, setEditorState] = useState<EditorState>(EditorState.createEmpty());
@@ -137,14 +135,32 @@ const MakeCallModal: React.FC<MakeCallModalProps> = ({ visible, onClose }) => {
     return html.replace(/<p(.*?)>/g, `<p$1 style="text-align: ${alignment};">`);
   };
 
+  const makeCall = async () => {
+    setCallInProgress(true);
+    console.log("LLAMANDO");
+    //await makeCallService(phoneCallData);
+    setCallInProgress(false);
+  };
+  const phoneCallStateLabel = (state: string) => {
+    switch (state) {
+      case "NO_ANSWER":
+        return "No contestó";
+      case "WRONG_PHONE":
+        return "Teléfono equivocado";
+      case "CALL_BACK_LATER":
+        return "Llamar luego";
+      case "SUCCESS":
+        return "Llamada exitosa";
+      default:
+        return "Estado de la llamada";
+    }
+  };
+
   const submit = async () => {
     setLoadingSubmit(true);
     const alignedHTML = applyAlignment(getHTML(), textAlignment);
     const createEmailData = {
-      forward_to: recipients.map((recipient) => ({
-        value: recipient.phone,
-        label: recipient.name
-      })),
+      forward_to: userToCall,
       body: alignedHTML,
       attachments: phoneCallData.attachments
     };
@@ -179,7 +195,7 @@ const MakeCallModal: React.FC<MakeCallModalProps> = ({ visible, onClose }) => {
       toolbar: styles.customToolbar
     }
   };
-
+  console.log("phoneCallData", phoneCallData);
   const [{ plugins, Toolbar }] = useState(() => {
     const toolbarPlugin = createToolbarPlugin({
       theme: customTheme
@@ -254,6 +270,7 @@ const MakeCallModal: React.FC<MakeCallModalProps> = ({ visible, onClose }) => {
           showMinimize={true}
           showMaximize={true}
           showRestore={true}
+          title="Llamada"
         />
       </div>
     );
@@ -285,6 +302,7 @@ const MakeCallModal: React.FC<MakeCallModalProps> = ({ visible, onClose }) => {
               showMinimize={true}
               showMaximize={viewMode !== "maximized"}
               showRestore={viewMode !== "default"}
+              title="Llamada"
             />
             {node}
           </div>
@@ -294,11 +312,12 @@ const MakeCallModal: React.FC<MakeCallModalProps> = ({ visible, onClose }) => {
         mask={mask}
       >
         <Flex vertical gap={20} className={styles.container}>
-          <MultiSelect
+          <CustomSelect
             label="Llamar a"
-            value={recipients}
-            onChange={setRecipients}
+            value={userToCall}
+            onChange={setUserToCall}
             options={phoneSuggestions}
+            onClickIcon={makeCall}
           />
           <div className={styles.textArea} style={{ minHeight: 110 }}>
             <Editor
@@ -381,7 +400,10 @@ const MakeCallModal: React.FC<MakeCallModalProps> = ({ visible, onClose }) => {
                   )}
                 >
                   <Button style={{ border: "none", fontSize: 16, fontWeight: 600 }}>
-                    Estado de la llamada <DownOutlined />
+                    {phoneCallData.state
+                      ? phoneCallStateLabel(phoneCallData.state)
+                      : "Estado de la llamada"}{" "}
+                    <DownOutlined />
                   </Button>
                 </Dropdown>
               </Flex>
@@ -391,7 +413,7 @@ const MakeCallModal: React.FC<MakeCallModalProps> = ({ visible, onClose }) => {
           <Flex>
             <PrincipalButton
               onClick={submit}
-              disabled={!recipients.length || !phoneCallData.body || !hasContent()}
+              disabled={!userToCall || !phoneCallData.body || !hasContent()}
               customStyles={{ width: 200, height: 48 }}
               loading={loadingSubmit}
             >

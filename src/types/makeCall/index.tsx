@@ -1,7 +1,7 @@
 export interface PhonecallData {
   call_to: string;
   body: string;
-  state: string;
+  state: string | undefined;
   attachments: File[];
 }
 

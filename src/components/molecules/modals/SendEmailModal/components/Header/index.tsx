@@ -10,6 +10,7 @@ export interface HeaderProps {
   showMinimize: boolean;
   showMaximize: boolean;
   showRestore: boolean;
+  title: string;
 }
 
 export const Header = ({
@@ -19,7 +20,8 @@ export const Header = ({
   onClose,
   showMinimize,
   showMaximize,
-  showRestore
+  showRestore,
+  title
 }: HeaderProps) => {
   const handleMaximize = () => {
     setViewMode("maximized");
@@ -43,7 +45,7 @@ export const Header = ({
     <div className={styles.modalHeader}>
       <Flex gap={8}>
         <CaretDown color="#ffffff" size={20} />
-        <span>Correo electrónico</span>
+        <span>{title}</span>
       </Flex>
       <Flex gap={8}>
         {showMinimize && (
