@@ -271,11 +271,11 @@ export const getDigitalRecordFormInfo = async (
   clientId: number
 ): Promise<DigitalRecordResponse> => {
   try {
-    const response: GenericResponse<DigitalRecordResponse> = await API.get(
+    const response: DigitalRecordResponse = await API.get(
       `${config.API_HOST}/client/digital-record?projectId=${projectId}&clientId=${clientId}`
     );
 
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Error getting digital record form info", error);
     throw error;
