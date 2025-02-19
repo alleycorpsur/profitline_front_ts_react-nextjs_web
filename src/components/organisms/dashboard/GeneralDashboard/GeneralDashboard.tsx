@@ -62,7 +62,6 @@ const GeneralDashboard: FC<GeneralDashboardViewProps> = ({ portfolioData }) => {
     sellsVsPaymentsData,
     history_dso
   } = useDashboardInfo(portfolioData.data);
-  console.log("history  DSO", history_dso);
 
   return (
     <>
