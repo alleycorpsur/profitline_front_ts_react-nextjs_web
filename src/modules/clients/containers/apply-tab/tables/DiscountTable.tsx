@@ -13,7 +13,7 @@ interface DiscountTableProps {
   // eslint-disable-next-line no-unused-vars
   handleDeleteRow?: (id: number) => void;
   // eslint-disable-next-line no-unused-vars
-  handleEditRow: (row_id: number) => void;
+  handleEditRow: (row: IApplyTabRecord) => void;
   rowSelection: {
     selectedRowKeys: React.Key[];
     // eslint-disable-next-line no-unused-vars
@@ -94,11 +94,7 @@ const DiscountTable: React.FC<DiscountTableProps> = ({
               <Button
                 icon={<Eye size={20} />}
                 className="buttonNoBorder"
-                onClick={() =>
-                  row.financial_discount_id &&
-                  handleEditRow &&
-                  handleEditRow(row.financial_discount_id)
-                }
+                onClick={() => row.financial_discount_id && handleEditRow && handleEditRow(row)}
               >
                 Ver
               </Button>

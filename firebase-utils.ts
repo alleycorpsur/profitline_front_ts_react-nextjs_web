@@ -65,9 +65,10 @@ const getAuth = async (
             Authorization: `Bearer ${token}`,
             tokenExm: `${JSON.stringify(userCred)}`
           }
-        }).then((response) => {
+        }).then(async (response) => {
+          const data = await response.json();
           if (response.status === 200) {
-            localStorage.setItem(STORAGE_TOKEN, token);
+            localStorage.setItem(STORAGE_TOKEN, data.data.token);
             router.push("/clientes/all");
           }
         });
@@ -84,7 +85,7 @@ const getAuth = async (
   }
 };
 
-const logOut = (router: AppRouterInstance) => {
+const logOut = (router?: AppRouterInstance) => {
   window.location.href = "/auth/login";
   signOut(auth);
   localStorage.removeItem(STORAGE_TOKEN);

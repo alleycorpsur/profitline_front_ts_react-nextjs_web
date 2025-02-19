@@ -64,7 +64,13 @@ const ApplyTab: React.FC = () => {
   );
 
   const [modalAdjustmentsState, setModalAdjustmentsState] = useState({} as IModalAdjustmentsState);
-  const [editingRow, setEditingRow] = useState<boolean>(false);
+  const [editingRow, setEditingRow] = useState<{
+    isOpen: boolean;
+    row: IApplyTabRecord | undefined;
+  }>({
+    isOpen: false,
+    row: undefined
+  });
   const [selectedRowKeys, setSelectedRowKeys] = useState<ISelectedRowKeys>({
     invoices: [],
     payments: [],
@@ -124,9 +130,11 @@ const ApplyTab: React.FC = () => {
     }
   };
 
-  const handleEditRow = (row_id: number) => {
-    console.info("Edit row", row_id);
-    setEditingRow(true);
+  const handleEditRow = (row: IApplyTabRecord) => {
+    setEditingRow({
+      isOpen: true,
+      row: row
+    });
   };
 
   const handleSelectChange = useCallback(
@@ -400,7 +408,16 @@ const ApplyTab: React.FC = () => {
           }
         }}
       />
-      <ModalEditRow visible={editingRow} onCancel={() => setEditingRow(false)} />
+      <ModalEditRow
+        visible={editingRow.isOpen}
+        row={editingRow.row}
+        onCancel={() =>
+          setEditingRow({
+            isOpen: false,
+            row: undefined
+          })
+        }
+      />
     </>
   );
 };
