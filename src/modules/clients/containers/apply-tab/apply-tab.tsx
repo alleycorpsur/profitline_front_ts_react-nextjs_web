@@ -339,7 +339,6 @@ const ApplyTab: React.FC = () => {
                     <DiscountTable
                       data={section.itemsList}
                       handleDeleteRow={handleRemoveRow}
-                      handleEditRow={handleEditRow}
                       rowSelection={rowSelection("discounts")}
                     />
                   )}

@@ -13,7 +13,6 @@ interface DiscountTableProps {
   // eslint-disable-next-line no-unused-vars
   handleDeleteRow?: (id: number) => void;
   // eslint-disable-next-line no-unused-vars
-  handleEditRow: (row: IApplyTabRecord, editing_type: "invoice" | "payment" | "discount") => void;
   rowSelection: {
     selectedRowKeys: React.Key[];
     // eslint-disable-next-line no-unused-vars
@@ -21,12 +20,7 @@ interface DiscountTableProps {
   };
 }
 
-const DiscountTable: React.FC<DiscountTableProps> = ({
-  data,
-  handleDeleteRow,
-  handleEditRow,
-  rowSelection
-}) => {
+const DiscountTable: React.FC<DiscountTableProps> = ({ data, handleDeleteRow, rowSelection }) => {
   const formatMoney = useAppStore((state) => state.formatMoney);
   const [activeRow, setActiveRow] = useState<IApplyTabRecord | null>(null);
   const [removeModal, setRemoveModal] = useState(false);
@@ -88,20 +82,6 @@ const DiscountTable: React.FC<DiscountTableProps> = ({
       width: 76,
       render: (_, row) => {
         const items = [
-          {
-            key: "1",
-            label: (
-              <Button
-                icon={<Eye size={20} />}
-                className="buttonNoBorder"
-                onClick={() =>
-                  row.financial_discount_id && handleEditRow && handleEditRow(row, "discount")
-                }
-              >
-                Ver
-              </Button>
-            )
-          },
           {
             key: "2",
             label: (
