@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 import { Button, Flex, Modal, Spin, Table, TableProps } from "antd";
 import { PencilLine, Plus, Trash } from "phosphor-react";
 import { useForm } from "react-hook-form";
 
 import { useAppStore } from "@/lib/store/store";
+import { useMessageApi } from "@/context/MessageContext";
+import { extractSingleParam } from "@/utils/utils";
+import { updateInvoiceOrPaymentAmount } from "@/services/applyTabClients/applyTabClients";
 
 import useScreenHeight from "@/components/hooks/useScreenHeight";
 import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
@@ -25,14 +29,20 @@ interface IFormValues {
 }
 interface IModalEditRowProps {
   visible: boolean;
-  onCancel: () => void;
+  // eslint-disable-next-line no-unused-vars
+  onCancel: (succesfullyApplied?: Boolean) => void;
   row?: IApplyTabRecord;
   editing_type?: "invoice" | "payment" | "discount";
 }
 
 const ModalEditRow: React.FC<IModalEditRowProps> = ({ visible, onCancel, row, editing_type }) => {
-  const height = useScreenHeight();
+  const { ID: projectId } = useAppStore((state) => state.selectedProject);
+  const params = useParams();
+  const clientId = Number(extractSingleParam(params.clientId)) || 0;
   const formatMoney = useAppStore((state) => state.formatMoney);
+  const height = useScreenHeight();
+  const { showMessage } = useMessageApi();
+
   const [isEditing, setIsEditing] = useState(false);
   const {
     control,
@@ -40,6 +50,7 @@ const ModalEditRow: React.FC<IModalEditRowProps> = ({ visible, onCancel, row, ed
     handleSubmit,
     reset
   } = useForm<IFormValues>();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     return () => {
@@ -106,7 +117,11 @@ const ModalEditRow: React.FC<IModalEditRowProps> = ({ visible, onCancel, row, ed
   };
 
   // Function to determine the title based on editing_type and row data
-  const getModalTitle = (type: IModalEditRowProps["editing_type"], rowData?: IApplyTabRecord) => {
+  const getModalTitle = (
+    type: IModalEditRowProps["editing_type"],
+    rowData?: IApplyTabRecord,
+    onlyTitle?: Boolean
+  ) => {
     let title = "";
     let id = "";
 
@@ -127,22 +142,61 @@ const ModalEditRow: React.FC<IModalEditRowProps> = ({ visible, onCancel, row, ed
         title = "Factura";
         id = "N/A";
     }
+    if (onlyTitle) return title;
     return `${title} ${id}`;
   };
 
-  const handleSaveChanges = (adjustmentsData: IFormValues) => {
-    // Merge form input (amount) with original row data (id and adjustment name)
-    const formattedData = row?.adjustments?.map((adjustment, index) => ({
-      id: adjustment.adjustment_id,
-      adjustment: adjustment.description,
-      amount: adjustmentsData.adjustments[index]?.amount
-    }));
+  const handleSaveChanges = async (adjustmentsData: IFormValues) => {
+    setLoading(true);
+    try {
+      // Update invoice or payment amount as the first "adjustment" is the invoice or payment amount itself
+      const res = await updateInvoiceOrPaymentAmount(
+        projectId,
+        clientId,
+        row?.id ?? 0,
+        adjustmentsData.adjustments[0].amount
+      );
+      console.log("res", res);
+      showMessage("success", "Cambios guardados correctamente");
+      onCancel(true);
+    } catch (error) {
+      showMessage("error", "Error al guardar los cambios");
+    }
 
-    console.info("Final Adjustments Data:", formattedData);
+    // Merge form input (amount) with original row data (id and adjustment name)
+    // Below is an example of how to merge the form data with the original row data for the adjustments if needed
+    // const formattedData = row?.adjustments?.map((adjustment, index) => ({
+    //   id: adjustment.adjustment_id,
+    //   adjustment: adjustment.description,
+    //   amount: adjustmentsData.adjustments[index]?.amount
+    // }));
+
+    setLoading(false);
   };
 
+  const adjustmentsArray: IApplicationTabRow[] =
+    row?.adjustments?.map((adjustment) => ({
+      id: adjustment.adjustment_id,
+      adjustment: adjustment.description,
+      amount: adjustment.amount
+    })) ?? [];
+
+  const facturaObject: IApplicationTabRow = {
+    id: row?.id ?? 0,
+    adjustment: getModalTitle(editing_type, row, true),
+    amount: row?.amount ?? 0
+  };
+
+  adjustmentsArray.unshift(facturaObject);
+
   return (
-    <Modal open={visible} onCancel={onCancel} footer={null} width={650} className="modalEditRow">
+    <Modal
+      open={visible}
+      onCancel={() => onCancel()}
+      footer={null}
+      width={650}
+      className="modalEditRow"
+    >
       <div className="header">
         <h2>{getModalTitle(editing_type, row)}</h2>
         <Button
@@ -162,13 +216,7 @@ const ModalEditRow: React.FC<IModalEditRowProps> = ({ visible, onCancel, row, ed
         <Table
           className="EditRowTable"
           columns={columns}
-          dataSource={row?.adjustments?.map((adjustment) => {
-            return {
-              id: adjustment.adjustment_id,
-              adjustment: adjustment.description,
-              amount: adjustment.amount
-            };
-          })}
+          dataSource={adjustmentsArray}
           pagination={false}
           rowClassName="TestRow"
           bordered
@@ -183,10 +231,15 @@ const ModalEditRow: React.FC<IModalEditRowProps> = ({ visible, onCancel, row, ed
       </div>
 
       <div className="modal-footer">
-        <SecondaryButton fullWidth onClick={onCancel}>
+        <SecondaryButton fullWidth onClick={() => onCancel()}>
           Cancelar
         </SecondaryButton>
-        <PrincipalButton disabled={!isEditing} fullWidth onClick={handleSubmit(handleSaveChanges)}>
+        <PrincipalButton
+          disabled={!isEditing}
+          fullWidth
+          loading={loading}
+          onClick={handleSubmit(handleSaveChanges)}
+        >
           Guardar cambios
         </PrincipalButton>
       </div>

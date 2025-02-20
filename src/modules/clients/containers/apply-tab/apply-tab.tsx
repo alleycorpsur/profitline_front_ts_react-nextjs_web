@@ -419,12 +419,13 @@ const ApplyTab: React.FC = () => {
         visible={editingRow.isOpen}
         row={editingRow.row}
         editing_type={editingRow.editing_type}
-        onCancel={() =>
+        onCancel={(succesfullyApplied) => {
           setEditingRow({
             isOpen: false,
             row: undefined
-          })
-        }
+          });
+          if (succesfullyApplied) mutate();
+        }}
       />
     </>
   );
