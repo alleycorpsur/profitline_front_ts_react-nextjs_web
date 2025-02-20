@@ -33,7 +33,7 @@ export const DetailsProjectView = () => {
       const response = await updateProject(finalData, projectId, data?.UUID || "");
       if (response.status === SUCCESS) {
         showMessage("success", "El proyecto fue editado exitosamente.");
-        // window.location.reload();
+        window.location.reload();
       }
       setIsEditProject(false);
     } catch (error) {

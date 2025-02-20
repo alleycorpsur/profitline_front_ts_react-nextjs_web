@@ -130,8 +130,6 @@ export const updateProject = async (
       billingPeriod.day_flag === "true" ? undefined : billingPeriod.day_of_week.toLowerCase()
   };
 
-  console.log("LOGO DATA: ", finalData.logo);
-
   const formData = new FormData();
   formData.append("id", id);
   formData.append("uuid", UUID);
@@ -165,16 +163,9 @@ export const updateProject = async (
     formData.append("day_of_week", finalData.day_of_week);
   }
 
-  // print only the logo key in the formdata
-  console.log("logo inform ", formData.get("logo"));
-
   try {
-    const response: ICreateProject = await API.put(`${config.API_HOST}/project`, formData, {
-      headers: {
-        Accept: "application/json, text/plain, */*",
-        "Content-Type": "multipart/form-data"
-      }
-    });
+    const response: ICreateProject = await API.put(`${config.API_HOST}/project`, formData);
+
     return response;
   } catch (error) {
     console.warn("error updating project: ", error);
