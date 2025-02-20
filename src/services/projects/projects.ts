@@ -76,7 +76,7 @@ export const addProject = async (data: IFormProject): Promise<ICreateProject> =>
   }
 
   try {
-    const response: ICreateProject = await axios.post(`${config.API_HOST}/project`, formData, {
+    const response: ICreateProject = await API.post(`${config.API_HOST}/project`, formData, {
       headers: {
         Accept: "application/json, text/plain, */*",
         "Content-Type": "multipart/form-data",
@@ -95,7 +95,6 @@ export const updateProject = async (
   id: string,
   UUID: string
 ): Promise<ICreateProject> => {
-  const token = await getIdToken();
   const currenciesFinal = data.general.currencies.map((currency) => ({
     id: currency.value,
     currency_name: currency.label
@@ -131,6 +130,8 @@ export const updateProject = async (
       billingPeriod.day_flag === "true" ? undefined : billingPeriod.day_of_week.toLowerCase()
   };
 
+  console.log("LOGO DATA: ", finalData.logo);
+
   const formData = new FormData();
   formData.append("id", id);
   formData.append("uuid", UUID);
@@ -164,17 +165,19 @@ export const updateProject = async (
     formData.append("day_of_week", finalData.day_of_week);
   }
 
+  // print only the logo key in the formdata
+  console.log("logo inform ", formData.get("logo"));
+
   try {
-    const response: ICreateProject = await axios.put(`${config.API_HOST}/project`, formData, {
+    const response: ICreateProject = await API.put(`${config.API_HOST}/project`, formData, {
       headers: {
         Accept: "application/json, text/plain, */*",
-        "Content-Type": "multipart/form-data",
-        Authorization: `Bearer ${token}`
+        "Content-Type": "multipart/form-data"
       }
     });
     return response;
   } catch (error) {
-    console.warn("eRROR updating project: ", error);
+    console.warn("error updating project: ", error);
     return error as any;
   }
 };
