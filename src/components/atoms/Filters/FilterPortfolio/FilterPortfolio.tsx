@@ -78,7 +78,7 @@ export const FilterPortfolio = ({ setSelectedFilters }: Props) => {
     if (targetOption.value === "Grupo de Cliente" && clientGroups.length === 0) {
       try {
         const response = await getClientGroups(ID);
-        const clientGroupsData = response.data as IClientsGroupsFull;
+        const clientGroupsData = response as IClientsGroupsFull;
         const clientGroupsToShow: Option[] = clientGroupsData.data.map((group) => ({
           label: group.group_name,
           value: group.id.toString()
