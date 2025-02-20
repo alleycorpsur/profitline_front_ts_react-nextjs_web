@@ -150,13 +150,12 @@ const ModalEditRow: React.FC<IModalEditRowProps> = ({ visible, onCancel, row, ed
     setLoading(true);
     try {
       // Update invoice or payment amount as the first "adjustment" is the invoice or payment amount itself
-      const res = await updateInvoiceOrPaymentAmount(
+      await updateInvoiceOrPaymentAmount(
         projectId,
         clientId,
         row?.id ?? 0,
         adjustmentsData.adjustments[0].amount
       );
-      console.log("res", res);
       showMessage("success", "Cambios guardados correctamente");
       onCancel(true);
     } catch (error) {
