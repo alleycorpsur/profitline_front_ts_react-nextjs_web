@@ -180,3 +180,24 @@ export const getApplicationAdjustments = async (project_id: number, client_id: s
     throw error;
   }
 };
+
+export const updateInvoiceOrPaymentAmount = async (
+  project_id: number,
+  client_id: number,
+  application_id: number,
+  amount: number
+) => {
+  try {
+    const response: GenericResponse<{ applications: number[] }> = await API.put(
+      `${config.API_HOST}/paymentApplication/project/${project_id}/client/${client_id}/application/${application_id}`,
+      {
+        amount
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("error updateInvoiceOrPaymentAmount", error);
+    throw error;
+  }
+};
