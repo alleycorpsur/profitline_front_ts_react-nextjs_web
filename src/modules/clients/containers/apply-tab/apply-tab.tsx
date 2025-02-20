@@ -244,6 +244,25 @@ const ApplyTab: React.FC = () => {
     return [invoices, payments, discounts];
   }, [filteredData]);
 
+  const handleCreateAdjustment = (openedRow: IApplyTabRecord) => {
+    //close modal edit row
+    setEditingRow({
+      isOpen: false,
+      row: undefined
+    });
+
+    //open modal list adjustments as by invoice
+    setModalAdjustmentsState({
+      isOpen: true,
+      modal: 2,
+      adjustmentType: "byInvoice"
+    });
+
+    // set selected rows to the opened row
+    setSelectedRows([openedRow]);
+    handleSelectChange("invoices", [openedRow.id]);
+  };
+
   return (
     <>
       <ModalResultAppy
@@ -425,6 +444,7 @@ const ApplyTab: React.FC = () => {
           });
           if (succesfullyApplied) mutate();
         }}
+        handleCreateAdjustment={handleCreateAdjustment}
       />
     </>
   );

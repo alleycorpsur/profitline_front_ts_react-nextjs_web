@@ -33,9 +33,17 @@ interface IModalEditRowProps {
   onCancel: (succesfullyApplied?: Boolean) => void;
   row?: IApplyTabRecord;
   editing_type?: "invoice" | "payment" | "discount";
+  // eslint-disable-next-line no-unused-vars
+  handleCreateAdjustment?: (openedRow: IApplyTabRecord) => void;
 }
 
-const ModalEditRow: React.FC<IModalEditRowProps> = ({ visible, onCancel, row, editing_type }) => {
+const ModalEditRow: React.FC<IModalEditRowProps> = ({
+  visible,
+  onCancel,
+  row,
+  editing_type,
+  handleCreateAdjustment
+}) => {
   const { ID: projectId } = useAppStore((state) => state.selectedProject);
   const params = useParams();
   const clientId = Number(extractSingleParam(params.clientId)) || 0;
@@ -222,12 +230,18 @@ const ModalEditRow: React.FC<IModalEditRowProps> = ({ visible, onCancel, row, ed
           scroll={{ y: height - 400, x: 100 }}
         />
       )}
-      <div className="create-adjustment">
-        <button className="create-adjustment-btn">
-          <Plus size={20} />
-          Agregar ajuste
-        </button>
-      </div>
+
+      {editing_type === "invoice" && (
+        <div className="create-adjustment">
+          <button
+            className="create-adjustment-btn"
+            onClick={() => row && handleCreateAdjustment && handleCreateAdjustment(row)}
+          >
+            <Plus size={20} />
+            Agregar ajuste
+          </button>
+        </div>
+      )}
 
       <div className="modal-footer">
         <SecondaryButton fullWidth onClick={() => onCancel()}>
