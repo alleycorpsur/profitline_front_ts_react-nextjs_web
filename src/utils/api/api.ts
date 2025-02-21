@@ -17,7 +17,7 @@ export async function getIdToken(forceRefresh?: boolean) {
   }
 }
 
-let idProject: number | null = null;
+export let idProject: number | null = null;
 
 const instance = axios.create({
   baseURL: config.API_HOST,
