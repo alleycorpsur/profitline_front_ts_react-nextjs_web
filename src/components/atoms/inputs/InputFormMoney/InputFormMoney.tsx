@@ -1,6 +1,7 @@
 import { Flex, Input, Typography } from "antd";
 import { Control, Controller, FieldError, RegisterOptions } from "react-hook-form";
 import "./inputFormMoney.scss";
+import { useAppStore } from "@/lib/store/store";
 
 interface Props {
   titleInput?: string;
@@ -35,6 +36,8 @@ export const InputFormMoney = ({
   defaultValue,
   changeInterceptor
 }: Props) => {
+  const formatMoney = useAppStore((state) => state.formatMoney);
+
   const formatNumber = (value: string | number): string => {
     if (!value) return "";
 
@@ -51,7 +54,7 @@ export const InputFormMoney = ({
   };
 
   const parseNumber = (value: string): string => {
-    return value.replace(/\./g, "");
+    return value.replace(/\./g, "").replace(/,/g, ".");
   };
 
   return (
@@ -72,10 +75,15 @@ export const InputFormMoney = ({
             readOnly={readOnly}
             className={!error ? `inputForm ${readOnly ? "-readOnly" : ""}` : "inputFormError"}
             placeholder={placeholder?.length > 0 ? placeholder : titleInput}
-            value={formatNumber(value)}
+            value={formatMoney(value, { hideCurrencySymbol: true })}
             onChange={(e) => {
-              const rawValue = e.target.value;
-              const formattedValue = formatNumber(rawValue);
+              console.log("value", value);
+              console.log("targe value", e.target.value);
+              const rawValue = parseNumber(e.target.value);
+              console.log("rawValue", rawValue);
+              // const formattedValue = formatNumber(rawValue);
+              const formattedValue = formatMoney(rawValue, { hideCurrencySymbol: true });
+              console.log("formattedValue", formattedValue);
               const numericValue = parseNumber(formattedValue);
               onChange(numericValue);
               changeInterceptor?.(numericValue);
@@ -84,6 +92,7 @@ export const InputFormMoney = ({
           />
         )}
       />
+      <p>{formatMoney(-9999, { hideCurrencySymbol: true })}</p>
       <Typography.Text className="textError">
         {error ? (error.message ? ` ${error.message}` : `${titleInput} es obligatorio *`) : ""}
       </Typography.Text>
