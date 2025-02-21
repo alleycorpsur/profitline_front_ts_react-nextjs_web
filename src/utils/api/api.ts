@@ -85,7 +85,6 @@ instance.interceptors.request.use((request) => {
   return request;
 });
 
-
 // set tokens in instance
 instance.interceptors.request.use(async (request) => {
   const token = (await getIdToken(false)) as string;
@@ -95,7 +94,6 @@ instance.interceptors.request.use(async (request) => {
 
 API.interceptors.request.use(async (request) => {
   request.headers.set("Accept", "application/json, text/plain, */*");
-  request.headers.set("Content-Type", "application/json; charset=utf-8");
   request.headers.set("Authorization", `Bearer ${await getIdToken()}`);
   return request;
 });

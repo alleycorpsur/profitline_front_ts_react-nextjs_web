@@ -13,7 +13,6 @@ import { GenericResponse } from "@/types/global/IGlobal";
 import { IProject } from "@/types/projects/IProject";
 
 export const addProject = async (data: IFormProject): Promise<ICreateProject> => {
-  const token = await getIdToken();
   const currenciesFinal = data.general.currencies.map((currency) => ({
     id: currency.value,
     currency_name: currency.label
@@ -76,13 +75,7 @@ export const addProject = async (data: IFormProject): Promise<ICreateProject> =>
   }
 
   try {
-    const response: ICreateProject = await axios.post(`${config.API_HOST}/project`, formData, {
-      headers: {
-        Accept: "application/json, text/plain, */*",
-        "Content-Type": "multipart/form-data",
-        Authorization: `Bearer ${token}`
-      }
-    });
+    const response: ICreateProject = await API.post(`${config.API_HOST}/project`, formData);
     return response;
   } catch (error) {
     console.warn("error creating project: ", error);
@@ -95,7 +88,6 @@ export const updateProject = async (
   id: string,
   UUID: string
 ): Promise<ICreateProject> => {
-  const token = await getIdToken();
   const currenciesFinal = data.general.currencies.map((currency) => ({
     id: currency.value,
     currency_name: currency.label
@@ -165,16 +157,11 @@ export const updateProject = async (
   }
 
   try {
-    const response: ICreateProject = await axios.put(`${config.API_HOST}/project`, formData, {
-      headers: {
-        Accept: "application/json, text/plain, */*",
-        "Content-Type": "multipart/form-data",
-        Authorization: `Bearer ${token}`
-      }
-    });
+    const response: ICreateProject = await API.put(`${config.API_HOST}/project`, formData);
+
     return response;
   } catch (error) {
-    console.warn("eRROR updating project: ", error);
+    console.warn("error updating project: ", error);
     return error as any;
   }
 };
