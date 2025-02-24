@@ -8,6 +8,7 @@ interface TagProps {
   iconGap?: number; // Espaciado entre el contenido y el icono
   iconPosition?: "left" | "right"; // Posición del icono en el tag
   color?: string; // Color del tag
+  withBorder?: boolean; // Mostrar borde en el tag
 }
 
 interface TagGroupProps {
@@ -23,7 +24,8 @@ const Tag: React.FC<TagProps> = ({
   style,
   iconGap = 4,
   iconPosition = "left",
-  color
+  color,
+  withBorder = true
 }) => (
   <Flex
     align="center"
@@ -33,7 +35,7 @@ const Tag: React.FC<TagProps> = ({
       padding: "4px 8px",
       fontSize: 16,
       fontWeight: 300,
-      border: `1px solid ${color ?? "#DDDDDD"}`,
+      border: withBorder ? `1px solid ${color ?? "#DDDDDD"}` : "",
       color: color ?? "#141414",
       borderRadius: 8,
       ...style // Permite sobrescribir estilos predeterminados

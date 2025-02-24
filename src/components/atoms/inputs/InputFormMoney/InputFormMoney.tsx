@@ -1,6 +1,7 @@
 import { Flex, Input, Typography } from "antd";
 import { Control, Controller, FieldError, RegisterOptions } from "react-hook-form";
 import "./inputFormMoney.scss";
+import { useAppStore } from "@/lib/store/store";
 
 interface Props {
   titleInput?: string;
@@ -35,15 +36,13 @@ export const InputFormMoney = ({
   defaultValue,
   changeInterceptor
 }: Props) => {
-  const formatNumber = (value: string): string => {
-    if (!value) return "";
-    else if (typeof value !== "string") value = String(value);
-    const numStr = String(value).replace(/\D/g, "");
-    return numStr.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-  };
+  const formatMoney = useAppStore((state) => state.formatMoney);
 
   const parseNumber = (value: string): string => {
-    return value.replace(/\./g, "");
+    if (value.endsWith(",")) {
+      return value.replace(/\./g, "");
+    }
+    return value.replace(/\./g, "").replace(/,/g, ".");
   };
 
   return (
@@ -64,9 +63,23 @@ export const InputFormMoney = ({
             readOnly={readOnly}
             className={!error ? `inputForm ${readOnly ? "-readOnly" : ""}` : "inputFormError"}
             placeholder={placeholder?.length > 0 ? placeholder : titleInput}
-            value={formatNumber(value)}
+            value={
+              typeof value === "string" && (value === "-" || value.endsWith(","))
+                ? value
+                : value === "" || value === null || value === undefined
+                  ? ""
+                  : value === "0" || value === 0
+                    ? value // Keep 0 if explicitly entered, but allow deletion
+                    : formatMoney(value, { hideCurrencySymbol: true })
+            }
             onChange={(e) => {
-              const formattedValue = formatNumber(e.target.value);
+              const rawValue = parseNumber(e.target.value);
+              if (rawValue === "-" || rawValue === "-." || rawValue.endsWith(",")) {
+                onChange(rawValue);
+                return;
+              }
+              const formattedValue = formatMoney(rawValue, { hideCurrencySymbol: true });
+
               const numericValue = parseNumber(formattedValue);
               onChange(numericValue);
               changeInterceptor?.(numericValue);

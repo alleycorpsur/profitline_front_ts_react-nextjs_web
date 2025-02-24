@@ -149,15 +149,6 @@ export const WalletTab = () => {
               Generar acción
             </Button>
           </Flex>
-
-          <Button
-            type="primary"
-            className="button__adjustments"
-            onClick={() => console.log("click ajustes contables")}
-          >
-            Ajustes contables
-            <CaretDoubleRight size={16} style={{ marginLeft: "0.5rem" }} />
-          </Button>
         </div>
         {isLoading ? (
           <Flex justify="center" align="center" style={{ height: "3rem" }}>

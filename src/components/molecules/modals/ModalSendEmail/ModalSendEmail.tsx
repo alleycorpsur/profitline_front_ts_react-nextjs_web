@@ -158,8 +158,19 @@ export const ModalSendEmail = ({ isOpen, onClose, event_id, onFinalOk, customOnR
 
   const onSubmit = async (data: IFormEmailNotification) => {
     setLoading(true);
+
+    const parsedEmailBody = data.body
+      .split("\n")
+      .map((line) => `<p>${line}</p>`)
+      .join("\n");
+
+    const modelData = {
+      ...data,
+      body: parsedEmailBody
+    };
+
     try {
-      await sendEmailNotification(data);
+      await sendEmailNotification(modelData);
       // change view to success view if email was sent
       setCurrentView("success");
     } catch (error) {
