@@ -236,7 +236,7 @@ export const sendEmailNotification = async (data: IFormEmailNotification) => {
   });
 
   try {
-    const response: GenericResponse<{ id: number }> = await axios.post(
+    const response: GenericResponse<{ id: number }> = await API.post(
       `${config.API_HOST}/comunication/email`,
       formData,
       {
