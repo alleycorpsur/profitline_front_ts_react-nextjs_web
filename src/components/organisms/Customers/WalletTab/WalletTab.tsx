@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button, Flex, Spin, message } from "antd";
 import { useParams } from "next/navigation";
-import { CaretDoubleRight, DotsThree } from "phosphor-react";
+import { DotsThree } from "phosphor-react";
 import { extractSingleParam } from "@/utils/utils";
 import { useInvoices } from "@/hooks/useInvoices";
 import { InvoicesTable } from "@/components/molecules/tables/InvoicesTable/InvoicesTable";

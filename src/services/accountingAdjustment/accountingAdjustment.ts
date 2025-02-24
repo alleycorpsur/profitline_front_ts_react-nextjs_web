@@ -138,7 +138,7 @@ export const reportInvoiceIncident = async (
     });
   }
 
-  const response: AxiosResponse<any> = await axios.post(
+  const response = await API.post(
     `${config.API_HOST}/invoice/incident/client/${clientId}`,
     formData,
     {

@@ -110,50 +110,59 @@ export const ModalSendEmail = ({ isOpen, onClose, event_id, onFinalOk, customOnR
 
   const handleAcceptSendingEmail = async () => {
     // send email request to verify template
-    const response = await getTemplateByEvent(projectId, clientId, event_id);
-    console.log("response", response);
+    try {
+      setLoading(true);
+      const response = await getTemplateByEvent(projectId, clientId, event_id);
+
+      if (response) {
+        setValue(
+          "forward_to",
+          response.recipients.map((recipient) => ({ value: recipient, label: recipient }))
+        );
+        setValue("subject", response.subject);
+        setValue("body", response.message);
+
+        // Handle file attachments from URLs
+        if (response.files && response.files.length > 0) {
+          try {
+            console.log("Fetching attachments...");
+
+            const fetchedFiles = await Promise.all(
+              response.files.map(async (url: string) => {
+                try {
+                  return await fetchFileFromUrl(url);
+                } catch (error) {
+                  console.error(`Failed to fetch file from ${url}:`, error);
+                  return null;
+                }
+              })
+            );
+
+            const validFiles = fetchedFiles.filter((file) => file !== null); // Remove failed files
+
+            console.log("Successfully fetched files:", validFiles);
+
+            if (validFiles.length > 0) {
+              setValue("attachments", validFiles);
+            } else {
+              showMessage("error", "No se pudieron cargar los archivos adjuntos.");
+            }
+          } catch (error) {
+            console.error("Error fetching attachments:", error);
+            showMessage(
+              "error",
+              "Ocurrió un error al recuperar los archivos adjuntos de la plantilla."
+            );
+          }
+        }
+      }
+    } catch (error) {
+      showMessage("error", "Ocurrió un error al obtener la plantilla");
+    }
+    setLoading(false);
     //change view to template
     setCurrentView("template");
     // if a template its returned assign values to form with response
-    if (response) {
-      setValue(
-        "forward_to",
-        response.recipients.map((recipient) => ({ value: recipient, label: recipient }))
-      );
-      setValue("subject", response.subject);
-      setValue("body", response.message);
-
-      // Handle file attachments from URLs
-      if (response.files && response.files.length > 0) {
-        try {
-          console.log("Fetching attachments...");
-
-          const fetchedFiles = await Promise.all(
-            response.files.map(async (url: string) => {
-              try {
-                return await fetchFileFromUrl(url);
-              } catch (error) {
-                console.error(`Failed to fetch file from ${url}:`, error);
-                return null;
-              }
-            })
-          );
-
-          const validFiles = fetchedFiles.filter((file) => file !== null); // Remove failed files
-
-          console.log("Successfully fetched files:", validFiles);
-
-          if (validFiles.length > 0) {
-            setValue("attachments", validFiles);
-          } else {
-            showMessage("error", "No se pudieron cargar los archivos adjuntos.");
-          }
-        } catch (error) {
-          console.error("Error fetching attachments:", error);
-          showMessage("error", "Ocurrió un error al recuperar los archivos adjuntos.");
-        }
-      }
-    }
   };
 
   const onSubmit = async (data: IFormEmailNotification) => {
@@ -204,7 +213,7 @@ export const ModalSendEmail = ({ isOpen, onClose, event_id, onFinalOk, customOnR
               {sendEmailConstants.cancelText}
             </SecondaryButton>
 
-            <PrincipalButton onClick={handleAcceptSendingEmail}>
+            <PrincipalButton onClick={handleAcceptSendingEmail} loading={loading}>
               {sendEmailConstants.okText}
             </PrincipalButton>
           </div>
