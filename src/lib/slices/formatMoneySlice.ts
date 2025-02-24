@@ -50,7 +50,7 @@ export const formatMoneySlice = (set: any, get: any): IFormatMoneyStore => ({
 
       if (!amount) {
         if (finalHideCurrencySymbol) {
-          return formatter.format(0).replace(/[^\d.,]/g, "");
+          return formatter.format(0).replace(/[^\d.,-]/g, "");
         }
         return formatter.format(0);
       }
@@ -63,7 +63,7 @@ export const formatMoneySlice = (set: any, get: any): IFormatMoneyStore => ({
       }
 
       if (finalHideCurrencySymbol) {
-        return formatter.format(number).replace(/[^\d.,]/g, "");
+        return formatter.format(number).replace(/[^\d.,-]/g, "");
       }
 
       if (hideDecimals) {
