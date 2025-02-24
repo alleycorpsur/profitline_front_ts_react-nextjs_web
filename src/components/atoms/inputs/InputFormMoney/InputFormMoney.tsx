@@ -38,22 +38,10 @@ export const InputFormMoney = ({
 }: Props) => {
   const formatMoney = useAppStore((state) => state.formatMoney);
 
-  const formatNumber = (value: string | number): string => {
-    if (!value) return "";
-
-    let numStr = String(value);
-
-    // Allow negative sign at the start but prevent multiple ones
-    const isNegative = numStr.startsWith("-");
-
-    numStr = numStr.replace(/[^0-9]/g, ""); // Remove all non-numeric characters
-
-    const formattedNumStr = numStr.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-
-    return isNegative ? `-${formattedNumStr}` : formattedNumStr;
-  };
-
   const parseNumber = (value: string): string => {
+    if (value.endsWith(",")) {
+      return value.replace(/\./g, "");
+    }
     return value.replace(/\./g, "").replace(/,/g, ".");
   };
 
@@ -75,15 +63,23 @@ export const InputFormMoney = ({
             readOnly={readOnly}
             className={!error ? `inputForm ${readOnly ? "-readOnly" : ""}` : "inputFormError"}
             placeholder={placeholder?.length > 0 ? placeholder : titleInput}
-            value={formatMoney(value, { hideCurrencySymbol: true })}
+            value={
+              typeof value === "string" && (value === "-" || value.endsWith(","))
+                ? value
+                : value === "" || value === null || value === undefined
+                  ? ""
+                  : value === "0" || value === 0
+                    ? value // Keep 0 if explicitly entered, but allow deletion
+                    : formatMoney(value, { hideCurrencySymbol: true })
+            }
             onChange={(e) => {
-              console.log("value", value);
-              console.log("targe value", e.target.value);
               const rawValue = parseNumber(e.target.value);
-              console.log("rawValue", rawValue);
-              // const formattedValue = formatNumber(rawValue);
+              if (rawValue === "-" || rawValue === "-." || rawValue.endsWith(",")) {
+                onChange(rawValue);
+                return;
+              }
               const formattedValue = formatMoney(rawValue, { hideCurrencySymbol: true });
-              console.log("formattedValue", formattedValue);
+
               const numericValue = parseNumber(formattedValue);
               onChange(numericValue);
               changeInterceptor?.(numericValue);
@@ -92,7 +88,6 @@ export const InputFormMoney = ({
           />
         )}
       />
-      <p>{formatMoney(-9999, { hideCurrencySymbol: true })}</p>
       <Typography.Text className="textError">
         {error ? (error.message ? ` ${error.message}` : `${titleInput} es obligatorio *`) : ""}
       </Typography.Text>

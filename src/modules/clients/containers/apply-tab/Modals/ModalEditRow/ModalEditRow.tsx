@@ -99,7 +99,7 @@ const ModalEditRow: React.FC<IModalEditRowProps> = ({
                 customStyle={{ width: "80%", textAlign: "center" }}
                 validationRules={{
                   pattern: {
-                    value: /^-?[0-9]+$/,
+                    value: /^-?\d+(\.\d+)?$/,
                     message: "Solo se permiten números"
                   }
                 }}
