@@ -11,7 +11,6 @@ import Loader from "@/components/atoms/loaders/loader";
 
 import { QueryClient, QueryClientProvider } from "react-query";
 import { MessageProvider } from "@/context/MessageContext";
-// import Head from "next/head";
 
 const queryClient = new QueryClient();
 
@@ -40,16 +39,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <ConfigProvider theme={theme}>
       <html lang="es" className={`${poppins.variable} ${aptosNarrow.variable}`}>
-        {/*        
-        <Head>
-          ✅ Add the CSP meta tag to allow AWS S3 
-          <meta
-            httpEquiv="Content-Security-Policy"
-            content="default-src 'self'; connect-src 'self' https://filesclients.s3.us-east-2.amazonaws.com"
-          />
-        </Head>
-
-         */}
         <QueryClientProvider client={queryClient}>
           <body className={poppins.className}>
             <AntdRegistry>
