@@ -151,7 +151,7 @@ const RegisterNewsConcilation = ({
         if (response.status == 200) {
           onClose();
           openModal("sendEmail", {
-            event: "massConciliation",
+            event_id: "massConciliation",
             onFinalOk: () => {
               router.push(`/clientes/detail/${clientId}/project/${ID}`);
             },

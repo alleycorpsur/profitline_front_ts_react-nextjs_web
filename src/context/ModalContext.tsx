@@ -47,7 +47,7 @@ interface ModalDetailPaymentProps {
 }
 
 interface ModalSendEmailProps {
-  event: string;
+  event_id: string;
   onFinalOk?: () => void;
   customOnReject?: () => void;
 }

@@ -6,9 +6,12 @@ import { CaretLeft, Plus } from "phosphor-react";
 
 import { useAppStore } from "@/lib/store/store";
 import { useMessageApi } from "@/context/MessageContext";
-import { sendEmailNotification } from "@/services/communications/communications";
+import {
+  getTemplateByEvent,
+  sendEmailNotification
+} from "@/services/communications/communications";
 import { getDigitalRecordFormInfo } from "@/services/accountingAdjustment/accountingAdjustment";
-import { extractSingleParam } from "@/utils/utils";
+import { extractSingleParam, fetchFileFromUrl } from "@/utils/utils";
 
 import useFileHandlers from "@/components/hooks/useFIleHandlers";
 import SecondaryButton from "@/components/atoms/buttons/secondaryButton/SecondaryButton";
@@ -37,11 +40,11 @@ type IView = "sendEmail" | "template" | "success";
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  event: string;
+  event_id: string;
   onFinalOk?: () => void;
   customOnReject?: () => void;
 }
-export const ModalSendEmail = ({ isOpen, onClose, onFinalOk, customOnReject }: Props) => {
+export const ModalSendEmail = ({ isOpen, onClose, event_id, onFinalOk, customOnReject }: Props) => {
   const { ID: projectId } = useAppStore((state) => state.selectedProject);
   const params = useParams();
   const clientId = parseInt(extractSingleParam(params.clientId) || "0");
@@ -105,8 +108,54 @@ export const ModalSendEmail = ({ isOpen, onClose, onFinalOk, customOnReject }: P
     onClose();
   };
 
-  const handleAcceptSendingEmail = () => {
+  const handleAcceptSendingEmail = async () => {
     // send email request to verify template
+    try {
+      setLoading(true);
+      const response = await getTemplateByEvent(projectId, clientId, event_id);
+
+      if (response) {
+        setValue(
+          "forward_to",
+          response.recipients.map((recipient) => ({ value: recipient, label: recipient }))
+        );
+        setValue("subject", response.subject);
+        setValue("body", response.message);
+
+        // Handle file attachments from URLs
+        if (response.files && response.files.length > 0) {
+          try {
+            const fetchedFiles = await Promise.all(
+              response.files.map(async (url: string) => {
+                try {
+                  return await fetchFileFromUrl(url);
+                } catch (error) {
+                  console.error(`Failed to fetch file from ${url}:`, error);
+                  return null;
+                }
+              })
+            );
+
+            const validFiles = fetchedFiles.filter((file): file is File => file !== null); // Remove failed files
+
+            if (validFiles.length > 0) {
+              setValue("attachments", validFiles);
+            } else {
+              showMessage("error", "No se pudieron cargar los archivos adjuntos.");
+            }
+          } catch (error) {
+            console.error("Error fetching attachments:", error);
+            showMessage(
+              "error",
+              "Ocurrió un error al recuperar los archivos adjuntos de la plantilla."
+            );
+          }
+        }
+      }
+    } catch (error) {
+      showMessage("error", "Ocurrió un error al obtener la plantilla");
+    }
+    setLoading(false);
     //change view to template
     setCurrentView("template");
     // if a template its returned assign values to form with response
@@ -159,7 +208,7 @@ export const ModalSendEmail = ({ isOpen, onClose, onFinalOk, customOnReject }: P
               {sendEmailConstants.cancelText}
             </SecondaryButton>
 
-            <PrincipalButton onClick={handleAcceptSendingEmail}>
+            <PrincipalButton onClick={handleAcceptSendingEmail} loading={loading}>
               {sendEmailConstants.okText}
             </PrincipalButton>
           </div>
