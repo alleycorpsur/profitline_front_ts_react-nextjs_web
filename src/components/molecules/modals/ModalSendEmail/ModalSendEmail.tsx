@@ -125,8 +125,6 @@ export const ModalSendEmail = ({ isOpen, onClose, event_id, onFinalOk, customOnR
         // Handle file attachments from URLs
         if (response.files && response.files.length > 0) {
           try {
-            console.log("Fetching attachments...");
-
             const fetchedFiles = await Promise.all(
               response.files.map(async (url: string) => {
                 try {
@@ -202,7 +200,6 @@ export const ModalSendEmail = ({ isOpen, onClose, event_id, onFinalOk, customOnR
       footer={null}
       centered
     >
-      <p onClick={() => setCurrentView("sendEmail")}>test</p>
       {currentView === "sendEmail" && (
         <>
           <h2 className="modalSendEmail__title">{sendEmailConstants.title}</h2>
