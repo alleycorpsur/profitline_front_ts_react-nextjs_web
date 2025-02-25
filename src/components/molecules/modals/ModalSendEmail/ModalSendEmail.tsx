@@ -136,9 +136,7 @@ export const ModalSendEmail = ({ isOpen, onClose, event_id, onFinalOk, customOnR
               })
             );
 
-            const validFiles = fetchedFiles.filter((file) => file !== null); // Remove failed files
-
-            console.log("Successfully fetched files:", validFiles);
+            const validFiles = fetchedFiles.filter((file): file is File => file !== null); // Remove failed files
 
             if (validFiles.length > 0) {
               setValue("attachments", validFiles);
