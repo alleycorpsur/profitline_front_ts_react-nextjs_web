@@ -97,8 +97,8 @@ export const FilterUsers = ({ idProject, setSelectedUsers }: Props) => {
     const targetOption = selectedOptions[selectedOptions.length - 1];
     if (targetOption.value === "channel") {
       if (br.channels.length === 0) {
-        const { data } = await getBusinessRulesByProjectId(ID);
-        const { channels, lines, sublines } = extractChannelLineSublines(data.data);
+        const data = await getBusinessRulesByProjectId(ID);
+        const { channels, lines, sublines } = extractChannelLineSublines(data);
         targetOption.children = channels.map((channel) => ({
           label: channel.name,
           value: channel.id
@@ -118,8 +118,8 @@ export const FilterUsers = ({ idProject, setSelectedUsers }: Props) => {
     }
     if (targetOption.value === "line") {
       if (br.lines.length === 0) {
-        const { data } = await getBusinessRulesByProjectId(ID);
-        const { channels, lines, sublines } = extractChannelLineSublines(data.data);
+        const data = await getBusinessRulesByProjectId(ID);
+        const { channels, lines, sublines } = extractChannelLineSublines(data);
         targetOption.children = lines.map((channel) => ({
           label: channel.name,
           value: channel.id
@@ -140,8 +140,8 @@ export const FilterUsers = ({ idProject, setSelectedUsers }: Props) => {
     }
     if (targetOption.value === "subline") {
       if (br.sublines.length === 0) {
-        const { data } = await getBusinessRulesByProjectId(ID);
-        const { channels, lines, sublines } = extractChannelLineSublines(data.data);
+        const data = await getBusinessRulesByProjectId(ID);
+        const { channels, lines, sublines } = extractChannelLineSublines(data);
         targetOption.children = sublines.map((channel) => ({
           label: channel.name,
           value: channel.id
