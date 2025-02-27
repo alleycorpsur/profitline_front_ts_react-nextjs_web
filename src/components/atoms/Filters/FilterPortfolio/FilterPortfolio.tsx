@@ -3,7 +3,7 @@ import { Cascader } from "antd";
 import { useAppStore } from "@/lib/store/store";
 
 import { getClientGroups } from "@/services/groupClients/groupClients";
-import { getHoldingsByProjectId, IHoldingResponse } from "@/services/holding/holding";
+import { getHoldingsByProjectId } from "@/services/holding/holding";
 import { IClientsGroupsFull } from "@/types/clientsGroups/IClientsGroups";
 
 import "../filterCascader.scss";
@@ -61,9 +61,8 @@ export const FilterPortfolio = ({ setSelectedFilters }: Props) => {
 
     if (targetOption.value === "Holding" && holdings.length === 0) {
       try {
-        const response = await getHoldingsByProjectId(ID);
-        const holdingsData = response.data as IHoldingResponse;
-        const holdingsToShow: Option[] = holdingsData.data.map((holding) => ({
+        const holdingsData = await getHoldingsByProjectId(ID);
+        const holdingsToShow: Option[] = holdingsData.map((holding) => ({
           label: holding.name,
           value: holding.id.toString()
         }));
@@ -78,7 +77,7 @@ export const FilterPortfolio = ({ setSelectedFilters }: Props) => {
     if (targetOption.value === "Grupo de Cliente" && clientGroups.length === 0) {
       try {
         const response = await getClientGroups(ID);
-        const clientGroupsData = response.data as IClientsGroupsFull;
+        const clientGroupsData = response as IClientsGroupsFull;
         const clientGroupsToShow: Option[] = clientGroupsData.data.map((group) => ({
           label: group.group_name,
           value: group.id.toString()

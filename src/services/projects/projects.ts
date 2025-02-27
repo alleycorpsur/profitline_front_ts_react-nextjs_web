@@ -1,6 +1,4 @@
-import axios from "axios";
-
-import { API, getIdToken } from "@/utils/api/api";
+import { API } from "@/utils/api/api";
 import config from "@/config";
 
 import {
@@ -165,41 +163,23 @@ export const updateProject = async (
     return error as any;
   }
 };
-export const activateProject = async (id: string): Promise<ICreateProject> => {
-  const token = await getIdToken();
+export const activateProject = async (id: string): Promise<any> => {
   try {
-    const response: ICreateProject = await axios.put(
-      `${config.API_HOST}/project/active/${id}`,
-      {},
-      {
-        headers: {
-          Accept: "*/*",
-          "Content-Type": "application/json; charset=utf-8",
-          Authorization: `Bearer ${token}`
-        }
-      }
-    );
+    const response = await API.put(`${config.API_HOST}/project/active/${id}`, {});
 
     return response;
   } catch (error) {
-    return error as any;
+    throw error;
   }
 };
 
-export const desactiveProject = async (id: string): Promise<ICreateProject> => {
-  const token = await getIdToken();
+export const desactiveProject = async (id: string): Promise<any> => {
   try {
-    const response: ICreateProject = await axios.delete(`${config.API_HOST}/project/${id}`, {
-      headers: {
-        Accept: "application/json, text/plain, */*",
-        "Content-Type": "application/json; charset=utf-8",
-        Authorization: `Bearer ${token}`
-      }
-    });
+    const response = await API.delete(`${config.API_HOST}/project/${id}`);
     return response;
   } catch (error) {
     console.warn("error desactivating project: ", error);
-    return error as any;
+    throw error;
   }
 };
 

@@ -3,8 +3,7 @@ import config from "@/config";
 import { DiscountRequestBody } from "@/types/accountingAdjustment/IAccountingAdjustment";
 import { GenericResponse } from "@/types/global/IGlobal";
 import { IPaymentDetail } from "@/types/paymentAgreement/IPaymentAgreement";
-import { API, getIdToken } from "@/utils/api/api";
-import axios, { AxiosResponse } from "axios";
+import { API } from "@/utils/api/api";
 
 interface RadicationData {
   invoices_id: number[];
@@ -19,23 +18,13 @@ interface AdjustmentData {
   comment: string;
 }
 
-export const createAccountingAdjustment = async (
-  requestBody: DiscountRequestBody
-): Promise<AxiosResponse<any>> => {
-  const token = await getIdToken();
+export const createAccountingAdjustment = async (requestBody: DiscountRequestBody) => {
   try {
-    const response: AxiosResponse<any> = await API.post(
+    const response = await API.post(
       `${config.API_HOST}/financial-discount/project/${requestBody.project_id}/client/${requestBody.client_id}`,
-      requestBody,
-      {
-        headers: {
-          Accept: "application/json, text/plain, */*",
-          "Content-Type": "application/json; charset=utf-8",
-          Authorization: `Bearer ${token}`
-        }
-      }
+      requestBody
     );
-    return response.data;
+    return response;
   } catch (error) {
     throw error;
   }
@@ -47,8 +36,7 @@ export const applyAccountingAdjustment = async (
   clientId: string,
   type: number,
   comment: string | undefined
-): Promise<AxiosResponse<any>> => {
-  const token = await getIdToken();
+) => {
   const formData = new FormData();
   formData.append("adjustment_data", adjustmentData);
   formData.append("type", type.toString());
@@ -59,18 +47,11 @@ export const applyAccountingAdjustment = async (
     });
   }
 
-  const response: AxiosResponse<any> = await axios.post(
+  const response = await API.post(
     `${config.API_HOST}/invoice/adjusment/project/${projectId}/client/${clientId}`,
-    formData,
-    {
-      headers: {
-        Accept: "application/json, text/plain, */*",
-        "Content-Type": "multipart/form-data",
-        Authorization: `Bearer ${token}`
-      }
-    }
+    formData
   );
-  return response.data;
+  return response;
 };
 
 export const changeStatusInvoice = async (
@@ -80,13 +61,7 @@ export const changeStatusInvoice = async (
   docFiles: File[] | null,
   projectId: number,
   clientId: number
-): Promise<
-  AxiosResponse<{
-    message: string;
-    data: any;
-  }>
-> => {
-  const token = await getIdToken();
+) => {
   const formData = new FormData();
   formData.append("status_name", statusName);
   formData.append("invoice_ids", JSON.stringify(invoiceIds));
@@ -97,19 +72,9 @@ export const changeStatusInvoice = async (
     });
   }
 
-  const response: AxiosResponse<{
-    message: string;
-    data: any;
-  }> = await axios.post(
+  const response = await API.post(
     `${config.API_HOST}/invoice/project/${projectId}/client/${clientId}/update_status`,
-    formData,
-    {
-      headers: {
-        Accept: "application/json, text/plain, */*",
-        "Content-Type": "multipart/form-data",
-        Authorization: `Bearer ${token}`
-      }
-    }
+    formData
   );
   return response;
 };
@@ -122,9 +87,7 @@ export const reportInvoiceIncident = async (
   clientId: string,
   project_id: string,
   amount?: string
-): Promise<AxiosResponse<any>> => {
-  const token = await getIdToken();
-
+) => {
   const formData = new FormData();
   formData.append("project_id", project_id);
   formData.append("invoices_id", JSON.stringify(invoicesId));
@@ -140,14 +103,7 @@ export const reportInvoiceIncident = async (
 
   const response = await API.post(
     `${config.API_HOST}/invoice/incident/client/${clientId}`,
-    formData,
-    {
-      headers: {
-        Accept: "application/json, text/plain, */*",
-        "Content-Type": "multipart/form-data",
-        Authorization: `Bearer ${token}`
-      }
-    }
+    formData
   );
   return response.data;
 };
@@ -156,9 +112,7 @@ export const radicateInvoice = async (
   radicationData: RadicationData,
   files: File[],
   clientId: number
-): Promise<AxiosResponse<any>> => {
-  const token = await getIdToken();
-
+) => {
   const formData = new FormData();
   formData.append("invoices_id", JSON.stringify(radicationData.invoices_id));
   formData.append("radication_type", radicationData.radication_type);
@@ -169,19 +123,12 @@ export const radicateInvoice = async (
     formData.append("files", file);
   });
 
-  const response: AxiosResponse<any> = await axios.post(
+  const response = await API.post(
     `${config.API_HOST}/invoice/radication/client/${clientId}`,
-    formData,
-    {
-      headers: {
-        Accept: "application/json, text/plain, */*",
-        "Content-Type": "multipart/form-data",
-        Authorization: `Bearer ${token}`
-      }
-    }
+    formData
   );
 
-  return response.data;
+  return response;
 };
 
 export const createPaymentAgreement = async (
@@ -189,9 +136,7 @@ export const createPaymentAgreement = async (
   clientId: string,
   adjustmentData: AdjustmentData[],
   file: File | null
-): Promise<AxiosResponse<any>> => {
-  const token = await getIdToken();
-
+) => {
   const formData = new FormData();
   formData.append("adjustment_data", JSON.stringify(adjustmentData));
 
@@ -199,19 +144,12 @@ export const createPaymentAgreement = async (
     formData.append("file", file);
   }
 
-  const response: AxiosResponse<any> = await axios.post(
+  const response = await API.post(
     `${config.API_HOST}/invoice/paymentAgreement/project/${projectId}/client/${clientId}`,
-    formData,
-    {
-      headers: {
-        Accept: "application/json, text/plain, */*",
-        "Content-Type": "multipart/form-data",
-        Authorization: `Bearer ${token}`
-      }
-    }
+    formData
   );
 
-  return response.data;
+  return response;
 };
 
 export const getDetailPaymentAgreement = async (incident_id: number) => {
@@ -229,7 +167,7 @@ export const getDetailPaymentAgreement = async (incident_id: number) => {
 
 export const cancelPaymentAgreement = async (incident_id: number) => {
   try {
-    const response: AxiosResponse<any> = await API.delete(
+    const response = await API.delete(
       `${config.API_HOST}/invoice/paymentAgreement/cancel-payment-agreement/${incident_id}`
     );
 
@@ -288,8 +226,7 @@ export const createDigitalRecord = async (
   project_id: number,
   user_id: number,
   clientId: number
-): Promise<AxiosResponse<any>> => {
-  const token = await getIdToken();
+) => {
   const forward_to = data.forward_to.map((user) => user.value);
   const copy_to = data?.copy_to?.map((user) => user.value);
 
@@ -307,15 +244,9 @@ export const createDigitalRecord = async (
   });
 
   try {
-    const response: AxiosResponse<any> = await axios.post(
+    const response = await API.post(
       `${config.API_HOST}/client/digital-record?projectId=${project_id}`,
-      formData,
-      {
-        headers: {
-          Accept: "application/json, text/plain, */*",
-          Authorization: `Bearer ${token}`
-        }
-      }
+      formData
     );
 
     return response;

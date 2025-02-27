@@ -1,5 +1,4 @@
 import config from "@/config";
-import axios from "axios";
 
 import { API, getIdToken } from "@/utils/api/api";
 import { MessageType } from "@/context/MessageContext";
@@ -194,15 +193,9 @@ export const createCommunication = async ({
   };
 
   try {
-    const response: GenericResponse<{ id: number }> = await axios.post(
+    const response: GenericResponse<{ id: number }> = await API.post(
       `${config.API_HOST}/comunication`,
-      modelData,
-      {
-        headers: {
-          Accept: "application/json, text/plain, */*",
-          Authorization: `Bearer ${token}`
-        }
-      }
+      modelData
     );
 
     if (response.status === 200) showMessage("success", "Comunicación creada correctamente");

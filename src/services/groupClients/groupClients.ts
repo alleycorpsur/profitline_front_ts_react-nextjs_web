@@ -1,6 +1,5 @@
-import axios, { AxiosResponse } from "axios";
 import config from "@/config";
-import { API, getIdToken } from "@/utils/api/api";
+import { API } from "@/utils/api/api";
 import { GenericResponse } from "@/types/global/IGlobal";
 import { IClientsGroup, IClientsGroupsFull } from "@/types/clientsGroups/IClientsGroups";
 import { Key } from "react";
@@ -29,16 +28,8 @@ export const createGroup = async (
     project_id: id
   };
 
-  const token = await getIdToken();
-
   try {
-    const response: AxiosResponse = await axios.post(`${config.API_HOST}/group-client`, modelData, {
-      headers: {
-        Accept: "application/json, text/plain, */*",
-        "Content-Type": "application/json; charset=utf-8",
-        Authorization: `Bearer ${token}`
-      }
-    });
+    const response = await API.post(`${config.API_HOST}/group-client`, modelData);
     return response;
   } catch (error) {
     return error as any;
@@ -56,16 +47,8 @@ export const updateGroup = async (
     project_id
   };
 
-  const token = await getIdToken();
-
   try {
-    const response: AxiosResponse = await axios.put(`${config.API_HOST}/group-client`, modelData, {
-      headers: {
-        Accept: "application/json, text/plain, */*",
-        "Content-Type": "application/json; charset=utf-8",
-        Authorization: `Bearer ${token}`
-      }
-    });
+    const response = await API.put(`${config.API_HOST}/group-client`, modelData);
 
     return response;
   } catch (error) {
@@ -81,7 +64,7 @@ export const deleteGroups = async (groupsId: number[], project_id: number): Prom
   };
 
   try {
-    const response: AxiosResponse = await API.put(
+    const response = await API.put(
       `${config.API_HOST}/group-client/delete`,
       modelData
     );
@@ -103,19 +86,10 @@ export const changeGroupState = async (
     status
   };
 
-  const token = await getIdToken();
-
   try {
-    const response: AxiosResponse = await axios.put(
+    const response = await API.put(
       `${config.API_HOST}/group-client/change-status`,
-      modelData,
-      {
-        headers: {
-          Accept: "application/json, text/plain, */*",
-          "Content-Type": "application/json; charset=utf-8",
-          Authorization: `Bearer ${token}`
-        }
-      }
+      modelData
     );
 
     return response;
@@ -128,18 +102,13 @@ export const getClientGroups = async (
   projectId: number,
   name?: string,
   status?: number
-): Promise<AxiosResponse<IClientsGroupsFull>> => {
-  const token = await getIdToken();
+): Promise<IClientsGroupsFull> => {
   try {
     let url = `${config.API_HOST}/group-client/?project_id=${projectId}`;
     if (name) url += `&name=${encodeURIComponent(name)}`;
     if (status !== undefined) url += `&status=${status}`;
 
-    const response: AxiosResponse<IClientsGroupsFull> = await axios.get(url, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
+    const response: IClientsGroupsFull = await API.get(url);
     return response;
   } catch (error) {
     return error as any;
