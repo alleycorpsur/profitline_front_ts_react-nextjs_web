@@ -173,7 +173,7 @@ export const FilterUsers = ({ idProject, setSelectedUsers }: Props) => {
     if (targetOption.value === "Zona" && zones.length === 0) {
       const { data } = await getAllZones({ idProject });
 
-      const zonesToShow = data.data.map((zone) => ({
+      const zonesToShow = data.map((zone) => ({
         label: `${zone.ZONE_DESCRIPTION}`,
         value: `${zone.ID}`
       }));

@@ -48,7 +48,7 @@ export const AccountingAdjustmentsFilter: React.FC<AccountingAdjustmentsFilterPr
           label: line.description_line
         }));
 
-        const zones = zonesData.data.data.map((zone: IZone) => ({
+        const zones = zonesData.data.map((zone: IZone) => ({
           value: zone.ID,
           label: zone.ZONE_DESCRIPTION
         }));

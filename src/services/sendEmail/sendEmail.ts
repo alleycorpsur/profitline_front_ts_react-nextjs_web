@@ -1,10 +1,4 @@
-import { getIdToken } from "@/utils/api/api";
-import axios, { AxiosResponse } from "axios";
-
-interface infoObject {
-  file: File;
-  fileList: File[];
-}
+import { API } from "@/utils/api/api";
 
 interface ISelect {
   value: string;
@@ -18,8 +12,7 @@ export interface Email {
   attachments: File[];
 }
 
-export const sendEmail = async (data: Email): Promise<AxiosResponse<any>> => {
-  const token = await getIdToken();
+export const sendEmail = async (data: Email): Promise<any> => {
   const forward_to = data.forward_to.map((user) => user.value);
   const copy_to = data?.copy_to?.map((user) => user.value);
 
@@ -34,15 +27,9 @@ export const sendEmail = async (data: Email): Promise<AxiosResponse<any>> => {
   });
 
   try {
-    const response: AxiosResponse<any> = await axios.post(
+    const response = await API.post(
       `https://z3i5kgp9mm.us-east-2.awsapprunner.com/api/comunication/email`,
-      formData,
-      {
-        headers: {
-          Accept: "application/json, text/plain, */*",
-          Authorization: `Bearer ${token}`
-        }
-      }
+      formData
     );
 
     return response;
