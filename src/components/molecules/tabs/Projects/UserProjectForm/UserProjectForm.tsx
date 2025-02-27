@@ -78,7 +78,7 @@ export const UserProjectForm = ({ isViewDetailsUser, onGoBackTable }: Props) => 
         data: {} as IUserData
       });
       const response = await getUserById(`${isViewDetailsUser?.id}`);
-      const finalData = response.data.data;
+      const finalData = response.data;
 
       const zonesFinalData =
         finalData.USER_ZONES?.map(

@@ -21,6 +21,9 @@ const getAuth = async (
   openNotification: ({ api, title, message, placement }: IOpenNotificationProps) => void,
   api: NotificationInstance
 ) => {
+  localStorage.removeItem(STORAGE_TOKEN);
+  const { resetStore } = useAppStore.getState();
+  resetStore();
   if (isSignUp) {
     createUserWithEmailAndPassword(auth, email, password)
       .then(async (userCred) => {
