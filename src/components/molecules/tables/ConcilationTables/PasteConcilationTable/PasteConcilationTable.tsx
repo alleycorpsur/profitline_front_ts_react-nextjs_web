@@ -166,7 +166,7 @@ export const PasteConcilationTable = ({
     const blob = new Blob([csvData], { type: "text/csv" });
     const file = new File([blob], "conciliacion.csv", { type: "text/csv" });
     try {
-      const response: dataConcilation = await invoiceConciliation([file], clientId, ID);
+      const response = await invoiceConciliation([file], clientId, ID);
       response && setInvoices && setInvoices(response.data);
       showModal();
     } catch (error) {
