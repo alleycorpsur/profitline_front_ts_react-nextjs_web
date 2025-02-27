@@ -1,6 +1,4 @@
-import axios from "axios";
-
-import { API, getIdToken } from "@/utils/api/api";
+import { API } from "@/utils/api/api";
 import config from "@/config";
 
 import {

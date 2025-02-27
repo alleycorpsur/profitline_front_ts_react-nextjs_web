@@ -161,8 +161,8 @@ export const FilterUsers = ({ idProject, setSelectedUsers }: Props) => {
       }
     }
     if (targetOption.value === "Roles" && roles.length === 0) {
-      const { data } = await getAllRoles();
-      const countriesToShow = data.data.map((role) => ({
+      const roles = await getAllRoles();
+      const countriesToShow = roles?.map((role) => ({
         label: `${role.ROL_NAME}`,
         value: `${role.ID}`
       }));
