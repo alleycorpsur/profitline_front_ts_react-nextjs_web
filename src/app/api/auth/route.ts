@@ -23,8 +23,9 @@ export async function POST() {
     const idCustomToken = await auth().createCustomToken(decodedToken.uid, {
       permissions: compressedClaims
     });
+    const idCustomTokenSession = await auth().createCustomToken(decodedToken.uid);
     token = idCustomToken;
-    const customToken = await customGetAuth(idCustomToken);
+    const customToken = await customGetAuth(idCustomTokenSession);
     if (decodedToken) {
       //Generar cookie
       const expiresIn = 60 * 60 * 24 * 14 * 1000;
@@ -57,9 +58,6 @@ export async function GET() {
   }
 
   const decodedClaims = await auth().verifySessionCookie(session, true);
-  const buffer = Buffer.from(decodedClaims.permissions, "base64") as any;
-  const decompressedClaims = inflateSync(buffer).toString();
-  decodedClaims.permissions = JSON.parse(decompressedClaims);
 
   if (!decodedClaims) {
     return NextResponse.json({ isLogged: false }, { status: 401 });
