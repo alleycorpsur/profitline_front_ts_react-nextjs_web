@@ -4,10 +4,11 @@ import useSWR from "swr";
 
 import { useAppStore } from "@/lib/store/store";
 import { fetcher } from "@/utils/api/api";
-import { IBRE, ISelectedBussinessRules } from "@/types/bre/IBRE";
+import { IChanel, ISelectedBussinessRules } from "@/types/bre/IBRE";
 
 import "./selectstructure.scss";
 import { SelectChips } from "../SelectChips/SelectChips";
+import { GenericResponse } from "@/types/global/IGlobal";
 interface Props {
   selectedBusinessRules: ISelectedBussinessRules;
   disabled: boolean;
@@ -19,7 +20,11 @@ export const SelectStructure = ({
   setSelectedBusinessRules
 }: Props) => {
   const { ID } = useAppStore((state) => state.selectedProject);
-  const { data: response, isLoading } = useSWR<IBRE>(`/bussines-rule/project/${ID}`, fetcher, {});
+  const { data: response, isLoading } = useSWR<GenericResponse<IChanel[]>>(
+    `/bussines-rule/project/${ID}`,
+    fetcher,
+    {}
+  );
 
   return (
     <div className="selectstructure">

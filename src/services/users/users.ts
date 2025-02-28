@@ -1,4 +1,3 @@
-import axios, { AxiosResponse } from "axios";
 import { IUserForm, WelcomeData } from "@/types/users/IUser";
 import { API } from "@/utils/api/api";
 import { SUCCESS } from "@/utils/constants/globalConstants";
@@ -40,10 +39,7 @@ export const inviteUser = async (
   };
   const endpointRole = data.info.rol?.value === 2 ? "admin" : "user";
   try {
-    const response: AxiosResponse = await API.post(
-      `/user/invitation/${endpointRole}/email`,
-      modelData
-    );
+    const response = await API.post(`/user/invitation/${endpointRole}/email`, modelData);
     return response;
   } catch (error) {
     console.warn("error inviting user: ", error);
@@ -77,7 +73,7 @@ export const updateUser = async (
   };
 
   try {
-    const response: AxiosResponse = await API.put(`/user`, modelData);
+    const response = await API.put(`/user`, modelData);
     return response;
   } catch (error) {
     console.warn("error updating user: ", error);
@@ -96,7 +92,7 @@ export const onChangeStatusById = async (
     active: isActive
   };
   try {
-    const response: AxiosResponse = await API.put(`/user/${userId}/user-change-status`, modelData);
+    const response = await API.put(`/user/${userId}/user-change-status`, modelData);
     if (response.status === SUCCESS) {
       showMessage(
         "success",
@@ -109,12 +105,9 @@ export const onChangeStatusById = async (
 
     return response;
   } catch (error) {
-    // const e = error as AxiosError;
-    if (axios.isAxiosError(error)) {
-      showMessage("error", error.response?.data?.message);
-      onClose();
-      return error as any;
-    }
+    showMessage("error", "Oops ocurrio un error.");
+    onClose();
+    throw error;
   }
 };
 
@@ -124,11 +117,9 @@ export const onRemoveUserById = async (
   // eslint-disable-next-line no-unused-vars
   showMessage: (type: MessageType, content: string) => void,
   onClose: () => void
-): Promise<AxiosResponse<any>> => {
+): Promise<any> => {
   try {
-    const response: AxiosResponse<any> = await API.delete(
-      `/user/id=${idUser}&project_id=${idProject}`
-    );
+    const response = await API.delete(`/user/id=${idUser}&project_id=${idProject}`);
     if (response.status === SUCCESS) {
       showMessage("success", "El usuario fue eliminado exitosamente.");
       onClose();
@@ -139,12 +130,14 @@ export const onRemoveUserById = async (
 
     return response;
   } catch (error) {
-    return error as any;
+    showMessage("error", "Oops ocurrio un error.");
+    onClose();
+    throw error;
   }
 };
-export const onResendInvitationUser = async (email: string): Promise<AxiosResponse<any>> => {
+export const onResendInvitationUser = async (email: string): Promise<any> => {
   try {
-    const response: AxiosResponse<any> = await API.post(`/user/invitation/resend`, { email });
+    const response = await API.post(`/user/invitation/resend`, { email });
 
     return response;
   } catch (error) {
@@ -152,17 +145,14 @@ export const onResendInvitationUser = async (email: string): Promise<AxiosRespon
   }
 };
 
-export const deleteUsersById = async (
-  users_id: number[],
-  project_id: string
-): Promise<AxiosResponse<any>> => {
+export const deleteUsersById = async (users_id: number[], project_id: string): Promise<any> => {
   const modelData = {
     users: users_id,
     project_id
   };
 
   try {
-    const response: AxiosResponse = await API.put(`/massive-action/user/delete`, modelData);
+    const response = await API.put(`/massive-action/user/delete`, modelData);
 
     return response;
   } catch (error) {
@@ -171,21 +161,18 @@ export const deleteUsersById = async (
   }
 };
 
-export const resendInvitationUsers = async (users_id: number[]): Promise<AxiosResponse<any>> => {
+export const resendInvitationUsers = async (users_id: number[]): Promise<any> => {
   const modelData = {
     users: users_id
   };
 
   try {
-    const response: AxiosResponse = await API.post(
-      `/massive-action/user/resend-invitation`,
-      modelData
-    );
+    const response = await API.post(`/massive-action/user/resend-invitation`, modelData);
 
     return response;
   } catch (error) {
     console.warn("error re-sending invite to users: ", error);
-    return error as any;
+    throw error;
   }
 };
 

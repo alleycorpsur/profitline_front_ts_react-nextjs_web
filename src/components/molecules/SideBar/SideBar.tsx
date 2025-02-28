@@ -13,7 +13,8 @@ import {
   SquaresFour,
   Storefront,
   UsersFour,
-  Stack
+  Stack,
+  ClipboardText
 } from "phosphor-react";
 
 import { logOut } from "../../../../firebase-utils";
@@ -220,6 +221,18 @@ export const SideBar = () => {
           </Link>
         )}
         {checkUserViewPermissions(project, "GestorTareas") && (
+          <Link href="/gestor-tareas" passHref legacyBehavior>
+            <Button
+              type="primary"
+              size="large"
+              icon={<ClipboardText size={26} />}
+              className={path === "/gestor-tareas" ? "buttonIcon" : "buttonIconActive"}
+            >
+              {isSideBarLarge && "Gestor de tareas"}
+            </Button>
+          </Link>
+        )}
+        {checkUserViewPermissions(project, "AdministracionClientes") && (
           <Link href="/client-management" passHref legacyBehavior>
             <Button
               type="primary"

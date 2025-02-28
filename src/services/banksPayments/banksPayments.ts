@@ -1,7 +1,6 @@
 import { GenericResponse } from "@/types/global/IGlobal";
-import axios from "axios";
 import config from "@/config";
-import { API, getIdToken } from "@/utils/api/api";
+import { API } from "@/utils/api/api";
 import { IClientsByProject, IPaymentDetail, IPaymentStatus } from "@/types/banks/IBanks";
 
 export const getPaymentDetail = async (payment_id: number) => {
@@ -46,24 +45,15 @@ export const assignClient = async ({
   client_id,
   evidence
 }: IAssignClient) => {
-  const token = await getIdToken();
-
   const formData = new FormData();
   formData.append("id_user", id_user.toString());
   formData.append("payment_ids", JSON.stringify(payment_ids));
   formData.append("assign_client_id", client_id);
   formData.append("evidence", evidence);
   try {
-    const response: GenericResponse<any> = await axios.put(
+    const response: GenericResponse<any> = await API.put(
       `${config.API_HOST}/bank/assign-client-payments`,
-      formData,
-      {
-        headers: {
-          Accept: "application/json, text/plain, */*",
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`
-        }
-      }
+      formData
     );
 
     return response.data;
@@ -80,8 +70,6 @@ export const editClient = async ({
   evidence,
   current_client_id
 }: IEditClient) => {
-  const token = await getIdToken();
-
   const formData = new FormData();
   formData.append("id_user", id_user.toString());
   formData.append("payment_ids", JSON.stringify(payment_ids));
@@ -89,16 +77,9 @@ export const editClient = async ({
   formData.append("evidence", evidence);
   formData.append("previous_assign_client_id", current_client_id);
   try {
-    const response: GenericResponse<any> = await axios.put(
+    const response: GenericResponse<any> = await API.put(
       `${config.API_HOST}/bank/updated-client-payments`,
-      formData,
-      {
-        headers: {
-          Accept: "application/json, text/plain, */*",
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`
-        }
-      }
+      formData
     );
 
     return response.data;
@@ -109,22 +90,13 @@ export const editClient = async ({
 };
 
 export const uploadEvidence = async (payment_id: number, user_id: number, evidence: File) => {
-  const token = await getIdToken();
-
   const formData = new FormData();
   formData.append("user_id", user_id.toString());
   formData.append("files", evidence);
   try {
-    const response: GenericResponse<any> = await axios.post(
+    const response: GenericResponse<any> = await API.post(
       `${config.API_HOST}/bank/upload-evidence/${payment_id}`,
-      formData,
-      {
-        headers: {
-          Accept: "application/json, text/plain, */*",
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`
-        }
-      }
+      formData
     );
 
     return response.data;
@@ -148,8 +120,6 @@ interface ISpliPayment {
 }
 
 export const splitPayment = async ({ payment_id, userId, data, files }: ISpliPayment) => {
-  const token = await getIdToken();
-
   const formData = new FormData();
   formData.append("payment_id", payment_id.toString());
   formData.append("data", JSON.stringify(data));
@@ -161,16 +131,9 @@ export const splitPayment = async ({ payment_id, userId, data, files }: ISpliPay
   });
 
   try {
-    const response: GenericResponse<any> = await axios.post(
+    const response: GenericResponse<any> = await API.post(
       `${config.API_HOST}/bank/split-payment`,
-      formData,
-      {
-        headers: {
-          Accept: "application/json, text/plain, */*",
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`
-        }
-      }
+      formData
     );
 
     return response.data;
@@ -207,8 +170,6 @@ export const changePaymentStatus = async ({
   comment,
   file
 }: IChangePaymentStatus) => {
-  const token = await getIdToken();
-
   const formData = new FormData();
   formData.append("project_id", projectId.toString());
 
@@ -220,15 +181,9 @@ export const changePaymentStatus = async ({
   formData.append("file", file);
 
   try {
-    const response: GenericResponse<any> = await axios.put(
+    const response: GenericResponse<any> = await API.put(
       `${config.API_HOST}/bank/change-status`,
-      formData,
-      {
-        headers: {
-          Accept: "application/json, text/plain, */*",
-          Authorization: `Bearer ${token}`
-        }
-      }
+      formData
     );
 
     return response;

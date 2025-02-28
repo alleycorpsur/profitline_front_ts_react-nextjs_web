@@ -1,17 +1,8 @@
 import config from "@/config";
+import { GenericResponse } from "@/types/global/IGlobal";
 import { API, getIdToken } from "@/utils/api/api";
 import { CREATED, SUCCESS } from "@/utils/constants/globalConstants";
 import { MessageInstance } from "antd/es/message/interface";
-import axios, { AxiosResponse } from "axios";
-
-export interface IHoldingResponse {
-  status: number;
-  message: string;
-  data: Array<{
-    id: number;
-    name: string;
-  }>;
-}
 
 export const addHolding = async ({
   name,
@@ -21,9 +12,9 @@ export const addHolding = async ({
   name: string;
   projectId: number;
   messageApi: MessageInstance;
-}): Promise<AxiosResponse<any>> => {
+}): Promise<any> => {
   try {
-    const response: AxiosResponse<any> = await API.post(`/holding`, {
+    const response = await API.post(`/holding`, {
       name,
       project_id: projectId
     });
@@ -51,19 +42,16 @@ export const removeHoldingById = async ({
 }: {
   idHolding: string;
   messageApi: MessageInstance;
-}): Promise<AxiosResponse<any>> => {
+}): Promise<any> => {
   const token = await getIdToken();
   try {
-    const response: AxiosResponse<any> = await axios.delete(
-      `${config.API_HOST}/holding/${idHolding}`,
-      {
-        headers: {
-          Accept: "application/json, text/plain, */*",
-          "Content-Type": "application/json; charset=utf-8",
-          Authorization: `Bearer ${token}`
-        }
+    const response = await API.delete(`${config.API_HOST}/holding/${idHolding}`, {
+      headers: {
+        Accept: "application/json, text/plain, */*",
+        "Content-Type": "application/json; charset=utf-8",
+        Authorization: `Bearer ${token}`
       }
-    );
+    });
     if (response.status === SUCCESS) {
       messageApi.open({
         type: "success",
@@ -82,22 +70,19 @@ export const removeHoldingById = async ({
   }
 };
 
-
 export const getHoldingsByProjectId = async (
   projectId: number
-): Promise<AxiosResponse<IHoldingResponse>> => {
-  const token = await getIdToken();
+): Promise<
+  {
+    id: number;
+    name: string;
+  }[]
+> => {
   try {
-    const response: AxiosResponse<IHoldingResponse> = await axios.get(
-      `${config.API_HOST}/holding/project/${projectId}`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
-        }
-      }
+    const response: GenericResponse<{ id: number; name: string }[]> = await API.get(
+      `${config.API_HOST}/holding/project/${projectId}`
     );
-    return response;
+    return response.data;
   } catch (error) {
     return error as any;
   }

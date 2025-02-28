@@ -154,7 +154,7 @@ export const ClientProjectForm = ({ onGoBackTable, isViewDetailsClient }: Props)
         data: {} as IClient
       });
       const response = await getClientById(isViewDetailsClient.id.toString(), idProject);
-      const finalData = response.data.data;
+      const finalData = response;
 
       setDataClient({
         isLoading: false,

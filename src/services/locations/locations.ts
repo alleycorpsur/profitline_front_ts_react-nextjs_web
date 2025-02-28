@@ -1,24 +1,18 @@
-import axios, { AxiosResponse } from "axios";
 import config from "@/config";
-import { API, getIdToken } from "@/utils/api/api";
+import { API } from "@/utils/api/api";
 import {
   ICreateLocation,
   ICities,
-  IResponseAddAddressToLocation
+  IResponseAddAddressToLocation,
+  ILocation
 } from "@/types/locations/ILocations";
 import { MessageType } from "@/context/MessageContext";
+import { GenericResponse } from "@/types/global/IGlobal";
 
 export const fetchAllLocations = async (): Promise<ICities[]> => {
   try {
-    const { data, status }: AxiosResponse = await axios.get<ICities>(
-      `${config.API_HOST}/location`,
-      {
-        headers: {
-          Authorization: `Bearer ${await getIdToken()}`
-        }
-      }
-    );
-    if (status === 200) return data.data;
+    const response: GenericResponse<ICities[]> = await API.get(`${config.API_HOST}/location`);
+    if (response.status === 200) return response.data;
     return [];
   } catch (error) {
     return [];
@@ -61,18 +55,10 @@ export const addAddressToLocation = async (
   }
 };
 
-export const getOneLocation = async (locationId: number, projectId: number): Promise<any> => {
-  const token = await getIdToken();
-
+export const getOneLocation = async (locationId: number, projectId: number): Promise<ILocation> => {
   try {
-    const response: AxiosResponse = await axios.get(
-      `${config.API_HOST}/location/${locationId}/project/${projectId}`,
-      {
-        headers: {
-          Accept: "application/json, text/plain, */*",
-          Authorization: `Bearer ${token}`
-        }
-      }
+    const response: GenericResponse<ILocation> = await API.get(
+      `${config.API_HOST}/location/${locationId}/project/${projectId}`
     );
     return response.data;
   } catch (error) {

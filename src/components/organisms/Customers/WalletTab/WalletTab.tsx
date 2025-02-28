@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button, Flex, Spin, message } from "antd";
 import { useParams } from "next/navigation";
-import { CaretDoubleRight, DotsThree } from "phosphor-react";
+import { DotsThree } from "phosphor-react";
 import { extractSingleParam } from "@/utils/utils";
 import { useInvoices } from "@/hooks/useInvoices";
 import { InvoicesTable } from "@/components/molecules/tables/InvoicesTable/InvoicesTable";
@@ -149,15 +149,6 @@ export const WalletTab = () => {
               Generar acción
             </Button>
           </Flex>
-
-          <Button
-            type="primary"
-            className="button__adjustments"
-            onClick={() => console.log("click ajustes contables")}
-          >
-            Ajustes contables
-            <CaretDoubleRight size={16} style={{ marginLeft: "0.5rem" }} />
-          </Button>
         </div>
         {isLoading ? (
           <Flex justify="center" align="center" style={{ height: "3rem" }}>
@@ -214,7 +205,7 @@ export const WalletTab = () => {
         onCloseAllModals={() => {
           closeAllModal();
           openModal("sendEmail", {
-            event: "paymentAgreement"
+            event_id: "paymentAgreement"
           });
         }}
       />
@@ -256,7 +247,7 @@ export const WalletTab = () => {
         onCloseAllModals={() => {
           closeAllModal();
           openModal("sendEmail", {
-            event: "Register_Novelty"
+            event_id: "1"
           });
         }}
       />

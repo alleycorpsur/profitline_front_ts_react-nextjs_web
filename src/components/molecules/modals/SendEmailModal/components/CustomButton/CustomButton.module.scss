@@ -1,0 +1,13 @@
+.activeButton {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+    padding: 6px;
+    transition: all 0.3s ease-in-out;
+    color: #555;
+
+    &:hover {
+        background-color: #f7f7f7;
+    }
+}

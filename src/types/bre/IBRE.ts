@@ -1,8 +1,3 @@
-export interface IBRE {
-  status: number;
-  message: string;
-  data: IChanel[];
-}
 export interface channeles {
   status: number;
   message: string;
