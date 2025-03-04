@@ -39,7 +39,13 @@ export const ClientsViewTable = () => {
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
   const [filters, setFilters] = useState<SelectedFilters>({
     holding: [],
-    clientGroup: []
+    clientGroup: [],
+    zones: [],
+    lines: [],
+    sublines: [],
+    channels: [],
+    radicado: false,
+    novedad: false
   });
   const [flattenedData, setFlattenedData] = useState<IClientsPortfolio[]>([]);
   const [grandTotal, setGrandTotal] = useState<any>({});
