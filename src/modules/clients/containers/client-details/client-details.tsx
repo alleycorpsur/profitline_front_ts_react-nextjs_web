@@ -54,7 +54,6 @@ export const ClientDetails: FC<ClientDetailsProps> = () => {
 
   useEffect(() => {
     if (error) {
-      console.log("error2SHOW", error);
       showMessage("error", error);
     }
   }, [error]);
