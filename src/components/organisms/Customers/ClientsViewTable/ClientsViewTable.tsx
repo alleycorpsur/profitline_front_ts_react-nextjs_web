@@ -58,14 +58,24 @@ export const ClientsViewTable = () => {
   });
 
   const fetchPortfolios = async ({ pageParam = 1 }) => {
-    const holdingQuery = filters.holding.length > 0 ? `&holding=${filters.holding.join(",")}` : "";
-    const searchQueryParam = debouncedSearchQuery
-      ? `&searchQuery=${encodeURIComponent(debouncedSearchQuery.toLowerCase().trim())}`
-      : "";
-    const clientGroupQuery =
-      filters.clientGroup.length > 0 ? `&client_group=${filters.clientGroup.join(",")}` : "";
+    const queryParams = [
+      `page=${pageParam}`,
+      `limit=${PAGINATION_LIMIT}`,
+      filters.holding.length > 0 && `holding=${filters.holding.join(",")}`,
+      debouncedSearchQuery &&
+        `searchQuery=${encodeURIComponent(debouncedSearchQuery.toLowerCase().trim())}`,
+      filters.clientGroup.length > 0 && `client_group=${filters.clientGroup.join(",")}`,
+      filters.zones.length > 0 && `zones=${filters.zones.join(",")}`,
+      filters.lines.length > 0 && `lines=${filters.lines.join(",")}`,
+      filters.sublines.length > 0 && `sublines=${filters.sublines.join(",")}`,
+      filters.channels.length > 0 && `channels=${filters.channels.join(",")}`,
+      filters.radicado && `radicado=${filters.radicado}`,
+      filters.novedad && `novedad=${filters.novedad}`
+    ]
+      .filter(Boolean)
+      .join("&");
 
-    const pathKey = `/portfolio/client/project/${ID}?page=${pageParam}&limit=${PAGINATION_LIMIT}${holdingQuery}${searchQueryParam}${clientGroupQuery}`;
+    const pathKey = `/portfolio/client/project/${ID}?${queryParams}`;
 
     return fetcher(pathKey);
   };
