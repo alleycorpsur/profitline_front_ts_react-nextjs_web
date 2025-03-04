@@ -45,6 +45,11 @@ instance.interceptors.response.use(
   }
 );
 
+interface IError {
+  error: boolean;
+  message: string;
+}
+
 export const fetcher = async (url: string) => {
   return instance
     .get(url)
@@ -59,6 +64,10 @@ export const fetcher = async (url: string) => {
       if (error.code === "ECONNABORTED") {
         throw new Error("La solicitud ha sido cancelada debido a un timeout");
       } else {
+        if (error.response?.data) {
+          const errorData = error.response.data as IError;
+          throw new Error(errorData.message);
+        }
         if (error?.message) {
           throw new Error(error.message);
         }
