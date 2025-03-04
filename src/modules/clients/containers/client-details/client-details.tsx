@@ -1,8 +1,9 @@
 import { CaretLeft } from "phosphor-react";
-import { Dispatch, FC, SetStateAction, createContext, useMemo, useState } from "react";
+import { Dispatch, FC, SetStateAction, createContext, useEffect, useMemo, useState } from "react";
 import { Button, Flex, Spin } from "antd";
 import Link from "next/link";
 
+import { useMessageApi } from "@/context/MessageContext";
 import { useClientDetails } from "../../hooks/client-details/client-details.hook";
 import { WalletTab } from "@/components/organisms/Customers/WalletTab/WalletTab";
 import Dashboard from "../dashboard";
@@ -13,11 +14,15 @@ import AccountingAdjustmentsTab from "../accounting-adjustments-tab";
 import PaymentsTab from "@/modules/clients/containers/payments-tab";
 import ContactsTab from "../contacts-tab";
 import HistoryTab from "../history-tab";
+import {
+  IClientPortfolioFilters,
+  FilterClientPortfolio
+} from "@/components/atoms/Filters/FilterClientPortfolio/FilterClientPortfolio";
+import ApplyTab from "../apply-tab";
 
 import { IDataSection } from "@/types/portfolios/IPortfolios";
 
 import styles from "./client-details.module.scss";
-import ApplyTab from "../apply-tab";
 
 type ClientDetailsContextType = {
   selectedOption: InvoiceAction;
@@ -32,15 +37,32 @@ export const ClientDetailsContext = createContext<ClientDetailsContextType>(
 );
 
 export const ClientDetails: FC<ClientDetailsProps> = () => {
-  const { portfolioData, setMutate } = useClientDetails();
+  const [filters, setFilters] = useState<IClientPortfolioFilters>({
+    zones: [],
+    lines: [],
+    sublines: [],
+    channels: [],
+    radicado: false,
+    novedad: false
+  });
+
+  const { data: portfolioData, error, mutate } = useClientDetails(filters);
+  const { showMessage } = useMessageApi();
   const [showInvoiceActionsModal, setShowInvoiceActionsModal] = useState<boolean>(false);
   const [selectedOption, setSelectedOption] = useState<InvoiceAction>(InvoiceAction.GenerateAction);
   const [activeTab, setActiveTab] = useState<string>("1");
 
+  useEffect(() => {
+    if (error) {
+      console.log("error2SHOW", error);
+      showMessage("error", error);
+    }
+  }, [error]);
+
   const onChangeTab = (activeKey: string) => {
     setActiveTab(activeKey);
     if (activeKey === "1") {
-      setMutate((prev) => !prev);
+      mutate();
     }
   };
 
@@ -110,7 +132,7 @@ export const ClientDetails: FC<ClientDetailsProps> = () => {
       <main className={styles.mainDetail}>
         <Flex vertical className={styles.containerDetailClient}>
           <Flex className={styles.stickyHeader} align="center" justify="space-between">
-            <Flex className={styles.infoHeader} align="center" justify="center">
+            <Flex className={styles.infoHeader} align="center" justify="space-between">
               <Link href={`/clientes/all`}>
                 <Button
                   type="text"
@@ -121,6 +143,7 @@ export const ClientDetails: FC<ClientDetailsProps> = () => {
                   {portfolioData ? portfolioData?.data_wallet?.client_name : "Loading..."}
                 </Button>
               </Link>
+              <FilterClientPortfolio setSelectedFilters={setFilters} />
             </Flex>
           </Flex>
 

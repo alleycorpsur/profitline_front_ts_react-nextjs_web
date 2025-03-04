@@ -4,13 +4,10 @@ import { useAppStore } from "@/lib/store/store";
 
 import { extractChannelLineSublines } from "@/utils/utils";
 import { getBusinessRulesByProjectId } from "@/services/businessRules/BR";
-import { getClientGroups } from "@/services/groupClients/groupClients";
-import { getHoldingsByProjectId } from "@/services/holding/holding";
 import { getAllZones } from "@/services/zone/zones";
 
-import { IClientsGroupsFull } from "@/types/clientsGroups/IClientsGroups";
-
 import "../filterCascader.scss";
+
 interface Option {
   value: string;
   label: string;
@@ -19,9 +16,7 @@ interface Option {
   children?: Option[];
 }
 
-export interface SelectedFilters {
-  holding: string[];
-  clientGroup: string[];
+export interface IClientPortfolioFilters {
   zones: string[];
   lines: string[];
   sublines: string[];
@@ -31,13 +26,11 @@ export interface SelectedFilters {
 }
 
 interface Props {
-  setSelectedFilters: Dispatch<SetStateAction<SelectedFilters>>;
+  setSelectedFilters: Dispatch<SetStateAction<IClientPortfolioFilters>>;
 }
 
-export const FilterPortfolio = ({ setSelectedFilters }: Props) => {
+export const FilterClientPortfolio = ({ setSelectedFilters }: Props) => {
   const { ID } = useAppStore((state) => state.selectedProject);
-  const [holdings, setHoldings] = useState<Option[]>([]);
-  const [clientGroups, setClientGroups] = useState<Option[]>([]);
   const [br, setBr] = useState({
     channels: [] as { id: number; name: string }[],
     lines: [] as { id: number; name: string }[],
@@ -49,8 +42,6 @@ export const FilterPortfolio = ({ setSelectedFilters }: Props) => {
   useEffect(() => {
     if (selectOptions.length === 0) {
       return setSelectedFilters({
-        holding: [],
-        clientGroup: [],
         zones: [],
         lines: [],
         sublines: [],
@@ -60,12 +51,6 @@ export const FilterPortfolio = ({ setSelectedFilters }: Props) => {
       });
     }
 
-    const holdingFilters = selectOptions
-      .filter((item) => item[0] === "Holding")
-      .map((item) => item[1]);
-    const clientGroupFilters = selectOptions
-      .filter((item) => item[0] === "Grupo de Cliente")
-      .map((item) => item[1]);
     const zonesFilters = selectOptions.filter((item) => item[0] === "Zona").map((item) => item[1]);
     const lineFilters = selectOptions.filter((item) => item[0] === "Linea").map((item) => item[1]);
     const sublineFilters = selectOptions
@@ -76,8 +61,6 @@ export const FilterPortfolio = ({ setSelectedFilters }: Props) => {
       .map((item) => item[1]);
 
     setSelectedFilters({
-      holding: holdingFilters,
-      clientGroup: clientGroupFilters,
       zones: zonesFilters,
       lines: lineFilters,
       sublines: sublineFilters,
@@ -93,37 +76,6 @@ export const FilterPortfolio = ({ setSelectedFilters }: Props) => {
 
   const loadData = async (selectedOptions: Option[]) => {
     const targetOption = selectedOptions[selectedOptions.length - 1];
-
-    if (targetOption.value === "Holding" && holdings.length === 0) {
-      try {
-        const holdingsData = await getHoldingsByProjectId(ID);
-        const holdingsToShow: Option[] = holdingsData.map((holding) => ({
-          label: holding.name,
-          value: holding.id.toString()
-        }));
-        targetOption.children = holdingsToShow;
-        setOptionsList([...optionsList]);
-        setHoldings(holdingsToShow);
-      } catch (error) {
-        console.error("Error fetching holdings:", error);
-      }
-    }
-
-    if (targetOption.value === "Grupo de Cliente" && clientGroups.length === 0) {
-      try {
-        const response = await getClientGroups(ID);
-        const clientGroupsData = response as IClientsGroupsFull;
-        const clientGroupsToShow: Option[] = clientGroupsData.data.map((group) => ({
-          label: group.group_name,
-          value: group.id.toString()
-        }));
-        targetOption.children = clientGroupsToShow;
-        setOptionsList([...optionsList]);
-        setClientGroups(clientGroupsToShow);
-      } catch (error) {
-        console.error("Error fetching client groups:", error);
-      }
-    }
 
     if (targetOption.value === "Zona") {
       const { data } = await getAllZones({ idProject: ID.toString() });
@@ -211,7 +163,7 @@ export const FilterPortfolio = ({ setSelectedFilters }: Props) => {
   return (
     <Cascader
       className="filterCascader"
-      style={{ width: "120px", height: "46px" }}
+      style={{ width: "15rem", height: "46px" }}
       multiple
       size="large"
       removeIcon
@@ -229,18 +181,6 @@ export const FilterPortfolio = ({ setSelectedFilters }: Props) => {
 };
 
 const options: Option[] = [
-  {
-    value: "Holding",
-    label: "Holding",
-    isLeaf: false,
-    disableCheckbox: true
-  },
-  {
-    value: "Grupo de Cliente",
-    label: "Grupo de Cliente",
-    isLeaf: false,
-    disableCheckbox: true
-  },
   {
     value: "Zona",
     label: "Zona",
@@ -276,8 +216,6 @@ const options: Option[] = [
 ];
 
 const initValueFiltersData = {
-  holding: [],
-  clientGroup: [],
   zones: [],
   channels: [],
   lines: [],
