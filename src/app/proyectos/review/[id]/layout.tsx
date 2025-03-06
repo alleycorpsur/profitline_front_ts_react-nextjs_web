@@ -1,6 +1,6 @@
 "use client";
 import { useParams, usePathname, useRouter } from "next/navigation";
-import { Tabs, Flex, Button, Skeleton, Typography, Result } from "antd";
+import { Tabs, Flex, Skeleton, Typography } from "antd";
 
 import { extractSingleParam } from "@/utils/utils";
 import { useProject } from "@/hooks/useProject";
@@ -9,7 +9,7 @@ import { SideBar } from "@/components/molecules/SideBar/SideBar";
 
 import "./layoutProjectDetail.scss";
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 
 export default function ProjectLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -64,34 +64,15 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
         </Flex>
 
         {/* Tabs Section */}
-        {!loading && !data ? (
-          <Flex vertical>
-            <Flex align="center" gap={"2rem"}>
-              <Button href="/settings">Volver</Button>
-              <Text>Informacion No encontrada</Text>
-            </Flex>
-            <Result
-              status="404"
-              title="404"
-              subTitle="Lo siento este proyecto no existe"
-              extra={
-                <Button type="primary" href="/settings">
-                  Back Home
-                </Button>
-              }
-            />
-          </Flex>
-        ) : (
-          <Flex className="tabsContainer">
-            <Tabs
-              style={{ width: "100%", height: "100%" }}
-              activeKey={activeTab}
-              onChange={handleTabChange}
-              size="large"
-              items={items}
-            />
-          </Flex>
-        )}
+        <Flex className="tabsContainer">
+          <Tabs
+            style={{ width: "100%", height: "100%" }}
+            activeKey={activeTab}
+            onChange={handleTabChange}
+            size="large"
+            items={items}
+          />
+        </Flex>
 
         {/* Render the active tab's content */}
         <div className="tabContent">{children}</div>
