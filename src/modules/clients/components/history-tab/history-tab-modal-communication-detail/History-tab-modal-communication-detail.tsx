@@ -7,10 +7,12 @@ import { InputForm } from "@/components/atoms/inputs/InputForm/InputForm";
 import GeneralSearchSelect from "@/components/ui/general-search-select";
 
 import "./history-tab-modal-communication-detail.scss";
+import { getCommunicationDetail } from "@/services/history/history";
 
 interface DigitalRecordModalProps {
   isOpen: boolean;
   onClose: () => void;
+  mongoID?: string;
 }
 
 interface ISelect {
@@ -25,7 +27,7 @@ export interface IFormDigitalRecordModal {
   attachments: File[];
 }
 
-const ModalCommunicationDetail = ({ isOpen, onClose }: DigitalRecordModalProps) => {
+const ModalCommunicationDetail = ({ isOpen, onClose, mongoID }: DigitalRecordModalProps) => {
   const { control, setValue, watch, reset } = useForm<IFormDigitalRecordModal>({
     defaultValues: {
       attachments: []
@@ -34,49 +36,23 @@ const ModalCommunicationDetail = ({ isOpen, onClose }: DigitalRecordModalProps) 
 
   useEffect(() => {
     const fetchFormInfo = async () => {
+      if (mongoID === undefined) return;
       try {
-        const response = {
-          forward_to: [
-            {
-              value: "1",
-              label: "Juan Perez"
-            },
-            {
-              value: "2",
-              label: "Maria Lopez"
-            }
-          ],
-          copy_to: [
-            {
-              value: "1",
-              label: "Juan Perez"
-            },
-            {
-              value: "2",
-              label: "Maria Lopez"
-            }
-          ],
-          subject: "Solicitud de información",
-          body: "Caliquet lacus aliquam quis. Maecenas pretium dapibus dolor, vitae convallis risus suscipit vel. Curabitur et maximus leo. Vivamus lacinia rhoncus ante, eu semper sapien luctus eget. Cras feugiat in nunc vel rhoncus. Etiam quam mauris, luctus eget felis in, porttitor tempor mauris. Cras quam purus, accumsan eget consectetur in, dapibus vitae enim. Ut mattis ex in dui elementum scelerisque. Praesent lobortis tempor dapibus.",
-          attachments: [
-            {
-              name: "example-document-1.pdf",
-              size: "2.5MB"
-            },
-            {
-              name: "example-image-1.pngexample-image-1.pngexample-image-1.pngexample-image-1.pngexample-image-1.png",
-              size: "1.8MB"
-            }
-          ]
-        };
-
-        setValue("forward_to", response.forward_to);
-        setValue("copy_to", response.copy_to);
+        const response = await getCommunicationDetail(mongoID);
+        setValue(
+          "forward_to",
+          response.email_send.map((email) => ({ value: email, label: email }))
+        );
+        setValue(
+          "copy_to",
+          response.email_copy.map((email) => ({ value: email, label: email }))
+        );
         setValue("subject", response.subject);
         setValue("body", response.body);
-        setValue("attachments", response.attachments as unknown as File[]);
+        // TODO: uncomment when attachments are available
+        // setValue("attachments", response.attachments as unknown as File[]);
       } catch (error) {
-        console.error("Error getting digital record form info2", error);
+        console.error("Error getting communication detail", error);
       }
     };
     fetchFormInfo();
