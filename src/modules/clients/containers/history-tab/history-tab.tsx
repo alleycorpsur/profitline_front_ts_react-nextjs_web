@@ -5,6 +5,7 @@ import { DotsThree } from "phosphor-react";
 
 import { extractSingleParam } from "@/utils/utils";
 import { useClientHistory } from "@/hooks/useClientHistory";
+import { useMessageApi } from "@/context/MessageContext";
 
 import UiSearchInput from "@/components/ui/search-input";
 import UiFilterDropdown from "@/components/ui/ui-filter-dropdown";
@@ -18,8 +19,10 @@ import { IHistoryRow } from "@/types/clientHistory/IClientHistory";
 import styles from "./history-tab.module.scss";
 
 const HistoryTab = () => {
+  const { showMessage } = useMessageApi();
   const params = useParams();
   const clientIdParam = extractSingleParam(params.clientId);
+  const [rowDetailID, setRowDetailID] = useState<string>();
   const [selectedRows, setSelectedRows] = useState<IHistoryRow[] | undefined>(undefined);
   const [search, setSearch] = useState("");
   const [openModal, setOpenModal] = useState({ selected: 0 });
@@ -34,7 +37,8 @@ const HistoryTab = () => {
   };
 
   const handleOpenDetail = (row: IHistoryRow) => {
-    console.info("Ver detalle", row);
+    if (!row.id_mongo_log) return showMessage("info", "No hay detalle para esta comunicación");
+    setRowDetailID(row.id_mongo_log);
     setOpenModal({ selected: 3 });
   };
 
@@ -92,6 +96,7 @@ const HistoryTab = () => {
           <ModalCommunicationDetail
             isOpen={openModal.selected === 3}
             onClose={() => setOpenModal({ selected: 0 })}
+            mongoID={rowDetailID}
           />
         </div>
       )}

@@ -185,6 +185,7 @@ const ApplyTab: React.FC = () => {
     try {
       await saveApplication(projectId, clientId);
       showMessage("success", "Se ha guardado la aplicación correctamente");
+      mutate();
     } catch (error) {
       showMessage("error", "Ha ocurrido un error al guardar la aplicación");
     }

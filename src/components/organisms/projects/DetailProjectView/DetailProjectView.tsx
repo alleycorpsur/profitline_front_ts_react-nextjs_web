@@ -65,41 +65,23 @@ export const DetailsProjectView = () => {
   return (
     <Flex vertical className="containerDetailProject">
       {/* Main Content */}
-      {!loading && !data ? (
-        <Flex vertical>
-          <Flex align="center" gap={"2rem"}>
-            <Button href="/settings">Volver</Button>
-            <Text>Información no encontrada</Text>
+
+      <Flex>
+        {loading ? (
+          <Flex style={{ height: "500px", width: "100%" }} align="center" justify="center">
+            <Spin size="large" />
           </Flex>
-          <Result
-            status="404"
-            title="404"
-            subTitle="Lo siento, este proyecto no existe."
-            extra={
-              <Button type="primary" href="/settings">
-                Volver a inicio
-              </Button>
-            }
+        ) : (
+          <ProjectFormTab
+            onSubmitForm={onUpdateProject}
+            onEditProject={() => setIsEditProject(true)}
+            data={data}
+            statusForm={isEditProject ? "edit" : "review"}
+            onActiveProject={onActiveProject}
+            onDesactivateProject={onDesactivateProject}
           />
-        </Flex>
-      ) : (
-        <Flex>
-          {loading ? (
-            <Flex style={{ height: "500px", width: "100%" }} align="center" justify="center">
-              <Spin size="large" />
-            </Flex>
-          ) : (
-            <ProjectFormTab
-              onSubmitForm={onUpdateProject}
-              onEditProject={() => setIsEditProject(true)}
-              data={data}
-              statusForm={isEditProject ? "edit" : "review"}
-              onActiveProject={onActiveProject}
-              onDesactivateProject={onDesactivateProject}
-            />
-          )}
-        </Flex>
-      )}
+        )}
+      </Flex>
     </Flex>
   );
 };
