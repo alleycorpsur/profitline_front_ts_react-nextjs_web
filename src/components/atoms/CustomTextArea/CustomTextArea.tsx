@@ -1,19 +1,17 @@
-import React, { useEffect, useRef } from "react";
+import React, { TextareaHTMLAttributes, useEffect, useRef } from "react";
 import { ControllerRenderProps } from "react-hook-form";
 import "./customTextArea.scss";
 
-type CustomTextAreProps = {
+interface CustomTextAreProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   field?: ControllerRenderProps<any>;
   placeholder?: string;
   customStyles?: React.CSSProperties;
-  // eslint-disable-next-line no-unused-vars
-  onChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   value?: string;
   highlightWords?: string[];
   readOnly?: boolean;
   disabled?: boolean;
   customStyleTextArea?: React.CSSProperties;
-};
+}
 
 export const CustomTextArea = ({
   field,
@@ -24,7 +22,8 @@ export const CustomTextArea = ({
   highlightWords,
   readOnly,
   disabled,
-  customStyleTextArea
+  customStyleTextArea,
+  ...rest
 }: CustomTextAreProps) => {
   //
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -101,6 +100,7 @@ export const CustomTextArea = ({
     <div className="container" id="container" style={customStyles}>
       <div ref={mirrorRef} className="container__mirror" />
       <textarea
+        {...rest}
         {...field}
         style={customStyleTextArea}
         ref={textareaRef}

@@ -89,6 +89,8 @@ export const CommunicationProjectForm = ({ onGoBackTable, showCommunicationDetai
       label: string;
     }[]
   >([]);
+  const [lastFocusedTextArea, setLastFocusedTextArea] = useState<"subject" | "message">("message");
+
   const { ID: projectId } = useAppStore((state) => state.selectedProject);
 
   const { showMessage } = useMessageApi();
@@ -218,8 +220,13 @@ export const CommunicationProjectForm = ({ onGoBackTable, showCommunicationDetai
 
     const lastAddedTag = value.length > 0 ? value[value.length - 1] : undefined;
 
-    setValue("template.message", `${valueBody ? valueBody : ""}{{${lastAddedTag?.label}}}`);
-    setValue("template.subject", `${valueSubject ? valueSubject : ""}{{${lastAddedTag?.label}}}`);
+    if (lastFocusedTextArea === "subject") {
+      setValue("template.subject", `${valueSubject ? valueSubject : ""}{{${lastAddedTag?.label}}}`);
+      return;
+    } else if (lastFocusedTextArea === "message") {
+      setValue("template.message", `${valueBody ? valueBody : ""}{{${lastAddedTag?.label}}}`);
+      return;
+    }
   };
 
   const handleCreateCommunication = async (data: any) => {
@@ -632,6 +639,7 @@ export const CommunicationProjectForm = ({ onGoBackTable, showCommunicationDetai
                     <p className={styles.textArea__label}>Asunto</p>
                     <CustomTextArea
                       {...field}
+                      onFocus={() => setLastFocusedTextArea("subject")}
                       onChange={field.onChange}
                       placeholder="Asunto"
                       customStyles={
@@ -661,6 +669,7 @@ export const CommunicationProjectForm = ({ onGoBackTable, showCommunicationDetai
                   <p className={styles.textArea__label}>Cuerpo</p>
                   <CustomTextArea
                     {...field}
+                    onFocus={() => setLastFocusedTextArea("message")}
                     onChange={field.onChange}
                     placeholder="Ingresar cuerpo del correo"
                     customStyles={errors.template?.message ? { borderColor: "red" } : {}}
