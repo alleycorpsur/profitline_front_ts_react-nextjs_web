@@ -1,13 +1,6 @@
-import axios, { AxiosError, AxiosResponse } from "axios";
 import config from "@/config";
-import { API, getIdToken } from "@/utils/api/api";
-import {
-  ClientFormType,
-  IClient,
-  IClientAxios,
-  ICreateClient,
-  IUpdateClient
-} from "@/types/clients/IClients";
+import { API } from "@/utils/api/api";
+import { ClientFormType, IClient, ICreateClient, IUpdateClient } from "@/types/clients/IClients";
 import { IBillingPeriodForm } from "@/types/billingPeriod/IBillingPeriod";
 
 import { SUCCESS } from "@/utils/constants/globalConstants";
@@ -64,19 +57,8 @@ export const createClient = async (
     }
   });
 
-  const token = await getIdToken();
-
   try {
-    const response: AxiosResponse | AxiosError = await axios.post(
-      `${config.API_HOST}/client`,
-      formData,
-      {
-        headers: {
-          Accept: "application/json, text/plain, */*",
-          Authorization: `Bearer ${token}`
-        }
-      }
-    );
+    const response = await API.post(`${config.API_HOST}/client`, formData);
 
     if (response.status === SUCCESS) {
       showMessage("success", "El Cliente fue creado exitosamente.");
@@ -86,28 +68,20 @@ export const createClient = async (
     return response;
   } catch (error) {
     console.warn("error creating new client: ", error);
-    if (axios.isAxiosError(error)) {
-      showMessage("error", error.response?.data?.message);
-    }
-    return error as AxiosError;
+
+    showMessage("error", "error creando cliente");
+
+    throw error;
   }
 };
 
-export const getClientById = async (idUser: string, projectId: string): Promise<IClientAxios> => {
-  const token = await getIdToken();
+export const getClientById = async (idUser: string, projectId: string): Promise<IClient> => {
   try {
-    const response: IClientAxios = await axios.get(
-      `${config.API_HOST}/client/${idUser}/project/${projectId}`,
-      {
-        headers: {
-          Accept: "application/json, text/plain, */*",
-          "Content-Type": "application/json; charset=utf-8",
-          Authorization: `Bearer ${token}`
-        }
-      }
+    const response: GenericResponse<IClient> = await API.get(
+      `${config.API_HOST}/client/${idUser}/project/${projectId}`
     );
 
-    return response;
+    return response.data;
   } catch (error) {
     console.warn("error getting client by Id: ", error);
     return error as any;
@@ -153,17 +127,10 @@ export const updateClient = async (
     }
   });
 
-  const token = await getIdToken();
   try {
-    const response: AxiosResponse | AxiosError = await axios.put(
+    const response = await API.put(
       `${config.API_HOST}/client/${clientId}/project/${idProject}`,
-      modelData,
-      {
-        headers: {
-          Accept: "application/json, text/plain, */*",
-          Authorization: `Bearer ${token}`
-        }
-      }
+      modelData
     );
 
     if (response.status === SUCCESS) {
@@ -173,10 +140,8 @@ export const updateClient = async (
     return response;
   } catch (error) {
     console.warn("error updating client: ", error);
-    if (axios.isAxiosError(error)) {
-      showMessage("error", error.response?.data?.message);
-    }
-    return error as AxiosError;
+    showMessage("error", "error actualizando cliente");
+    throw error;
   }
 };
 
@@ -186,19 +151,9 @@ export const deleteClientById = async (
   // eslint-disable-next-line no-unused-vars
   showMessage: (type: MessageType, content: string) => void,
   onClose: () => void
-): Promise<IClientAxios> => {
-  const token = await getIdToken();
+): Promise<any> => {
   try {
-    const response: IClientAxios = await axios.delete(
-      `${config.API_HOST}/client/${idUser}/project/${projectId}`,
-      {
-        headers: {
-          Accept: "application/json, text/plain, */*",
-          "Content-Type": "application/json; charset=utf-8",
-          Authorization: `Bearer ${token}`
-        }
-      }
-    );
+    const response = await API.delete(`${config.API_HOST}/client/${idUser}/project/${projectId}`);
 
     if (response.status === SUCCESS) {
       showMessage("success", "El Cliente fue eliminado exitosamente.");
@@ -245,19 +200,10 @@ export const changeClientStatus = async (
   // eslint-disable-next-line no-unused-vars
   showMessage: (type: MessageType, content: string) => void
 ) => {
-  const token = await getIdToken();
-
   try {
-    const response: AxiosResponse | AxiosError = await axios.put(
-      `${config.API_HOST}/client/change-status/${clientId}`,
-      { status: newStatus },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
-        }
-      }
-    );
+    const response = await API.put(`${config.API_HOST}/client/change-status/${clientId}`, {
+      status: newStatus
+    });
 
     if (response.status === 200) {
       showMessage("success", "Estado del cliente cambiado exitosamente.");
@@ -268,7 +214,7 @@ export const changeClientStatus = async (
   } catch (error) {
     console.warn("Error cambiando el estado del cliente: ", error);
     showMessage("error", "Oops, ocurrió un error cambiando el estado del cliente.");
-    return error as AxiosError;
+    throw error;
   }
 };
 
@@ -285,8 +231,6 @@ export const editClientDocument = async ({
   file,
   showMessage
 }: PropsEditClientDocument) => {
-  const token = await getIdToken();
-
   const modelData: { [key: string]: any } = {
     client_id: clientId,
     project_id: "1",
@@ -301,12 +245,7 @@ export const editClientDocument = async ({
   });
 
   try {
-    const response = await axios.put(`${config.API_HOST}/client/change-documents`, formData, {
-      headers: {
-        Accept: "application/json, text/plain, */*",
-        Authorization: `Bearer ${token}`
-      }
-    });
+    const response = await API.put(`${config.API_HOST}/client/change-documents`, formData, {});
 
     if (response.status === SUCCESS) {
       showMessage("success", "Documento actualizado exitosamente.");
@@ -316,6 +255,6 @@ export const editClientDocument = async ({
     console.warn("Error editando documentos cliente: ", error);
     showMessage("error", "Oops, ocurrió un error editando el documento del cliente.");
     alert("error");
-    return error as AxiosError;
+    throw error;
   }
 };

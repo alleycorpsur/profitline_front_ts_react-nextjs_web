@@ -1,6 +1,5 @@
 import config from "@/config";
-import { getIdToken } from "@/utils/api/api";
-import axios, { AxiosResponse } from "axios";
+import { API } from "@/utils/api/api";
 
 interface IncidentActionData {
   comments: string;
@@ -11,9 +10,7 @@ export const approveIncident = async (
   invoiceId: number,
   incidentId: number,
   actionData: IncidentActionData
-): Promise<AxiosResponse<any>> => {
-  const token = await getIdToken();
-
+): Promise<any> => {
   const formData = new FormData();
   formData.append("comments", actionData.comments);
 
@@ -23,16 +20,9 @@ export const approveIncident = async (
     });
   }
 
-  const response: AxiosResponse<any> = await axios.post(
+  const response = await API.post(
     `${config.API_HOST}/invoice/${invoiceId}/approve-incident/${incidentId}`,
-    formData,
-    {
-      headers: {
-        Accept: "application/json, text/plain, */*",
-        "Content-Type": "multipart/form-data",
-        Authorization: `Bearer ${token}`
-      }
-    }
+    formData
   );
 
   return response;
@@ -42,9 +32,7 @@ export const rejectIncident = async (
   invoiceId: number,
   incidentId: number,
   actionData: IncidentActionData
-): Promise<AxiosResponse<any>> => {
-  const token = await getIdToken();
-
+): Promise<any> => {
   const formData = new FormData();
   formData.append("comments", actionData.comments);
 
@@ -54,16 +42,9 @@ export const rejectIncident = async (
     });
   }
 
-  const response: AxiosResponse<any> = await axios.post(
+  const response = await API.post(
     `${config.API_HOST}/invoice/${invoiceId}/reject-incident/${incidentId}`,
-    formData,
-    {
-      headers: {
-        Accept: "application/json, text/plain, */*",
-        "Content-Type": "multipart/form-data",
-        Authorization: `Bearer ${token}`
-      }
-    }
+    formData
   );
 
   return response;
@@ -76,18 +57,10 @@ interface AddCommentData {
 export const addIncidentComment = async (
   incidentId: string,
   commentData: AddCommentData
-): Promise<AxiosResponse<any>> => {
-  const token = await getIdToken();
-
-  const response: AxiosResponse<any> = await axios.post(
+): Promise<any> => {
+  const response: any = await API.post(
     `${config.API_HOST}/invoice/incident-comments/${incidentId}`,
-    commentData,
-    {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
-      }
-    }
+    commentData
   );
 
   return response;

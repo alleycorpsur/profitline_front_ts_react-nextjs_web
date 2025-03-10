@@ -9,8 +9,7 @@ import {
 } from "@/types/discount/DiscountBasics";
 import { DiscountContractRange } from "@/types/discount/DiscountContractRange";
 import { GenericResponse, GenericResponsePage } from "@/types/global/IGlobal";
-import { API, getIdToken } from "@/utils/api/api";
-import axios from "axios";
+import { API, getIdToken, idProject } from "@/utils/api/api";
 import {
   Discount,
   DiscountPackageCreateResponse,
@@ -113,14 +112,15 @@ export const createDiscount = async (
   body = form;
 
   const token = await getIdToken();
-  const response = await axios.post<GenericResponse<DiscountCreateResponse>>(
-    `${config.API_HOST}/discount`,
+  const response = await API.post<GenericResponse<DiscountCreateResponse>>(
+    `/discount`,
     body,
     {
       headers: {
         Accept: "application/json, text/plain, */*",
         "Content-Type": "multipart/form-data",
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
+        "projectid": idProject
       }
     }
   );
@@ -151,14 +151,15 @@ export const updateDiscount = async (
   body = form;
 
   const token = await getIdToken();
-  const response = await axios.put<GenericResponse<DiscountGetOne>>(
-    `${config.API_HOST}/discount/${discountId}`,
+  const response = await API.put<GenericResponse<DiscountGetOne>>(
+    `/discount/${discountId}`,
     body,
     {
       headers: {
         Accept: "application/json, text/plain, */*",
         "Content-Type": "multipart/form-data",
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
+        "projectid": idProject
       }
     }
   );
@@ -179,17 +180,9 @@ export const createDiscountPackage = async (
   body.primaryDiscounts = body.primaryDiscounts?.map((x: Discount) => x.id);
   body.secondaryDiscounts = body.secondaryDiscounts?.map((x: Discount) => x.id);
 
-  const token = await getIdToken();
-  const response = await axios.post<GenericResponse<DiscountPackageCreateResponse>>(
-    `${config.API_HOST}/discount/discount-package`,
-    body,
-    {
-      headers: {
-        Accept: "application/json, text/plain, */*",
-        "Content-Type": "application/json; charset=utf-8",
-        Authorization: `Bearer ${token}`
-      }
-    }
+  const response = await API.post<GenericResponse<DiscountPackageCreateResponse>>(
+    `/discount/discount-package`,
+    body
   );
   return response.data;
 };

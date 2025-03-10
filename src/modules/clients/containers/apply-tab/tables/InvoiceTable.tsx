@@ -13,7 +13,7 @@ interface InvoiceTableProps {
   // eslint-disable-next-line no-unused-vars
   handleDeleteRow?: (id: number) => void;
   // eslint-disable-next-line no-unused-vars
-  handleEditRow: (row_id: number) => void;
+  handleEditRow: (row: IApplyTabRecord, editing_type: "invoice" | "payment" | "discount") => void;
   // eslint-disable-next-line no-unused-vars
   rowSelection: {
     selectedRowKeys: React.Key[];
@@ -53,9 +53,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
       title: "Monto",
       dataIndex: "initial_value",
       key: "initial_value",
-      render: (initial_value) => (
-        <p className="fontMonoSpace">{formatMoney(initial_value)}</p>
-      ),
+      render: (initial_value) => <p className="fontMonoSpace">{formatMoney(initial_value)}</p>,
       sorter: (a, b) => a.initial_value - b.initial_value,
       showSorterTooltip: false,
       align: "right"
@@ -102,7 +100,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                 className="buttonNoBorder"
                 onClick={() => {
                   setActiveRow(row);
-                  handleEditRow(row.id);
+                  handleEditRow(row, "invoice");
                 }}
               >
                 Ver

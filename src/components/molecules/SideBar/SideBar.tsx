@@ -13,7 +13,8 @@ import {
   SquaresFour,
   Storefront,
   UsersFour,
-  Stack
+  Stack,
+  ClipboardText
 } from "phosphor-react";
 
 import { logOut } from "../../../../firebase-utils";
@@ -26,6 +27,7 @@ import { ModalProjectSelector } from "../modals/ModalProjectSelector/ModalProjec
 
 import "./sidebar.scss";
 import { SealPercent } from "@phosphor-icons/react";
+import { setProjectInApi } from "@/utils/api/api";
 
 export const SideBar = () => {
   const [isSideBarLarge, setIsSideBarLarge] = useState(false);
@@ -34,8 +36,15 @@ export const SideBar = () => {
   const router = useRouter();
   const path = usePathname();
   const project = useStore(useAppStore, (state) => state.selectedProject);
-  const { setProjectsBasicInfo, setSelectedProject, setUserId, setCurrency, setLocale } =
-    useAppStore((state) => state);
+  const {
+    setProjectsBasicInfo,
+    setSelectedProject,
+    setUserId,
+    setCurrency,
+    setLocale,
+    isHy,
+    projectsBasicInfo
+  } = useAppStore((state) => state);
 
   const LOGO = project?.LOGO;
 
@@ -46,7 +55,7 @@ export const SideBar = () => {
   useEffect(() => {
     //to check if there is a project selected
     //if not it should open the modal to select one
-    if (!isComponentLoading && !project?.ID) {
+    if (isHy && !isComponentLoading && !project?.ID) {
       setModalProjectSelectorOpen(true);
     }
   }, [isComponentLoading, project]);
@@ -55,35 +64,43 @@ export const SideBar = () => {
     //useEffect to call userPermissions and get the projects
     const fetchProjects = async () => {
       const response = await getUserPermissions();
-      setProjectsBasicInfo(
-        response?.data?.permissions.map((project) => ({
-          ID: project.project_id,
-          NAME: project.name,
-          LOGO: project.logo ? `${project.logo.trim()}?v=${new Date().getTime()}` : "",
-          views_permissions: project.views_permissions,
-          action_permissions: project.action_permissions,
-          isSuperAdmin: project.is_super_admin
-        }))
-      );
+      if (response?.data) {
+        setProjectsBasicInfo(
+          response?.data?.permissions.map((project) => ({
+            ID: project.project_id,
+            NAME: project.name,
+            LOGO: project.logo ? project.logo : "",
+            rol_id: project.rol_id,
+            views_permissions: project.views_permissions,
+            action_permissions: project.action_permissions,
+            isSuperAdmin: project.is_super_admin
+          }))
+        );
 
-      setUserId(response?.data.id_user);
-      setCurrency(response?.data.preferences.currency);
-      setLocale(response?.data.preferences.id);
+        setUserId(response?.data.id_user);
+        setCurrency(response?.data.preferences.currency);
+        setLocale(response?.data.preferences.id);
 
-      if (response?.data?.permissions?.length === 1) {
-        setSelectedProject({
-          ID: response?.data.permissions[0].project_id,
-          NAME: response?.data.permissions[0].name,
-          LOGO: response?.data.permissions[0].logo ? response?.data.permissions[0].logo : "",
-          views_permissions: response?.data.permissions[0].views_permissions,
-          action_permissions: response?.data.permissions[0].action_permissions,
-          isSuperAdmin: response?.data?.permissions[0].is_super_admin
-        });
+        if (response?.data?.permissions?.length === 1) {
+          const project = {
+            ID: response?.data.permissions[0].project_id,
+            NAME: response?.data.permissions[0].name,
+            LOGO: response?.data.permissions[0].logo ? response?.data.permissions[0].logo : "",
+            rol_id: response?.data.permissions[0].rol_id,
+            views_permissions: response?.data.permissions[0].views_permissions,
+            action_permissions: response?.data.permissions[0].action_permissions,
+            isSuperAdmin: response?.data.permissions[0].is_super_admin
+          };
+          setProjectInApi(project.ID);
+          setSelectedProject(project);
+        }
       }
     };
 
-    fetchProjects();
-  }, []);
+    if (!projectsBasicInfo?.length && isHy) {
+      fetchProjects();
+    }
+  }, [isHy]);
 
   return (
     <div className={isSideBarLarge ? "mainLarge" : "main"}>
@@ -204,6 +221,18 @@ export const SideBar = () => {
           </Link>
         )}
         {checkUserViewPermissions(project, "GestorTareas") && (
+          <Link href="/gestor-tareas" passHref legacyBehavior>
+            <Button
+              type="primary"
+              size="large"
+              icon={<ClipboardText size={26} />}
+              className={path === "/gestor-tareas" ? "buttonIcon" : "buttonIconActive"}
+            >
+              {isSideBarLarge && "Gestor de tareas"}
+            </Button>
+          </Link>
+        )}
+        {checkUserViewPermissions(project, "AdministracionClientes") && (
           <Link href="/client-management" passHref legacyBehavior>
             <Button
               type="primary"

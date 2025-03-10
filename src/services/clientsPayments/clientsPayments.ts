@@ -1,7 +1,5 @@
-import axios from "axios";
 import config from "@/config";
-
-import { API, getIdToken } from "@/utils/api/api";
+import { API } from "@/utils/api/api";
 
 import {
   IFormIdentifyPaymentModal,
@@ -67,8 +65,6 @@ interface IMatchPayment {
 }
 
 export const matchPayment = async ({ data, paymentId, clientId }: IMatchPayment) => {
-  const token = await getIdToken();
-
   const modelData = {
     clientId,
     accountId: data.account?.value,
@@ -82,17 +78,15 @@ export const matchPayment = async ({ data, paymentId, clientId }: IMatchPayment)
     formData.append(key, modelData[key as keyof typeof modelData] as any);
   }
 
-  const response: GenericResponse<any> = await axios.post(
-    `${config.API_HOST}/bank/match-payment/${paymentId}`,
-    formData,
-    {
-      headers: {
-        Accept: "application/json, text/plain, */*",
-        "Content-Type": "multipart/form-data",
-        Authorization: `Bearer ${token}`
-      }
-    }
-  );
+  try {
+    const response: GenericResponse<any> = await API.post(
+      `${config.API_HOST}/bank/match-payment/${paymentId}`,
+      formData
+    );
 
-  return response;
+    return response;
+  } catch (error) {
+    console.error("Error in matchPayment:", error);
+    throw error;
+  }
 };

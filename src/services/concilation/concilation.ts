@@ -4,16 +4,10 @@ import {
   dataConcilation,
   IInvoiceIncident
 } from "@/types/concilation/concilation";
-import { getIdToken } from "@/utils/api/api";
-import axios, { AxiosResponse } from "axios";
+import { GenericResponse } from "@/types/global/IGlobal";
+import { API } from "@/utils/api/api";
 
-export const invoiceConciliation = async (
-  files: File[],
-  clientId: number,
-  projectId: number
-): Promise<dataConcilation> => {
-  const token = await getIdToken();
-
+export const invoiceConciliation = async (files: File[], clientId: number, projectId: number) => {
   const formData = new FormData();
 
   files.forEach((file) => {
@@ -22,16 +16,9 @@ export const invoiceConciliation = async (
   formData.append("client_id", clientId.toString());
   formData.append("project_id", projectId.toString());
 
-  const response: AxiosResponse<dataConcilation> = await axios.post(
+  const response: GenericResponse<dataConcilation> = await API.post(
     `${config.API_HOST}/massive-action/invoice-conciliation`,
-    formData,
-    {
-      headers: {
-        Accept: "application/json, text/plain, */*",
-        "Content-Type": "multipart/form-data",
-        Authorization: `Bearer ${token}`
-      }
-    }
+    formData
   );
 
   return response.data;
@@ -42,9 +29,7 @@ export const invoiceCreateIncident = async (
   invoices: IInvoiceIncident[],
   comments: string,
   clientId: number
-): Promise<CreateIncidentResponse> => {
-  const token = await getIdToken();
-
+) => {
   const formData = new FormData();
   files.forEach((file) => {
     formData.append("files", file);
@@ -53,17 +38,10 @@ export const invoiceCreateIncident = async (
   formData.append("comments", comments);
   formData.append("client_id", clientId.toString());
 
-  const response: AxiosResponse<CreateIncidentResponse> = await axios.post(
+  const response: GenericResponse<CreateIncidentResponse> = await API.post(
     `${config.API_HOST}/massive-action/invoice-create-incident`,
-    formData,
-    {
-      headers: {
-        Accept: "application/json, text/plain, */*",
-        "Content-Type": "multipart/form-data",
-        Authorization: `Bearer ${token}`
-      }
-    }
+    formData
   );
 
-  return response.data;
+  return response;
 };

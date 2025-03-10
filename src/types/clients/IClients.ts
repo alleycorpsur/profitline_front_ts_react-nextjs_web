@@ -1,15 +1,4 @@
-import { AxiosHeaders } from "axios";
-import { Config } from "../users/IUser";
 import { IBillingPeriodForm } from "../billingPeriod/IBillingPeriod";
-
-export interface IClientAxios {
-  data: IClientFullResponse;
-  status: number;
-  statusText: string;
-  headers: AxiosHeaders;
-  config: Config;
-  request: Request;
-}
 
 export interface IClientFullResponse {
   status: number;

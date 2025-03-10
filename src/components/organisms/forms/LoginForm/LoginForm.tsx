@@ -14,7 +14,6 @@ import { openNotification } from "@/components/atoms/Notification/Notification";
 
 import "./loginform.scss";
 import { sendOtp, validateOtp } from "@/services/externalAuth/externalAuth";
-import { STORAGE_TOKEN } from "@/utils/constants/globalConstants";
 
 interface IAuthLogin {
   email: string;
@@ -24,16 +23,24 @@ interface IAuthLogin {
 
 const schema = yup.object().shape({
   email: yup.string().email().required(),
-  password: yup.string().min(5).max(32).when("$hasToken", {
-    is: true,
-    then: (schema) => schema.notRequired(),
-    otherwise: (schema) => schema.required(),
-  }),
-  otp: yup.string().length(6).matches(/^\d{6}$/).when("$isCodeSent", {
-    is: true,
-    then: (schema) => schema.required(),
-    otherwise: (schema) => schema.notRequired(),
-  }),
+  password: yup
+    .string()
+    .min(5)
+    .max(32)
+    .when("$hasToken", {
+      is: true,
+      then: (schema) => schema.notRequired(),
+      otherwise: (schema) => schema.required()
+    }),
+  otp: yup
+    .string()
+    .length(6)
+    .matches(/^\d{6}$/)
+    .when("$isCodeSent", {
+      is: true,
+      then: (schema) => schema.required(),
+      otherwise: (schema) => schema.notRequired()
+    })
 });
 
 interface LoginFormProps {
@@ -71,7 +78,7 @@ export const LoginForm = ({ setResetPassword, token }: LoginFormProps) => {
       });
       return;
     }
-    const isSendedOtp = await sendOtp(email, token);
+    const isSendedOtp = await sendOtp(email);
     if (isSendedOtp.code !== 200) {
       openNotification({
         api: api,
@@ -88,7 +95,7 @@ export const LoginForm = ({ setResetPassword, token }: LoginFormProps) => {
       title: "¡Revisa tu correo!",
       message: "Te hemos enviado un código de acceso único. Ingrésalo para continuar."
     });
-  }
+  };
 
   const onSubmitHandler = async ({ email, password, otp }: IAuthLogin) => {
     setIsLoading(true);
@@ -96,7 +103,7 @@ export const LoginForm = ({ setResetPassword, token }: LoginFormProps) => {
     if (token) {
       if (isCodeSent && otp) {
         setIsLoading(false);
-        const isSendedOtp = await validateOtp(email, otp, token);
+        const isSendedOtp = await validateOtp(email, otp);
         if (isSendedOtp.code !== 200) {
           setIsInvalidCode(true);
           openNotification({
@@ -108,7 +115,14 @@ export const LoginForm = ({ setResetPassword, token }: LoginFormProps) => {
         }
         // localStorage.setItem(STORAGE_TOKEN, token);
         // router.push("/clientes/all");
-        await getAuth(email.trim(), isSendedOtp.data.password, router, false, openNotification, api);
+        await getAuth(
+          email.trim(),
+          isSendedOtp.data.password,
+          router,
+          false,
+          openNotification,
+          api
+        );
         setIsLoading(false);
         reset();
         return;
@@ -139,12 +153,12 @@ export const LoginForm = ({ setResetPassword, token }: LoginFormProps) => {
   return (
     <form className="loginForm" onSubmit={handleSubmit(onSubmitHandler)}>
       {contextHolder}
-      <h4 className="loginForm__title">{!token ? 'Inicia sesión' : 'Ingresar'}</h4>
+      <h4 className="loginForm__title">{!token ? "Inicia sesión" : "Ingresar"}</h4>
 
       <Flex vertical gap={"1.5rem"} className="loginForm__content">
         {!isCodeSent && (
           <div>
-            <p className="loginForm__inputTitle">{!token ? 'Usuario' : 'Correo electrónico'}</p>
+            <p className="loginForm__inputTitle">{!token ? "Usuario" : "Correo electrónico"}</p>
             <InputForm
               customStyle={{ with: "100%" }}
               placeholder="Ingresar usuario"
@@ -158,7 +172,10 @@ export const LoginForm = ({ setResetPassword, token }: LoginFormProps) => {
         )}
         {isCodeSent && (
           <div>
-            <p className="loginForm__otpTitle">Hemos enviado el código de autenticación al correo <span className="loginForm__otpTitle__bold">{getValues('email')}</span></p>
+            <p className="loginForm__otpTitle">
+              Hemos enviado el código de autenticación al correo{" "}
+              <span className="loginForm__otpTitle__bold">{getValues("email")}</span>
+            </p>
             <div className="otpInputContainer">
               <Controller
                 name="otp"
@@ -179,11 +196,12 @@ export const LoginForm = ({ setResetPassword, token }: LoginFormProps) => {
             </div>
             {isInvalidCode && <p className="loginForm__otpError">Código inválido</p>}
             {timeLeft > 0 ? (
-              <p className="loginForm__otpResentCode">
-                Reenviar en {timeLeft}s
-              </p>
+              <p className="loginForm__otpResentCode">Reenviar en {timeLeft}s</p>
             ) : (
-              <p onClick={() => handleSentOtpCode(getValues('email'))} className="loginForm__otpResentCode">
+              <p
+                onClick={() => handleSentOtpCode(getValues("email"))}
+                className="loginForm__otpResentCode"
+              >
                 Reenviar codigo
               </p>
             )}
