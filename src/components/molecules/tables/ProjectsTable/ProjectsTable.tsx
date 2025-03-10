@@ -1,18 +1,20 @@
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Avatar, Button, Flex, Table, Typography, message } from "antd";
 import type { TableProps } from "antd";
 import { Clipboard, Eye, Plus, Triangle } from "phosphor-react";
 
-import { FilterProjects } from "@/components/atoms/Filters/FilterProjects/FilterProjects";
-import { useProjects } from "@/hooks/useProjects";
 import { useAppStore } from "@/lib/store/store";
+import { useProjects } from "@/hooks/useProjects";
+import { countries } from "@/utils/countries";
+
+import { FilterProjects } from "@/components/atoms/Filters/FilterProjects/FilterProjects";
+import UiSearchInput from "@/components/ui/search-input";
+import { DotsDropdown } from "@/components/atoms/DotsDropdown/DotsDropdown";
+
 import { IProject } from "@/types/projects/IProjects";
 
 import "./projectstable.scss";
-import UiSearchInput from "@/components/ui/search-input";
-import { countries } from "@/utils/countries";
-import { DotsDropdown } from "@/components/atoms/DotsDropdown/DotsDropdown";
-
 const { Text } = Typography;
 
 export const ProjectTable = () => {
@@ -32,6 +34,8 @@ export const ProjectTable = () => {
 
   const projects = useAppStore((state) => state.projects);
   const setProjects = useAppStore((state) => state.setProjects);
+  const setSelectedProject = useAppStore((state) => state.setSelectedProject);
+  const router = useRouter();
 
   const onChangePage = (pagePagination: number) => {
     setPage(pagePagination);
@@ -55,6 +59,133 @@ export const ProjectTable = () => {
       messageApi.open({ type: "error", content: error.message });
     }
   }, [error]);
+
+  const handleOpenProject = (row: IProject) => {
+    setSelectedProject({
+      ID: row.ID,
+      NAME: row.PROJECT_DESCRIPTION,
+      LOGO: row.LOGO ?? ""
+    });
+
+    router.push(`/proyectos/review/${row.ID}/detail`);
+  };
+
+  const columns: TableProps<IProject>["columns"] = [
+    {
+      title: "Proyecto",
+      dataIndex: "name",
+      className: "tableTitle",
+      key: "name",
+      render: (_, { LOGO }) => (
+        <>
+          {LOGO ? (
+            <Avatar
+              shape="square"
+              className="avatarProject"
+              size={70}
+              src={`${LOGO.trim()}?v=${new Date().getTime()}`}
+            />
+          ) : (
+            <Avatar shape="square" className="imageWithoutImage" size={65} icon={<Clipboard />} />
+          )}
+        </>
+      )
+    },
+    {
+      title: "Nombre",
+      dataIndex: "PROJECT_DESCRIPTION",
+      className: "tableTitle",
+      key: "PROJECT_DESCRIPTION",
+      render: (text) => <Text>{text}</Text>
+    },
+    {
+      title: "País",
+      dataIndex: "COUNTRY_NAME",
+      className: "tableTitle",
+      key: "COUNTRY_NAME",
+      render: (text) => (
+        <Text className="text">
+          {countries(text)}
+          {text}
+        </Text>
+      )
+    },
+    {
+      title: "Dirección",
+      className: "tableTitle",
+      dataIndex: "ADDRESS",
+      key: "ADDRESS"
+    },
+    {
+      title: "Contacto",
+      key: "CONTACT",
+      className: "tableTitle",
+      dataIndex: "CONTACT",
+      render: (text) => <Text>{text}</Text>
+    },
+    {
+      title: "Teléfono",
+      key: "PHONE",
+      className: "tableTitle",
+      dataIndex: "PHONE",
+      render: (text) => <Text>{text}</Text>
+    },
+    {
+      title: "Usuarios",
+      key: "NUMBER_USERS",
+      className: "tableTitle",
+      dataIndex: "NUMBER_USERS",
+      render: (text) => <Text>{text}</Text>
+    },
+    {
+      title: "Divisas",
+      key: "CURRENCY",
+      className: "tableTitle",
+      dataIndex: "CURRENCY",
+      render: (_, { CURRENCY }) => {
+        return (
+          <>
+            {CURRENCY.map(({ currency_name = "", id }) => {
+              const currencyName = currency_name ?? currency_name;
+              return <Text key={`${id}-${currencyName}`}>{currencyName.toUpperCase() + " "}</Text>;
+            })}
+          </>
+        );
+      }
+    },
+    {
+      title: "Estado",
+      key: "status",
+      className: "tableTitle",
+      width: "130px",
+      dataIndex: "status",
+      render: (_, { IS_ACTIVE }) => (
+        <Flex>
+          <Flex
+            align="center"
+            className={IS_ACTIVE ? "statusContainerActive" : "statusContainerInactive"}
+          >
+            <div className={IS_ACTIVE ? "statusActive" : "statusInactive"} />
+            <Text>{IS_ACTIVE ? "Activo" : "Inactivo"}</Text>
+          </Flex>
+        </Flex>
+      )
+    },
+    {
+      title: "",
+      key: "buttonSee",
+      width: "54px",
+      dataIndex: "",
+      render: (_, row) => (
+        <Button
+          onClick={() => handleOpenProject(row)}
+          className="icon-detail"
+          icon={<Eye size={20} />}
+        />
+      )
+    }
+  ];
+
   return (
     <main className="mainProjectsTable">
       {contextHolder}
@@ -102,119 +233,3 @@ export const ProjectTable = () => {
     </main>
   );
 };
-
-const columns: TableProps<IProject>["columns"] = [
-  {
-    title: "Proyecto",
-    dataIndex: "name",
-    className: "tableTitle",
-    key: "name",
-    render: (_, { LOGO }) => (
-      <>
-        {LOGO ? (
-          <Avatar
-            shape="square"
-            className="avatarProject"
-            size={70}
-            src={`${LOGO.trim()}?v=${new Date().getTime()}`}
-          />
-        ) : (
-          <Avatar shape="square" className="imageWithoutImage" size={65} icon={<Clipboard />} />
-        )}
-      </>
-    )
-  },
-  {
-    title: "Nombre",
-    dataIndex: "PROJECT_DESCRIPTION",
-    className: "tableTitle",
-    key: "PROJECT_DESCRIPTION",
-    render: (text) => <Text>{text}</Text>
-  },
-  {
-    title: "País",
-    dataIndex: "COUNTRY_NAME",
-    className: "tableTitle",
-    key: "COUNTRY_NAME",
-    render: (text) => (
-      <Text className="text">
-        {countries(text)}
-        {text}
-      </Text>
-    )
-  },
-  {
-    title: "Dirección",
-    className: "tableTitle",
-    dataIndex: "ADDRESS",
-    key: "ADDRESS"
-  },
-  {
-    title: "Contacto",
-    key: "CONTACT",
-    className: "tableTitle",
-    dataIndex: "CONTACT",
-    render: (text) => <Text>{text}</Text>
-  },
-  {
-    title: "Teléfono",
-    key: "PHONE",
-    className: "tableTitle",
-    dataIndex: "PHONE",
-    render: (text) => <Text>{text}</Text>
-  },
-  {
-    title: "Usuarios",
-    key: "NUMBER_USERS",
-    className: "tableTitle",
-    dataIndex: "NUMBER_USERS",
-    render: (text) => <Text>{text}</Text>
-  },
-  {
-    title: "Divisas",
-    key: "CURRENCY",
-    className: "tableTitle",
-    dataIndex: "CURRENCY",
-    render: (_, { CURRENCY }) => {
-      return (
-        <>
-          {CURRENCY.map(({ currency_name = "", id }) => {
-            const currencyName = currency_name ?? currency_name;
-            return <Text key={`${id}-${currencyName}`}>{currencyName.toUpperCase() + " "}</Text>;
-          })}
-        </>
-      );
-    }
-  },
-  {
-    title: "Estado",
-    key: "status",
-    className: "tableTitle",
-    width: "130px",
-    dataIndex: "status",
-    render: (_, { IS_ACTIVE }) => (
-      <Flex>
-        <Flex
-          align="center"
-          className={IS_ACTIVE ? "statusContainerActive" : "statusContainerInactive"}
-        >
-          <div className={IS_ACTIVE ? "statusActive" : "statusInactive"} />
-          <Text>{IS_ACTIVE ? "Activo" : "Inactivo"}</Text>
-        </Flex>
-      </Flex>
-    )
-  },
-  {
-    title: "",
-    key: "buttonSee",
-    width: "54px",
-    dataIndex: "",
-    render: (_, { ID }) => (
-      <Button
-        href={`/proyectos/review/${ID}/detail`}
-        className="icon-detail"
-        icon={<Eye size={20} />}
-      />
-    )
-  }
-];
