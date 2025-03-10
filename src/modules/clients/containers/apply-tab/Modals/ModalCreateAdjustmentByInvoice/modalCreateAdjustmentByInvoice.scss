@@ -1,0 +1,101 @@
+@import "@/styles/variables.scss";
+
+.modalCreateAdjustmentByInvoice {
+    .ant-modal-body {
+        display: flex;
+        flex-direction: column;
+    }
+    .header {
+        display: flex;
+        justify-content: left;
+        align-items: center;
+        gap: 0.25rem;
+        margin-bottom: 1.5rem;
+        transition: all 0.1s;
+        width: fit-content;
+        h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        &:hover {
+            cursor: pointer;
+            opacity: 0.7;
+        }
+    }
+
+    &__allAdjustments {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+
+    &__addAdjustment {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-family: inherit;
+        background-color: transparent;
+        transition: all 0.3s;
+        width: fit-content;
+        border: none;
+        box-shadow: none;
+        font-size: 1rem;
+        font-weight: 400;
+        padding: 6px 2px;
+        cursor: pointer;
+        border-radius: 8px;
+
+        &:hover {
+            background-color: $background !important;
+        }
+    }
+
+    .pasteInvoices {
+        margin: 1.5rem 0;
+        width: fit-content;
+        align-self: flex-end;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        font-size: 1rem;
+        font-weight: 400;
+        cursor: pointer;
+
+        &:hover {
+            background-color: $background !important;
+        }
+    }
+
+    .AdjustmentsTable {
+        .ant-table-cell-scrollbar {
+            display: none;
+        }
+        .ant-table-body {
+            scrollbar-width: none;
+        }
+        /* row data */
+        .ant-table-tbody > tr > td {
+            // height: fit-content;
+            height: 49px;
+            padding: 0 2rem;
+            font-size: 1rem;
+            font-weight: 300;
+        }
+
+        /* row header */
+        .ant-table-thead > tr > th {
+            text-align: center;
+            padding: 0.625rem 2rem;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+    }
+
+    .modal-footer {
+        display: grid;
+        margin-top: 16px;
+        gap: 1rem;
+        grid-template-columns: 1fr 1fr;
+    }
+}

@@ -27,6 +27,7 @@ import { ModalSelectAjustements } from "./Modals/ModalSelectAjustements/ModalSel
 import ModalListAdjustments from "./Modals/ModalListAdjustments/ModalListAdjustments";
 import ModalCreateAdjustment from "./Modals/ModalCreateAdjustment/ModalCreateAdjustment";
 import ModalEditRow from "./Modals/ModalEditRow/ModalEditRow";
+import ModalCreateAdjustmentByInvoice from "./Modals/ModalCreateAdjustmentByInvoice/ModalCreateAdjustmentByInvoice";
 
 import { IApplyTabRecord } from "@/types/applyTabClients/IApplyTabClients";
 
@@ -424,6 +425,19 @@ const ApplyTab: React.FC = () => {
       <ModalCreateAdjustment
         isOpen={
           modalAdjustmentsState && modalAdjustmentsState.isOpen && modalAdjustmentsState.modal === 3
+        }
+        onCancel={(created?: Boolean) => {
+          if (created) {
+            setModalAdjustmentsState({ isOpen: false, modal: 0 });
+            mutate();
+          } else {
+            setModalAdjustmentsState({ isOpen: true, modal: 2 });
+          }
+        }}
+      />
+      <ModalCreateAdjustmentByInvoice
+        isOpen={
+          modalAdjustmentsState && modalAdjustmentsState.isOpen && modalAdjustmentsState.modal === 4
         }
         onCancel={(created?: Boolean) => {
           if (created) {
