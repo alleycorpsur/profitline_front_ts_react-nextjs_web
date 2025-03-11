@@ -67,6 +67,24 @@
         }
     }
 
+    &__summary {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        background-color: $background;
+        padding: 1rem;
+        border-radius: 1rem;
+        font-size: 1rem;
+        font-weight: 300;
+        margin-bottom: 1.5rem;
+
+        .total {
+            border-top: 1px solid $white;
+            padding-top: 0.5rem;
+            font-weight: 600;
+        }
+    }
+
     .AdjustmentsTable {
         .ant-table-cell-scrollbar {
             display: none;
@@ -76,11 +94,17 @@
         }
         /* row data */
         .ant-table-tbody > tr > td {
-            // height: fit-content;
-            height: 49px;
+            height: 33px;
             padding: 0 2rem;
-            font-size: 1rem;
-            font-weight: 300;
+            font-size: 0.875rem;
+            font-weight: 400;
+        }
+
+        .ant-table-tbody > tr:nth-child(even) {
+            background-color: $background;
+        }
+        .ant-table-tbody > tr:nth-child(odd) {
+            background-color: #fbfbfb;
         }
 
         /* row header */
@@ -89,7 +113,13 @@
             padding: 0.625rem 2rem;
             font-size: 1rem;
             font-weight: 600;
+            text-decoration: none;
         }
+    }
+
+    .invoiceId {
+        color: $link;
+        text-decoration: underline;
     }
 
     .modal-footer {

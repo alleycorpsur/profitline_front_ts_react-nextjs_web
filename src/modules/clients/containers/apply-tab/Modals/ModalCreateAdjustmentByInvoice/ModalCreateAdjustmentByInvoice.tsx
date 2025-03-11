@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { Modal, Table } from "antd";
+import { Flex, Modal, Table } from "antd";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { CaretLeft, CopySimple, Plus } from "phosphor-react";
 
 import { useAppStore } from "@/lib/store/store";
 import { useFinancialDiscountMotives } from "@/hooks/useFinancialDiscountMotives";
 import { useAcountingAdjustment } from "@/hooks/useAcountingAdjustment";
-import { extractSingleParam } from "@/utils/utils";
+import { extractSingleParam, toNumberOrZero } from "@/utils/utils";
 import { useMessageApi } from "@/context/MessageContext";
+import useScreenHeight from "@/components/hooks/useScreenHeight";
 
 import SecondaryButton from "@/components/atoms/buttons/secondaryButton/SecondaryButton";
 import PrincipalButton from "@/components/atoms/buttons/principalButton/PrincipalButton";
@@ -29,6 +30,9 @@ interface IColumn {
   title: string;
   dataIndex: string;
   key: string;
+  className?: string;
+  // eslint-disable-next-line no-unused-vars
+  render?: (text: any, record: any, index: number) => React.ReactNode;
 }
 
 interface ModalCreateAdjustmentByInvoiceProps {
@@ -44,14 +48,25 @@ const ModalCreateAdjustmentByInvoice: React.FC<ModalCreateAdjustmentByInvoicePro
   const { ID: projectId } = useAppStore((state) => state.selectedProject);
   const params = useParams();
   const clientId = Number(extractSingleParam(params.clientId)) || 0;
+  const height = useScreenHeight();
   const { showMessage } = useMessageApi();
   const { mutate } = useAcountingAdjustment(clientId.toString(), projectId.toString(), 2);
   const { data: motives } = useFinancialDiscountMotives();
 
   const [loadingCreate, setLoadingCreate] = useState(false);
+  const [processed, setProcessed] = useState(false);
   const [updateFlag, setUpdateFlag] = useState(0); // Estado para forzar la actualización
   const [columns, setColumns] = useState<IColumn[]>([]);
-  const [dataSource, setDataSource] = useState<any[]>([]);
+  const [dataSource, setDataSource] = useState<{ [key: string]: string | any }[]>([]);
+  const [processedData, setProcessedData] = useState<{
+    total: number | string;
+    invoice: string;
+    // a key that can be with any string name baut value its a number
+    [key: string]: number | string;
+  }>({
+    total: 0, // Default value for total
+    invoice: "" // Default value for invoice
+  });
 
   const {
     control,
@@ -89,9 +104,10 @@ const ModalCreateAdjustmentByInvoice: React.FC<ModalCreateAdjustmentByInvoicePro
 
     setColumns([
       {
-        title: "Invoice",
+        title: "ID Factura",
         dataIndex: "invoice",
-        key: "invoice"
+        key: "invoice",
+        className: "invoiceId"
       },
       ...dynamicColumns
     ]);
@@ -104,16 +120,35 @@ const ModalCreateAdjustmentByInvoice: React.FC<ModalCreateAdjustmentByInvoicePro
     }
   }, [isOpen, append, reset]);
 
-  const onSubmit = async (data: { adjustments: IAdjustment[] }) => {
+  const onSubmit = async () => {
     setLoadingCreate(true);
-    const adjustments = data.adjustments.map((adjustment) => ({
-      adjustment: parseInt(adjustment?.adjustment?.value || "0")
-    }));
-    try {
-      console.info("adjustments", adjustments);
-      showMessage("success", "Ajuste(s) creado correctamente");
-      mutate();
+
+    if (processed) {
+      console.info("Apply adjustments");
       onCancel(true);
+      return setLoadingCreate(false);
+    }
+
+    try {
+      // create the processedData object based on the dataSource when pasting
+      const proccessedData: any = dataSource.reduce((acc, row) => {
+        Object.entries(row).forEach(([key, value]) => {
+          if (key === "invoice") return acc[key] ? (acc[key] += 1) : (acc[key] = 1);
+          if (value) {
+            acc[key] = acc[key]
+              ? toNumberOrZero(acc[key]) + toNumberOrZero(value)
+              : toNumberOrZero(value);
+            acc["total"] = acc["total"]
+              ? toNumberOrZero(acc["total"]) + toNumberOrZero(value)
+              : toNumberOrZero(value);
+          }
+        });
+        return acc;
+      }, {});
+      showMessage("success", "Ajuste(s) creado correctamente");
+      setProcessedData(proccessedData);
+      setProcessed(true);
+      // mutate();
     } catch (error) {
       showMessage("error", "Error al crear el ajuste(s)");
     }
@@ -145,6 +180,13 @@ const ModalCreateAdjustmentByInvoice: React.FC<ModalCreateAdjustmentByInvoicePro
   const handleSelectChange = () => {
     setUpdateFlag((prev) => prev + 1); // Forzar la actualización
   };
+
+  const handleCancel = () => {
+    if (processed) {
+      return setProcessed(false);
+    }
+    onCancel();
+  };
   return (
     <>
       <Modal
@@ -160,49 +202,74 @@ const ModalCreateAdjustmentByInvoice: React.FC<ModalCreateAdjustmentByInvoicePro
           <h2>Crear ajuste</h2>
         </div>
 
-        <div className="modalCreateAdjustmentByInvoice__allAdjustments">
-          {fields.map((field, index) => (
-            <Controller
-              key={field.id}
-              name={`adjustments.${index}.adjustment`}
-              control={control}
-              rules={{ required: "Tipo de ajuste es obligatorio" }}
-              render={({ field }) => (
-                <GeneralSelect
-                  errors={errors?.adjustments?.[index]?.adjustment}
-                  field={{
-                    ...field, // Mantén todas las propiedades del field
-                    onChange: (selectedOption) => {
-                      field.onChange(selectedOption); // Llama al onChange original
-                      handleSelectChange(); // Llama a tu función adicional
-                    }
-                  }}
-                  title="Tipo de ajuste"
-                  placeholder="Seleccionar tipo de ajuste"
-                  options={
-                    motives?.map((motive) => ({ value: motive.id, label: motive.name })) || []
-                  }
-                  showSearch
-                  customStyleContainer={{ width: "100%" }}
-                  customStyleTitle={{ marginBottom: "4px" }}
+        {processed ? (
+          <div className="modalCreateAdjustmentByInvoice__summary">
+            <Flex justify="space-between">
+              <p>Facturas ({processedData?.invoice})</p>
+              <p>{processedData?.total}</p>
+            </Flex>
+
+            {Object.keys(processedData).map((key) => {
+              if (key === "invoice" || key === "total") return null;
+              return (
+                <Flex justify="space-between" key={key}>
+                  <p>{key.split("_").join(" ")}</p>
+                  <p>{processedData[key]}</p>
+                </Flex>
+              );
+            })}
+            <Flex justify="space-between" className="total">
+              <p>Pendiente</p>
+              <p>$XXX.XXX.XXX</p>
+            </Flex>
+          </div>
+        ) : (
+          <>
+            <div className="modalCreateAdjustmentByInvoice__allAdjustments">
+              {fields.map((field, index) => (
+                <Controller
+                  key={field.id}
+                  name={`adjustments.${index}.adjustment`}
+                  control={control}
+                  rules={{ required: "Tipo de ajuste es obligatorio" }}
+                  render={({ field }) => (
+                    <GeneralSelect
+                      errors={errors?.adjustments?.[index]?.adjustment}
+                      field={{
+                        ...field,
+                        onChange: (selectedOption) => {
+                          field.onChange(selectedOption);
+                          handleSelectChange();
+                        }
+                      }}
+                      title="Tipo de ajuste"
+                      placeholder="Seleccionar tipo de ajuste"
+                      options={
+                        motives?.map((motive) => ({ value: motive.id, label: motive.name })) || []
+                      }
+                      showSearch
+                      customStyleContainer={{ width: "100%" }}
+                      customStyleTitle={{ marginBottom: "4px" }}
+                    />
+                  )}
                 />
-              )}
-            />
-          ))}
-        </div>
+              ))}
+            </div>
 
-        <button
-          className="modalCreateAdjustmentByInvoice__addAdjustment"
-          onClick={() => append({ adjustment: undefined })}
-        >
-          <Plus />
-          Agregar otro ajuste
-        </button>
+            <button
+              className="modalCreateAdjustmentByInvoice__addAdjustment"
+              onClick={() => append({ adjustment: undefined })}
+            >
+              <Plus />
+              Agregar otro ajuste
+            </button>
 
-        <div className="pasteInvoices" onClick={handlePasteInvoices}>
-          <CopySimple size={20} />
-          Pegar desde excel
-        </div>
+            <div className="pasteInvoices" onClick={handlePasteInvoices}>
+              <CopySimple size={20} />
+              Pegar desde excel
+            </div>
+          </>
+        )}
 
         <Table
           className="AdjustmentsTable"
@@ -210,10 +277,11 @@ const ModalCreateAdjustmentByInvoice: React.FC<ModalCreateAdjustmentByInvoicePro
           dataSource={dataSource}
           pagination={false}
           bordered
+          scroll={{ y: height - 520, x: 100 }}
         />
 
         <div className="modal-footer">
-          <SecondaryButton fullWidth onClick={() => onCancel()}>
+          <SecondaryButton fullWidth onClick={handleCancel}>
             Cancelar
           </SecondaryButton>
 
@@ -223,7 +291,7 @@ const ModalCreateAdjustmentByInvoice: React.FC<ModalCreateAdjustmentByInvoicePro
             fullWidth
             loading={loadingCreate}
           >
-            Procesar
+            {processed ? "Aplicar" : "Procesar"}
           </PrincipalButton>
         </div>
       </Modal>
