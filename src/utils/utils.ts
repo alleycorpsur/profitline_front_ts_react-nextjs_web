@@ -399,3 +399,8 @@ export const fetchFileFromUrl = async (fileUrl: string): Promise<File> => {
     throw error;
   }
 };
+
+export const toNumberOrZero = (value: string): number => {
+  const parsed = parseFloat(value);
+  return isNaN(parsed) ? 0 : parsed; // Return 0 if parsing fails (NaN)
+};
