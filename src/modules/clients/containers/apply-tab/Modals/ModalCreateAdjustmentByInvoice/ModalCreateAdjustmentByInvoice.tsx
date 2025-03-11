@@ -46,6 +46,7 @@ const ModalCreateAdjustmentByInvoice: React.FC<ModalCreateAdjustmentByInvoicePro
   onCancel
 }) => {
   const { ID: projectId } = useAppStore((state) => state.selectedProject);
+  const formatMoney = useAppStore((state) => state.formatMoney);
   const params = useParams();
   const clientId = Number(extractSingleParam(params.clientId)) || 0;
   const height = useScreenHeight();
@@ -99,7 +100,8 @@ const ModalCreateAdjustmentByInvoice: React.FC<ModalCreateAdjustmentByInvoicePro
       .map((adj) => ({
         title: adj.adjustment?.label || "",
         dataIndex: adj.adjustment?.label.split(" ").join("_") || "",
-        key: adj.adjustment?.value || ""
+        key: adj.adjustment?.value || "",
+        render: (text: any) => formatMoney(text)
       }));
 
     setColumns([
@@ -117,6 +119,9 @@ const ModalCreateAdjustmentByInvoice: React.FC<ModalCreateAdjustmentByInvoicePro
     if (isOpen) {
       reset(); // Clear the form when modal opens
       append({ adjustment: undefined });
+      setDataSource([]);
+      setProcessed(false);
+      setProcessedData({ total: 0, invoice: "" });
     }
   }, [isOpen, append, reset]);
 
@@ -206,7 +211,7 @@ const ModalCreateAdjustmentByInvoice: React.FC<ModalCreateAdjustmentByInvoicePro
           <div className="modalCreateAdjustmentByInvoice__summary">
             <Flex justify="space-between">
               <p>Facturas ({processedData?.invoice})</p>
-              <p>{processedData?.total}</p>
+              <p>{formatMoney(processedData?.total)}</p>
             </Flex>
 
             {Object.keys(processedData).map((key) => {
@@ -214,7 +219,7 @@ const ModalCreateAdjustmentByInvoice: React.FC<ModalCreateAdjustmentByInvoicePro
               return (
                 <Flex justify="space-between" key={key}>
                   <p>{key.split("_").join(" ")}</p>
-                  <p>{processedData[key]}</p>
+                  <p>{formatMoney(processedData[key])}</p>
                 </Flex>
               );
             })}

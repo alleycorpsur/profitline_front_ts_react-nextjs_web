@@ -401,21 +401,18 @@ const ApplyTab: React.FC = () => {
             mutate();
             setModalAdjustmentsState({
               isOpen: false,
-              modal: 0,
-              adjustmentType: undefined
+              modal: 0
             });
           } else {
             setModalAdjustmentsState({
               isOpen: true,
-              modal: 1,
-              adjustmentType: undefined
+              modal: 1
             });
           }
         }}
         setModalAction={(e: number) => {
-          setModalAdjustmentsState({
-            isOpen: true,
-            modal: e
+          setModalAdjustmentsState((prev) => {
+            return { ...prev, isOpen: true, modal: e };
           });
         }}
         addGlobalAdjustment={handleAdd}
@@ -431,7 +428,9 @@ const ApplyTab: React.FC = () => {
             setModalAdjustmentsState({ isOpen: false, modal: 0 });
             mutate();
           } else {
-            setModalAdjustmentsState({ isOpen: true, modal: 2 });
+            setModalAdjustmentsState((prev) => {
+              return { ...prev, isOpen: true, modal: 2 };
+            });
           }
         }}
       />
@@ -444,7 +443,9 @@ const ApplyTab: React.FC = () => {
             setModalAdjustmentsState({ isOpen: false, modal: 0 });
             mutate();
           } else {
-            setModalAdjustmentsState({ isOpen: true, modal: 2 });
+            setModalAdjustmentsState((prev) => {
+              return { ...prev, isOpen: true, modal: 2 };
+            });
           }
         }}
       />
