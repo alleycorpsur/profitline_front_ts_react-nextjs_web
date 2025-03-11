@@ -189,3 +189,29 @@ export interface ISingleCommunication {
   send_to: string[];
   EVENT_TYPE: string;
 }
+
+export interface ITemplateCommunication {
+  id: number;
+  id_project: number;
+  name: string;
+  description: string;
+  client_group_id: number[];
+  comunicacion_state: string | null;
+  id_comunicacion_type: number;
+  JSON_frecuency: string | null;
+  id_event_type: number | null;
+  delay_event: number | null;
+  via: string;
+  subject: string;
+  message: string;
+  comunicacion_state_id: number;
+  user_roles: string; // JSON string representation of roles (might be better as an array if properly parsed)
+  contact_roles: number[];
+  action_type_ids: number[];
+  sub_action_type_ids: number[];
+  document_comunication_id: number | null;
+  id_mongo_log: string | null;
+  other_mails: string | null;
+  files: string[]; // Array of file URLs
+  recipients: string[]; // Array of recipient emails
+}

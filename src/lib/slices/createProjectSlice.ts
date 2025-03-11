@@ -1,5 +1,6 @@
 import { IProject } from "@/types/projects/IProjects";
 import { IViewPermission } from "@/types/userPermissions/IUserPermissions";
+import { setProjectInApi } from "@/utils/api/api";
 
 export type ISelectedProject = {
   ID: number;
@@ -26,6 +27,9 @@ export const createProjectSlice = (set: any): ProjectSlice => ({
   selectedProject: {} as ISelectedProject,
   projectsBasicInfo: [],
   setProjects: (by: IProject[]) => set({ projects: by }),
-  setSelectedProject: (by: ISelectedProject) => set({ selectedProject: by }),
+  setSelectedProject: (by: ISelectedProject) => {
+    setProjectInApi(by.ID);
+    return set({ selectedProject: by });
+  },
   setProjectsBasicInfo: (by: ISelectedProject[]) => set({ projectsBasicInfo: by })
 });

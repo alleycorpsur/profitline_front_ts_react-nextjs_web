@@ -377,3 +377,25 @@ export function formatNumber(num: number | string, decimals = 0) {
     ? `${formattedThousands},${Math.floor(Math.pow(10, decimals) * rest)}`
     : formattedThousands;
 }
+
+export const fetchFileFromUrl = async (fileUrl: string): Promise<File> => {
+  try {
+    console.info("Attempting to fetch file from:", fileUrl);
+
+    const response = await fetch(fileUrl);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const blob = await response.blob();
+
+    const fileName = fileUrl.split("/").pop() || "attachment";
+    const file = new File([blob], fileName, { type: blob.type });
+
+    return file;
+  } catch (error) {
+    console.error("Error in fetchFileFromUrl:", error);
+    throw error;
+  }
+};

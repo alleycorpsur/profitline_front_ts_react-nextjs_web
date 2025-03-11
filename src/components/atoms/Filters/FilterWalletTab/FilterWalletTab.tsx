@@ -52,12 +52,12 @@ export const WalletTabFilter: React.FC<Props> = ({ setSelectedFilters }) => {
           label: line.description_line
         }));
 
-        const zones = zonesData.data.data.map((zone: IZone) => ({
+        const zones = zonesData.data.map((zone: IZone) => ({
           value: zone.ID,
           label: zone.ZONE_DESCRIPTION
         }));
 
-        const channels = channelsData.data.data.map((channel: channel) => ({
+        const channels = channelsData.map((channel: channel) => ({
           value: channel.id,
           label: channel.channel_description
         }));

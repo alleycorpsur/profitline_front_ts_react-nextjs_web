@@ -1,27 +1,12 @@
 import config from "@/config";
 import { IZones } from "@/types/zones/IZones";
-import { getIdToken } from "@/utils/api/api";
+import { API, getIdToken } from "@/utils/api/api";
 import { SUCCESS } from "@/utils/constants/globalConstants";
 import { MessageInstance } from "antd/es/message/interface";
-import axios, { AxiosResponse } from "axios";
 
-export const getAllZones = async ({
-  idProject
-}: {
-  idProject: string;
-}): Promise<AxiosResponse<IZones>> => {
-  const token = await getIdToken();
+export const getAllZones = async ({ idProject }: { idProject: string }): Promise<IZones> => {
   try {
-    const response: AxiosResponse<IZones> = await axios.get(
-      `${config.API_HOST}/zone/project/${idProject}`,
-      {
-        headers: {
-          Accept: "application/json, text/plain, */*",
-          "Content-Type": "application/json; charset=utf-8",
-          Authorization: `Bearer ${token}`
-        }
-      }
-    );
+    const response: IZones = await API.get(`${config.API_HOST}/zone/project/${idProject}`);
 
     return response;
   } catch (error) {
@@ -37,20 +22,12 @@ export const addZone = async ({
   name: string;
   project_id: string;
   messageApi: MessageInstance;
-}): Promise<AxiosResponse<any>> => {
-  const token = await getIdToken();
+}): Promise<any> => {
   try {
-    const response: AxiosResponse<any> = await axios.post(
-      `${config.API_HOST}/zone/`,
-      { zone_description: name, project_id },
-      {
-        headers: {
-          Accept: "application/json, text/plain, */*",
-          "Content-Type": "application/json; charset=utf-8",
-          Authorization: `Bearer ${token}`
-        }
-      }
-    );
+    const response = await API.post(`${config.API_HOST}/zone/`, {
+      zone_description: name,
+      project_id
+    });
     if (response.status === SUCCESS) {
       messageApi.open({
         type: "success",
@@ -75,10 +52,10 @@ export const removeZoneById = async ({
 }: {
   idZone: string;
   messageApi: MessageInstance;
-}): Promise<AxiosResponse<any>> => {
+}): Promise<any> => {
   const token = await getIdToken();
   try {
-    const response: AxiosResponse<any> = await axios.delete(`${config.API_HOST}/zone/${idZone}`, {
+    const response = await API.delete(`${config.API_HOST}/zone/${idZone}`, {
       headers: {
         Accept: "application/json, text/plain, */*",
         "Content-Type": "application/json; charset=utf-8",

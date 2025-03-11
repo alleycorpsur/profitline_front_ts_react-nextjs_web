@@ -10,7 +10,6 @@ import { IChanel } from "@/types/bre/IBRE";
 
 import "../filterCascader.scss";
 
-
 interface FilterOption {
   value: string | number;
   label: string;
@@ -49,12 +48,12 @@ export const AccountingAdjustmentsFilter: React.FC<AccountingAdjustmentsFilterPr
           label: line.description_line
         }));
 
-        const zones = zonesData.data.data.map((zone: IZone) => ({
+        const zones = zonesData.data.map((zone: IZone) => ({
           value: zone.ID,
           label: zone.ZONE_DESCRIPTION
         }));
 
-        const channels = businessRulesData.data.data.map((channel: IChanel) => ({
+        const channels = businessRulesData.map((channel: IChanel) => ({
           value: channel.CHANNEL_ID,
           label: channel.CHANNEL_NAME,
           children: channel.CHANNEL_LINES.map((line) => ({

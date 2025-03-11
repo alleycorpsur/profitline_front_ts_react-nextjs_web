@@ -78,7 +78,7 @@ export const UserProjectForm = ({ isViewDetailsUser, onGoBackTable }: Props) => 
         data: {} as IUserData
       });
       const response = await getUserById(`${isViewDetailsUser?.id}`);
-      const finalData = response.data.data;
+      const finalData = response.data;
 
       const zonesFinalData =
         finalData.USER_ZONES?.map(
@@ -112,26 +112,29 @@ export const UserProjectForm = ({ isViewDetailsUser, onGoBackTable }: Props) => 
     if (zones.length === 0 || selectedBusinessRules?.channels.length === 0)
       return setLoading(false);
 
-    const response = isViewDetailsUser?.id
-      ? await updateUser(
-          data,
-          selectedBusinessRules,
-          assignedGroups,
-          zones,
-          isViewDetailsUser?.id,
-          ID,
-          dataUser.data?.ACTIVE === 1
-        )
-      : await inviteUser(data, selectedBusinessRules, assignedGroups, zones, ID);
+    try {
+      const response = isViewDetailsUser?.id
+        ? await updateUser(
+            data,
+            selectedBusinessRules,
+            assignedGroups,
+            zones,
+            isViewDetailsUser?.id,
+            ID,
+            dataUser.data?.ACTIVE === 1
+          )
+        : await inviteUser(data, selectedBusinessRules, assignedGroups, zones, ID);
 
-    setIsEditAvailable(false);
-    if (response.status === 200 || response.status === 202) {
-      const isEdit = isViewDetailsUser?.id ? "editado" : "creado";
-      showMessage("success", `El usuario fue ${isEdit} exitosamente.`);
-      !isViewDetailsUser?.id && onGoBackTable();
-    } else if (response.response.status === 409) {
-      showMessage("error", "Este email ya esta en uso, prueba otro.");
-    } else {
+      if (response.status === 200 || response.status === 202) {
+        const isEdit = isViewDetailsUser?.id ? "editado" : "creado";
+        showMessage("success", `El usuario fue ${isEdit} exitosamente.`);
+        !isViewDetailsUser?.id && onGoBackTable();
+      } else if (response.response.status === 409) {
+        showMessage("error", "Este email ya esta en uso, prueba otro.");
+      }
+
+      setIsEditAvailable(false);
+    } catch (error) {
       showMessage("error", "Oops ocurrio un error.");
     }
     setLoading(false);

@@ -1,6 +1,4 @@
-import axios from "axios";
-
-import { API, getIdToken } from "@/utils/api/api";
+import { API } from "@/utils/api/api";
 import config from "@/config";
 
 import {
@@ -13,7 +11,6 @@ import { GenericResponse } from "@/types/global/IGlobal";
 import { IProject } from "@/types/projects/IProject";
 
 export const addProject = async (data: IFormProject): Promise<ICreateProject> => {
-  const token = await getIdToken();
   const currenciesFinal = data.general.currencies.map((currency) => ({
     id: currency.value,
     currency_name: currency.label
@@ -76,13 +73,7 @@ export const addProject = async (data: IFormProject): Promise<ICreateProject> =>
   }
 
   try {
-    const response: ICreateProject = await axios.post(`${config.API_HOST}/project`, formData, {
-      headers: {
-        Accept: "application/json, text/plain, */*",
-        "Content-Type": "multipart/form-data",
-        Authorization: `Bearer ${token}`
-      }
-    });
+    const response: ICreateProject = await API.post(`${config.API_HOST}/project`, formData);
     return response;
   } catch (error) {
     console.warn("error creating project: ", error);
@@ -95,7 +86,6 @@ export const updateProject = async (
   id: string,
   UUID: string
 ): Promise<ICreateProject> => {
-  const token = await getIdToken();
   const currenciesFinal = data.general.currencies.map((currency) => ({
     id: currency.value,
     currency_name: currency.label
@@ -165,54 +155,31 @@ export const updateProject = async (
   }
 
   try {
-    const response: ICreateProject = await axios.put(`${config.API_HOST}/project`, formData, {
-      headers: {
-        Accept: "application/json, text/plain, */*",
-        "Content-Type": "multipart/form-data",
-        Authorization: `Bearer ${token}`
-      }
-    });
-    return response;
-  } catch (error) {
-    console.warn("eRROR updating project: ", error);
-    return error as any;
-  }
-};
-export const activateProject = async (id: string): Promise<ICreateProject> => {
-  const token = await getIdToken();
-  try {
-    const response: ICreateProject = await axios.put(
-      `${config.API_HOST}/project/active/${id}`,
-      {},
-      {
-        headers: {
-          Accept: "*/*",
-          "Content-Type": "application/json; charset=utf-8",
-          Authorization: `Bearer ${token}`
-        }
-      }
-    );
+    const response: ICreateProject = await API.put(`${config.API_HOST}/project`, formData);
 
     return response;
   } catch (error) {
+    console.warn("error updating project: ", error);
     return error as any;
   }
 };
-
-export const desactiveProject = async (id: string): Promise<ICreateProject> => {
-  const token = await getIdToken();
+export const activateProject = async (id: string): Promise<any> => {
   try {
-    const response: ICreateProject = await axios.delete(`${config.API_HOST}/project/${id}`, {
-      headers: {
-        Accept: "application/json, text/plain, */*",
-        "Content-Type": "application/json; charset=utf-8",
-        Authorization: `Bearer ${token}`
-      }
-    });
+    const response = await API.put(`${config.API_HOST}/project/active/${id}`, {});
+
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const desactiveProject = async (id: string): Promise<any> => {
+  try {
+    const response = await API.delete(`${config.API_HOST}/project/${id}`);
     return response;
   } catch (error) {
     console.warn("error desactivating project: ", error);
-    return error as any;
+    throw error;
   }
 };
 

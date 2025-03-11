@@ -1,22 +1,13 @@
-import axios, { AxiosResponse } from "axios";
-import config from "@/config";
-import { IUserAxios, IUserForm } from "@/types/users/IUser";
-import { getIdToken } from "@/utils/api/api";
+import { IUserForm, WelcomeData } from "@/types/users/IUser";
+import { API } from "@/utils/api/api";
 import { SUCCESS } from "@/utils/constants/globalConstants";
 import { ISelectedBussinessRules } from "@/types/bre/IBRE";
 import { IGroupsByUser } from "@/types/clientsGroups/IClientsGroups";
 import { MessageType } from "@/context/MessageContext";
 
-export const getUserById = async (idUser: string): Promise<IUserAxios> => {
-  const token = await getIdToken();
+export const getUserById = async (idUser: string): Promise<WelcomeData> => {
   try {
-    const response: IUserAxios = await axios.get(`${config.API_HOST}/user/${idUser}`, {
-      headers: {
-        Accept: "application/json, text/plain, */*",
-        "Content-Type": "application/json; charset=utf-8",
-        Authorization: `Bearer ${token}`
-      }
-    });
+    const response: WelcomeData = await API.get(`/user/${idUser}`);
 
     return response;
   } catch (error) {
@@ -46,24 +37,13 @@ export const inviteUser = async (
     rol_id: data.info.rol?.value,
     groups_id: selectedGroups
   };
-  const token = await getIdToken();
   const endpointRole = data.info.rol?.value === 2 ? "admin" : "user";
   try {
-    const response: AxiosResponse = await axios.post(
-      `${config.API_HOST}/user/invitation/${endpointRole}/email`,
-      modelData,
-      {
-        headers: {
-          Accept: "application/json, text/plain, */*",
-          "Content-Type": "application/json; charset=utf-8",
-          Authorization: `Bearer ${token}`
-        }
-      }
-    );
+    const response = await API.post(`/user/invitation/${endpointRole}/email`, modelData);
     return response;
   } catch (error) {
-    console.warn("error inviting user: ", error);
-    return error as any;
+    console.error("error inviting user: ", error);
+    throw error;
   }
 };
 //update
@@ -92,15 +72,8 @@ export const updateUser = async (
     groups_id: selectedGroups
   };
 
-  const token = await getIdToken();
   try {
-    const response: AxiosResponse = await axios.put(`${config.API_HOST}/user`, modelData, {
-      headers: {
-        Accept: "application/json, text/plain, */*",
-        "Content-Type": "application/json; charset=utf-8",
-        Authorization: `Bearer ${token}`
-      }
-    });
+    const response = await API.put(`/user`, modelData);
     return response;
   } catch (error) {
     console.warn("error updating user: ", error);
@@ -118,19 +91,8 @@ export const onChangeStatusById = async (
   const modelData = {
     active: isActive
   };
-  const token = await getIdToken();
   try {
-    const response: AxiosResponse = await axios.put(
-      `${config.API_HOST}/user/${userId}/user-change-status`,
-      modelData,
-      {
-        headers: {
-          Accept: "application/json, text/plain, */*",
-          "Content-Type": "application/json; charset=utf-8",
-          Authorization: `Bearer ${token}`
-        }
-      }
-    );
+    const response = await API.put(`/user/${userId}/user-change-status`, modelData);
     if (response.status === SUCCESS) {
       showMessage(
         "success",
@@ -143,12 +105,9 @@ export const onChangeStatusById = async (
 
     return response;
   } catch (error) {
-    // const e = error as AxiosError;
-    if (axios.isAxiosError(error)) {
-      showMessage("error", error.response?.data?.message);
-      onClose();
-      return error as any;
-    }
+    showMessage("error", "Oops ocurrio un error.");
+    onClose();
+    throw error;
   }
 };
 
@@ -158,19 +117,9 @@ export const onRemoveUserById = async (
   // eslint-disable-next-line no-unused-vars
   showMessage: (type: MessageType, content: string) => void,
   onClose: () => void
-): Promise<AxiosResponse<any>> => {
-  const token = await getIdToken();
+): Promise<any> => {
   try {
-    const response: AxiosResponse<any> = await axios.delete(
-      `${config.API_HOST}/user/id=${idUser}&project_id=${idProject}`,
-      {
-        headers: {
-          Accept: "application/json, text/plain, */*",
-          "Content-Type": "application/json; charset=utf-8",
-          Authorization: `Bearer ${token}`
-        }
-      }
-    );
+    const response = await API.delete(`/user/id=${idUser}&project_id=${idProject}`);
     if (response.status === SUCCESS) {
       showMessage("success", "El usuario fue eliminado exitosamente.");
       onClose();
@@ -181,23 +130,14 @@ export const onRemoveUserById = async (
 
     return response;
   } catch (error) {
-    return error as any;
+    showMessage("error", "Oops ocurrio un error.");
+    onClose();
+    throw error;
   }
 };
-export const onResendInvitationUser = async (email: string): Promise<AxiosResponse<any>> => {
-  const token = await getIdToken();
+export const onResendInvitationUser = async (email: string): Promise<any> => {
   try {
-    const response: AxiosResponse<any> = await axios.post(
-      `${config.API_HOST}/user/invitation/resend`,
-      { email },
-      {
-        headers: {
-          Accept: "application/json, text/plain, */*",
-          "Content-Type": "application/json; charset=utf-8",
-          Authorization: `Bearer ${token}`
-        }
-      }
-    );
+    const response = await API.post(`/user/invitation/resend`, { email });
 
     return response;
   } catch (error) {
@@ -205,29 +145,14 @@ export const onResendInvitationUser = async (email: string): Promise<AxiosRespon
   }
 };
 
-export const deleteUsersById = async (
-  users_id: number[],
-  project_id: string
-): Promise<AxiosResponse<any>> => {
-  const token = await getIdToken();
-
+export const deleteUsersById = async (users_id: number[], project_id: string): Promise<any> => {
   const modelData = {
     users: users_id,
     project_id
   };
 
   try {
-    const response: AxiosResponse = await axios.put(
-      `${config.API_HOST}/massive-action/user/delete`,
-      modelData,
-      {
-        headers: {
-          Accept: "application/json, text/plain, */*",
-          "Content-Type": "application/json; charset=utf-8",
-          Authorization: `Bearer ${token}`
-        }
-      }
-    );
+    const response = await API.put(`/massive-action/user/delete`, modelData);
 
     return response;
   } catch (error) {
@@ -236,48 +161,28 @@ export const deleteUsersById = async (
   }
 };
 
-export const resendInvitationUsers = async (users_id: number[]): Promise<AxiosResponse<any>> => {
-  const token = await getIdToken();
-
+export const resendInvitationUsers = async (users_id: number[]): Promise<any> => {
   const modelData = {
     users: users_id
   };
 
   try {
-    const response: AxiosResponse = await axios.post(
-      `${config.API_HOST}/massive-action/user/resend-invitation`,
-      modelData,
-      {
-        headers: {
-          Accept: "application/json, text/plain, */*",
-          "Content-Type": "application/json; charset=utf-8",
-          Authorization: `Bearer ${token}`
-        }
-      }
-    );
+    const response = await API.post(`/massive-action/user/resend-invitation`, modelData);
 
     return response;
   } catch (error) {
     console.warn("error re-sending invite to users: ", error);
-    return error as any;
+    throw error;
   }
 };
 
 export const getGroupsByUser = async (userID: number, projectID: number) => {
-  const token = await getIdToken();
   try {
-    const response: AxiosResponse<IGroupsByUser> = await axios.get(
-      `${config.API_HOST}/group-client/user/${userID}/project/${projectID}`,
-      {
-        headers: {
-          Accept: "application/json, text/plain, */*",
-          "Content-Type": "application/json; charset=utf-8",
-          Authorization: `Bearer ${token}`
-        }
-      }
+    const response: IGroupsByUser = await API.get(
+      `/group-client/user/${userID}/project/${projectID}`
     );
 
-    return response.data;
+    return response;
   } catch (error) {
     console.warn("error getting groups by user: ", error);
     return error as any;

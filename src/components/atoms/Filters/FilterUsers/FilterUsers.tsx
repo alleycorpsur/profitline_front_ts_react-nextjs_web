@@ -97,8 +97,8 @@ export const FilterUsers = ({ idProject, setSelectedUsers }: Props) => {
     const targetOption = selectedOptions[selectedOptions.length - 1];
     if (targetOption.value === "channel") {
       if (br.channels.length === 0) {
-        const { data } = await getBusinessRulesByProjectId(ID);
-        const { channels, lines, sublines } = extractChannelLineSublines(data.data);
+        const data = await getBusinessRulesByProjectId(ID);
+        const { channels, lines, sublines } = extractChannelLineSublines(data);
         targetOption.children = channels.map((channel) => ({
           label: channel.name,
           value: channel.id
@@ -118,8 +118,8 @@ export const FilterUsers = ({ idProject, setSelectedUsers }: Props) => {
     }
     if (targetOption.value === "line") {
       if (br.lines.length === 0) {
-        const { data } = await getBusinessRulesByProjectId(ID);
-        const { channels, lines, sublines } = extractChannelLineSublines(data.data);
+        const data = await getBusinessRulesByProjectId(ID);
+        const { channels, lines, sublines } = extractChannelLineSublines(data);
         targetOption.children = lines.map((channel) => ({
           label: channel.name,
           value: channel.id
@@ -140,8 +140,8 @@ export const FilterUsers = ({ idProject, setSelectedUsers }: Props) => {
     }
     if (targetOption.value === "subline") {
       if (br.sublines.length === 0) {
-        const { data } = await getBusinessRulesByProjectId(ID);
-        const { channels, lines, sublines } = extractChannelLineSublines(data.data);
+        const data = await getBusinessRulesByProjectId(ID);
+        const { channels, lines, sublines } = extractChannelLineSublines(data);
         targetOption.children = sublines.map((channel) => ({
           label: channel.name,
           value: channel.id
@@ -161,8 +161,8 @@ export const FilterUsers = ({ idProject, setSelectedUsers }: Props) => {
       }
     }
     if (targetOption.value === "Roles" && roles.length === 0) {
-      const { data } = await getAllRoles();
-      const countriesToShow = data.data.map((role) => ({
+      const roles = await getAllRoles();
+      const countriesToShow = roles?.map((role) => ({
         label: `${role.ROL_NAME}`,
         value: `${role.ID}`
       }));
@@ -173,7 +173,7 @@ export const FilterUsers = ({ idProject, setSelectedUsers }: Props) => {
     if (targetOption.value === "Zona" && zones.length === 0) {
       const { data } = await getAllZones({ idProject });
 
-      const zonesToShow = data.data.map((zone) => ({
+      const zonesToShow = data.map((zone) => ({
         label: `${zone.ZONE_DESCRIPTION}`,
         value: `${zone.ID}`
       }));

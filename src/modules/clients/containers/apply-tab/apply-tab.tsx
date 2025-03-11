@@ -48,6 +48,11 @@ export interface IModalAdjustmentsState {
   modal: number;
   adjustmentType?: "global" | "byInvoice";
 }
+interface IEditingRowState {
+  isOpen: boolean;
+  row?: IApplyTabRecord;
+  editing_type?: "invoice" | "payment" | "discount";
+}
 
 const ApplyTab: React.FC = () => {
   const { ID: projectId } = useAppStore((state) => state.selectedProject);
@@ -64,7 +69,11 @@ const ApplyTab: React.FC = () => {
   );
 
   const [modalAdjustmentsState, setModalAdjustmentsState] = useState({} as IModalAdjustmentsState);
-  const [editingRow, setEditingRow] = useState<boolean>(false);
+  const [editingRow, setEditingRow] = useState<IEditingRowState>({
+    isOpen: false,
+    row: undefined,
+    editing_type: undefined
+  });
   const [selectedRowKeys, setSelectedRowKeys] = useState<ISelectedRowKeys>({
     invoices: [],
     payments: [],
@@ -124,9 +133,15 @@ const ApplyTab: React.FC = () => {
     }
   };
 
-  const handleEditRow = (row_id: number) => {
-    console.info("Edit row", row_id);
-    setEditingRow(true);
+  const handleEditRow = (
+    row: IApplyTabRecord,
+    editing_type: "invoice" | "payment" | "discount"
+  ) => {
+    setEditingRow({
+      isOpen: true,
+      row: row,
+      editing_type
+    });
   };
 
   const handleSelectChange = useCallback(
@@ -170,6 +185,7 @@ const ApplyTab: React.FC = () => {
     try {
       await saveApplication(projectId, clientId);
       showMessage("success", "Se ha guardado la aplicación correctamente");
+      mutate();
     } catch (error) {
       showMessage("error", "Ha ocurrido un error al guardar la aplicación");
     }
@@ -228,6 +244,25 @@ const ApplyTab: React.FC = () => {
 
     return [invoices, payments, discounts];
   }, [filteredData]);
+
+  const handleCreateAdjustment = (openedRow: IApplyTabRecord) => {
+    //close modal edit row
+    setEditingRow({
+      isOpen: false,
+      row: undefined
+    });
+
+    //open modal list adjustments as by invoice
+    setModalAdjustmentsState({
+      isOpen: true,
+      modal: 2,
+      adjustmentType: "byInvoice"
+    });
+
+    // set selected rows to the opened row
+    setSelectedRows([openedRow]);
+    handleSelectChange("invoices", [openedRow.id]);
+  };
 
   return (
     <>
@@ -324,7 +359,6 @@ const ApplyTab: React.FC = () => {
                     <DiscountTable
                       data={section.itemsList}
                       handleDeleteRow={handleRemoveRow}
-                      handleEditRow={handleEditRow}
                       rowSelection={rowSelection("discounts")}
                     />
                   )}
@@ -400,7 +434,19 @@ const ApplyTab: React.FC = () => {
           }
         }}
       />
-      <ModalEditRow visible={editingRow} onCancel={() => setEditingRow(false)} />
+      <ModalEditRow
+        visible={editingRow.isOpen}
+        row={editingRow.row}
+        editing_type={editingRow.editing_type}
+        onCancel={(succesfullyApplied) => {
+          setEditingRow({
+            isOpen: false,
+            row: undefined
+          });
+          if (succesfullyApplied) mutate();
+        }}
+        handleCreateAdjustment={handleCreateAdjustment}
+      />
     </>
   );
 };

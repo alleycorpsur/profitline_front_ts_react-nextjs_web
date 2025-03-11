@@ -1,5 +1,4 @@
 import config from "@/config";
-import axios from "axios";
 
 import { API, getIdToken } from "@/utils/api/api";
 import { MessageType } from "@/context/MessageContext";
@@ -11,6 +10,7 @@ import {
   ICommunicationForm,
   ICreateCommunication,
   IPeriodicityModalForm,
+  ITemplateCommunication,
   Iattachments
 } from "@/types/communications/ICommunications";
 import { GenericResponse } from "@/types/global/IGlobal";
@@ -193,15 +193,9 @@ export const createCommunication = async ({
   };
 
   try {
-    const response: GenericResponse<{ id: number }> = await axios.post(
+    const response: GenericResponse<{ id: number }> = await API.post(
       `${config.API_HOST}/comunication`,
-      modelData,
-      {
-        headers: {
-          Accept: "application/json, text/plain, */*",
-          Authorization: `Bearer ${token}`
-        }
-      }
+      modelData
     );
 
     if (response.status === 200) showMessage("success", "Comunicación creada correctamente");
@@ -236,7 +230,7 @@ export const sendEmailNotification = async (data: IFormEmailNotification) => {
   });
 
   try {
-    const response: GenericResponse<{ id: number }> = await axios.post(
+    const response: GenericResponse<{ id: number }> = await API.post(
       `${config.API_HOST}/comunication/email`,
       formData,
       {
@@ -249,6 +243,23 @@ export const sendEmailNotification = async (data: IFormEmailNotification) => {
     return response;
   } catch (error) {
     console.error("Error sending email notification", error);
+    throw error;
+  }
+};
+
+export const getTemplateByEvent = async (
+  projectId: number,
+  clientId: number,
+  actionId: string,
+  subActionId?: string
+) => {
+  const basePath = `${config.API_HOST}/comunication/find-action-template?action=${actionId}&project_id=${projectId}&client_id=${clientId}`;
+  const url = subActionId ? `${basePath}&sub_action=${subActionId}` : basePath;
+  try {
+    const response: GenericResponse<ITemplateCommunication> = await API.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Error getting template by event", error);
     throw error;
   }
 };

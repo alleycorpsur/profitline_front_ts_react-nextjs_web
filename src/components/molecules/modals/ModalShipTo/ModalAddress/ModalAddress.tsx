@@ -84,7 +84,7 @@ export const ModalAddress = ({ setIsModalAddressOpen, setParentFormValue }: Prop
     if (watchCity) {
       const fetchLocation = async () => {
         const response = await getLocation(watchCity.value);
-        setAlreadyExistingAddresses(response?.data?.address);
+        setAlreadyExistingAddresses(response?.address);
       };
       fetchLocation();
     }

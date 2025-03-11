@@ -22,6 +22,9 @@ export interface IApplyTabRecord {
   created_by_name: string | null;
   applied_amount: number;
   total_adjustments: number | null;
+  adjustments_detail: string | null;
+  adjustments_breakdown: IAdjustmentBreakdown;
+  adjustments?: IApplyTabAdjustment[];
 }
 
 export interface IApplyTabClients {
@@ -33,5 +36,24 @@ export interface IApplyTabClients {
     total_payments: number;
     total_discounts: number;
     total_balance: number;
+  };
+}
+
+interface IApplyTabAdjustment {
+  adjustment_id: number;
+  amount: number;
+  description: string;
+  is_global: number;
+  motive_id: number;
+  motive_type: string;
+  timestamp: string;
+  user_name: string;
+}
+
+interface IAdjustmentBreakdown {
+  specific: {
+    credit_notes: number;
+    discounts: number;
+    debit_notes: number;
   };
 }

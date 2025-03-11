@@ -1,6 +1,5 @@
-import axios from "axios";
 import config from "@/config";
-import { API, getIdToken } from "@/utils/api/api";
+import { API } from "@/utils/api/api";
 import { GenericResponse } from "@/types/global/IGlobal";
 import { IApplicationInvoice, InvoicesData } from "@/types/invoices/IInvoices";
 import { IClientPaymentStatus } from "@/types/clientPayments/IClientPayments";
@@ -95,7 +94,6 @@ export const addSpecificAdjustments = async (
   client_id: string,
   data: ISpecificAdjustment
 ) => {
-  const token = await getIdToken();
   const formData = new FormData();
 
   for (const key in data) {
@@ -103,16 +101,9 @@ export const addSpecificAdjustments = async (
   }
 
   try {
-    const response: GenericResponse<{ applications: number[] }> = await axios.post(
+    const response: GenericResponse<{ applications: number[] }> = await API.post(
       `${config.API_HOST}/paymentApplication/projects/${project_id}/clients/${client_id}/adjustments`,
-      formData,
-      {
-        headers: {
-          Accept: "application/json, text/plain, */*",
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`
-        }
-      }
+      formData
     );
 
     return response.data;
@@ -177,6 +168,27 @@ export const getApplicationAdjustments = async (project_id: number, client_id: s
     return response.data;
   } catch (error) {
     console.error("error getApplicationAdjustments", error);
+    throw error;
+  }
+};
+
+export const updateInvoiceOrPaymentAmount = async (
+  project_id: number,
+  client_id: number,
+  application_id: number,
+  amount: number
+) => {
+  try {
+    const response: GenericResponse<{ applications: number[] }> = await API.put(
+      `${config.API_HOST}/paymentApplication/project/${project_id}/client/${client_id}/application/${application_id}`,
+      {
+        amount
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("error updateInvoiceOrPaymentAmount", error);
     throw error;
   }
 };

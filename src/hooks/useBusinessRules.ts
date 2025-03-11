@@ -1,7 +1,7 @@
 import useSWR from "swr";
 import { fetcher } from "@/utils/api/api";
 import { useAppStore } from "@/lib/store/store";
-import { IBRE } from "@/types/bre/IBRE";
+import { IChanel } from "@/types/bre/IBRE";
 import { MessageInstance } from "antd/es/message/interface";
 import {
   addChannelBR,
@@ -11,10 +11,15 @@ import {
   removeLineBR,
   removeSublineBR
 } from "@/services/businessRules/BR";
+import { GenericResponse } from "@/types/global/IGlobal";
 
 export const useStructureBR = () => {
   const { ID } = useAppStore((state) => state.selectedProject);
-  const { data, isLoading, mutate } = useSWR<IBRE>(`/bussines-rule/project/${ID}`, fetcher, {});
+  const { data, isLoading, mutate } = useSWR<GenericResponse<IChanel[]>>(
+    `/bussines-rule/project/${ID}`,
+    fetcher,
+    {}
+  );
 
   const addChannel = async (channelDescription: string, messageApi: MessageInstance) => {
     await addChannelBR(ID, channelDescription, messageApi);
