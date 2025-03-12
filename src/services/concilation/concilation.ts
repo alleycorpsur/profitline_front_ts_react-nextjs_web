@@ -1,13 +1,17 @@
 import config from "@/config";
 import {
   CreateIncidentResponse,
-  dataConcilation,
-  IInvoiceIncident
+  IInvoiceIncident,
+  InfoConcilation
 } from "@/types/concilation/concilation";
 import { GenericResponse } from "@/types/global/IGlobal";
 import { API } from "@/utils/api/api";
 
-export const invoiceConciliation = async (files: File[], clientId: number, projectId: number) => {
+export const invoiceConciliation = async (
+  files: File[],
+  clientId: number,
+  projectId: number
+): Promise<InfoConcilation> => {
   const formData = new FormData();
 
   files.forEach((file) => {
@@ -16,12 +20,17 @@ export const invoiceConciliation = async (files: File[], clientId: number, proje
   formData.append("client_id", clientId.toString());
   formData.append("project_id", projectId.toString());
 
-  const response: GenericResponse<dataConcilation> = await API.post(
-    `${config.API_HOST}/massive-action/invoice-conciliation`,
-    formData
-  );
+  try {
+    const response: GenericResponse<InfoConcilation> = await API.post(
+      `${config.API_HOST}/massive-action/invoice-conciliation`,
+      formData
+    );
 
-  return response.data;
+    return response.data;
+  } catch (error) {
+    console.error("Error:", error);
+    throw error;
+  }
 };
 
 export const invoiceCreateIncident = async (

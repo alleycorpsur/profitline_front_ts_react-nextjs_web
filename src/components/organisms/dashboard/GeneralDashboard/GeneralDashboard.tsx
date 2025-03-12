@@ -25,10 +25,7 @@ const DynamicPortfoliAges = dynamic(
 );
 
 interface GeneralDashboardViewProps {
-  portfolioData: {
-    loading: boolean;
-    data: IDataSection | undefined;
-  };
+  portfolioData: IDataSection | undefined;
 }
 
 const GeneralDashboard: FC<GeneralDashboardViewProps> = ({ portfolioData }) => {
@@ -61,11 +58,11 @@ const GeneralDashboard: FC<GeneralDashboardViewProps> = ({ portfolioData }) => {
     dsoValue,
     sellsVsPaymentsData,
     history_dso
-  } = useDashboardInfo(portfolioData.data);
+  } = useDashboardInfo(portfolioData);
 
   return (
     <>
-      {portfolioData.data ? (
+      {portfolioData ? (
         <div className={styles.wrapper}>
           <div className={styles.a}>
             <DashboardTotalPortfolio className={styles.item} totalWallet={totalWallet} />
