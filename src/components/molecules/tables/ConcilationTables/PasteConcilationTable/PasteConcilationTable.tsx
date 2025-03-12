@@ -8,7 +8,7 @@ import { useDebounce } from "@/hooks/useSearch";
 import { ModalNextConcilation } from "@/components/molecules/modals/ModalNextConcilation/ModalNextConcilation";
 import { MicrosoftExcelLogo } from "phosphor-react";
 import { invoiceConciliation } from "@/services/concilation/concilation";
-import { dataConcilation, InfoConcilation } from "@/types/concilation/concilation";
+import { InfoConcilation } from "@/types/concilation/concilation";
 import { useAppStore } from "@/lib/store/store";
 import { ModalConcilation } from "@/components/molecules/modals/ModalConcilation/ModalConcilation";
 
@@ -167,11 +167,10 @@ export const PasteConcilationTable = ({
     const file = new File([blob], "conciliacion.csv", { type: "text/csv" });
     try {
       const response = await invoiceConciliation([file], clientId, ID);
-      response && setInvoices && setInvoices(response.data);
+      response && setInvoices && setInvoices(response);
       showModal();
     } catch (error) {
       messageApi.error("Error al realizar la conciliación");
-      console.error("Error:", error);
     }
   };
 

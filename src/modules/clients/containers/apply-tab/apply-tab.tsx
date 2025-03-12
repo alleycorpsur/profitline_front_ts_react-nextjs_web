@@ -27,6 +27,7 @@ import { ModalSelectAjustements } from "./Modals/ModalSelectAjustements/ModalSel
 import ModalListAdjustments from "./Modals/ModalListAdjustments/ModalListAdjustments";
 import ModalCreateAdjustment from "./Modals/ModalCreateAdjustment/ModalCreateAdjustment";
 import ModalEditRow from "./Modals/ModalEditRow/ModalEditRow";
+import ModalCreateAdjustmentByInvoice from "./Modals/ModalCreateAdjustmentByInvoice/ModalCreateAdjustmentByInvoice";
 
 import { IApplyTabRecord } from "@/types/applyTabClients/IApplyTabClients";
 
@@ -400,21 +401,18 @@ const ApplyTab: React.FC = () => {
             mutate();
             setModalAdjustmentsState({
               isOpen: false,
-              modal: 0,
-              adjustmentType: undefined
+              modal: 0
             });
           } else {
             setModalAdjustmentsState({
               isOpen: true,
-              modal: 1,
-              adjustmentType: undefined
+              modal: 1
             });
           }
         }}
         setModalAction={(e: number) => {
-          setModalAdjustmentsState({
-            isOpen: true,
-            modal: e
+          setModalAdjustmentsState((prev) => {
+            return { ...prev, isOpen: true, modal: e };
           });
         }}
         addGlobalAdjustment={handleAdd}
@@ -430,7 +428,24 @@ const ApplyTab: React.FC = () => {
             setModalAdjustmentsState({ isOpen: false, modal: 0 });
             mutate();
           } else {
-            setModalAdjustmentsState({ isOpen: true, modal: 2 });
+            setModalAdjustmentsState((prev) => {
+              return { ...prev, isOpen: true, modal: 2 };
+            });
+          }
+        }}
+      />
+      <ModalCreateAdjustmentByInvoice
+        isOpen={
+          modalAdjustmentsState && modalAdjustmentsState.isOpen && modalAdjustmentsState.modal === 4
+        }
+        onCancel={(created?: Boolean) => {
+          if (created) {
+            setModalAdjustmentsState({ isOpen: false, modal: 0 });
+            mutate();
+          } else {
+            setModalAdjustmentsState((prev) => {
+              return { ...prev, isOpen: true, modal: 2 };
+            });
           }
         }}
       />
