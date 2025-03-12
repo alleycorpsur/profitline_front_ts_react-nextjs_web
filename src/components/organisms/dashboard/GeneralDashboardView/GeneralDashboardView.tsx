@@ -1,54 +1,36 @@
-import { FC, useEffect, useState } from "react";
-
-import { useAppStore } from "@/lib/store/store";
-import GeneralDashboard from "../GeneralDashboard/GeneralDashboard";
-import FilterDiscounts from "@/components/atoms/Filters/FilterDiscounts/FilterDiscounts";
-
-import styles from "./generalDashboardView.module.scss";
-import { getProjectPortfolio } from "@/services/portfolios/portfolios";
-import { IDataSection } from "@/types/portfolios/IPortfolios";
+import { FC, useState } from "react";
 import { Spin } from "antd";
 
-interface GeneralDashboardViewProps {}
+import { useGeneralPortfolio } from "@/hooks/useGeneralPortfolio";
+import GeneralDashboard from "../GeneralDashboard/GeneralDashboard";
+import {
+  FilterClientPortfolio,
+  IClientPortfolioFilters
+} from "@/components/atoms/Filters/FilterClientPortfolio/FilterClientPortfolio";
 
-const GeneralDashboardView: FC<GeneralDashboardViewProps> = () => {
-  const [portfolioData, setPortfolioData] = useState<{
-    loading: boolean;
-    data: IDataSection | undefined;
-  }>({
-    loading: false,
-    data: undefined
+import styles from "./generalDashboardView.module.scss";
+
+const GeneralDashboardView: FC = () => {
+  const [filters, setFilters] = useState<IClientPortfolioFilters>({
+    zones: [],
+    lines: [],
+    sublines: [],
+    channels: [],
+    radicado: false,
+    novedad: false
   });
-  const { ID: projectId } = useAppStore((state) => state.selectedProject);
 
-  const fetchProjectPortfolio = async () => {
-    setPortfolioData({ loading: true, data: undefined });
-    // Call the API to get the data
-    try {
-      const response: IDataSection = await getProjectPortfolio(projectId);
-      setPortfolioData({ loading: false, data: response });
-    } catch (error) {
-      console.warn("error getting project portfolio", error);
-      setPortfolioData({ loading: false, data: undefined });
-    }
-  };
-
-  useEffect(() => {
-    fetchProjectPortfolio();
-  }, [projectId]);
+  const { data, loading } = useGeneralPortfolio(filters);
 
   return (
     <div className={styles.generalDashboardView}>
-      {portfolioData.loading ? (
+      <div>
+        <FilterClientPortfolio setSelectedFilters={setFilters} />
+      </div>
+      {loading ? (
         <Spin size="large" style={{ margin: "70px auto" }} />
       ) : (
-        <>
-          <div>
-            <FilterDiscounts />
-          </div>
-
-          <GeneralDashboard portfolioData={portfolioData} />
-        </>
+        <GeneralDashboard portfolioData={data} />
       )}
     </div>
   );
