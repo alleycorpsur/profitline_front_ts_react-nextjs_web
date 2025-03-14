@@ -5,6 +5,7 @@ import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { CaretLeft, CopySimple, Plus } from "phosphor-react";
 
 import { useAppStore } from "@/lib/store/store";
+import { createGlobalAdjustment } from "@/services/applyTabClients/applyTabClients";
 import { useFinancialDiscountMotives } from "@/hooks/useFinancialDiscountMotives";
 import { useAcountingAdjustment } from "@/hooks/useAcountingAdjustment";
 import { extractSingleParam, toNumberOrZero } from "@/utils/utils";
@@ -125,12 +126,34 @@ const ModalCreateAdjustmentByInvoice: React.FC<ModalCreateAdjustmentByInvoicePro
     }
   }, [isOpen, append, reset]);
 
-  const onSubmit = async () => {
+  const onSubmit = async (data: { adjustments: IAdjustment[] }) => {
     setLoadingCreate(true);
 
     if (processed) {
-      console.info("Apply adjustments");
-      onCancel(true);
+      const totalPerSelectedAdjustment = Object.keys(processedData).map((key) => {
+        if (key === "invoice" || key === "total") return null;
+        return {
+          adjustment: key.split("_").join(" "),
+          amount: processedData[key]
+        };
+      });
+
+      const finalAdjustments = data.adjustments.map((adjustment) => ({
+        motive: parseInt(adjustment?.adjustment?.value || "0"),
+        amount: totalPerSelectedAdjustment.find(
+          (total) => total?.adjustment === adjustment.adjustment?.label
+        )?.amount as number | 0,
+        description: "Adjustment by invoice created in Application Tab"
+      }));
+
+      try {
+        await createGlobalAdjustment(projectId, clientId, finalAdjustments);
+        showMessage("success", "Ajuste(s) creado correctamente");
+        mutate();
+        onCancel(true);
+      } catch (error) {
+        showMessage("error", "Error al crear el ajuste(s)");
+      }
       return setLoadingCreate(false);
     }
 
@@ -150,10 +173,8 @@ const ModalCreateAdjustmentByInvoice: React.FC<ModalCreateAdjustmentByInvoicePro
         });
         return acc;
       }, {});
-      showMessage("success", "Ajuste(s) creado correctamente");
       setProcessedData(proccessedData);
       setProcessed(true);
-      // mutate();
     } catch (error) {
       showMessage("error", "Error al crear el ajuste(s)");
     }
@@ -223,10 +244,11 @@ const ModalCreateAdjustmentByInvoice: React.FC<ModalCreateAdjustmentByInvoicePro
                 </Flex>
               );
             })}
-            <Flex justify="space-between" className="total">
+            {/* TO DO IF API IS CREATED FOR COMPARISON */}
+            {/* <Flex justify="space-between" className="total">
               <p>Pendiente</p>
               <p>$XXX.XXX.XXX</p>
-            </Flex>
+            </Flex> */}
           </div>
         ) : (
           <>
