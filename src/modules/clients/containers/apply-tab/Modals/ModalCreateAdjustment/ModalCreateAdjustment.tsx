@@ -151,7 +151,7 @@ const ModalCreateAdjustment: React.FC<ModalCreateAdjustmentProps> = ({ isOpen, o
           onClick={() => append({ motive: undefined, detail: undefined, amount: undefined })}
         >
           <Plus />
-          Agregar pago
+          Agregar ajuste
         </button>
 
         <div className="modal-footer">
