@@ -15,16 +15,17 @@ export const sendOtp = async (email: string): Promise<ISendOtpResponse> => {
   }
 };
 
-export const validateOtp = async (email: string, otp: string): Promise<IValidateOtpResponse> => {
+export const validateOtp = async (email: string, otp: string, token: string): Promise<IValidateOtpResponse> => {
   try {
     const response: IValidateOtpResponse = await API.post(`${config.API_HOST}/email-otp/validate`, {
       email,
-      otp
+      otp,
+      token
     });
 
     return response;
   } catch (error) {
-    console.warn("error sending otp: ", error);
+    console.warn("error validating otp: ", error);
     return error as any;
   }
 };
