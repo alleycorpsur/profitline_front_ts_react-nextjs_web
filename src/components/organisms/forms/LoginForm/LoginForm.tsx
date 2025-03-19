@@ -78,7 +78,7 @@ export const LoginForm = ({ setResetPassword, token }: LoginFormProps) => {
       });
       return;
     }
-    const isSendedOtp = await sendOtp(email);
+    const isSendedOtp = await sendOtp(email, token);
     if (isSendedOtp.code !== 200) {
       openNotification({
         api: api,
@@ -112,7 +112,6 @@ export const LoginForm = ({ setResetPassword, token }: LoginFormProps) => {
             title: "Error",
             message: "El código OTP ingresado no es válido. Verifica e intenta nuevamente."
           });
-          return;
         }
         await getAuth(
           email.trim(),
