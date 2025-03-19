@@ -35,7 +35,8 @@ export const validateOtp = async (
       `${config.API_HOST}/email-otp/validate`,
       {
         email,
-        otp
+        otp,
+        token
       },
       {
         headers: {
