@@ -1,0 +1,25 @@
+@import "@styles/variables.scss";
+
+.form-grid {
+  display: grid;
+  gap: 20px;
+  width: 100%;
+
+  // Mobile (1 column)
+  grid-template-columns: 1fr;
+
+  // Tablet (2 columns)
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  // Small desktop (3 columns)
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  // Large desktop (4 columns)
+  @media (min-width: 1280px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}

@@ -2,7 +2,6 @@ import IconButton from "@/components/atoms/IconButton/IconButton";
 import { Tag } from "@/components/atoms/Tag/Tag";
 import { Flex } from "antd";
 import { Eye } from "phosphor-react";
-import { getTagColor } from "../utils/utils";
 
 export const columns = ({ handleOpenDrawer, setRequirementIndex }: any) => [
   { title: "Nombre", dataIndex: "name", key: "name" },
@@ -15,26 +14,37 @@ export const columns = ({ handleOpenDrawer, setRequirementIndex }: any) => [
     title: "Fecha cargue",
     dataIndex: "uploadDate",
     key: "uploadDate",
-    render: () => "-"
+    render: (_: string, record: any) => {
+      if (record.uploadedAt) {
+        return record.uploadedAt;
+      }
+      return "-";
+    }
   },
   {
     title: "Vencimiento",
-    dataIndex: "expiryDate",
-    key: "expiryDate",
-    render: () => "-"
+    dataIndex: "validity",
+    key: "validity",
+    render: (_: string, record: any) => {
+      if (record.validity) {
+        return record.validity;
+      }
+      return "-";
+    }
   },
   {
     title: "Estado",
     dataIndex: "status",
     key: "status",
-    render: (status: string) => {
-      const color = getTagColor(status);
-      return (
-        <Flex>
-          <Tag color={color} content={status} style={{ fontSize: 14, fontWeight: 400 }} />
-        </Flex>
-      );
-    }
+    render: (_: string, record: any) => (
+      <Flex>
+        <Tag
+          color={record.statusColor}
+          content={record.statusName}
+          style={{ fontSize: 14, fontWeight: 400 }}
+        />
+      </Flex>
+    )
   },
   {
     title: "",
