@@ -60,12 +60,13 @@ interface Document {
   name: string;
   templateUrl: string | null;
   documentType: string;
-  validity: string | null;
+  description?: string;
+  createdAt: string | null;
+  expiryDate: string | null;
   statusName: string;
   statusColor: string;
   url: string | null;
   requirementId?: number;
-  description?: string;
   approvers?: string[];
   type?: string;
   events?: any[];
@@ -261,12 +262,12 @@ const SupplierForm: React.FC<Props> = ({ userType, clientTypeId }) => {
             type: documents[requirementIndex as number]?.documentType || "document"
           } as IRequirement
         }
-        updateExpirationDate={(expirationDate: string) => {
+        updateExpirationDate={(expiryDate: string) => {
           if (requirementIndex !== null) {
             const updatedDocuments = [...documents];
             updatedDocuments[requirementIndex] = {
               ...updatedDocuments[requirementIndex],
-              validity: expirationDate
+              expiryDate: expiryDate
             };
             setDocuments(updatedDocuments);
           }

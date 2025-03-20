@@ -12,22 +12,22 @@ export const columns = ({ handleOpenDrawer, setRequirementIndex }: any) => [
   },
   {
     title: "Fecha cargue",
-    dataIndex: "uploadDate",
-    key: "uploadDate",
+    dataIndex: "createdAt",
+    key: "createdAt",
     render: (_: string, record: any) => {
-      if (record.uploadedAt) {
-        return record.uploadedAt;
+      if (record.createdAt) {
+        return record.createdAt;
       }
       return "-";
     }
   },
   {
     title: "Vencimiento",
-    dataIndex: "validity",
-    key: "validity",
+    dataIndex: "expiryDate",
+    key: "expiryDate",
     render: (_: string, record: any) => {
-      if (record.validity) {
-        return record.validity;
+      if (record.expiryDate) {
+        return record.expiryDate;
       }
       return "-";
     }

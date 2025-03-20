@@ -84,8 +84,8 @@ const DrawerComponent: React.FC<DrawerProps> = ({
           uploadedBy={requirement?.loadedBy ?? ""}
         />
         <ValiditySection
-          validity={requirement?.validity ?? ""}
-          date={requirement?.uploadedAt ?? ""}
+          validity={requirement?.expiryDate ?? ""}
+          date={requirement?.createdAt ?? ""}
         />
         <ApproversSection approvers={requirement?.approvers ?? []} />
         <hr style={{ borderTop: "1px solid #f7f7f7" }} />
