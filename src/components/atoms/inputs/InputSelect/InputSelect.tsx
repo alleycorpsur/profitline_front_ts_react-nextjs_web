@@ -40,7 +40,11 @@ export const InputSelect = ({
 }: InputSelectProps) => {
   return (
     <Flex vertical className={`selectContainer ${className}`}>
-      {!hiddenTitle && <p className="select-form-title">{titleInput}</p>}
+      {!hiddenTitle && (
+        <Typography.Title className="input-form-title" level={5}>
+          {titleInput}
+        </Typography.Title>
+      )}
       <Controller
         name={nameInput}
         rules={{ required: true, ...validationRules }}
