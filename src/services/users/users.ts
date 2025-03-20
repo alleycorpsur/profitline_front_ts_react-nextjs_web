@@ -42,8 +42,8 @@ export const inviteUser = async (
     const response = await API.post(`/user/invitation/${endpointRole}/email`, modelData);
     return response;
   } catch (error) {
-    console.warn("error inviting user: ", error);
-    return error as any;
+    console.error("error inviting user: ", error);
+    throw error;
   }
 };
 //update

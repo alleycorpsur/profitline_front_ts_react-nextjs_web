@@ -89,7 +89,7 @@ const ModalListAdjustments: React.FC<ModalListAdjustmentsProps> = ({
     if (modalAdjustmentsState.adjustmentType === "global") {
       setModalAction(3);
     } else if (modalAdjustmentsState.adjustmentType === "byInvoice") {
-      console.info("by invoice");
+      setModalAction(4);
     }
   };
 
