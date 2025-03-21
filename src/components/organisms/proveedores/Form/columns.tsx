@@ -3,7 +3,7 @@ import { Tag } from "@/components/atoms/Tag/Tag";
 import { Flex } from "antd";
 import { Eye } from "phosphor-react";
 
-export const columns = ({ handleOpenDrawer, setRequirementIndex }: any) => [
+export const columns = ({ handleOpenDrawer, setDocumentTypeId }: any) => [
   { title: "Nombre", dataIndex: "name", key: "name" },
   {
     title: "Descripción",
@@ -53,7 +53,7 @@ export const columns = ({ handleOpenDrawer, setRequirementIndex }: any) => [
     render: (_: any, record: any, index: number) => (
       <IconButton
         onClick={() => {
-          setRequirementIndex(index);
+          setDocumentTypeId(record.documentTypeId);
           handleOpenDrawer();
         }}
         icon={<Eye size={"1.3rem"} />}

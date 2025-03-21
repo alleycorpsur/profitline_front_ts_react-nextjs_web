@@ -131,9 +131,10 @@ const SupplierForm: React.FC<Props> = ({ userType, clientTypeId }) => {
   const router = useRouter();
   const [formFields, setFormFields] = useState<FormField[]>([]);
   const [documents, setDocuments] = useState<Document[]>([]);
-  const [requirementIndex, setRequirementIndex] = useState<number | null>(null);
+
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [modalGenerateActionVisible, setModalGenerateActionVisible] = useState(false);
+  const [documentTypeId, setDocumentTypeId] = useState<number | null>(null);
 
   const handleOpenDrawer = () => setDrawerVisible(true);
   const handleCloseDrawer = () => setDrawerVisible(false);
@@ -203,7 +204,7 @@ const SupplierForm: React.FC<Props> = ({ userType, clientTypeId }) => {
     }
   };
 
-  const tableColumns = columns({ handleOpenDrawer, setRequirementIndex });
+  const tableColumns = columns({ handleOpenDrawer, setDocumentTypeId });
 
   const getHeaderTitle = () => {
     switch (userType) {
@@ -251,27 +252,10 @@ const SupplierForm: React.FC<Props> = ({ userType, clientTypeId }) => {
         </Flex>
       </Container>
       <DrawerComponent
-        requirementIndex={requirementIndex as number}
-        clientTypeId={2}
         visible={drawerVisible}
         onClose={handleCloseDrawer}
-        requirement={
-          {
-            ...documents[requirementIndex as number],
-            status: documents[requirementIndex as number]?.statusName || "Pendiente",
-            type: documents[requirementIndex as number]?.documentType || "document"
-          } as IRequirement
-        }
-        updateExpirationDate={(expiryDate: string) => {
-          if (requirementIndex !== null) {
-            const updatedDocuments = [...documents];
-            updatedDocuments[requirementIndex] = {
-              ...updatedDocuments[requirementIndex],
-              expiryDate: expiryDate
-            };
-            setDocuments(updatedDocuments);
-          }
-        }}
+        subjectId={supplierId.toString()}
+        documentTypeId={documentTypeId?.toString() ?? ""}
         control={control}
         errors={errors}
       />
